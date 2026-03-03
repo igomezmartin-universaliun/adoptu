@@ -1,6 +1,6 @@
 package com.adoptu.plugins
 
-import com.adoptu.services.auth.SessionUser
+import com.adoptu.auth.SessionUser
 import io.ktor.server.application.*
 import io.ktor.server.sessions.*
 import io.ktor.util.*

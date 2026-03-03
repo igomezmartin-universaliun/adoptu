@@ -11,21 +11,19 @@ import io.ktor.server.netty.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
-import org.slf4j.LoggerFactory
-
-private val logger = LoggerFactory.getLogger("AdoptU")
 
 fun main(args: Array<String>) {
-    val env = System.getenv("ADOPTU_ENV") ?: "prod"
-    logger.info("Starting Adopt-U application in $env environment")
     EngineMain.main(args)
 }
 
 fun Application.module() {
     val config = environment.config
+    val configModule = module {
+        single { config }
+    }
     install(Koin) {
         slf4jLogger()
-        modules(appModule(config))
+        modules(appModule, configModule)
     }
     DatabaseFactory.init(config)
     configureSerialization()

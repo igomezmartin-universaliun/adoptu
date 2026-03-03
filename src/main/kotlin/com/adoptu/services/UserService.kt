@@ -1,64 +1,45 @@
 package com.adoptu.services
 
-import com.adoptu.dto.input.AcceptTermsRequest
-import com.adoptu.dto.input.UserDto
-import com.adoptu.dto.input.UserRole
-import com.adoptu.ports.UserRepositoryPort
+import com.adoptu.dto.AcceptTermsRequest
+import com.adoptu.dto.UserDto
+import com.adoptu.dto.UserRole
+import com.adoptu.models.Users
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 
-class UserService(
-    private val userRepository: UserRepositoryPort
-) {
-    fun getById(userId: Int): UserDto? = userRepository.getById(userId)
-    
-    fun getByEmail(email: String): UserDto? = userRepository.getByEmail(email)
-    
-    fun getAllUsers(): List<UserDto> = userRepository.getAllUsers()
-    
-    fun getRescuers(): List<UserDto> = userRepository.getRescuers()
-    
-    fun banUser(userId: Int, reason: String? = null): Boolean = userRepository.banUser(userId, reason)
-    
-    fun unbanUser(userId: Int): Boolean = userRepository.unbanUser(userId)
-    
-    fun isBanned(userId: Int): Boolean = userRepository.isBanned(userId)
-    
-    fun isRoleActive(userId: Int, role: UserRole): Boolean =
-        userRepository.isRoleActive(userId, role)
-    
-    fun activateRescuerProfile(userId: Int): UserDto? = userRepository.activateRescuerProfile(userId)
-    
-    fun deactivateRescuerProfile(userId: Int): UserDto? = userRepository.deactivateRescuerProfile(userId)
-    
-    fun activateTemporalHomeProfile(userId: Int): UserDto? = userRepository.activateTemporalHomeProfile(userId)
-    
-    fun deactivateTemporalHomeProfile(userId: Int): UserDto? = userRepository.deactivateTemporalHomeProfile(userId)
-    
-    fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto? = 
-        userRepository.updateProfile(userId, displayName, language)
-    
-    fun updateLanguage(userId: Int, language: String): UserDto? = userRepository.updateLanguage(userId, language)
-    
-    fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? = userRepository.acceptTerms(userId, request)
-    
-    fun isUserVerified(userId: Int): Boolean = userRepository.isEmailVerified(userId)
-    
-    fun verifyToken(token: String): Boolean {
-        val userId = userRepository.verifyToken(token) ?: return false
-        val updated = userRepository.setEmailVerified(userId, true)
-        if (updated) {
-            userRepository.deleteVerificationTokens(userId)
-        }
-        return updated
+object UserService {
+
+    fun getById(userId: Int): UserDto? = transaction {
+        Users.selectAll()
+            .where { Users.id eq userId }
+            .firstOrNull()
+            ?.let { user ->
+                UserDto(
+                    id = user[Users.id],
+                    username = user[Users.username],
+                    displayName = user[Users.displayName],
+                    email = user[Users.email],
+                    role = UserRole.valueOf(user[Users.role]),
+                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions]
+                )
+            }
     }
 
-    fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
-        val userId = userRepository.verifyToken(token) ?: return false to "en"
-        val user = userRepository.getById(userId)
-        val language = user?.language ?: "en"
-        val updated = userRepository.setEmailVerified(userId, true)
-        if (updated) {
-            userRepository.deleteVerificationTokens(userId)
+    fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? {
+        val now = System.currentTimeMillis()
+        transaction {
+            Users.update({ Users.id eq userId }) {
+                if (request.acceptPrivacyPolicy) {
+                    it[Users.lastAcceptedPrivacyPolicy] = now
+                }
+                if (request.acceptTermsAndConditions) {
+                    it[Users.lastAcceptedTermsAndConditions] = now
+                }
+            }
         }
-        return updated to language
+        return getById(userId)
     }
 }

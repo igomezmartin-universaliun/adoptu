@@ -1,6 +1,6 @@
 package com.adoptu.mocks
 
-import com.adoptu.ports.ImageStoragePort
+import com.adoptu.domains.image.ImageStoragePort
 import java.io.InputStream
 
 class MockImageStorage : ImageStoragePort {
@@ -13,7 +13,7 @@ class MockImageStorage : ImageStoragePort {
 
     override suspend fun uploadImage(petId: Int, imageName: String, contentType: String, inputStream: InputStream): String {
         if (shouldFail) {
-            throw RuntimeException("Failed to upload storage")
+            throw RuntimeException("Failed to upload image")
         }
         storedImages[imageName] = inputStream.readBytes()
         return "https://mock-storage.example.com/$imageName"
@@ -21,7 +21,7 @@ class MockImageStorage : ImageStoragePort {
 
     override suspend fun deleteImage(imageUrl: String): Boolean {
         if (shouldFail) {
-            throw RuntimeException("Failed to delete storage")
+            throw RuntimeException("Failed to delete image")
         }
         val key = imageUrl.substringAfterLast("/")
         storedImages.remove(key)

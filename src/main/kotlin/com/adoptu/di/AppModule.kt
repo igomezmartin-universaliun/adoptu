@@ -1,47 +1,26 @@
 package com.adoptu.di
 
-import com.adoptu.adapters.db.repositories.*
-import com.adoptu.adapters.notification.SesEmailAdapter
-import com.adoptu.adapters.storage.S3ImageStorageAdapter
-import com.adoptu.ports.*
-import com.adoptu.services.*
-import com.adoptu.services.auth.WebAuthnService
-import com.adoptu.services.validation.*
+import com.adoptu.adapters.image.S3ImageStorageAdapter
+import com.adoptu.auth.WebAuthnService
+import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.repositories.PetRepository
+import com.adoptu.services.EmailService
+import com.adoptu.services.PetService
+import com.adoptu.services.UserService
 import io.ktor.server.config.*
 import org.koin.dsl.module
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
-fun appModule(config: ApplicationConfig) = module {
-    single<Clock> { Clock.System }
-    single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com") }
-    single<PetRepositoryPort> { PetRepositoryImpl(get()) }
-    single<UserRepositoryPort> { UserRepository(get()) }
-    single<PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get(), get()) }
-    single<TemporalHomeRepositoryPort> { TemporalHomeRepositoryImpl(get(), get(), get()) }
-    single<ShelterRepositoryPort> { ShelterRepository(get()) }
-    single<SterilizationLocationRepositoryPort> { SterilizationLocationRepository(get()) }
-    single<ImageStoragePort> { createImageStorageAdapter(config) }
-    single<NotificationPort> { SesEmailAdapter(get()) }
-    single<PhotographerService> { PhotographerService(get(), get(), get(), get()) }
-    single<UserService> { UserService(get()) }
-    single<PetService> { PetService(get(), get(), get(), get()) }
-    single<TemporalHomeService> { TemporalHomeService(get(), get(), get(), get()) }
-    single { ShelterService(get()) }
-    single { SterilizationLocationService(get()) }
-    single { EmailVerificationService(get(), get(), get()) }
-    single { UsersValidationService() }
-    single { PetsValidationService() }
-    single { PhotographersValidationService() }
-    single { SheltersValidationService() }
-    single { SterilizationLocationsValidationService() }
-    single { TemporalHomesValidationService() }
-    single { AuthValidationService() }
+val appModule = module {
+    single { WebAuthnService }
+    single { PetRepository }
+    single { UserService }
+    single { EmailService(get()) }
+    single<PetService> { PetService(get(), get(), get()) }
+    single<ImageStoragePort> { createImageStorageAdapter(get()) }
 }
 
-internal fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {
-    val env = config.propertyOrNull("env")?.getString() ?: "prod"
+private fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {
+    val env = config.propertyOrNull("db.env")?.getString() ?: "prod"
     val prefix = "storage.$env"
 
     val bucketName = config.property("$prefix.bucket").getString()
