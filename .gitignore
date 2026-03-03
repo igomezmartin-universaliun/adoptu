@@ -1,0 +1,50 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.kotlin/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Build
+*.jar
+*.war
+*.class
+
+# Test results
+/test-results/
+/reports/
+
+# Kotlin
+*.class
+*.log
+*.ktds
+
+# Distributions
+build/distributions/*.zip
+build/distributions/*.tar
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
