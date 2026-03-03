@@ -1,6 +1,7 @@
 package com.adoptu.services
 
 import com.adoptu.mocks.MockEmailService
+import io.ktor.server.config.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -124,5 +125,141 @@ class EmailServiceTest {
         val sentEmail = mockEmailService.getSentEmails().first()
         assertContains(sentEmail.body, "Luna")
         assertContains(sentEmail.body, "Alice")
+    }
+}
+
+class RealEmailServiceTest {
+
+    @Test
+    fun `EmailService returns false when not configured`() = runBlocking {
+        val config = MapApplicationConfig()
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `EmailService returns false when only host is configured`() = runBlocking {
+        val config = MapApplicationConfig(
+            "email.host" to "smtp.example.com"
+        )
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `EmailService returns false when only host and username are configured`() = runBlocking {
+        val config = MapApplicationConfig(
+            "email.host" to "smtp.example.com",
+            "email.username" to "user"
+        )
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `EmailService uses default from address when not configured`() = runBlocking {
+        val config = MapApplicationConfig(
+            "email.host" to "smtp.example.com",
+            "email.username" to "user",
+            "email.password" to "pass"
+        )
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `EmailService uses configured from address`() = runBlocking {
+        val config = MapApplicationConfig(
+            "email.host" to "smtp.example.com",
+            "email.username" to "user",
+            "email.password" to "pass",
+            "email.from" to "custom@adopt-u.com"
+        )
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `EmailService uses configured port`() = runBlocking {
+        val config = MapApplicationConfig(
+            "email.host" to "smtp.example.com",
+            "email.username" to "user",
+            "email.password" to "pass",
+            "email.port" to "465"
+        )
+        val emailService = EmailService(config)
+
+        val result = emailService.sendEmail(
+            to = "test@example.com",
+            subject = "Test",
+            body = "Test body"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendAdoptionRequestNotification returns false when not configured`() = runBlocking {
+        val config = MapApplicationConfig()
+        val emailService = EmailService(config)
+
+        val result = emailService.sendAdoptionRequestNotification(
+            rescuerEmail = "rescuer@example.com",
+            petName = "Buddy",
+            adopterName = "John",
+            message = "Hello"
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendAdoptionRequestNotification returns false with blank inputs when not configured`() = runBlocking {
+        val config = MapApplicationConfig()
+        val emailService = EmailService(config)
+
+        val result = emailService.sendAdoptionRequestNotification(
+            rescuerEmail = "",
+            petName = "",
+            adopterName = "",
+            message = null
+        )
+
+        assertFalse(result)
     }
 }

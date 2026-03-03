@@ -309,7 +309,7 @@ form {
     gap: 1rem;
     margin: 1rem 0;
     padding: 1rem;
-    background: #f8f9fa;
+    background: var(--secondary);
     border-radius: 8px;
 }
 
@@ -320,7 +320,7 @@ form {
 .detail-section {
     margin: 1rem 0;
     padding: 1rem;
-    background: #f8f9fa;
+    background: var(--card-bg);
     border-radius: 8px;
 }
 
@@ -381,7 +381,7 @@ form {
 .image-management {
     margin: 1.5rem 0;
     padding: 1rem;
-    background: #f8f9fa;
+    background: var(--secondary);
     border-radius: 8px;
     
     h3 {
