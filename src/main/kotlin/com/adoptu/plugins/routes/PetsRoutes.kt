@@ -1,7 +1,6 @@
 package com.adoptu.plugins.routes
 
 import com.adoptu.auth.SessionUser
-import com.adoptu.domains.image.ImageStoragePort
 import com.adoptu.dto.CreateAdoptionRequestRequest
 import com.adoptu.dto.CreatePetRequest
 import com.adoptu.dto.UpdatePetRequest
@@ -11,15 +10,16 @@ import com.adoptu.plugins.respondError
 import com.adoptu.services.PetService
 import com.adoptu.services.ServiceResult
 import io.ktor.http.content.*
+import io.ktor.utils.io.ByteReadChannel
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.coroutines.runBlocking
 import org.koin.ktor.ext.inject
 
 fun Route.petsRoutes() {
     val petService by inject<PetService>()
-    val imageStorage by inject<ImageStoragePort>()
 
     route("/api/pets") {
         get {
@@ -74,17 +74,33 @@ fun Route.petsRoutes() {
                 ?: return@post call.respondError("Unauthorized", 401)
             val petId = call.parameters["id"]?.toIntOrNull() ?: return@post call.respondError("Invalid ID")
 
+            val imageIdsParam = call.request.queryParameters["imageIds"]
+            if (imageIdsParam != null) {
+                try {
+                    val imageIds = imageIdsParam.split(",").mapNotNull { it.toIntOrNull() }
+                    when (val result = runBlocking { petService.updatePetImages(petId, session.userId, session.role, imageIds) }) {
+                        is ServiceResult.Success -> call.respond(mapOf("images" to result.data))
+                        is ServiceResult.NotFound -> call.respondError("Not found", 404)
+                        is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+                    }
+                } catch (e: Exception) {
+                    call.respondError("Failed to update images. Please try again later.", 500)
+                }
+                return@post
+            }
+
             val multipart = call.receiveMultipart()
-            var imageUrl: String? = null
+            var imageData: ByteArray? = null
+            var fileName = "image"
+            var contentType = "image/jpeg"
             var isPrimary = false
 
             multipart.forEachPart { part ->
                 when (part) {
                     is PartData.FileItem -> {
-                        val fileName: String = part.originalFileName as? String ?: "image"
-                        val contentType: String = part.contentType?.toString() ?: "image/jpeg"
-                        val inputStream = part.streamProvider()
-                        imageUrl = imageStorage.uploadImage(petId, fileName, contentType, inputStream)
+                        fileName = part.originalFileName ?: "image"
+                        contentType = part.contentType?.toString() ?: "image/jpeg"
+                        imageData = part.streamProvider().readBytes()
                     }
                     is PartData.FormItem -> {
                         if (part.name == "isPrimary") {
@@ -95,14 +111,26 @@ fun Route.petsRoutes() {
                 }
             }
 
-            if (imageUrl == null) {
+            if (imageData == null) {
                 return@post call.respondError("No image provided")
             }
 
-            when (val result = petService.addImage(petId, session.userId, session.role, imageUrl!!, isPrimary)) {
-                is ServiceResult.Success -> call.respond(result.data)
-                is ServiceResult.NotFound -> call.respondError("Not found", 404)
-                is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+            try {
+                when (val result = runBlocking { petService.uploadAndAddImage(
+                    petId = petId,
+                    userId = session.userId,
+                    userRole = session.role,
+                    imageName = fileName,
+                    contentType = contentType,
+                    imageData = imageData,
+                    isPrimary = isPrimary
+                ) }) {
+                    is ServiceResult.Success -> call.respond(result.data)
+                    is ServiceResult.NotFound -> call.respondError("Not found", 404)
+                    is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+                }
+            } catch (e: Exception) {
+                call.respondError("Failed to upload image. Please try again later.", 500)
             }
         }
 
@@ -112,10 +140,14 @@ fun Route.petsRoutes() {
             val petId = call.parameters["petId"]?.toIntOrNull() ?: return@delete call.respondError("Invalid pet ID")
             val imageId = call.parameters["imageId"]?.toIntOrNull() ?: return@delete call.respondError("Invalid image ID")
 
-            when (val result = petService.removeImage(petId, imageId, session.userId, session.role)) {
-                is ServiceResult.Success -> call.respond(SuccessResponse(success = true))
-                is ServiceResult.NotFound -> call.respondError("Not found", 404)
-                is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+            try {
+                when (val result = runBlocking { petService.removeImage(petId, imageId, session.userId, session.role) }) {
+                    is ServiceResult.Success -> call.respond(SuccessResponse(success = true))
+                    is ServiceResult.NotFound -> call.respondError("Not found", 404)
+                    is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+                }
+            } catch (e: Exception) {
+                call.respondError("Failed to delete image. Please try again later.", 500)
             }
         }
 
@@ -125,10 +157,14 @@ fun Route.petsRoutes() {
             val petId = call.parameters["petId"]?.toIntOrNull() ?: return@put call.respondError("Invalid pet ID")
             val imageId = call.parameters["imageId"]?.toIntOrNull() ?: return@put call.respondError("Invalid image ID")
 
-            when (val result = petService.setPrimaryImage(petId, imageId, session.userId, session.role)) {
-                is ServiceResult.Success -> call.respond(SuccessResponse(success = true))
-                is ServiceResult.NotFound -> call.respondError("Not found", 404)
-                is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+            try {
+                when (val result = petService.setPrimaryImage(petId, imageId, session.userId, session.role)) {
+                    is ServiceResult.Success -> call.respond(SuccessResponse(success = true))
+                    is ServiceResult.NotFound -> call.respondError("Not found", 404)
+                    is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
+                }
+            } catch (e: Exception) {
+                call.respondError("Failed to set primary image. Please try again later.", 500)
             }
         }
 

@@ -30,6 +30,7 @@ fun HTML.indexPage() {
                 a("/pets") { classes = setOf("btn"); attributes["data-i18n"] = "browsePets"; +"Browse Pets" }
             }
         }
+        footer()
         script(src = "/static/js/api.js") {}
         script(src = "/static/js/i18n.js") {}
         script { unsafe { raw("""

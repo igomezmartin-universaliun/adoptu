@@ -5,6 +5,7 @@ import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 
 object DatabaseFactory {
     val listOfTables = listOf(
@@ -28,7 +29,7 @@ object DatabaseFactory {
             SchemaUtils.create(*listOfTables.toTypedArray())
             SchemaUtils.addMissingColumnsStatements(*listOfTables.toTypedArray())
                 .forEach { exec(it)}
+            MigrationUtils.dropUnmappedColumnsStatements(*listOfTables.toTypedArray())
         }
     }
-
 }

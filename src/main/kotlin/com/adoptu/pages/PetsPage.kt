@@ -35,6 +35,7 @@ fun HTML.petsPage() {
             }
             div { id = "pets"; classes = setOf("pet-grid"); +"" }
         }
+        footer()
         commonScripts()
         script { unsafe { raw("""
 const emoji = { DOG: '🐕', CAT: '🐱', BIRD: '🐦', FISH: '🐟' };
@@ -49,7 +50,7 @@ async function loadPets() {
         const imageHtml = primaryImage 
             ? '<img src="'+primaryImage.imageUrl+'" alt="'+p.name+'">' 
             : '<div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div>';
-        return '<a href="/pet/'+p.id+'" class="pet-card">'+imageHtml+'<div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3><p class="pet-info"><span class="pet-age"><span class="label">'+t('age')+'</span><span class="value">'+(p.breed ? p.breed + ' • ' : '')+p.ageYears+t('years')+' '+p.ageMonths+t('months')+'</span></span><span class="pet-rescue-date">'+(p.rescueDate ? '<span class="label">'+t('rescued')+'</span><span class="value">'+new Date(p.rescueDate).toLocaleDateString()+'</span>' : '')+'</span></p><p>'+p.status+'</p></div></a>';
+        return '<a href="/pet/'+p.id+'" class="pet-card">'+imageHtml+'<div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age"><span class="label">'+t('age')+'</span><span class="value">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+'</span></span><span class="pet-rescue-date">'+(p.rescueDate ? '<span class="label">'+t('rescued')+'</span><span class="value">'+new Date(p.rescueDate).toLocaleDateString()+'</span>' : '')+'</span></p><p>'+p.status+'</p></div></a>';
     }).join('') : '<p>'+t('noPetsFound')+'</p>';
 }
 document.querySelectorAll('.filter-btn').forEach(btn => {

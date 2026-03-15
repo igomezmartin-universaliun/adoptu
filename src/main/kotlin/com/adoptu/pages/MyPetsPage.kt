@@ -68,14 +68,27 @@ fun HTML.myPetsPage() {
                     label { htmlFor = "rescueLocation"; attributes["data-i18n"] = "rescueLocation"; +"Rescue Location" }; input(InputType.text) { id = "rescueLocation" }
                     label { htmlFor = "rescueDate"; attributes["data-i18n"] = "rescueDate"; +"Rescue Date" }; input(InputType.date) { id = "rescueDate" }
                     label { htmlFor = "specialNeeds"; attributes["data-i18n"] = "specialNeeds"; +"Special Needs" }; textArea { id = "specialNeeds" }
-                    label { htmlFor = "adoptionFee"; attributes["data-i18n"] = "adoptionFee"; +"Adoption Fee ($)" }; input(InputType.number) { id = "adoptionFee"; step = "0.01"; value = "0" }
+                    label { htmlFor = "adoptionFee"; attributes["data-i18n"] = "adoptionFee"; +"Adoption Fee" }; 
+                    div(classes = "fee-input-group") { style = "display: flex; gap: 0.5rem;"
+                        input(InputType.number) { id = "adoptionFee"; step = "0.01"; value = "0"; style = "flex: 3;"; this.min = "0" }
+                        select { id = "currency"; style = "flex: 1;"
+                            option { value = "USD"; +"$ USD" }
+                            option { value = "EUR"; +"€ EUR" }
+                            option { value = "GBP"; +"£ GBP" }
+                            option { value = "CAD"; +"$ CAD" }
+                            option { value = "AUD"; +"$ AUD" }
+                        }
+                    }
                     div { classes = setOf("checkbox-group")
                         input(InputType.checkBox) { id = "isUrgent" }; label { htmlFor = "isUrgent"; attributes["data-i18n"] = "urgentAdoption"; +"Urgent adoption needed" }
                     }
-                    label { attributes["data-i18n"] = "photos"; +"Photos" }
-                    div(classes = "image-upload-form") {
-                        input(InputType.file) { id = "pet-images"; accept = "image/*"; multiple = true }
+                    label { attributes["data-i18n"] = "photos"; +"Photos (max 12)" }
+                    div(classes = "image-dropzone") {
+                        id = "image-dropzone"
+                        div { classes = setOf("dropzone-content"); +"Drop images here or click to browse" }
+                        input(InputType.file) { id = "pet-images"; accept = "image/*"; multiple = true; classes = setOf("file-input") }
                     }
+                    div { id = "image-previews"; classes = setOf("image-previews") }
                     div(classes = "form-actions") {
                         button(classes = "btn", type = ButtonType.submit) { attributes["data-i18n"] = "save"; +"Save" }
                         button(classes = "btn btn-secondary", type = ButtonType.button) { id = "cancel-btn"; attributes["data-i18n"] = "cancel"; +"Cancel" }
@@ -85,18 +98,34 @@ fun HTML.myPetsPage() {
             button(classes = "btn") { id = "add-btn"; attributes["data-i18n"] = "addPet"; +"Add Pet" }
             div { id = "pets"; classes = setOf("pet-grid"); style = "margin-top: 2rem;"; +"" }
         }
+        footer()
+        style { unsafe { raw("""
+            .image-dropzone { border: 2px dashed #ccc; border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.3s; }
+            .image-dropzone:hover, .image-dropzone.dragover { border-color: #4a90d9; background: #f8f9fa; }
+            .image-dropzone .file-input { display: none; }
+            .dropzone-content { color: #666; }
+            .image-previews { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+            .preview-item { position: relative; width: 80px; height: 80px; border-radius: 4px; overflow: hidden; }
+            .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+            .preview-item.primary { border: 3px solid #4a90d9; }
+            .preview-item .primary-badge { position: absolute; top: 2px; left: 2px; background: #4a90d9; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+            .preview-item .primary-btn { position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 1; opacity: 0; transition: opacity 0.2s; }
+            .preview-item:hover .primary-btn { opacity: 1; }
+            .preview-item button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 1; }
+        """) } }
         commonScripts()
         script { unsafe { raw("""
 const emoji = { DOG: '🐕', CAT: '🐱', BIRD: '🐦', FISH: '🐟' };
 const params = new URLSearchParams(location.search);
 let user;
+let existingImages = [];
 async function load() {
     user = await api.me();
     if (user.authenticated === false || !['RESCUER','ADMIN'].includes(user.role)) { location.href = '/'; return; }
     let pets = await api.getPets(params.get('filter'));
     if (user.role !== 'ADMIN') pets = pets.filter(p => p.rescuerId === user.id);
     const container = document.getElementById('pets');
-    container.innerHTML = pets.length ? pets.map(p => '<div class="pet-card"><div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div><div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3><p class="pet-info"><span class="pet-age">'+p.breed+' • '+p.ageYears+t('years')+' '+p.ageMonths+t('months')+' • '+p.weight+' kg</span><span class="pet-rescue-date">'+(p.rescueDate ? ' '+t('rescued')+': '+new Date(p.rescueDate).toLocaleDateString() : '')+'</span></p><p>'+p.status+'</p><div class="pet-card-actions"><a href="/pet/'+p.id+'" class="btn">'+t('viewDetails')+'</a><button class="btn btn-secondary" onclick="edit('+p.id+')">'+t('edit')+'</button><button class="btn btn-secondary" onclick="del('+p.id+')">'+t('delete')+'</button></div></div></div>').join('') : '<p>'+t('noPets')+'</p>';
+    container.innerHTML = pets.length ? pets.map(p => '<div class="pet-card"><div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div><div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+' • '+p.weight+' kg</span><span class="pet-rescue-date">'+(p.rescueDate ? ' '+t('rescued')+': '+new Date(p.rescueDate).toLocaleDateString() : '')+'</span></p><p>'+p.status+'</p><div class="pet-card-actions"><a href="/pet/'+p.id+'" class="btn">'+t('viewDetails')+'</a><button class="btn btn-secondary" onclick="edit('+p.id+')">'+t('edit')+'</button><button class="btn btn-secondary" onclick="del('+p.id+')">'+t('delete')+'</button></div></div></div>').join('') : '<p>'+t('noPets')+'</p>';
     const editId = params.get('edit');
     if (editId) { 
     const pet = await api.getPet(editId); 
@@ -133,17 +162,82 @@ function fillForm(pet) {
     }
     document.getElementById('specialNeeds').value = pet.specialNeeds || '';
     document.getElementById('adoptionFee').value = pet.adoptionFee || 0;
+    document.getElementById('currency').value = pet.currency || 'USD';
     document.getElementById('isUrgent').checked = pet.isUrgent || false;
+    
+    existingImages = pet.images || [];
+    updatePreviews();
 }
 window.edit = async (id) => { const pet = await api.getPet(id); fillForm(pet); document.getElementById('form-title').textContent = 'Edit Pet'; document.getElementById('form-container').style.display = 'block'; };
 window.del = async (id) => { if (!confirm('Delete this pet?')) return; await api.deletePet(id); load(); };
-document.getElementById('add-btn').onclick = () => { document.getElementById('pet-form').reset(); document.getElementById('pet-id').value = ''; document.getElementById('form-title').textContent = 'Add Pet'; document.getElementById('form-container').style.display = 'block'; };
+document.getElementById('add-btn').onclick = () => { document.getElementById('pet-form').reset(); document.getElementById('pet-id').value = ''; document.getElementById('currency').value = 'USD'; selectedFiles = []; existingImages = []; updatePreviews(); document.getElementById('form-title').textContent = 'Add Pet'; document.getElementById('form-container').style.display = 'block'; };
 document.getElementById('cancel-btn').onclick = () => { document.getElementById('form-container').style.display = 'none'; history.replaceState({}, '', '/my-pets'); };
 ['weight', 'ageYears', 'ageMonths'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', () => { if (parseFloat(el.value) < 0) el.value = 0; });
     el.addEventListener('blur', () => { if (parseFloat(el.value) < 0) el.value = 0; if (id === 'ageMonths' && parseInt(el.value) > 11) el.value = 11; });
 });
+['adoptionFee'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => { if (parseFloat(el.value) < 0) el.value = 0; });
+    el.addEventListener('blur', () => { if (parseFloat(el.value) < 0) el.value = 0; });
+});
+const dropzone = document.getElementById('image-dropzone');
+const fileInput = document.getElementById('pet-images');
+const previewContainer = document.getElementById('image-previews');
+let selectedFiles = [];
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+function handleFiles(files) {
+    const remaining = 12 - selectedFiles.length;
+    if (remaining <= 0) { alert('Maximum 12 photos allowed'); return; }
+    const filesToAdd = Array.from(files).slice(0, remaining);
+    selectedFiles = [...selectedFiles, ...filesToAdd];
+    updatePreviews();
+    const dataTransfer = new DataTransfer();
+    selectedFiles.forEach(f => dataTransfer.items.add(f));
+    fileInput.files = dataTransfer.files;
+}
+function updatePreviews() {
+    const existingHtml = existingImages.map((img, index) => 
+        '<div class="preview-item'+(img.isPrimary ? ' primary' : '')+'"><img src="'+img.imageUrl+'">'+(img.isPrimary ? '<span class="primary-badge">★</span>' : '<button type="button" class="primary-btn" onclick="setPrimaryImage('+index+')" title="Set as primary">☆</button>')+'<button type="button" onclick="removeExistingImage('+index+')">×</button></div>'
+    ).join('');
+    const newFilesHtml = selectedFiles.map((file, index) => 
+        '<div class="preview-item"><img src="'+URL.createObjectURL(file)+'"><button type="button" onclick="removePreview('+index+')">×</button></div>'
+    ).join('');
+    previewContainer.innerHTML = existingHtml + newFilesHtml;
+}
+window.setPrimaryImage = async (index) => {
+    const img = existingImages[index];
+    const petId = document.getElementById('pet-id').value;
+    try {
+        await api.setPrimaryImage(petId, img.id);
+        existingImages.forEach((img, i) => img.isPrimary = (i === index));
+        updatePreviews();
+    } catch (err) {
+        alert('Failed to set primary image: ' + err.message);
+    }
+};
+window.removeExistingImage = async (index) => { 
+    const img = existingImages[index];
+    const petId = document.getElementById('pet-id').value;
+    if (!confirm('Delete this image?')) return;
+    try {
+        await api.removeImage(petId, img.id);
+        existingImages.splice(index, 1);
+        updatePreviews();
+    } catch (err) {
+        alert('Failed to delete image: ' + err.message);
+    }
+};
+window.removePreview = (index) => { selectedFiles.splice(index, 1); updatePreviews(); const dataTransfer = new DataTransfer(); selectedFiles.forEach(f => dataTransfer.items.add(f)); fileInput.files = dataTransfer.files; };
 document.getElementById('pet-form').onsubmit = async (e) => {
     e.preventDefault(); 
     const msg = document.getElementById('message'); 
@@ -152,9 +246,11 @@ document.getElementById('pet-form').onsubmit = async (e) => {
     const weight = parseFloat(document.getElementById('weight').value) || 0;
     const ageYears = parseInt(document.getElementById('ageYears').value) || 0;
     const ageMonths = parseInt(document.getElementById('ageMonths').value) || 0;
+    const adoptionFee = parseFloat(document.getElementById('adoptionFee').value) || 0;
     if (weight < 0) { msg.className = 'message error'; msg.textContent = 'Weight must be zero or positive'; return; }
     if (ageYears < 0) { msg.className = 'message error'; msg.textContent = 'Age (years) must be zero or positive'; return; }
     if (ageMonths < 0 || ageMonths > 11) { msg.className = 'message error'; msg.textContent = 'Age (months) must be between 0 and 11'; return; }
+    if (adoptionFee < 0) { msg.className = 'message error'; msg.textContent = 'Adoption fee must be zero or positive'; return; }
     const data = {
         name: document.getElementById('name').value,
         type: document.getElementById('type').value,
@@ -180,6 +276,7 @@ document.getElementById('pet-form').onsubmit = async (e) => {
         rescueDate: rescueDateVal ? new Date(rescueDateVal).getTime() : null,
         specialNeeds: document.getElementById('specialNeeds').value || null,
         adoptionFee: parseFloat(document.getElementById('adoptionFee').value) || 0,
+        currency: document.getElementById('currency').value,
         isUrgent: document.getElementById('isUrgent').checked
     }; 
     try { 
@@ -191,7 +288,7 @@ document.getElementById('pet-form').onsubmit = async (e) => {
             petId = pet.id;
         }
         
-        const imageFiles = document.getElementById('pet-images').files;
+        const imageFiles = selectedFiles;
         if (imageFiles.length > 0) {
             for (let i = 0; i < imageFiles.length; i++) {
                 await api.addImage(petId, imageFiles[i], i === 0);

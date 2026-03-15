@@ -20,7 +20,7 @@ val appModule = module {
 }
 
 private fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {
-    val env = config.propertyOrNull("db.env")?.getString() ?: "prod"
+    val env = config.propertyOrNull("env")?.getString() ?: "prod"
     val prefix = "storage.$env"
 
     val bucketName = config.property("$prefix.bucket").getString()

@@ -6,7 +6,9 @@ import com.adoptu.pages.loginPage
 import com.adoptu.pages.myPetsPage
 import com.adoptu.pages.petDetailPage
 import com.adoptu.pages.petsPage
+import com.adoptu.pages.privacyPage
 import com.adoptu.pages.registerPage
+import com.adoptu.pages.termsPage
 import io.ktor.http.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
@@ -27,4 +29,6 @@ fun Route.uiRoutes() {
     }
     get("/my-pets") { call.respondHtml(HttpStatusCode.OK) { myPetsPage() } }
     get("/admin") { call.respondHtml(HttpStatusCode.OK) { adminPage() } }
+    get("/privacy") { call.respondHtml(HttpStatusCode.OK) { privacyPage() } }
+    get("/terms") { call.respondHtml(HttpStatusCode.OK) { termsPage() } }
 }

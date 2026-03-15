@@ -22,6 +22,7 @@ class PetService(
         require(request.ageYears >= 0) { "Age (years) must be zero or positive" }
         require(request.ageMonths >= 0) { "Age (months) must be zero or positive" }
         require(request.ageMonths < 12) { "Age (months) must be less than 12" }
+        require(request.adoptionFee >= 0) { "Adoption fee must be zero or positive" }
         return petRepository.create(
             rescuerId = rescuerId,
             name = request.name,
@@ -48,6 +49,7 @@ class PetService(
             rescueLocation = request.rescueLocation,
             specialNeeds = request.specialNeeds,
             adoptionFee = request.adoptionFee,
+            currency = request.currency,
             isUrgent = request.isUrgent
         )
     }
@@ -57,6 +59,7 @@ class PetService(
         body.ageYears?.let { require(it >= 0) { "Age (years) must be zero or positive" } }
         body.ageMonths?.let { require(it >= 0) { "Age (months) must be zero or positive" } }
         body.ageMonths?.let { require(it < 12) { "Age (months) must be less than 12" } }
+        body.adoptionFee?.let { require(it >= 0) { "Adoption fee must be zero or positive" } }
         val existing = petRepository.getById(id) ?: return ServiceResult.NotFound
         if (userRole != UserRole.ADMIN && existing.rescuerId != userId) {
             return ServiceResult.Forbidden
@@ -83,6 +86,28 @@ class PetService(
         return ServiceResult.Success(image)
     }
 
+    suspend fun uploadAndAddImage(
+        petId: Int,
+        userId: Int,
+        userRole: UserRole,
+        imageName: String,
+        contentType: String,
+        imageData: ByteArray,
+        isPrimary: Boolean
+    ): ServiceResult<PetImageDto> {
+        val existing = petRepository.getById(petId) ?: return ServiceResult.NotFound
+        if (userRole != UserRole.ADMIN && existing.rescuerId != userId) {
+            return ServiceResult.Forbidden
+        }
+
+        val format = if (contentType.contains("png")) "png" else "jpg"
+        val compressedStream = ImageCompressor.compress(imageData.inputStream(), format)
+        val imageUrl = imageStorage.uploadImage(petId, imageName, contentType, compressedStream.toByteArray().inputStream())
+
+        val image = petRepository.addImage(petId, imageUrl, isPrimary)
+        return ServiceResult.Success(image)
+    }
+
     suspend fun removeImage(petId: Int, imageId: Int, userId: Int, userRole: UserRole): ServiceResult<Unit> {
         val existing = petRepository.getById(petId) ?: return ServiceResult.NotFound
         if (userRole != UserRole.ADMIN && existing.rescuerId != userId) {
@@ -93,6 +118,29 @@ class PetService(
         imageStorage.deleteImage(image.imageUrl)
         petRepository.removeImage(petId, imageId)
         return ServiceResult.Success(Unit)
+    }
+
+    suspend fun updatePetImages(petId: Int, userId: Int, userRole: UserRole, imageIds: List<Int>): ServiceResult<List<PetImageDto>> {
+        val existing = petRepository.getById(petId) ?: return ServiceResult.NotFound
+        if (userRole != UserRole.ADMIN && existing.rescuerId != userId) {
+            return ServiceResult.Forbidden
+        }
+
+        val existingImages = petRepository.getImages(petId)
+        val existingImageIds = existingImages.map { it.id }.toSet()
+        val incomingImageIds = imageIds.toSet()
+        val imageIdsToDelete = existingImageIds - incomingImageIds
+
+        imageIdsToDelete.forEach { imageId ->
+            val image = existingImages.find { it.id == imageId }
+            if (image != null) {
+                imageStorage.deleteImage(image.imageUrl)
+                petRepository.removeImage(petId, imageId)
+            }
+        }
+
+        val remainingImages = petRepository.getImages(petId)
+        return ServiceResult.Success(remainingImages)
     }
 
     fun setPrimaryImage(petId: Int, imageId: Int, userId: Int, userRole: UserRole): ServiceResult<Unit> {

@@ -2,6 +2,7 @@ package com.adoptu.plugins.routes
 
 import com.adoptu.dto.Gender
 import com.adoptu.dto.Status
+import com.adoptu.dto.Currency
 import com.adoptu.models.Users
 import com.adoptu.repositories.PetRepository
 import com.adoptu.mocks.TestDatabase
@@ -239,6 +240,7 @@ class UIRoutesDataTest {
             rescueLocation = "City Shelter",
             specialNeeds = "None",
             adoptionFee = 250.0,
+            currency = Currency.USD,
             isUrgent = false,
             status = "AVAILABLE"
         )
@@ -268,6 +270,7 @@ class UIRoutesDataTest {
         assertEquals("City Shelter", pet.rescueLocation)
         assertEquals("None", pet.specialNeeds)
         assertEquals(250.0, pet.adoptionFee)
+        assertEquals(Currency.USD, pet.currency)
         assertFalse(pet.isUrgent)
         assertEquals(Status.AVAILABLE, pet.status)
     }

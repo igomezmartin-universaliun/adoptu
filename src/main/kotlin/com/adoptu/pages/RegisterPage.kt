@@ -31,6 +31,7 @@ fun HTML.registerPage() {
                 p { style = "margin-top: 1rem;"; attributes["data-i18n"] = "alreadyHaveAccount"; +"Already have an account? "; a("/login") { attributes["data-i18n"] = "login"; +"Login" } }
             }
         }
+        footer()
         commonScripts()
         script(src = "/static/js/webauthn.js") {}
         script { unsafe { raw("""

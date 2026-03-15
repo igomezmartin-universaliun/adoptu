@@ -56,6 +56,7 @@ object Pets : Table("pets") {
     val rescueLocation = varchar("rescue_location", 255).nullable()
     val specialNeeds = text("special_needs").nullable()
     val adoptionFee = decimal("adoption_fee", 10, 2).default(BigDecimal.ZERO)
+    val currency = varchar("currency", 10).default("USD")
     val isUrgent = bool("is_urgent").default(false)
     val createdAt = long("created_at")
 

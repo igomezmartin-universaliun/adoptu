@@ -21,6 +21,7 @@ fun HTML.loginPage() {
                 p { style = "margin-top: 1rem;"; small { attributes["data-i18n"] = "usesFido"; +"Uses FIDO2 / WebAuthn for secure passwordless authentication." } }
             }
         }
+        footer()
         commonScripts()
         script(src = "/static/js/webauthn.js") {}
         script { unsafe { raw("""

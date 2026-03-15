@@ -1,15 +1,20 @@
 package com.adoptu.adapters.image
 
 import com.adoptu.domains.image.ImageStoragePort
+import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.util.*
+import java.util.UUID
+import software.amazon.awssdk.core.sync.RequestBody
 
 class S3ImageStorageAdapter(
     private val bucketName: String,
@@ -19,6 +24,7 @@ class S3ImageStorageAdapter(
     private val endpoint: String?,
     private val pathStyleAccess: Boolean = false
 ) : ImageStoragePort {
+    private val log = LoggerFactory.getLogger(S3ImageStorageAdapter::class.java)
 
     private val s3Client: S3Client by lazy {
         val builder = S3Client.builder()
@@ -39,8 +45,13 @@ class S3ImageStorageAdapter(
         builder.forcePathStyle(pathStyleAccess).build()
     }
 
-    override suspend fun uploadImage(petId: Int, imageName: String, contentType: String, inputStream: InputStream): String {
-        val key = "pets/$petId/${UUID.randomUUID()}-$imageName"
+    override suspend fun uploadImage(
+        petId: Int,
+        imageName: String,
+        contentType: String,
+        inputStream: InputStream
+    ): String {
+            val key = "pets/$petId/${UUID.randomUUID()}-$imageName"
 
         val request = PutObjectRequest.builder()
             .bucket(bucketName)
@@ -48,9 +59,41 @@ class S3ImageStorageAdapter(
             .contentType(contentType)
             .build()
 
-        s3Client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromInputStream(inputStream, -1))
+        return uploadImage(request, inputStream, contentType, petId, key)
+    }
+
+    private fun uploadImage(
+        request: PutObjectRequest?,
+        inputStream: InputStream,
+        contentType: String,
+        petId: Int,
+        key: String,
+    ): String {
+        val bytes = inputStream.readAllBytes()
+        try {
+            s3Client.putObject(request, RequestBody.fromBytes(bytes))
+        } catch (e: NoSuchBucketException) {
+            log.info("Creating bucket: {}", bucketName)
+            createBucket()
+            return uploadImage(request, ByteArrayInputStream(bytes), contentType, petId, key)
+        } catch (e: Exception) {
+            log.error("Error uploading image to S3: {}", e.message, e)
+            throw RuntimeException("Failed to upload image: ${e.message}", e)
+        }
 
         return getImageUrl(petId, key)
+    }
+
+    private fun createBucket() {
+        val createBucketRequest = CreateBucketRequest.builder()
+            .bucket(bucketName)
+            .build()
+        try {
+            s3Client.createBucket(createBucketRequest)
+        } catch (e: Exception) {
+            log.error("Error creating S3 bucket: {}", e.message, e)
+            throw RuntimeException("Failed to create S3 bucket: ${e.message}", e)
+        }
     }
 
     override suspend fun deleteImage(imageUrl: String): Boolean {
@@ -63,7 +106,8 @@ class S3ImageStorageAdapter(
             s3Client.deleteObject(request)
             true
         } catch (e: Exception) {
-            false
+            log.error("Error deleting image from S3: {}", e.message, e)
+            throw RuntimeException("Failed to delete image: ${e.message}", e)
         }
     }
 

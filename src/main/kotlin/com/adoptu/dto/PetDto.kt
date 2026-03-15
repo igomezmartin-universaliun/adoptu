@@ -6,6 +6,10 @@ enum class Gender {
     MALE, FEMALE
 }
 
+enum class Currency {
+    USD, EUR, GBP, CAD, AUD
+}
+
 enum class Status {
     AVAILABLE, ADOPTED, DISABLED
 }
@@ -39,6 +43,7 @@ data class PetDto(
     val rescueLocation: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double = 0.0,
+    val currency: Currency = Currency.USD,
     val isUrgent: Boolean = false,
     val createdAt: Long,
     val images: List<PetImageDto> = emptyList()
@@ -78,6 +83,7 @@ data class CreatePetRequest(
     val rescueLocation: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double = 0.0,
+    val currency: Currency = Currency.USD,
     val isUrgent: Boolean = false
 )
 
@@ -108,6 +114,7 @@ data class UpdatePetRequest(
     val rescueLocation: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double? = null,
+    val currency: Currency? = null,
     val isUrgent: Boolean? = null
 )
 

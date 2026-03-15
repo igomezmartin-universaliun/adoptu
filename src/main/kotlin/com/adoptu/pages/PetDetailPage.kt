@@ -21,6 +21,7 @@ fun HTML.petDetailPage() {
             div { id = "pet-detail"; classes = setOf("pet-detail"); +"" }
             div { id = "message"; +"" }
         }
+        footer()
         commonScripts()
         script { unsafe { raw("""
 const emoji = { DOG: '🐕', CAT: '🐱', BIRD: '🐦', FISH: '🐟' };
@@ -58,11 +59,6 @@ async function load() {
     if (isOwner) {
         details += '<div class="image-management">';
         details += '<h3>Photos</h3>';
-        details += '<div class="image-upload-form">';
-        details += '<input type="file" id="new-image" accept="image/*">';
-        details += '<label><input type="checkbox" id="set-primary"> Set as primary photo</label>';
-        details += '<button class="btn" id="upload-btn">Upload Photo</button>';
-        details += '</div>';
         details += '<div class="pet-images-grid" id="pet-images">' + renderImages() + '</div>';
         details += '</div>';
     }
@@ -92,42 +88,21 @@ async function load() {
     if (currentPet.vaccinations) details += '<div class="detail-section"><strong>Vaccinations:</strong><p>'+currentPet.vaccinations+'</p></div>';
     if (currentPet.rescueLocation) details += '<div class="detail-section"><strong>Rescue Location:</strong> '+currentPet.rescueLocation+'</div>';
     if (currentPet.specialNeeds) details += '<div class="detail-section"><strong>Special Needs:</strong><p>'+currentPet.specialNeeds+'</p></div>';
-    if (currentPet.adoptionFee > 0) details += '<div class="detail-section"><strong>Adoption Fee:</strong> $'+currentPet.adoptionFee+'</div>';
+    const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$' };
+    if (currentPet.adoptionFee > 0) details += '<div class="detail-section"><strong>Adoption Fee:</strong> '+(currencySymbols[currentPet.currency] || '$')+currentPet.adoptionFee+' '+currentPet.currency+'</div>';
     if (currentPet.isUrgent) details += '<div class="urgent-badge">URGENT - Needs home soon!</div>';
     
     details += adoptForm + editBtn + '</div>';
     
     container.innerHTML = details;
     
-    if (isOwner) {
-        document.getElementById('upload-btn').onclick = async () => {
-            const fileInput = document.getElementById('new-image');
-            const setPrimary = document.getElementById('set-primary').checked;
-            const msgEl = document.getElementById('image-msg');
-            if (!fileInput.files[0]) return;
-            try {
-                await api.addImage(currentPet.id, fileInput.files[0], setPrimary);
-                currentPet = await api.getPet(currentPet.id);
-                document.getElementById('pet-images').innerHTML = renderImages();
-                fileInput.value = '';
-                document.getElementById('image-msg').className = 'message success';
-                document.getElementById('image-msg').textContent = 'Image uploaded!';
-            } catch (err) {
-                document.getElementById('image-msg').className = 'message error';
-                document.getElementById('image-msg').textContent = err.message;
-            }
-        };
-    }
-    
     const form = document.getElementById('adopt-form');
     if (form) form.onsubmit = async (e) => { e.preventDefault(); if (!user.id) { location.href = '/login'; return; } try { await api.adoptPet(id, document.getElementById('msg').value); document.getElementById('message').className = 'message success'; document.getElementById('message').textContent = 'Adoption request submitted!'; form.style.display = 'none'; } catch (err) { document.getElementById('message').className = 'message error'; document.getElementById('message').textContent = err.message; } };
 }
 function renderImages() {
     if (!currentPet.images || currentPet.images.length === 0) return '<p>No photos yet.</p>';
-    return currentPet.images.map(img => '<div class="pet-image-item'+(img.isPrimary ? ' primary' : '')+'"><img src="'+img.imageUrl+'" alt="Pet photo"><div class="pet-image-actions">'+(img.isPrimary ? '<span class="primary-badge">Primary</span>' : '<button class="btn btn-small" onclick="setPrimary('+img.id+')">Set Primary</button>')+'<button class="btn btn-small btn-danger" onclick="removeImage('+img.id+')">Remove</button></div></div>').join('');
+    return currentPet.images.map(img => '<div class="pet-image-item'+(img.isPrimary ? ' primary' : '')+'"><img src="'+img.imageUrl+'" alt="Pet photo">'+(img.isPrimary ? '<span class="primary-badge">Primary</span>' : '')+'</div>').join('');
 }
-window.setPrimary = async (imageId) => { await api.setPrimaryImage(currentPet.id, imageId); currentPet = await api.getPet(currentPet.id); document.getElementById('pet-images').innerHTML = renderImages(); };
-window.removeImage = async (imageId) => { if (!confirm('Remove this photo?')) return; await api.removeImage(currentPet.id, imageId); currentPet = await api.getPet(currentPet.id); document.getElementById('pet-images').innerHTML = renderImages(); };
 load().catch(() => location.href = '/pets');
 (async () => { try { const u = await api.me(); if (u.authenticated !== false) { document.getElementById('login-link').style.display = 'none'; document.getElementById('register-link').style.display = 'none'; if (u.role === 'RESCUER' || u.role === 'ADMIN') document.getElementById('my-pets-link').style.display = 'inline'; document.getElementById('logout-link').style.display = 'inline'; if (u.role === 'ADMIN') document.getElementById('admin-link').style.display = 'inline'; document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); }; } } catch (e) {} })();
 """.trimIndent()) } }

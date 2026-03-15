@@ -4,6 +4,7 @@ import com.adoptu.dto.*
 import com.adoptu.models.AdoptionRequests
 import com.adoptu.models.PetImages
 import com.adoptu.models.Pets
+import com.adoptu.dto.Currency
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -44,6 +45,7 @@ object PetRepository {
             rescueLocation = row[Pets.rescueLocation],
             specialNeeds = row[Pets.specialNeeds],
             adoptionFee = row[Pets.adoptionFee].toDouble(),
+            currency = Currency.valueOf(row[Pets.currency]),
             isUrgent = row[Pets.isUrgent],
             createdAt = row[Pets.createdAt],
             images = images
@@ -107,6 +109,7 @@ object PetRepository {
         rescueLocation: String? = null,
         specialNeeds: String? = null,
         adoptionFee: Double = 0.0,
+        currency: Currency = Currency.USD,
         isUrgent: Boolean = false,
         status: String = "AVAILABLE"
     ): PetDto = transaction {
@@ -137,6 +140,7 @@ object PetRepository {
             it[Pets.rescueLocation] = rescueLocation
             it[Pets.specialNeeds] = specialNeeds
             it[Pets.adoptionFee] = BigDecimal(adoptionFee.toString())
+            it[Pets.currency] = currency.name
             it[Pets.isUrgent] = isUrgent
             it[Pets.createdAt] = System.currentTimeMillis()
         } get Pets.id
@@ -171,6 +175,7 @@ object PetRepository {
             body.rescueLocation?.let { l -> it[Pets.rescueLocation] = l }
             body.specialNeeds?.let { s -> it[Pets.specialNeeds] = s }
             body.adoptionFee?.let { f -> it[Pets.adoptionFee] = BigDecimal(f.toString()) }
+            body.currency?.let { c -> it[Pets.currency] = c.name }
             body.isUrgent?.let { u -> it[Pets.isUrgent] = u }
         }
         getById(id)
@@ -223,7 +228,7 @@ object PetRepository {
         } get PetImages.id
 
         PetImageDto(
-            id = id!!,
+            id = id,
             imageUrl = imageUrl,
             isPrimary = isPrimary,
             sortOrder = if (sortOrder > 0) sortOrder else maxOrder + 1

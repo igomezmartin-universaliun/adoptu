@@ -29,8 +29,6 @@ class PagesIntegrationTest {
         "db.prod.postgres.password" to "",
         "storage.dev.bucket" to "test-bucket",
         "storage.dev.region" to "us-east-1",
-        "storage.dev.access_key_id" to "test",
-        "storage.dev.secret_access_key" to "test",
         "storage.dev.endpoint" to "http://localhost:4566",
         "storage.dev.path_style_access" to "true",
         "email.from" to "test@test.com"

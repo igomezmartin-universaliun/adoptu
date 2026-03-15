@@ -1,0 +1,31 @@
+version: 1.0
+env:
+  variables:
+    ADOPTU_ENV: prod
+  secrets-manager:
+    ADOPTU_DB_URL: arn:aws:secretsmanager:region:account:secret:adoptu/db-url
+    ADOPTU_DB_USER: arn:aws:secretsmanager:region:account:secret:adoptu/db-user
+    ADOPTU_DB_PASSWORD: arn:aws:secretsmanager:region:account:secret:adoptu/db-password
+    ADOPTU_S3_BUCKET: arn:aws:secretsmanager:region:account:secret:adoptu/s3-bucket
+    ADOPTU_S3_REGION: arn:aws:secretsmanager:region:account:secret:adoptu/s3-region
+    ADOPTU_S3_ENDPOINT: arn:aws:secretsmanager:region:account:secret:adoptu/s3-endpoint
+    SMTP_HOST: arn:aws:secretsmanager:region:account:secret:adoptu/smtp-host
+    SMTP_PORT: arn:aws:secretsmanager:region:account:secret:adoptu/smtp-port
+    SMTP_USERNAME: arn:aws:secretsmanager:region:account:secret:adoptu/smtp-username
+    SMTP_PASSWORD: arn:aws:secretsmanager:region:account:secret:adoptu/smtp-password
+    SMTP_FROM: arn:aws:secretsmanager:region:account:secret:adoptu/smtp-from
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+  build:
+    commands:
+      - docker build -t adoptu-app .
+  post_build:
+    commands:
+      - echo Build completed
+
+artifacts:
+  files:
+    - '*/**'
