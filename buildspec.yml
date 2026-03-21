@@ -2,6 +2,7 @@ version: 1.0
 env:
   variables:
     ADOPTU_ENV: prod
+    ADOPTU_ADMIN_USERNAME: admin
   secrets-manager:
     ADOPTU_DB_URL: arn:aws:secretsmanager:region:account:secret:adoptu/db-url
     ADOPTU_DB_USER: arn:aws:secretsmanager:region:account:secret:adoptu/db-user

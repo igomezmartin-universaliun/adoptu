@@ -7,13 +7,27 @@ object Users : Table("users") {
     val id = integer("id").autoIncrement()
     val username = varchar("username", 255).uniqueIndex()
     val displayName = varchar("display_name", 255)
-    val email = varchar("email", 255).nullable()
-    val role = varchar("role", 50) // ADMIN, RESCUER, ADOPTER
+    val language = varchar("language", 10).default("en")
     val createdAt = long("created_at")
     val lastAcceptedPrivacyPolicy = long("last_accepted_privacy_policy").nullable()
     val lastAcceptedTermsAndConditions = long("last_accepted_terms_and_conditions").nullable()
 
     override val primaryKey = PrimaryKey(id)
+}
+
+object Photographers : Table("photographers") {
+    val userId = integer("user_id").references(Users.id)
+    val photographerFee = decimal("photographer_fee", 10, 2).nullable()
+    val photographerCurrency = varchar("photographer_currency", 10).nullable()
+
+    override val primaryKey = PrimaryKey(userId)
+}
+
+object UserActiveRoles : Table("user_active_roles") {
+    val userId = integer("user_id").references(Users.id)
+    val role = varchar("role", 50)
+
+    override val primaryKey = PrimaryKey(userId, role)
 }
 
 object WebAuthnCredentials : Table("webauthn_credentials") {
@@ -58,6 +72,7 @@ object Pets : Table("pets") {
     val adoptionFee = decimal("adoption_fee", 10, 2).default(BigDecimal.ZERO)
     val currency = varchar("currency", 10).default("USD")
     val isUrgent = bool("is_urgent").default(false)
+    val isPromoted = bool("is_promoted").default(false)
     val createdAt = long("created_at")
 
     override val primaryKey = PrimaryKey(id)
@@ -79,6 +94,53 @@ object AdoptionRequests : Table("adoption_requests") {
     val adopterId = integer("adopter_id").references(Users.id)
     val message = text("message")
     val status = varchar("status", 50) // PENDING, APPROVED, REJECTED
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PhotographyRequests : Table("photography_requests") {
+    val id = integer("id").autoIncrement()
+    val photographerId = integer("photographer_id").references(Users.id)
+    val requesterId = integer("requester_id").references(Users.id)
+    val petId = integer("pet_id").references(Pets.id).nullable()
+    val message = text("message").nullable()
+    val status = varchar("status", 50) // PENDING, APPROVED, REJECTED, COMPLETED, CANCELLED
+    val scheduledDate = long("scheduled_date").nullable()
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object TemporalHomes : Table("temporal_homes") {
+    val userId = integer("user_id").references(Users.id)
+    val alias = varchar("alias", 255)
+    val country = varchar("country", 100)
+    val state = varchar("state", 100).nullable()
+    val city = varchar("city", 100)
+    val zip = varchar("zip", 20).nullable()
+    val neighborhood = varchar("neighborhood", 100).nullable()
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(userId)
+}
+
+object BlockedRescuers : Table("blocked_rescuers") {
+    val id = integer("id").autoIncrement()
+    val temporalHomeId = integer("temporal_home_id").references(Users.id)
+    val rescuerId = integer("rescuer_id").references(Users.id)
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object TemporalHomeRequests : Table("temporal_home_requests") {
+    val id = integer("id").autoIncrement()
+    val temporalHomeId = integer("temporal_home_id").references(Users.id)
+    val rescuerId = integer("rescuer_id").references(Users.id)
+    val petId = integer("pet_id").references(Pets.id).nullable()
+    val message = text("message")
+    val status = varchar("status", 50) // SENT, READ
     val createdAt = long("created_at")
 
     override val primaryKey = PrimaryKey(id)

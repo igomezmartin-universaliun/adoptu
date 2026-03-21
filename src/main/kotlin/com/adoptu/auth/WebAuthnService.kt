@@ -1,6 +1,7 @@
 package com.adoptu.auth
 
 import com.adoptu.models.Users
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.models.WebAuthnCredentials
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.AttestedCredentialDataConverter
@@ -69,7 +70,6 @@ object WebAuthnService {
         val id: Int,
         val username: String,
         val displayName: String,
-        val email: String? = null,
         val role: String
     )
 
@@ -82,9 +82,9 @@ object WebAuthnService {
     private fun base64UrlEncode(bytes: ByteArray): String =
         Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
 
-    fun generateRegistrationOptions(username: String, displayName: String): RegistrationOptionsResponse {
+    fun generateRegistrationOptions(email: String, displayName: String): RegistrationOptionsResponse {
         val challenge = ByteArray(32).also { secureRandom.nextBytes(it) }
-        ChallengeStore.store(username, challenge)
+        ChallengeStore.store(email, challenge)
 
         val userId = ByteArray(32).also { secureRandom.nextBytes(it) }
 
@@ -92,7 +92,7 @@ object WebAuthnService {
             rp = RelyingParty(id = RP_ID, name = RP_NAME),
             user = PublicKeyUser(
                 id = base64UrlEncode(userId),
-                name = username,
+                name = email,
                 displayName = displayName
             ),
             challenge = base64UrlEncode(challenge),
@@ -104,13 +104,14 @@ object WebAuthnService {
     }
 
     fun verifyAndRegister(
-        username: String,
+        email: String,
         displayName: String,
         role: String,
+        roles: List<String> = listOf(role),
         registrationResponseJson: String
     ): Int? {
-        val storedChallenge = ChallengeStore.retrieve(username) ?: return null
-        ChallengeStore.remove(username)
+        val storedChallenge = ChallengeStore.retrieve(email) ?: return null
+        ChallengeStore.remove(email)
 
         val serverProperty = ServerProperty.builder()
             .origin(Origin(ORIGIN))
@@ -129,20 +130,41 @@ object WebAuthnService {
             val acdBytes = attestedCredentialDataConverter.convert(attestedCredentialData)
 
             transaction {
-                val userId = Users.insert {
-                    it[Users.username] = username
-                    it[Users.displayName] = displayName
-                    it[Users.role] = role
-                    it[Users.createdAt] = System.currentTimeMillis()
-                } get Users.id
+                val existingUser = Users.selectAll().where { Users.username eq email }.firstOrNull()
 
-                WebAuthnCredentials.insert {
-                    it[WebAuthnCredentials.userId] = userId
-                    it[WebAuthnCredentials.credentialId] = base64UrlEncode(attestedCredentialData.credentialId)
-                    it[WebAuthnCredentials.attestedCredentialDataBase64] = Base64.getEncoder().encodeToString(acdBytes)
-                    it[WebAuthnCredentials.signCount] = registrationData.attestationObject!!.authenticatorData.signCount
-                    it[WebAuthnCredentials.transports] = null
-                    it[WebAuthnCredentials.createdAt] = System.currentTimeMillis()
+                val userId = if (existingUser != null) {
+                    existingUser[Users.id]
+                } else {
+                    Users.insert {
+                        it[Users.username] = email
+                        it[Users.displayName] = displayName
+                        it[Users.createdAt] = System.currentTimeMillis()
+                    } get Users.id
+                }
+
+                val existingCredential = WebAuthnCredentials
+                    .selectAll()
+                    .where { WebAuthnCredentials.userId eq userId }
+                    .firstOrNull()
+
+                if (existingCredential == null) {
+                    WebAuthnCredentials.insert {
+                        it[WebAuthnCredentials.userId] = userId
+                        it[WebAuthnCredentials.credentialId] = base64UrlEncode(attestedCredentialData.credentialId)
+                        it[WebAuthnCredentials.attestedCredentialDataBase64] = Base64.getEncoder().encodeToString(acdBytes)
+                        it[WebAuthnCredentials.signCount] = registrationData.attestationObject!!.authenticatorData.signCount
+                        it[WebAuthnCredentials.transports] = null
+                        it[WebAuthnCredentials.createdAt] = System.currentTimeMillis()
+                    }
+                }
+
+                if (existingUser == null) {
+                    roles.forEach { roleName ->
+                        UserActiveRoles.insert {
+                            it[UserActiveRoles.userId] = userId
+                            it[UserActiveRoles.role] = roleName
+                        }
+                    }
                 }
 
                 userId
@@ -221,13 +243,20 @@ object WebAuthnService {
                 Users.selectAll().where { Users.id eq userId }.firstOrNull()
             } ?: return null
 
+            val primaryRole = transaction {
+                val roles = UserActiveRoles.selectAll()
+                    .where { UserActiveRoles.userId eq userId }
+                    .map { it[UserActiveRoles.role] }
+                if (roles.contains("ADMIN")) "ADMIN" else roles.firstOrNull() ?: "ADOPTER"
+            }
+
             AuthResult(
                 userId = userId,
                 user = AuthenticatedUser(
                     id = user[Users.id],
                     username = user[Users.username],
                     displayName = user[Users.displayName],
-                    role = user[Users.role]
+                    role = primaryRole
                 )
             )
         } catch (e: Exception) {

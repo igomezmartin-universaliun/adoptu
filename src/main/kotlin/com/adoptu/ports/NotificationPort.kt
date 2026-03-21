@@ -1,0 +1,28 @@
+package com.adoptu.ports
+
+interface NotificationPort {
+    suspend fun sendEmail(to: String, subject: String, body: String): Boolean
+    suspend fun sendPhotographerRequest(
+        photographerEmail: String,
+        photographerName: String,
+        requesterName: String,
+        petName: String?,
+        message: String,
+        fee: Double?,
+        currency: String?
+    ): Boolean
+    suspend fun sendAdoptionRequestNotification(
+        rescuerEmail: String,
+        petName: String,
+        adopterName: String,
+        message: String?
+    ): Boolean
+    suspend fun sendTemporalHomeRequest(
+        temporalHomeEmail: String,
+        temporalHomeAlias: String,
+        rescuerName: String,
+        petName: String?,
+        message: String,
+        spamReportLink: String
+    ): Boolean
+}

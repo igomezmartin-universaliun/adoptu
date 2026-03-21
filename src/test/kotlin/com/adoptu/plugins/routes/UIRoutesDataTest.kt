@@ -4,6 +4,7 @@ import com.adoptu.dto.Gender
 import com.adoptu.dto.Status
 import com.adoptu.dto.Currency
 import com.adoptu.models.Users
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.repositories.PetRepository
 import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -22,33 +23,39 @@ class UIRoutesDataTest {
             try {
                 Users.insert {
                     it[Users.id] = 1
-                    it[Users.username] = "rescuer1"
+                    it[Users.username] = "rescuer1@mocks.com"
                     it[Users.displayName] = "Rescuer One"
-                    it[Users.email] = "rescuer1@mocks.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                }
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = 1
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) { }
             
             try {
                 Users.insert {
                     it[Users.id] = 2
-                    it[Users.username] = "rescuer2"
+                    it[Users.username] = "rescuer2@mocks.com"
                     it[Users.displayName] = "Rescuer Two"
-                    it[Users.email] = "rescuer2@mocks.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                }
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = 2
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) { }
             
             try {
-                Users.insert {
+                val adminId = Users.insert {
                     it[Users.id] = 3
-                    it[Users.username] = "admin"
+                    it[Users.username] = "admin@mocks.com"
                     it[Users.displayName] = "Admin"
-                    it[Users.email] = "admin@mocks.com"
-                    it[Users.role] = "ADMIN"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adminId
+                    it[UserActiveRoles.role] = "ADMIN"
                 }
             } catch (e: Exception) { }
         }

@@ -5,8 +5,9 @@ import com.adoptu.dto.Gender
 import com.adoptu.dto.UpdatePetRequest
 import com.adoptu.dto.UserRole
 import com.adoptu.models.Users
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.repositories.PetRepository
-import com.adoptu.mocks.MockEmailService
+import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -23,7 +24,7 @@ class PetServiceTest {
 
     private lateinit var petService: PetService
     private lateinit var mockImageStorage: MockImageStorage
-    private lateinit var mockEmailService: MockEmailService
+    private lateinit var mockNotificationAdapter: MockNotificationAdapter
 
     @BeforeEach
     fun setup() {
@@ -34,11 +35,13 @@ class PetServiceTest {
             try {
                 Users.insert {
                     it[Users.id] = 1
-                    it[Users.username] = "testuser"
+                    it[Users.username] = "mocks@mocks.com"
                     it[Users.displayName] = "Test User"
-                    it[Users.email] = "mocks@mocks.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                }
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = 1
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) {
                 // User already exists, ignore
@@ -53,8 +56,8 @@ class PetServiceTest {
         }
         
         mockImageStorage = MockImageStorage()
-        mockEmailService = MockEmailService()
-        petService = PetService(PetRepository, mockImageStorage, mockEmailService)
+        mockNotificationAdapter = MockNotificationAdapter()
+        petService = PetService(PetRepository, mockImageStorage, mockNotificationAdapter)
     }
 
     @Test

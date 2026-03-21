@@ -1,11 +1,14 @@
 package com.adoptu.di
 
-import com.adoptu.adapters.image.S3ImageStorageAdapter
+import com.adoptu.adapters.storage.S3ImageStorageAdapter
+import com.adoptu.adapters.notification.SnsNotificationAdapter
 import com.adoptu.auth.WebAuthnService
-import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.ports.ImageStoragePort
+import com.adoptu.ports.NotificationPort
 import com.adoptu.repositories.PetRepository
-import com.adoptu.services.EmailService
 import com.adoptu.services.PetService
+import com.adoptu.services.PhotographerService
+import com.adoptu.services.TemporalHomeService
 import com.adoptu.services.UserService
 import io.ktor.server.config.*
 import org.koin.dsl.module
@@ -14,9 +17,13 @@ val appModule = module {
     single { WebAuthnService }
     single { PetRepository }
     single { UserService }
-    single { EmailService(get()) }
-    single<PetService> { PetService(get(), get(), get()) }
     single<ImageStoragePort> { createImageStorageAdapter(get()) }
+    single<NotificationPort> { SnsNotificationAdapter(get()) }
+    single<PetService> { PetService(get(), get(), get()) }
+    single { PhotographerService }
+    single { PhotographerService.apply { setNotificationAdapter(get()) } }
+    single { TemporalHomeService }
+    single { TemporalHomeService.apply { setNotificationAdapter(get()) } }
 }
 
 private fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {

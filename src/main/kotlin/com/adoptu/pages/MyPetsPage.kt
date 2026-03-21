@@ -6,27 +6,26 @@ fun HTML.myPetsPage() {
     commonHead("My Pets - Adopt-U")
     body {
         header {
-            a("/") { classes = setOf("logo"); +"Adopt-U" }
-            nav {
-                a("/pets") { attributes["data-i18n"] = "browsePets"; +"Browse Pets" }
-                a("/my-pets") { attributes["data-i18n"] = "myPets"; +"My Pets" }
-                a("#") { id = "logout-link"; attributes["data-i18n"] = "logout"; +"Logout" }
-                languageDropdown()
-            }
+            a("/") { commonLogo() }
+            nav { commonNav() }
         }
         main {
             h1 { attributes["data-i18n"] = "myPets"; +"My Pets" }
             div { id = "message"; +"" }
+            div { id = "adoption-requests-section"; style = "margin-bottom: 2rem;"
+                h2 { attributes["data-i18n"] = "adoptionRequests"; +"Adoption Requests" }
+                div { id = "adoption-requests"; +"" }
+            }
             div { id = "form-container"; style = "display:none"
                 h2 { id = "form-title"; attributes["data-i18n"] = "addPet"; +"Add Pet" }
                 form { id = "pet-form"
                     input(InputType.hidden) { id = "pet-id" }
                     label { htmlFor = "name"; attributes["data-i18n"] = "name"; +"Name *" }; input(InputType.text) { id = "name"; required = true }
                     label { htmlFor = "type"; attributes["data-i18n"] = "type"; +"Type *" }; select { id = "type"; required = true
-                        option { value = "DOG"; +"Dog" }
-                        option { value = "CAT"; +"Cat" }
-                        option { value = "BIRD"; +"Bird" }
-                        option { value = "FISH"; +"Fish" }
+                        option { value = "DOG"; attributes["data-i18n"] = "dog"; +"Dog" }
+                        option { value = "CAT"; attributes["data-i18n"] = "cat"; +"Cat" }
+                        option { value = "BIRD"; attributes["data-i18n"] = "bird"; +"Bird" }
+                        option { value = "FISH"; attributes["data-i18n"] = "fish"; +"Fish" }
                     }
                     label { htmlFor = "breed"; attributes["data-i18n"] = "breed"; +"Breed" }; input(InputType.text) { id = "breed" }
                     label { htmlFor = "description"; attributes["data-i18n"] = "description"; +"Description" }; textArea { id = "description" }
@@ -83,12 +82,12 @@ fun HTML.myPetsPage() {
                         input(InputType.checkBox) { id = "isUrgent" }; label { htmlFor = "isUrgent"; attributes["data-i18n"] = "urgentAdoption"; +"Urgent adoption needed" }
                     }
                     label { attributes["data-i18n"] = "photos"; +"Photos (max 12)" }
-                    div(classes = "image-dropzone") {
-                        id = "image-dropzone"
+                    div(classes = "storage-dropzone") {
+                        id = "storage-dropzone"
                         div { classes = setOf("dropzone-content"); +"Drop images here or click to browse" }
-                        input(InputType.file) { id = "pet-images"; accept = "image/*"; multiple = true; classes = setOf("file-input") }
+                        input(InputType.file) { id = "pet-images"; accept = "storage/*"; multiple = true; classes = setOf("file-input") }
                     }
-                    div { id = "image-previews"; classes = setOf("image-previews") }
+                    div { id = "storage-previews"; classes = setOf("storage-previews") }
                     div(classes = "form-actions") {
                         button(classes = "btn", type = ButtonType.submit) { attributes["data-i18n"] = "save"; +"Save" }
                         button(classes = "btn btn-secondary", type = ButtonType.button) { id = "cancel-btn"; attributes["data-i18n"] = "cancel"; +"Cancel" }
@@ -100,11 +99,11 @@ fun HTML.myPetsPage() {
         }
         footer()
         style { unsafe { raw("""
-            .image-dropzone { border: 2px dashed #ccc; border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.3s; }
-            .image-dropzone:hover, .image-dropzone.dragover { border-color: #4a90d9; background: #f8f9fa; }
-            .image-dropzone .file-input { display: none; }
+            .storage-dropzone { border: 2px dashed #ccc; border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.3s; }
+            .storage-dropzone:hover, .storage-dropzone.dragover { border-color: #4a90d9; background: #f8f9fa; }
+            .storage-dropzone .file-input { display: none; }
             .dropzone-content { color: #666; }
-            .image-previews { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+            .storage-previews { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
             .preview-item { position: relative; width: 80px; height: 80px; border-radius: 4px; overflow: hidden; }
             .preview-item img { width: 100%; height: 100%; object-fit: cover; }
             .preview-item.primary { border: 3px solid #4a90d9; }
@@ -112,6 +111,15 @@ fun HTML.myPetsPage() {
             .preview-item .primary-btn { position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 1; opacity: 0; transition: opacity 0.2s; }
             .preview-item:hover .primary-btn { opacity: 1; }
             .preview-item button { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 14px; line-height: 1; }
+            .adoption-request-card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #1b5e20; color: white; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+            .adoption-request-card .ar-pet { font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem; }
+            .adoption-request-card .ar-status { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.5rem; }
+            .adoption-request-card .status-PENDING { background: #ffc107; color: #000; }
+            .adoption-request-card .status-APPROVED { background: #4caf50; color: #fff; }
+            .adoption-request-card .status-REJECTED { background: #f44336; color: #fff; }
+            .adoption-request-card .ar-message { margin: 0.5rem 0; color: #e0e0e0; grid-column: 1 / -1; }
+            .adoption-request-card .ar-date { font-size: 0.875rem; color: #b0b0b0; }
+            .adoption-request-card .ar-actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; grid-column: 1 / -1; }
         """) } }
         commonScripts()
         script { unsafe { raw("""
@@ -121,18 +129,45 @@ let user;
 let existingImages = [];
 async function load() {
     user = await api.me();
-    if (user.authenticated === false || !['RESCUER','ADMIN'].includes(user.role)) { location.href = '/'; return; }
+    if (user.authenticated === false || !user.activeRoles?.includes('RESCUER') && !user.activeRoles?.includes('ADMIN')) { location.href = '/'; return; }
     let pets = await api.getPets(params.get('filter'));
-    if (user.role !== 'ADMIN') pets = pets.filter(p => p.rescuerId === user.id);
+    if (!user.activeRoles?.includes('ADMIN')) pets = pets.filter(p => p.rescuerId === user.id);
     const container = document.getElementById('pets');
-    container.innerHTML = pets.length ? pets.map(p => '<div class="pet-card"><div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div><div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+' • '+p.weight+' kg</span><span class="pet-rescue-date">'+(p.rescueDate ? ' '+t('rescued')+': '+new Date(p.rescueDate).toLocaleDateString() : '')+'</span></p><p>'+p.status+'</p><div class="pet-card-actions"><a href="/pet/'+p.id+'" class="btn">'+t('viewDetails')+'</a><button class="btn btn-secondary" onclick="edit('+p.id+')">'+t('edit')+'</button><button class="btn btn-secondary" onclick="del('+p.id+')">'+t('delete')+'</button></div></div></div>').join('') : '<p>'+t('noPets')+'</p>';
+    container.innerHTML = pets.length ? pets.map(p => {
+        const primaryImage = p.images && p.images.length > 0 ? p.images.find(img => img.isPrimary) || p.images[0] : null;
+        const imageHtml = primaryImage 
+            ? '<img src="'+primaryImage.imageUrl+'" alt="'+p.name+'">' 
+            : '<div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div>';
+        return '<div class="pet-card">'+imageHtml+'<div class="pet-card-body"><span class="pet-type">'+t(p.type.toLowerCase())+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+t(p.sex.toLowerCase())+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+' • '+p.weight+' kg</span><span class="pet-rescue-date">'+(p.rescueDate ? ' '+t('rescued')+': '+new Date(p.rescueDate).toLocaleDateString() : '')+'</span></p><p>'+p.status+'</p><div class="pet-card-actions"><a href="/pet/'+p.id+'" class="btn">'+t('viewDetails')+'</a><button class="btn btn-secondary" onclick="edit('+p.id+')">'+t('edit')+'</button><button class="btn btn-secondary" onclick="del('+p.id+')">'+t('delete')+'</button></div></div></div>';
+    }).join('') : '<p>'+t('noPets')+'</p>';
     const editId = params.get('edit');
     if (editId) { 
     const pet = await api.getPet(editId); 
     fillForm(pet);
     document.getElementById('form-title').textContent = 'Edit Pet'; 
     document.getElementById('form-container').style.display = 'block'; }
+    
+    await loadAdoptionRequests(pets);
 }
+async function loadAdoptionRequests(pets) {
+    const container = document.getElementById('adoption-requests');
+    let allRequests = [];
+    for (const pet of pets) {
+        try {
+            const requests = await api.getAdoptionRequests(pet.id);
+            if (requests.length > 0) {
+                allRequests = allRequests.concat(requests.map(r => ({...r, petName: pet.name, petType: pet.type})));
+            }
+        } catch (e) {}
+    }
+    if (allRequests.length === 0) {
+        container.innerHTML = '<p>No adoption requests</p>';
+        return;
+    }
+    container.innerHTML = allRequests.map(r => '<div class="adoption-request-card"><div class="ar-pet">'+(emoji[r.petType]||'🐾')+' '+r.petName+'</div><div class="ar-status status-'+r.status.toLowerCase()+'">'+r.status+'</div><div class="ar-message">'+(r.message || 'No message')+'</div><div class="ar-date">'+new Date(r.createdAt).toLocaleDateString()+'</div>'+(r.status === 'PENDING' ? '<div class="ar-actions"><button class="btn btn-secondary" onclick="approveRequest('+r.id+')">Approve</button><button class="btn btn-secondary" onclick="rejectRequest('+r.id+')">Reject</button></div>' : '')+'</div>').join('');
+}
+window.approveRequest = async (requestId) => { try { await api.updateAdoptionRequest(requestId, 'APPROVED'); load(); } catch (err) { alert(err.message); } };
+window.rejectRequest = async (requestId) => { try { await api.updateAdoptionRequest(requestId, 'REJECTED'); load(); } catch (err) { alert(err.message); } };
 function fillForm(pet) {
     document.getElementById('pet-id').value = pet.id; 
     document.getElementById('name').value = pet.name || ''; 
@@ -182,9 +217,9 @@ document.getElementById('cancel-btn').onclick = () => { document.getElementById(
     el.addEventListener('input', () => { if (parseFloat(el.value) < 0) el.value = 0; });
     el.addEventListener('blur', () => { if (parseFloat(el.value) < 0) el.value = 0; });
 });
-const dropzone = document.getElementById('image-dropzone');
+const dropzone = document.getElementById('storage-dropzone');
 const fileInput = document.getElementById('pet-images');
-const previewContainer = document.getElementById('image-previews');
+const previewContainer = document.getElementById('storage-previews');
 let selectedFiles = [];
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
@@ -222,19 +257,19 @@ window.setPrimaryImage = async (index) => {
         existingImages.forEach((img, i) => img.isPrimary = (i === index));
         updatePreviews();
     } catch (err) {
-        alert('Failed to set primary image: ' + err.message);
+        alert('Failed to set primary storage: ' + err.message);
     }
 };
 window.removeExistingImage = async (index) => { 
     const img = existingImages[index];
     const petId = document.getElementById('pet-id').value;
-    if (!confirm('Delete this image?')) return;
+    if (!confirm('Delete this storage?')) return;
     try {
         await api.removeImage(petId, img.id);
         existingImages.splice(index, 1);
         updatePreviews();
     } catch (err) {
-        alert('Failed to delete image: ' + err.message);
+        alert('Failed to delete storage: ' + err.message);
     }
 };
 window.removePreview = (index) => { selectedFiles.splice(index, 1); updatePreviews(); const dataTransfer = new DataTransfer(); selectedFiles.forEach(f => dataTransfer.items.add(f)); fileInput.files = dataTransfer.files; };

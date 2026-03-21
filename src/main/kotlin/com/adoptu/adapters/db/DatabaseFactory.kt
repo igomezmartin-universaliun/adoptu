@@ -1,19 +1,29 @@
 package com.adoptu.adapters.db
 
+import com.adoptu.dto.UserRole
 import com.adoptu.models.*
 import io.ktor.server.config.*
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 
 object DatabaseFactory {
     val listOfTables = listOf(
         Users,
+        UserActiveRoles,
+        Photographers,
         WebAuthnCredentials,
         Pets,
+        PetImages,
         AdoptionRequests,
-        PetImages)
+        PhotographyRequests,
+        TemporalHomes,
+        BlockedRescuers,
+        TemporalHomeRequests)
     fun init(config: ApplicationConfig) {
         val env = config.propertyOrNull("env")?.getString() ?: "prod"
         val prefix = "db.$env"
@@ -30,6 +40,30 @@ object DatabaseFactory {
             SchemaUtils.addMissingColumnsStatements(*listOfTables.toTypedArray())
                 .forEach { exec(it)}
             MigrationUtils.dropUnmappedColumnsStatements(*listOfTables.toTypedArray())
+        }
+
+        createDefaultAdmin(config)
+    }
+
+    private fun createDefaultAdmin(config: ApplicationConfig) {
+        val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "adopt-u@adopt-u.org"
+
+        transaction {
+            val existingAdmin = Users.selectAll().where { Users.username.eq(adminEmail) }.firstOrNull()
+            if (existingAdmin == null) {
+                val userId = Users.insert {
+                    it[username] = adminEmail
+                    it[displayName] = "Admin"
+                    it[createdAt] = System.currentTimeMillis()
+                } get Users.id
+                
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = userId
+                    it[UserActiveRoles.role] = UserRole.ADMIN.name
+                }
+                
+                println("Default admin user created: $adminEmail")
+            }
         }
     }
 }

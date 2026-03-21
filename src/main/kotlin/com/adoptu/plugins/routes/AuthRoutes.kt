@@ -6,6 +6,8 @@ import com.adoptu.dto.UserRole
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
 import com.adoptu.services.UserService
+import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -17,12 +19,14 @@ import org.koin.ktor.ext.inject
 private data class AuthMeResponse(
     val authenticated: Boolean,
     val id: Int? = null,
-    val username: String? = null,
-    val displayName: String? = null,
     val email: String? = null,
-    val role: String? = null,
+    val displayName: String? = null,
+    val language: String = "en",
+    val activeRoles: List<String> = emptyList(),
     val lastAcceptedPrivacyPolicy: Long? = null,
-    val lastAcceptedTermsAndConditions: Long? = null
+    val lastAcceptedTermsAndConditions: Long? = null,
+    val photographerFee: Double? = null,
+    val photographerCurrency: String? = null
 )
 
 @Serializable
@@ -31,27 +35,36 @@ private data class SuccessWithErrorResponse(val success: Boolean, val error: Str
 fun Route.authRoutes() {
     val webAuthnService by inject<WebAuthnService>()
     val userService by inject<UserService>()
+    val config by inject<ApplicationConfig>()
+    val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com"
 
     route("/api/auth") {
         post("/registration-options") {
             val params = call.receiveParameters()
-            val username = params["username"] ?: return@post call.respondError("username required")
+            val email = params["email"] ?: return@post call.respondError("email required")
             val displayName = params["displayName"] ?: return@post call.respondError("displayName required")
-            val options = webAuthnService.generateRegistrationOptions(username, displayName)
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(email)) return@post call.respondError("invalid email format")
+            val options = webAuthnService.generateRegistrationOptions(email, displayName)
             call.respond(options)
         }
 
         post("/register") {
             val params = call.receiveParameters()
-            val username = params["username"] ?: return@post call.respondError("username required")
+            val email = params["email"] ?: return@post call.respondError("email required")
             val displayName = params["displayName"] ?: return@post call.respondError("displayName required")
-            val role = params["role"] ?: "ADOPTER"
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(email)) return@post call.respondError("invalid email format")
+            val rolesParam = params["roles"] ?: "ADOPTER"
+            val roles = rolesParam.split(",").filter { it.isNotBlank() }.map { it.trim() }
             val registrationResponse = params["registrationResponse"]
                 ?: return@post call.respondError("registrationResponse required")
 
-            val userId = webAuthnService.verifyAndRegister(username, displayName, role, registrationResponse)
+            val primaryRole = if (email.equals(adminEmail, ignoreCase = true)) UserRole.ADMIN else (roles.firstOrNull()?.let { UserRole.valueOf(it) } ?: UserRole.ADOPTER)
+
+            val userId = webAuthnService.verifyAndRegister(email, displayName, primaryRole.name, roles, registrationResponse)
             if (userId != null) {
-                call.sessions.set(SessionUser(userId, username, displayName, null, UserRole.valueOf(role)))
+                call.sessions.set(SessionUser(userId, email, displayName))
                 call.respond(SuccessResponse(success = true))
             } else {
                 call.respond(SuccessWithErrorResponse(success = false, error = "Registration failed"))
@@ -70,11 +83,13 @@ fun Route.authRoutes() {
             val result = webAuthnService.verifyAndAuthenticate(body)
             if (result != null) {
                 val user = result.user
+                println("DEBUG /authenticate: success for userId=${result.userId}, username=${user.username}")
                 call.sessions.set(
-                    SessionUser(result.userId, user.username, user.displayName, user.email, UserRole.valueOf(user.role))
+                    SessionUser(result.userId, user.username, user.displayName)
                 )
                 call.respond(SuccessResponse(success = true))
             } else {
+                println("DEBUG /authenticate: failed - invalid credential")
                 call.respond(SuccessWithErrorResponse(success = false, error = "Authentication failed"))
             }
         }
@@ -86,22 +101,39 @@ fun Route.authRoutes() {
 
         get("/me") {
             val session = call.sessions.get<SessionUser>()
+            println("DEBUG /me: session = ${session?.userId}, ${session?.email}")
             if (session != null) {
-                val user = userService.getById(session.userId)
-                if (user != null) {
-                    call.respond(
-                        AuthMeResponse(
-                            authenticated = true,
-                            id = session.userId,
-                            username = session.username,
-                            displayName = session.displayName,
-                            email = session.email,
-                            role = session.role.name,
-                            lastAcceptedPrivacyPolicy = user.lastAcceptedPrivacyPolicy,
-                            lastAcceptedTermsAndConditions = user.lastAcceptedTermsAndConditions
+                try {
+                    val user = userService.getById(session.userId)
+                    println("DEBUG /me: user = ${user?.id}")
+                    if (user != null) {
+                        val activeRolesList = user.activeRoles.map { it.name }
+                        val isPhotographer = activeRolesList.contains("PHOTOGRAPHER") || activeRolesList.contains("ADMIN")
+                        val photographerData = if (isPhotographer) {
+                            userService.getPhotographerById(session.userId)
+                        } else null
+                        
+                        call.respond(
+                            AuthMeResponse(
+                                authenticated = true,
+                                id = session.userId,
+                                email = session.email,
+                                displayName = session.displayName,
+                                language = user.language,
+                                activeRoles = activeRolesList,
+                                lastAcceptedPrivacyPolicy = user.lastAcceptedPrivacyPolicy,
+                                lastAcceptedTermsAndConditions = user.lastAcceptedTermsAndConditions,
+                                photographerFee = photographerData?.photographerFee,
+                                photographerCurrency = photographerData?.photographerCurrency
+                            )
                         )
-                    )
-                } else {
+                    } else {
+                        println("DEBUG: Session exists but user not found for userId: ${session.userId}")
+                        call.respond(AuthMeResponse(authenticated = false))
+                    }
+                } catch (e: Exception) {
+                    println("DEBUG: Exception in /me endpoint: ${e.message}")
+                    e.printStackTrace()
                     call.respond(AuthMeResponse(authenticated = false))
                 }
             } else {

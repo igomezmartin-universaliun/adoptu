@@ -6,12 +6,8 @@ fun HTML.loginPage() {
     commonHead("Login - Adopt-U")
     body {
         header {
-            a("/") { classes = setOf("logo"); +"Adopt-U" }
-            nav {
-                a("/pets") { attributes["data-i18n"] = "browsePets"; +"Browse Pets" }
-                a("/register") { attributes["data-i18n"] = "register"; +"Register" }
-                languageDropdown()
-            }
+            a("/") { commonLogo() }
+            nav { guestNav() }
         }
         main {
             div { classes = setOf("auth-form")

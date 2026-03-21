@@ -4,9 +4,12 @@ import com.adoptu.dto.*
 import com.adoptu.models.AdoptionRequests
 import com.adoptu.models.PetImages
 import com.adoptu.models.Pets
+import com.adoptu.models.UserActiveRoles
+import com.adoptu.models.Users
 import com.adoptu.dto.Currency
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
@@ -47,6 +50,7 @@ object PetRepository {
             adoptionFee = row[Pets.adoptionFee].toDouble(),
             currency = Currency.valueOf(row[Pets.currency]),
             isUrgent = row[Pets.isUrgent],
+            isPromoted = row[Pets.isPromoted],
             createdAt = row[Pets.createdAt],
             images = images
         )
@@ -66,15 +70,28 @@ object PetRepository {
             }
     }
 
-    fun getAll(type: String? = null): List<PetDto> = transaction {
+    fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = transaction {
         val baseCondition = Pets.status eq "AVAILABLE"
         val finalCondition = if (type != null) {
-            baseCondition and (Pets.type eq type.uppercase())
+            if (showPromotedOnly) {
+                baseCondition and (Pets.type eq type.uppercase()) and (Pets.isPromoted eq true)
+            } else {
+                baseCondition and (Pets.type eq type.uppercase())
+            }
         } else {
-            baseCondition
+            if (showPromotedOnly) {
+                baseCondition and (Pets.isPromoted eq true)
+            } else {
+                baseCondition
+            }
         }
+        
+        val rescuerIds = UserActiveRoles.select(UserActiveRoles.userId)
+            .where { UserActiveRoles.role eq com.adoptu.dto.UserRole.RESCUER.name }
+            .map { it[UserActiveRoles.userId] }
+        
         Pets.selectAll()
-            .where { finalCondition }
+            .where { finalCondition and (Pets.rescuerId inList rescuerIds) }
             .orderBy(Pets.createdAt, SortOrder.DESC)
             .map(::rowToPetDto)
     }
@@ -111,6 +128,7 @@ object PetRepository {
         adoptionFee: Double = 0.0,
         currency: Currency = Currency.USD,
         isUrgent: Boolean = false,
+        isPromoted: Boolean = false,
         status: String = "AVAILABLE"
     ): PetDto = transaction {
         val id = Pets.insert {
@@ -142,6 +160,7 @@ object PetRepository {
             it[Pets.adoptionFee] = BigDecimal(adoptionFee.toString())
             it[Pets.currency] = currency.name
             it[Pets.isUrgent] = isUrgent
+            it[Pets.isPromoted] = isPromoted
             it[Pets.createdAt] = System.currentTimeMillis()
         } get Pets.id
 
@@ -177,6 +196,7 @@ object PetRepository {
             body.adoptionFee?.let { f -> it[Pets.adoptionFee] = BigDecimal(f.toString()) }
             body.currency?.let { c -> it[Pets.currency] = c.name }
             body.isUrgent?.let { u -> it[Pets.isUrgent] = u }
+            body.isPromoted?.let { p -> it[Pets.isPromoted] = p }
         }
         getById(id)
     }
@@ -205,6 +225,59 @@ object PetRepository {
             status = "PENDING",
             createdAt = createdAt
         )
+    }
+
+    fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = transaction {
+        AdoptionRequests.selectAll()
+            .where { AdoptionRequests.petId eq petId }
+            .map { row ->
+                AdoptionRequestDto(
+                    id = row[AdoptionRequests.id],
+                    petId = row[AdoptionRequests.petId],
+                    adopterId = row[AdoptionRequests.adopterId],
+                    message = row[AdoptionRequests.message],
+                    status = row[AdoptionRequests.status],
+                    createdAt = row[AdoptionRequests.createdAt]
+                )
+            }
+    }
+
+    fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = transaction {
+        AdoptionRequests.selectAll()
+            .where { AdoptionRequests.adopterId eq userId }
+            .map { row ->
+                AdoptionRequestDto(
+                    id = row[AdoptionRequests.id],
+                    petId = row[AdoptionRequests.petId],
+                    adopterId = row[AdoptionRequests.adopterId],
+                    message = row[AdoptionRequests.message],
+                    status = row[AdoptionRequests.status],
+                    createdAt = row[AdoptionRequests.createdAt]
+                )
+            }
+    }
+
+    fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = transaction {
+        val updated = AdoptionRequests.update({ AdoptionRequests.id eq requestId }) {
+            it[AdoptionRequests.status] = status
+        }
+        updated > 0
+    }
+
+    fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = transaction {
+        AdoptionRequests.selectAll()
+            .where { AdoptionRequests.id eq requestId }
+            .firstOrNull()
+            ?.let { row ->
+                AdoptionRequestDto(
+                    id = row[AdoptionRequests.id],
+                    petId = row[AdoptionRequests.petId],
+                    adopterId = row[AdoptionRequests.adopterId],
+                    message = row[AdoptionRequests.message],
+                    status = row[AdoptionRequests.status],
+                    createdAt = row[AdoptionRequests.createdAt]
+                )
+            }
     }
 
     fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean = false, sortOrder: Int = 0): PetImageDto = transaction {

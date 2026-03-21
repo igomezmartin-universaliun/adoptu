@@ -50,9 +50,7 @@ dependencies {
 
     // AWS S3
     implementation("software.amazon.awssdk:s3:2.29.0")
-
-    // Email
-    implementation("com.sun.mail:javax.mail:1.6.2")
+    implementation("software.amazon.awssdk:sns:2.29.0")
 
     // Testing
     val kotestVersion = "5.8.1"

@@ -1,9 +1,8 @@
 package com.adoptu.mocks
 
-import com.adoptu.services.EmailService
-import io.ktor.server.config.*
+import com.adoptu.ports.NotificationPort
 
-class MockEmailService : EmailService(MapApplicationConfig()) {
+class MockNotificationAdapter : NotificationPort {
     private val sentEmails = mutableListOf<EmailRecord>()
     private var shouldFail = false
 
@@ -44,6 +43,33 @@ class MockEmailService : EmailService(MapApplicationConfig()) {
         """.trimIndent()
         
         return sendEmail(rescuerEmail, subject, body)
+    }
+
+    override suspend fun sendPhotographerRequest(
+        photographerEmail: String,
+        photographerName: String,
+        requesterName: String,
+        petName: String?,
+        message: String,
+        fee: Double?,
+        currency: String?
+    ): Boolean {
+        val subject = "New Photography Session Request - Adopt-U"
+        val body = "Request from: $requesterName, Pet: $petName, Message: $message"
+        return sendEmail(photographerEmail, subject, body)
+    }
+
+    override suspend fun sendTemporalHomeRequest(
+        temporalHomeEmail: String,
+        temporalHomeAlias: String,
+        rescuerName: String,
+        petName: String?,
+        message: String,
+        spamReportLink: String
+    ): Boolean {
+        val subject = "New Pet Care Help Request - Adopt-U"
+        val body = "Request from: $rescuerName, Pet: $petName, Message: $message\nSpam Report Link: $spamReportLink"
+        return sendEmail(temporalHomeEmail, subject, body)
     }
 
     fun getSentEmails(): List<EmailRecord> = sentEmails.toList()

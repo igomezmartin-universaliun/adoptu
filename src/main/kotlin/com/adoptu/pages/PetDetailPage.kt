@@ -6,20 +6,13 @@ fun HTML.petDetailPage() {
     commonHead("Pet Details - Adopt-U")
     body {
         header {
-            a("/") { classes = setOf("logo"); +"Adopt-U" }
-            nav {
-                a("/pets") { attributes["data-i18n"] = "browsePets"; +"Browse Pets" }
-                a("/login") { id = "login-link"; attributes["data-i18n"] = "login"; +"Login" }
-                a("/register") { id = "register-link"; attributes["data-i18n"] = "register"; +"Register" }
-                a("/my-pets") { id = "my-pets-link"; style = "display:none"; attributes["data-i18n"] = "myPets"; +"My Pets" }
-                a("/admin") { id = "admin-link"; style = "display:none"; attributes["data-i18n"] = "admin"; +"Admin" }
-                a("#") { id = "logout-link"; style = "display:none"; attributes["data-i18n"] = "logout"; +"Logout" }
-                languageDropdown()
-            }
+            a("/") { commonLogo() }
+            nav { commonNav() }
         }
         main {
             div { id = "pet-detail"; classes = setOf("pet-detail"); +"" }
             div { id = "message"; +"" }
+            style { unsafe { raw("#msg { width: 100%; box-sizing: border-box; margin-top: 0.5rem; } #adopt-form { max-width: none; }") } }
         }
         footer()
         commonScripts()
@@ -29,12 +22,12 @@ const id = location.pathname.split('/').pop() || new URLSearchParams(location.se
 let user;
 let currentPet;
 async function load() {
-    if (!id) { location.href = '/pets'; return; }
+    if (!id) { location.href = '/'; return; }
     try { user = await api.me(); } catch { user = { authenticated: false }; }
     currentPet = await api.getPet(id);
     const container = document.getElementById('pet-detail');
-    let isOwner = (user.role === 'RESCUER' || user.role === 'ADMIN') && currentPet.rescuerId === user.id;
-    let adoptForm = currentPet.status === 'AVAILABLE' && user.role === 'ADOPTER' ? '<form id="adopt-form"><label for="msg">Message (optional)</label><textarea id="msg" name="message"></textarea><button type="submit" class="btn">Request Adoption</button></form>' : '';
+    let isOwner = (user.activeRoles?.includes('RESCUER') || user.activeRoles?.includes('ADMIN')) && currentPet.rescuerId === user.id;
+    let adoptForm = currentPet.status === 'AVAILABLE' && user.activeRoles?.includes('ADOPTER') ? '<form id="adopt-form"><label for="msg">Message (optional)</label><textarea id="msg" name="message"></textarea><button type="submit" class="btn">Request Adoption</button></form>' : '';
     let editBtn = isOwner ? '<a href="/my-pets?edit='+currentPet.id+'" class="btn">Edit Pet</a>' : '';
     
     let primaryImage = currentPet.images && currentPet.images.length > 0 
@@ -49,15 +42,15 @@ async function load() {
         details += '<div class="pet-detail-placeholder">'+(emoji[currentPet.type]||'🐾')+'</div>';
     }
     
-    details += '<span class="pet-type">'+currentPet.type+'</span><h1>'+currentPet.name+'</h1>';
+    details += '<span class="pet-type">'+t(currentPet.type.toLowerCase())+'</span><h1>'+currentPet.name+'</h1>';
     if (currentPet.breed) details += '<p class="pet-breed">'+currentPet.breed+'</p>';
-    details += '<p><strong>Weight:</strong> '+currentPet.weight+' kg | <strong>Age:</strong> '+currentPet.ageYears+'y '+currentPet.ageMonths+'m | <strong>Sex:</strong> '+currentPet.sex+'</p>';
+    details += '<p><strong>Weight:</strong> '+currentPet.weight+' kg | <strong>Age:</strong> '+currentPet.ageYears+'y '+currentPet.ageMonths+'m | <strong>Sex:</strong> '+t(currentPet.sex.toLowerCase())+'</p>';
     details += '<p><strong>Status:</strong> '+currentPet.status+'</p></div>';
     
     details += '<div class="pet-detail-body">';
     
     if (isOwner) {
-        details += '<div class="image-management">';
+        details += '<div class="storage-management">';
         details += '<h3>Photos</h3>';
         details += '<div class="pet-images-grid" id="pet-images">' + renderImages() + '</div>';
         details += '</div>';
@@ -103,8 +96,8 @@ function renderImages() {
     if (!currentPet.images || currentPet.images.length === 0) return '<p>No photos yet.</p>';
     return currentPet.images.map(img => '<div class="pet-image-item'+(img.isPrimary ? ' primary' : '')+'"><img src="'+img.imageUrl+'" alt="Pet photo">'+(img.isPrimary ? '<span class="primary-badge">Primary</span>' : '')+'</div>').join('');
 }
-load().catch(() => location.href = '/pets');
-(async () => { try { const u = await api.me(); if (u.authenticated !== false) { document.getElementById('login-link').style.display = 'none'; document.getElementById('register-link').style.display = 'none'; if (u.role === 'RESCUER' || u.role === 'ADMIN') document.getElementById('my-pets-link').style.display = 'inline'; document.getElementById('logout-link').style.display = 'inline'; if (u.role === 'ADMIN') document.getElementById('admin-link').style.display = 'inline'; document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); }; } } catch (e) {} })();
+load().catch(() => location.href = '/');
+(async () => { try { const u = await api.me(); if (u.authenticated !== false) { document.getElementById('login-link').style.display = 'none'; document.getElementById('register-link').style.display = 'none'; if (u.activeRoles?.includes('RESCUER') || u.activeRoles?.includes('ADMIN')) document.getElementById('my-pets-link').style.display = 'inline'; document.getElementById('logout-link').style.display = 'inline'; if (u.activeRoles?.includes('ADMIN')) document.getElementById('admin-link').style.display = 'inline'; document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); }; } } catch (e) {} })();
 """.trimIndent()) } }
     }
 }

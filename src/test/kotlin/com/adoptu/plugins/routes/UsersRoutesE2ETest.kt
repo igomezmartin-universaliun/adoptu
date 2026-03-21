@@ -2,13 +2,15 @@ package com.adoptu.plugins.routes
 
 import com.adoptu.di.appModule
 import com.adoptu.dto.AcceptTermsRequest
-import com.adoptu.mocks.MockEmailService
+import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.TestDatabase
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.models.Users
 import com.adoptu.plugins.configureRouting
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
+import com.adoptu.ports.ImageStoragePort
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -39,24 +41,28 @@ class UsersRoutesE2ETest {
     private fun createTestUsers() {
         transaction {
             try {
-                Users.insert {
+                val rescuerId = Users.insert {
                     it[Users.id] = 1
-                    it[Users.username] = "rescuer"
+                    it[Users.username] = "rescuer@test.com"
                     it[Users.displayName] = "Test Rescuer"
-                    it[Users.email] = "rescuer@test.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = rescuerId
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) { }
 
             try {
-                Users.insert {
+                val adopterId = Users.insert {
                     it[Users.id] = 2
-                    it[Users.username] = "adopter"
+                    it[Users.username] = "adopter@test.com"
                     it[Users.displayName] = "Test Adopter"
-                    it[Users.email] = "adopter@test.com"
-                    it[Users.role] = "ADOPTER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adopterId
+                    it[UserActiveRoles.role] = "ADOPTER"
                 }
             } catch (e: Exception) { }
         }
@@ -71,10 +77,9 @@ class UsersRoutesE2ETest {
         val testModules = module {
             single<io.ktor.server.config.ApplicationConfig> { config }
             single { com.adoptu.auth.WebAuthnService }
-            single { MockImageStorage() }
-            single { MockEmailService() }
-            single<com.adoptu.domains.image.ImageStoragePort> { get<MockImageStorage>() }
-            single { com.adoptu.services.EmailService(get()) }
+            single<ImageStoragePort> { MockImageStorage() }
+            single { MockNotificationAdapter() }
+            single<com.adoptu.ports.NotificationPort> { get<MockNotificationAdapter>() }
             single { com.adoptu.repositories.PetRepository }
             single { com.adoptu.services.UserService }
             single { com.adoptu.services.PetService(get(), get(), get()) }

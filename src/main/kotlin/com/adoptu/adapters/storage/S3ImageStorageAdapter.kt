@@ -1,6 +1,6 @@
-package com.adoptu.adapters.image
+package com.adoptu.adapters.storage
 
-import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.ports.ImageStoragePort
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
@@ -77,8 +77,8 @@ class S3ImageStorageAdapter(
             createBucket()
             return uploadImage(request, ByteArrayInputStream(bytes), contentType, petId, key)
         } catch (e: Exception) {
-            log.error("Error uploading image to S3: {}", e.message, e)
-            throw RuntimeException("Failed to upload image: ${e.message}", e)
+            log.error("Error uploading storage to S3: {}", e.message, e)
+            throw RuntimeException("Failed to upload storage: ${e.message}", e)
         }
 
         return getImageUrl(petId, key)
@@ -106,8 +106,8 @@ class S3ImageStorageAdapter(
             s3Client.deleteObject(request)
             true
         } catch (e: Exception) {
-            log.error("Error deleting image from S3: {}", e.message, e)
-            throw RuntimeException("Failed to delete image: ${e.message}", e)
+            log.error("Error deleting storage from S3: {}", e.message, e)
+            throw RuntimeException("Failed to delete storage: ${e.message}", e)
         }
     }
 

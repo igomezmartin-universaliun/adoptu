@@ -6,16 +6,8 @@ fun HTML.petsPage() {
     commonHead("Browse Pets - Adopt-U")
     body {
         header {
-            a("/") { classes = setOf("logo"); +"Adopt-U" }
-            nav {
-                a("/pets") { attributes["data-i18n"] = "browsePets"; +"Browse Pets" }
-                a("/login") { id = "login-link"; attributes["data-i18n"] = "login"; +"Login" }
-                a("/register") { id = "register-link"; attributes["data-i18n"] = "register"; +"Register" }
-                a("/my-pets") { id = "my-pets-link"; style = "display:none"; attributes["data-i18n"] = "myPets"; +"My Pets" }
-                a("/admin") { id = "admin-link"; style = "display:none"; attributes["data-i18n"] = "admin"; +"Admin" }
-                a("#") { id = "logout-link"; style = "display:none"; attributes["data-i18n"] = "logout"; +"Logout" }
-                languageDropdown()
-            }
+            a("/") { commonLogo() }
+            nav { commonNav() }
         }
         main {
             h1 { attributes["data-i18n"] = "petsForAdoption"; +"Pets for Adoption" }
@@ -50,7 +42,7 @@ async function loadPets() {
         const imageHtml = primaryImage 
             ? '<img src="'+primaryImage.imageUrl+'" alt="'+p.name+'">' 
             : '<div class="pet-card-placeholder">'+(emoji[p.type]||'🐾')+'</div>';
-        return '<a href="/pet/'+p.id+'" class="pet-card">'+imageHtml+'<div class="pet-card-body"><span class="pet-type">'+p.type+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+p.sex+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age"><span class="label">'+t('age')+'</span><span class="value">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+'</span></span><span class="pet-rescue-date">'+(p.rescueDate ? '<span class="label">'+t('rescued')+'</span><span class="value">'+new Date(p.rescueDate).toLocaleDateString()+'</span>' : '')+'</span></p><p>'+p.status+'</p></div></a>';
+        return '<a href="/pet/'+p.id+'" class="pet-card">'+imageHtml+'<div class="pet-card-body"><span class="pet-type">'+t(p.type.toLowerCase())+'</span><span class="pet-sex '+(p.sex === 'MALE' ? 'male' : 'female')+'">'+t(p.sex.toLowerCase())+'</span>'+(p.size ? '<span class="pet-size">'+p.size+'</span>' : '')+'<div class="pet-name"><h3>'+p.name+(p.isUrgent ? ' ⚠️' : '')+'</h3>'+(p.breed ? '<span class="pet-breed">'+p.breed+'</span>' : '')+'</div><p class="pet-info"><span class="pet-age"><span class="label">'+t('age')+'</span><span class="value">'+p.ageYears+t('years')+' '+p.ageMonths+t('months')+'</span></span><span class="pet-rescue-date">'+(p.rescueDate ? '<span class="label">'+t('rescued')+'</span><span class="value">'+new Date(p.rescueDate).toLocaleDateString()+'</span>' : '')+'</span></p><p>'+p.status+'</p></div></a>';
     }).join('') : '<p>'+t('noPetsFound')+'</p>';
 }
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -69,19 +61,6 @@ if (sexFilter) {
     };
 }
 loadPets();
-(async () => {
-    try {
-        const user = await api.me();
-        if (user.authenticated !== false) {
-            document.getElementById('login-link').style.display = 'none';
-            document.getElementById('register-link').style.display = 'none';
-            if (user.role === 'RESCUER' || user.role === 'ADMIN') document.getElementById('my-pets-link').style.display = 'inline';
-            document.getElementById('logout-link').style.display = 'inline';
-            if (user.role === 'ADMIN') document.getElementById('admin-link').style.display = 'inline';
-            document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
-        }
-    } catch (e) {}
-})();
 """.trimIndent()) } }
     }
 }

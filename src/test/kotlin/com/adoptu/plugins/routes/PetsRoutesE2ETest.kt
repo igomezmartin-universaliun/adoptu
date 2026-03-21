@@ -1,14 +1,15 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.ports.ImageStoragePort
 import com.adoptu.dto.Gender
 import com.adoptu.dto.PetDto
 import com.adoptu.dto.PetImageDto
 import com.adoptu.dto.Status
-import com.adoptu.mocks.MockEmailService
+import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.TestDatabase
 import com.adoptu.models.Pets
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.models.Users
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
@@ -49,33 +50,39 @@ class PetsRoutesE2ETest {
             try {
                 Users.insert {
                     it[Users.id] = 1
-                    it[Users.username] = "rescuer"
+                    it[Users.username] = "rescuer@test.com"
                     it[Users.displayName] = "Test Rescuer"
-                    it[Users.email] = "rescuer@test.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                }
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = 1
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) { }
 
             try {
-                Users.insert {
+                val adopterId = Users.insert {
                     it[Users.id] = 2
-                    it[Users.username] = "adopter"
+                    it[Users.username] = "adopter@test.com"
                     it[Users.displayName] = "Test Adopter"
-                    it[Users.email] = "adopter@test.com"
-                    it[Users.role] = "ADOPTER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adopterId
+                    it[UserActiveRoles.role] = "ADOPTER"
                 }
             } catch (e: Exception) { }
 
             try {
-                Users.insert {
+                val adminId = Users.insert {
                     it[Users.id] = 3
-                    it[Users.username] = "admin"
+                    it[Users.username] = "admin@test.com"
                     it[Users.displayName] = "Test Admin"
-                    it[Users.email] = "admin@test.com"
-                    it[Users.role] = "ADMIN"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adminId
+                    it[UserActiveRoles.role] = "ADMIN"
                 }
             } catch (e: Exception) { }
         }
@@ -90,13 +97,12 @@ class PetsRoutesE2ETest {
         val testModules = module {
             single<ApplicationConfig> { config }
             single { com.adoptu.auth.WebAuthnService }
-            single { MockImageStorage() }
-            single { MockEmailService() }
-            single<com.adoptu.domains.image.ImageStoragePort> { get<MockImageStorage>() }
-            single { com.adoptu.services.EmailService(get()) }
-            single { com.adoptu.repositories.PetRepository }
+            single<ImageStoragePort> { MockImageStorage() }
+            single { MockNotificationAdapter() }
+            single<com.adoptu.ports.NotificationPort> { get<MockNotificationAdapter>() }
+            single { PetRepository }
             single { com.adoptu.services.UserService }
-            single { com.adoptu.services.PetService(get(), get(), get()) }
+            single { PetService(get(), get(), get()) }
         }
 
         environment {

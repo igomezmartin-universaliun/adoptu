@@ -2,10 +2,11 @@ package com.adoptu.plugins.routes
 
 import com.adoptu.dto.*
 import com.adoptu.models.Users
+import com.adoptu.models.UserActiveRoles
 import com.adoptu.repositories.PetRepository
 import com.adoptu.services.PetService
 import com.adoptu.services.ServiceResult
-import com.adoptu.mocks.MockEmailService
+import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -23,7 +24,7 @@ class PetsRoutesIntegrationTest {
     private lateinit var petService: PetService
     private lateinit var petRepository: PetRepository
     private lateinit var mockImageStorage: MockImageStorage
-    private lateinit var mockEmailService: MockEmailService
+    private lateinit var mockNotificationAdapter: MockNotificationAdapter
 
     @BeforeEach
     fun setup() {
@@ -34,41 +35,47 @@ class PetsRoutesIntegrationTest {
             try {
                 Users.insert {
                     it[Users.id] = 1
-                    it[Users.username] = "rescuer"
+                    it[Users.username] = "rescuer@mocks.com"
                     it[Users.displayName] = "Test Rescuer"
-                    it[Users.email] = "rescuer@mocks.com"
-                    it[Users.role] = "RESCUER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                }
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = 1
+                    it[UserActiveRoles.role] = "RESCUER"
                 }
             } catch (e: Exception) { }
             
             try {
-                Users.insert {
+                val adopterId = Users.insert {
                     it[Users.id] = 2
-                    it[Users.username] = "adopter"
+                    it[Users.username] = "adopter@mocks.com"
                     it[Users.displayName] = "Test Adopter"
-                    it[Users.email] = "adopter@mocks.com"
-                    it[Users.role] = "ADOPTER"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adopterId
+                    it[UserActiveRoles.role] = "ADOPTER"
                 }
             } catch (e: Exception) { }
             
             try {
-                Users.insert {
+                val adminId = Users.insert {
                     it[Users.id] = 3
-                    it[Users.username] = "admin"
+                    it[Users.username] = "admin@mocks.com"
                     it[Users.displayName] = "Test Admin"
-                    it[Users.email] = "admin@mocks.com"
-                    it[Users.role] = "ADMIN"
                     it[Users.createdAt] = System.currentTimeMillis()
+                } get Users.id
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = adminId
+                    it[UserActiveRoles.role] = "ADMIN"
                 }
             } catch (e: Exception) { }
         }
         
         mockImageStorage = MockImageStorage()
-        mockEmailService = MockEmailService()
+        mockNotificationAdapter = MockNotificationAdapter()
         petRepository = PetRepository
-        petService = PetService(petRepository, mockImageStorage, mockEmailService)
+        petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter)
     }
 
     // ==================== GET /api/pets ====================
@@ -383,7 +390,7 @@ class PetsRoutesIntegrationTest {
     fun `DELETE removes image from pet`() {
         val created = createPetViaRepository("Buddy", "DOG")
         
-        // Add image first
+        // Add storage first
         petService.addImage(
             petId = created.id,
             userId = 1,
@@ -395,7 +402,7 @@ class PetsRoutesIntegrationTest {
         val images = petService.getImages(created.id)
         assertEquals(1, images.size)
         
-        // Remove image - it's a suspend function
+        // Remove storage - it's a suspend function
         val removeResult = kotlinx.coroutines.runBlocking {
             petService.removeImage(
                 petId = created.id,

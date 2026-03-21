@@ -1,9 +1,9 @@
 const webauthn = {
-    async register(username, displayName, role) {
+    async register(email, displayName, role) {
         const optsRes = await fetch('/api/auth/registration-options', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ username, displayName })
+            body: new URLSearchParams({ email, displayName })
         });
         const options = await optsRes.json();
         const credential = await navigator.credentials.create({
@@ -13,7 +13,7 @@ const webauthn = {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
-                username, displayName, role,
+                email, displayName, role,
                 registrationResponse: JSON.stringify(credential.toJSON?.() ?? this.toJSON(credential))
             }),
             credentials: 'include'

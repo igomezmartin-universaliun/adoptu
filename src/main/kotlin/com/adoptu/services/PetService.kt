@@ -1,7 +1,8 @@
 package com.adoptu.services
 
-import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.ports.ImageStoragePort
 import com.adoptu.dto.*
+import com.adoptu.ports.NotificationPort
 import com.adoptu.repositories.PetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +11,10 @@ import kotlinx.coroutines.launch
 class PetService(
     private val petRepository: PetRepository,
     private val imageStorage: ImageStoragePort,
-    private val emailService: EmailService
+    private val notificationPort: NotificationPort
 ) {
 
-    fun getAll(type: String? = null): List<PetDto> = petRepository.getAll(type)
+    fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = petRepository.getAll(type, showPromotedOnly)
 
     fun getById(id: Int): PetDto? = petRepository.getById(id)
 
@@ -50,7 +51,8 @@ class PetService(
             specialNeeds = request.specialNeeds,
             adoptionFee = request.adoptionFee,
             currency = request.currency,
-            isUrgent = request.isUrgent
+            isUrgent = request.isUrgent,
+            isPromoted = request.isPromoted
         )
     }
 
@@ -161,10 +163,10 @@ class PetService(
         if (pet != null) {
             val rescuer = UserService.getById(pet.rescuerId)
             val adopter = UserService.getById(adopterId)
-            if (rescuer?.email != null && adopter != null) {
+            if (rescuer?.username != null && rescuer.activeRoles.contains(UserRole.RESCUER) && adopter != null) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    emailService.sendAdoptionRequestNotification(
-                        rescuerEmail = rescuer.email,
+                    notificationPort.sendAdoptionRequestNotification(
+                        rescuerEmail = rescuer.username,
                         petName = pet.name,
                         adopterName = adopter.displayName,
                         message = message
@@ -174,5 +176,39 @@ class PetService(
         }
         
         return request
+    }
+
+    fun getAdoptionRequestsForPet(petId: Int, userId: Int, userRole: UserRole): ServiceResult<List<AdoptionRequestDto>> {
+        val pet = petRepository.getById(petId) ?: return ServiceResult.NotFound
+        if (userRole != UserRole.ADMIN && pet.rescuerId != userId) {
+            return ServiceResult.Forbidden
+        }
+        return ServiceResult.Success(petRepository.getAdoptionRequestsForPet(petId))
+    }
+
+    fun getMyAdoptionRequests(userId: Int): List<AdoptionRequestDto> {
+        return petRepository.getAdoptionRequestsForUser(userId)
+    }
+
+    fun updateAdoptionRequest(requestId: Int, status: String, userId: Int, userRole: UserRole): ServiceResult<AdoptionRequestDto> {
+        val request = petRepository.getAdoptionRequestById(requestId) ?: return ServiceResult.NotFound
+        val pet = petRepository.getById(request.petId) ?: return ServiceResult.NotFound
+        if (userRole != UserRole.ADMIN && pet.rescuerId != userId) {
+            return ServiceResult.Forbidden
+        }
+        if (!listOf("APPROVED", "REJECTED").contains(status)) {
+            return ServiceResult.Forbidden
+        }
+        petRepository.updateAdoptionRequestStatus(requestId, status)
+        
+        if (status == "APPROVED") {
+            petRepository.update(request.petId, UpdatePetRequest(status = Status.ADOPTED))
+            petRepository.getAdoptionRequestsForPet(request.petId)
+                .filter { it.id != requestId && it.status == "PENDING" }
+                .forEach { petRepository.updateAdoptionRequestStatus(it.id, "REJECTED") }
+        }
+        
+        val updatedRequest = petRepository.getAdoptionRequestById(requestId)
+        return if (updatedRequest != null) ServiceResult.Success(updatedRequest) else ServiceResult.NotFound
     }
 }

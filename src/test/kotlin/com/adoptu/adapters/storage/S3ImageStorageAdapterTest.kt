@@ -1,6 +1,6 @@
-package com.adoptu.adapters.image
+package com.adoptu.adapters.storage
 
-import com.adoptu.domains.image.ImageStoragePort
+import com.adoptu.ports.ImageStoragePort
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
@@ -25,11 +25,11 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `getImageUrl returns correct URL with custom endpoint`() {
-        val url = adapter.getImageUrl(1, "pets/1/image.jpg")
+        val url = adapter.getImageUrl(1, "pets/1/storage.jpg")
         
         assertTrue(url.startsWith("https://s3.example.com/"))
         assertTrue(url.contains("mocks-bucket"))
-        assertTrue(url.contains("pets/1/image.jpg"))
+        assertTrue(url.contains("pets/1/storage.jpg"))
     }
 
     @Test
@@ -43,7 +43,7 @@ class S3ImageStorageAdapterTest {
             pathStyleAccess = false
         )
         
-        val url = adapterNoEndpoint.getImageUrl(1, "pets/1/image.jpg")
+        val url = adapterNoEndpoint.getImageUrl(1, "pets/1/storage.jpg")
         
         assertTrue(url.startsWith("https://"))
         assertTrue(url.contains("my-bucket"))
@@ -140,8 +140,8 @@ class S3ImageStorageAdapterTest {
     @Test
     fun `different pet ids generate different paths`() {
         // The pet ID is embedded in the key during upload
-        val url1 = adapter.getImageUrl(1, "pets/1/image.jpg")
-        val url2 = adapter.getImageUrl(2, "pets/2/image.jpg")
+        val url1 = adapter.getImageUrl(1, "pets/1/storage.jpg")
+        val url2 = adapter.getImageUrl(2, "pets/2/storage.jpg")
         
         assertTrue(url1.contains("pets/1/"))
         assertTrue(url2.contains("pets/2/"))
@@ -149,18 +149,18 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `image key can contain UUID format`() {
-        val url = adapter.getImageUrl(1, "12345678-1234-1234-1234-123456789012-image.jpg")
+        val url = adapter.getImageUrl(1, "12345678-1234-1234-1234-123456789012-storage.jpg")
         
-        assertTrue(url.contains("12345678-1234-1234-1234-123456789012-image.jpg"))
+        assertTrue(url.contains("12345678-1234-1234-1234-123456789012-storage.jpg"))
     }
 
     @Test
     fun `multiple images for same pet have unique keys`() {
-        val url1 = adapter.getImageUrl(1, "first-image.jpg")
-        val url2 = adapter.getImageUrl(1, "second-image.jpg")
+        val url1 = adapter.getImageUrl(1, "first-storage.jpg")
+        val url2 = adapter.getImageUrl(1, "second-storage.jpg")
         
-        assertTrue(url1.contains("first-image.jpg"))
-        assertTrue(url2.contains("second-image.jpg"))
+        assertTrue(url1.contains("first-storage.jpg"))
+        assertTrue(url2.contains("second-storage.jpg"))
     }
 
     @Test

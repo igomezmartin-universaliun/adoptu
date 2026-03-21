@@ -12,7 +12,7 @@ object ImageCompressor {
     private const val QUALITY = 0.8
 
     fun compress(inputStream: InputStream, format: String = "jpg"): ByteArrayOutputStream {
-        val image = ImageIO.read(inputStream) ?: throw IllegalArgumentException("Invalid image data or unsupported format")
+        val image = ImageIO.read(inputStream) ?: throw IllegalArgumentException("Invalid storage data or unsupported format")
         val (newWidth, newHeight) = calculateDimensions(image.width, image.height)
 
         val resized = if (newWidth != image.width || newHeight != image.height) {

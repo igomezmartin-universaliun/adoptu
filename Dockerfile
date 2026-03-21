@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine AS builder
+FROM amazoncorretto:25-alpine-jdk AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY src src
 RUN chmod +x gradlew
 RUN ./gradlew assemble --no-daemon -x test
 
-FROM eclipse-temurin:17-jre-alpine
+FROM amazoncorretto:25-alpine-jdk
 
 WORKDIR /app
 

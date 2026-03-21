@@ -45,6 +45,7 @@ data class PetDto(
     val adoptionFee: Double = 0.0,
     val currency: Currency = Currency.USD,
     val isUrgent: Boolean = false,
+    val isPromoted: Boolean = false,
     val createdAt: Long,
     val images: List<PetImageDto> = emptyList()
 )
@@ -84,7 +85,8 @@ data class CreatePetRequest(
     val specialNeeds: String? = null,
     val adoptionFee: Double = 0.0,
     val currency: Currency = Currency.USD,
-    val isUrgent: Boolean = false
+    val isUrgent: Boolean = false,
+    val isPromoted: Boolean = false
 )
 
 @Serializable
@@ -115,7 +117,8 @@ data class UpdatePetRequest(
     val specialNeeds: String? = null,
     val adoptionFee: Double? = null,
     val currency: Currency? = null,
-    val isUrgent: Boolean? = null
+    val isUrgent: Boolean? = null,
+    val isPromoted: Boolean? = null
 )
 
 

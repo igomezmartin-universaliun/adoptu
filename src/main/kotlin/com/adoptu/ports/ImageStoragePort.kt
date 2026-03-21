@@ -1,4 +1,4 @@
-package com.adoptu.domains.image
+package com.adoptu.ports
 
 import java.io.InputStream
 
