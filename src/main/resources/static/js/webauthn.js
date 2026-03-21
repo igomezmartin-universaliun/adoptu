@@ -19,7 +19,7 @@ const webauthn = {
             credentials: 'include'
         });
         const result = await regRes.json();
-        return result.success;
+        return result;
     },
     async authenticate() {
         const optsRes = await fetch('/api/auth/assertion-options', { credentials: 'include' });

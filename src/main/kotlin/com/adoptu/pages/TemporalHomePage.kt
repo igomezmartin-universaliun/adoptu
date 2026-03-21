@@ -16,7 +16,7 @@ fun HTML.temporalHomeProfilePage() {
                 h2 { attributes["data-i18n"] = "createTemporalHome"; +"Create Temporal Home Profile" }
                 form { id = "temporal-home-form"
                     label { htmlFor = "alias"; attributes["data-i18n"] = "alias"; +"Alias" }; input(InputType.text) { name = "alias"; id = "alias"; required = true }
-                    label { htmlFor = "country"; attributes["data-i18n"] = "country"; +"Country" }; input(InputType.text) { name = "country"; id = "country"; required = true }
+                    label { htmlFor = "country"; attributes["data-i18n"] = "countryLabel"; +"Country" }; input(InputType.text) { name = "country"; id = "country"; required = true }
                     label { htmlFor = "state"; attributes["data-i18n"] = "state"; +"State" }; input(InputType.text) { name = "state"; id = "state" }
                     label { htmlFor = "city"; attributes["data-i18n"] = "city"; +"City" }; input(InputType.text) { name = "city"; id = "city"; required = true }
                     label { htmlFor = "zip"; attributes["data-i18n"] = "zipCode"; +"Zip Code" }; input(InputType.text) { name = "zip"; id = "zip" }
@@ -95,6 +95,8 @@ window.blockRescuer = async (rescuerId) => {
     }
 }
 
+private const val SEARCH_FILTER = "search-filter"
+
 fun HTML.temporalHomesSearchPage() {
     commonHead("Find Temporal Homes - Adopt-U")
     body {
@@ -104,10 +106,10 @@ fun HTML.temporalHomesSearchPage() {
         }
         main {
             h1 { attributes["data-i18n"] = "findTemporalHome"; +"Find Temporal Homes" }
-            div(classes = "search-form") {
-                div {
-                    label { htmlFor = "country"; attributes["data-i18n"] = "country"; +"Country" }
-                    select { id = "search-country"; name = "country"; onChange = "searchTemporalHomes()"
+            div(classes = "temporal-search-form") {
+                div(classes = "search-country") {
+                    label { htmlFor = "country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
+                    select { id = "search-country"; name = "country"; onChange = "onCountryChange()"
                         option { value = ""; attributes["data-i18n"] = "selectCountry"; +"Select a country" }
                         option { value = "Afghanistan"; attributes["data-i18n"] = "country.afghanistan"; +"Afghanistan" }
                         option { value = "Albania"; attributes["data-i18n"] = "country.albania"; +"Albania" }
@@ -224,10 +226,22 @@ fun HTML.temporalHomesSearchPage() {
                     }
                 }
                 div(classes = "search-filters") {
-                    label { htmlFor = "state"; attributes["data-i18n"] = "state"; +"State" }; input(InputType.text) { name = "state"; id = "search-state"; disabled = true }
-                    label { htmlFor = "city"; attributes["data-i18n"] = "city"; +"City" }; input(InputType.text) { name = "city"; id = "search-city"; disabled = true }
-                    label { htmlFor = "zip"; attributes["data-i18n"] = "zipCode"; +"Zip" }; input(InputType.text) { name = "zip"; id = "search-zip"; disabled = true; maxLength = 7 }
-                    label { htmlFor = "neighborhood"; attributes["data-i18n"] = "neighborhood"; +"Neighborhood" }; input(InputType.text) { name = "neighborhood"; id = "search-neighborhood"; disabled = true }
+                    div(classes = SEARCH_FILTER){
+                        label { htmlFor = "state"; attributes["data-i18n"] = "state"; +"State" }
+                        input(InputType.text) { name = "state"; id = "search-state"; disabled = true }
+                    }
+                    div(classes = SEARCH_FILTER){
+                        label { htmlFor = "city"; attributes["data-i18n"] = "city"; +"City" }
+                        input(InputType.text) { name = "city"; id = "search-city"; disabled = true }
+                    }
+                    div(classes = SEARCH_FILTER){
+                        label { htmlFor = "zip"; attributes["data-i18n"] = "zipCode"; +"Zip" }
+                        input(InputType.text) { name = "zip"; id = "search-zip"; disabled = true; maxLength = "7" }
+                    }
+                    div(classes = SEARCH_FILTER){
+                        label { htmlFor = "neighborhood"; attributes["data-i18n"] = "neighborhood"; +"Neighborhood" }
+                        input(InputType.text) { name = "neighborhood"; id = "search-neighborhood"; disabled = true }
+                    }
                 }
                 button(classes = "btn", type = ButtonType.button) { attributes["data-i18n"] = "search"; onClick = "searchTemporalHomes()"; +"Search" }
             }
@@ -236,6 +250,18 @@ fun HTML.temporalHomesSearchPage() {
         footer()
         commonScripts()
         script { unsafe { raw("""
+function onCountryChange() {
+    const hasCountry = document.getElementById('search-country').value !== '';
+    const filters = document.querySelectorAll('.search-filters input');
+    filters.forEach(input => {
+        input.disabled = !hasCountry;
+        if (!hasCountry) input.value = '';
+    });
+    if (!hasCountry) {
+        document.getElementById('results-container').innerHTML = '';
+    }
+}
+
 function searchTemporalHomes() {
     const params = new URLSearchParams();
     const country = document.getElementById('search-country').value;
@@ -264,20 +290,6 @@ function searchTemporalHomes() {
         })
         .catch(err => console.error(err));
 }
-
-document.getElementById('search-country').addEventListener('change', function() {
-    const hasCountry = this.value !== '';
-    const filters = document.querySelectorAll('.search-filters input');
-    filters.forEach(input => {
-        input.disabled = !hasCountry;
-        if (!hasCountry) input.value = '';
-    });
-    if (!hasCountry) {
-        document.getElementById('results-container').innerHTML = '';
-    } else {
-        searchTemporalHomes();
-    }
-});
 """.trimIndent()) } }
     }
 }

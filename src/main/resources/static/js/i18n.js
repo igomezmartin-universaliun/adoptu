@@ -120,7 +120,7 @@ const i18n = {
             myTemporalHome: "My Temporal Home",
             createTemporalHome: "Create Temporal Home Profile",
             alias: "Alias",
-            country: "Country",
+            countryLabel: "Country",
             state: "State",
             city: "City",
             zipCode: "Zip Code",
@@ -1558,6 +1558,17 @@ const i18n = {
             const key = el.getAttribute('data-i18n-placeholder');
             el.placeholder = this.t(key);
         });
+        this.sortCountryOptions();
+    },
+    sortCountryOptions: function() {
+        const countrySelect = document.getElementById('search-country');
+        if (!countrySelect) return;
+        const options = Array.from(countrySelect.options);
+        const selectedValue = countrySelect.value;
+        const sortedOptions = options.sort((a, b) => a.textContent.localeCompare(b.textContent));
+        countrySelect.innerHTML = '';
+        sortedOptions.forEach(opt => countrySelect.appendChild(opt));
+        countrySelect.value = selectedValue;
     },
     updateDropdownLabel: function() {
         const btn = document.querySelector('.lang-dropbtn');

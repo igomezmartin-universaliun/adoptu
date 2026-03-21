@@ -76,7 +76,9 @@ fun Route.usersRoutes() {
         }
 
         get("/photographers") {
-            val photographers = userService.getPhotographers()
+            val country = call.parameters["country"]
+            val state = call.parameters["state"]
+            val photographers = userService.getPhotographers(country, state)
             call.respond(photographers)
         }
 

@@ -15,6 +15,7 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 
 object TemporalHomeService {
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -68,6 +69,40 @@ object TemporalHomeService {
                 createdAt = createdAt
             )
         }
+    }
+
+    fun updateTemporalHome(userId: Int, request: UpdateTemporalHomeRequest): TemporalHomeDto? = transaction {
+        val existing = TemporalHomes.selectAll()
+            .where { TemporalHomes.userId eq userId }
+            .firstOrNull()
+            ?: return@transaction null
+
+        val updatedAlias = request.alias ?: existing[TemporalHomes.alias]
+        val updatedCountry = request.country ?: existing[TemporalHomes.country]
+        val updatedState = request.state ?: existing[TemporalHomes.state]
+        val updatedCity = request.city ?: existing[TemporalHomes.city]
+        val updatedZip = request.zip ?: existing[TemporalHomes.zip]
+        val updatedNeighborhood = request.neighborhood ?: existing[TemporalHomes.neighborhood]
+
+        TemporalHomes.update({ TemporalHomes.userId eq userId }) {
+            it[TemporalHomes.alias] = updatedAlias
+            it[TemporalHomes.country] = updatedCountry
+            it[TemporalHomes.state] = updatedState
+            it[TemporalHomes.city] = updatedCity
+            it[TemporalHomes.zip] = updatedZip
+            it[TemporalHomes.neighborhood] = updatedNeighborhood
+        }
+
+        TemporalHomeDto(
+            userId = userId,
+            alias = updatedAlias,
+            country = updatedCountry,
+            state = updatedState,
+            city = updatedCity,
+            zip = updatedZip,
+            neighborhood = updatedNeighborhood,
+            createdAt = existing[TemporalHomes.createdAt]
+        )
     }
 
     fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> = transaction {

@@ -74,11 +74,11 @@ const api = {
             body: JSON.stringify({ displayName })
         });
     },
-    async updatePhotographerSettings(fee, currency) {
+    async updatePhotographerSettings(fee, currency, country, state) {
         return this.fetch('/api/users/photographer-settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ photographerFee: fee, photographerCurrency: currency })
+            body: JSON.stringify({ photographerFee: fee, photographerCurrency: currency, country, state })
         });
     },
     async createPhotographyRequest(photographerId, petId, message) {
@@ -132,6 +132,13 @@ const api = {
     async createTemporalHome(data) {
         return this.fetch('/api/users/temporal-home', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    },
+    async updateTemporalHome(data) {
+        return this.fetch('/api/users/temporal-home', {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });

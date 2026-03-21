@@ -19,6 +19,8 @@ object Photographers : Table("photographers") {
     val userId = integer("user_id").references(Users.id)
     val photographerFee = decimal("photographer_fee", 10, 2).nullable()
     val photographerCurrency = varchar("photographer_currency", 10).nullable()
+    val country = varchar("country", 100).nullable()
+    val state = varchar("state", 100).nullable()
 
     override val primaryKey = PrimaryKey(userId)
 }

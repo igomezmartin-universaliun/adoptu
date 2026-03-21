@@ -26,11 +26,13 @@ private data class AuthMeResponse(
     val lastAcceptedPrivacyPolicy: Long? = null,
     val lastAcceptedTermsAndConditions: Long? = null,
     val photographerFee: Double? = null,
-    val photographerCurrency: String? = null
+    val photographerCurrency: String? = null,
+    val photographerCountry: String? = null,
+    val photographerState: String? = null
 )
 
 @Serializable
-private data class SuccessWithErrorResponse(val success: Boolean, val error: String? = null)
+private data class SuccessWithErrorResponse(val success: Boolean, val error: String? = null, val needsProfileCompletion: Boolean = false)
 
 fun Route.authRoutes() {
     val webAuthnService by inject<WebAuthnService>()
@@ -65,7 +67,8 @@ fun Route.authRoutes() {
             val userId = webAuthnService.verifyAndRegister(email, displayName, primaryRole.name, roles, registrationResponse)
             if (userId != null) {
                 call.sessions.set(SessionUser(userId, email, displayName))
-                call.respond(SuccessResponse(success = true))
+                val needsProfileCompletion = roles.contains("PHOTOGRAPHER") || roles.contains("TEMPORAL_HOME")
+                call.respond(SuccessWithErrorResponse(success = true, needsProfileCompletion = needsProfileCompletion))
             } else {
                 call.respond(SuccessWithErrorResponse(success = false, error = "Registration failed"))
             }
@@ -124,7 +127,9 @@ fun Route.authRoutes() {
                                 lastAcceptedPrivacyPolicy = user.lastAcceptedPrivacyPolicy,
                                 lastAcceptedTermsAndConditions = user.lastAcceptedTermsAndConditions,
                                 photographerFee = photographerData?.photographerFee,
-                                photographerCurrency = photographerData?.photographerCurrency
+                                photographerCurrency = photographerData?.photographerCurrency,
+                                photographerCountry = photographerData?.country,
+                                photographerState = photographerData?.state
                             )
                         )
                     } else {

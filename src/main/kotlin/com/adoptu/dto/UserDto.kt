@@ -10,6 +10,7 @@ enum class UserRole {
 data class UserDto(
     val id: Int,
     val username: String,
+    val email: String? = null,
     val displayName: String,
     val language: String = "en",
     val activeRoles: Set<UserRole> = emptySet(),
@@ -23,7 +24,9 @@ data class PhotographerDto(
     val displayName: String,
     val username: String? = null,
     val photographerFee: Double? = null,
-    val photographerCurrency: String? = null
+    val photographerCurrency: String? = null,
+    val country: String? = null,
+    val state: String? = null
 )
 
 @Serializable
@@ -35,7 +38,9 @@ data class AcceptTermsRequest(
 @Serializable
 data class PhotographerSettingsRequest(
     val photographerFee: Double,
-    val photographerCurrency: String
+    val photographerCurrency: String,
+    val country: String? = null,
+    val state: String? = null
 )
 
 @Serializable
@@ -106,7 +111,21 @@ data class CreateTemporalHomeRequest(
     val state: String? = null,
     val city: String,
     val zip: String? = null,
-    val neighborhood: String? = null
+    val neighborhood: String? = null,
+    val streetAddress: String? = null,
+    val phone: String? = null
+)
+
+@Serializable
+data class UpdateTemporalHomeRequest(
+    val alias: String? = null,
+    val country: String? = null,
+    val state: String? = null,
+    val city: String? = null,
+    val zip: String? = null,
+    val neighborhood: String? = null,
+    val streetAddress: String? = null,
+    val phone: String? = null
 )
 
 @Serializable

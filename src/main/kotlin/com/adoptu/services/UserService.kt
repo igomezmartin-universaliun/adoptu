@@ -45,6 +45,7 @@ object UserService {
                 UserDto(
                     id = user[Users.id],
                     username = user[Users.username],
+                    email = user[Users.username],
                     displayName = user[Users.displayName],
                     language = user[Users.language],
                     activeRoles = activeRoles,
@@ -67,30 +68,44 @@ object UserService {
                     displayName = user[Users.displayName],
                     username = user[Users.username],
                     photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
-                    photographerCurrency = photographer?.get(Photographers.photographerCurrency)
+                    photographerCurrency = photographer?.get(Photographers.photographerCurrency),
+                    country = photographer?.get(Photographers.country),
+                    state = photographer?.get(Photographers.state)
                 )
             } else null
         }
     }
 
-    fun getPhotographers(): List<PhotographerDto> = transaction {
-        UserActiveRoles.selectAll()
+    fun getPhotographers(country: String? = null, state: String? = null): List<PhotographerDto> = transaction {
+        val photographerUserIds = UserActiveRoles.selectAll()
             .where { UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name }
             .map { row -> row[UserActiveRoles.userId] }
             .distinct()
-            .mapNotNull { userId ->
-                val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
-                val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
-                if (user != null) {
+        
+        photographerUserIds.mapNotNull { userId ->
+            val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
+            val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
+            
+            if (user != null && photographer != null) {
+                val photographerCountry = photographer[Photographers.country]
+                val photographerState = photographer[Photographers.state]
+                
+                val matchesCountry = country.isNullOrBlank() || photographerCountry == country
+                val matchesState = state.isNullOrBlank() || photographerState == state
+                
+                if (matchesCountry && matchesState) {
                     PhotographerDto(
                         userId = userId,
                         displayName = user[Users.displayName],
                         username = user[Users.username],
-                        photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
-                        photographerCurrency = photographer?.get(Photographers.photographerCurrency)
+                        photographerFee = photographer[Photographers.photographerFee]?.toDouble(),
+                        photographerCurrency = photographer[Photographers.photographerCurrency],
+                        country = photographerCountry,
+                        state = photographerState
                     )
                 } else null
-            }
+            } else null
+        }
     }
 
     fun getRescuers(): List<UserDto> = transaction {
@@ -166,6 +181,8 @@ object UserService {
             if (existingPhotographer == null) {
                 Photographers.insert {
                     it[Photographers.userId] = userId
+                    it[country] = null
+                    it[state] = null
                 }
             }
         }
@@ -266,12 +283,16 @@ object UserService {
                 Photographers.update({ Photographers.userId eq userId }) {
                     it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
                     it[photographerCurrency] = request.photographerCurrency
+                    it[country] = request.country
+                    it[state] = request.state
                 }
             } else {
                 Photographers.insert {
                     it[Photographers.userId] = userId
                     it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
                     it[photographerCurrency] = request.photographerCurrency
+                    it[country] = request.country
+                    it[state] = request.state
                 }
             }
         }
@@ -284,7 +305,9 @@ object UserService {
                     userId = userId,
                     displayName = user[Users.displayName],
                     photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
-                    photographerCurrency = photographer?.get(Photographers.photographerCurrency)
+                    photographerCurrency = photographer?.get(Photographers.photographerCurrency),
+                    country = photographer?.get(Photographers.country),
+                    state = photographer?.get(Photographers.state)
                 )
             } else null
         }

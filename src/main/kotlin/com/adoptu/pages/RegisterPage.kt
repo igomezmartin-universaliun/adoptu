@@ -60,8 +60,16 @@ document.getElementById('register-form').onsubmit = async (e) => {
     if (!emailRegex.test(email)) { msg.className = 'message error'; msg.textContent = 'Please enter a valid email address.'; return; }
     try {
         msg.textContent = 'Creating passkey...';
-        const ok = await webauthn.register(email, displayName, roles);
-        if (ok) { msg.className = 'message success'; msg.textContent = 'Success! Redirecting...'; location.href = '/'; }
+        const result = await webauthn.register(email, displayName, roles);
+        if (result) { 
+            msg.className = 'message success'; 
+            msg.textContent = 'Success! Redirecting...';
+            if (result.needsProfileCompletion) {
+                location.href = '/profile';
+            } else {
+                location.href = '/';
+            }
+        }
         else { msg.className = 'message error'; msg.textContent = 'Registration failed.'; }
     } catch (err) { msg.className = 'message error'; msg.textContent = err.message || 'Registration error.'; }
 };

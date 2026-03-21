@@ -3,6 +3,7 @@ package com.adoptu.plugins.routes
 import com.adoptu.auth.SessionUser
 import com.adoptu.dto.BlockRescuerRequest
 import com.adoptu.dto.CreateTemporalHomeRequest
+import com.adoptu.dto.UpdateTemporalHomeRequest
 import com.adoptu.dto.SendTemporalHomeRequestRequest
 import com.adoptu.dto.TemporalHomeSearchParams
 import com.adoptu.dto.UserRole
@@ -59,6 +60,28 @@ fun Route.temporalHomeRoutes() {
                 return@get call.respondError("Temporal home profile not found", 404)
             }
             call.respond(temporalHome)
+        }
+
+        put("/temporal-home") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@put call.respondError("Unauthorized", 401)
+
+            val existing = temporalHomeService.getTemporalHome(session.userId)
+            if (existing == null) {
+                return@put call.respondError("Temporal home profile not found", 404)
+            }
+
+            val body = call.receive<UpdateTemporalHomeRequest>()
+            
+            try {
+                val updated = temporalHomeService.updateTemporalHome(session.userId, body)
+                if (updated == null) {
+                    return@put call.respondError("Failed to update temporal home", 500)
+                }
+                call.respond(updated)
+            } catch (e: Exception) {
+                call.respondError(e.message ?: "Failed to update temporal home", 500)
+            }
         }
 
         get("/temporal-home/requests") {
