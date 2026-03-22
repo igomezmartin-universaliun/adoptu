@@ -4,6 +4,7 @@ import com.adoptu.ports.NotificationPort
 import io.ktor.server.config.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class SnsNotificationAdapterTest {
@@ -126,15 +127,10 @@ class SnsNotificationAdapterTest {
     }
 
     @Test
-    fun `sendEmail constructs correct message format`() {
+    fun `sendEmail returns false for not configured`() {
         val config = MapApplicationConfig()
         val adapter = SnsNotificationAdapter(config)
 
-        kotlinx.coroutines.runBlocking {
-            adapter.sendEmail("test@example.com", "Test Subject", "Test Body")
-        }
-
-        // Verify it returns false (not configured) but processes the request
         val result = kotlinx.coroutines.runBlocking {
             adapter.sendEmail("test@example.com", "Test Subject", "Test Body")
         }
@@ -148,4 +144,132 @@ class SnsNotificationAdapterTest {
 
         assertTrue(adapter is NotificationPort)
     }
+
+    @Test
+    fun `sendTemporalHomeRequest returns false when not configured`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendTemporalHomeRequest(
+                temporalHomeEmail = "home@test.com",
+                temporalHomeAlias = "Test Home",
+                rescuerName = "Test Rescuer",
+                petName = "Buddy",
+                message = "Need help",
+                spamReportLink = "https://example.com/block"
+            )
+        }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendTemporalHomeRequest returns false when not configured with null pet`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendTemporalHomeRequest(
+                temporalHomeEmail = "home@test.com",
+                temporalHomeAlias = "Test Home",
+                rescuerName = "Test Rescuer",
+                petName = null,
+                message = "Need help",
+                spamReportLink = "https://example.com/block"
+            )
+        }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `adapter can be instantiated with empty config`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+        assertNotNull(adapter)
+    }
+
+    @Test
+    fun `adapter can be instantiated with sns config`() {
+        val config = MapApplicationConfig(
+            "sns.region" to "us-west-2",
+            "sns.access_key_id" to "key",
+            "sns.secret_access_key" to "secret",
+            "sns.topic_arn" to "arn:aws:sns:us-west-2:123456789012:test"
+        )
+        val adapter = SnsNotificationAdapter(config)
+        assertNotNull(adapter)
+    }
+
+    @Test
+    fun `sendPhotographerRequest with fee and currency builds correct parameters`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendPhotographerRequest(
+                photographerEmail = "photo@test.com",
+                photographerName = "John",
+                requesterName = "Jane",
+                petName = "Buddy",
+                message = "Test message",
+                fee = 100.0,
+                currency = "EUR"
+            )
+        }
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendPhotographerRequest with zero fee does not include fee`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendPhotographerRequest(
+                photographerEmail = "photo@test.com",
+                photographerName = "John",
+                requesterName = "Jane",
+                petName = "Buddy",
+                message = "Test message",
+                fee = 0.0,
+                currency = "USD"
+            )
+        }
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendAdoptionRequestNotification with blank message`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendAdoptionRequestNotification(
+                rescuerEmail = "rescuer@test.com",
+                petName = "Buddy",
+                adopterName = "Jane",
+                message = ""
+            )
+        }
+        assertFalse(result)
+    }
+
+    @Test
+    fun `sendAdoptionRequestNotification with blank message string`() {
+        val config = MapApplicationConfig()
+        val adapter = SnsNotificationAdapter(config)
+
+        val result = kotlinx.coroutines.runBlocking {
+            adapter.sendAdoptionRequestNotification(
+                rescuerEmail = "rescuer@test.com",
+                petName = "Buddy",
+                adopterName = "Jane",
+                message = "   "
+            )
+        }
+        assertFalse(result)
+    }
 }
+

@@ -13,6 +13,9 @@ import com.adoptu.models.BlockedRescuers
 import com.adoptu.models.TemporalHomeRequests
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -86,6 +89,31 @@ class DatabaseFactoryTest {
     fun `TemporalHomeRequests table is in listOfTables`() {
         assertTrue(DatabaseFactory.listOfTables.contains(TemporalHomeRequests))
     }
+
+    @Test
+    fun `listOfTables contains all expected tables in correct order`() {
+        val expectedTables = listOf(
+            Users,
+            UserActiveRoles,
+            Photographers,
+            WebAuthnCredentials,
+            Pets,
+            PetImages,
+            AdoptionRequests,
+            PhotographyRequests,
+            TemporalHomes,
+            BlockedRescuers,
+            TemporalHomeRequests
+        )
+        
+        assertEquals(expectedTables.size, DatabaseFactory.listOfTables.size)
+        expectedTables.forEachIndexed { index, table ->
+            assertTrue(
+                DatabaseFactory.listOfTables.contains(table),
+                "Table at index $index should be in listOfTables"
+            )
+        }
+    }
 }
 
 class DatabaseIntegrationTest {
@@ -93,7 +121,7 @@ class DatabaseIntegrationTest {
     @Test
     fun `can connect to in-memory H2 database`() {
         val db = Database.connect(
-            url = "jdbc:h2:mem:mocks;DB_CLOSE_DELAY=-1",
+            url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
             driver = "org.h2.Driver",
             user = "sa",
             password = ""
@@ -111,7 +139,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(
@@ -129,7 +157,6 @@ class DatabaseIntegrationTest {
             )
         }
         
-        // Schema created successfully
         assertTrue(true)
     }
 
@@ -142,13 +169,12 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users)
         }
         
-        // Table created
         assertTrue(true)
     }
 
@@ -161,7 +187,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, Pets)
@@ -179,7 +205,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, Pets, PetImages)
@@ -197,7 +223,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, Pets, AdoptionRequests)
@@ -215,7 +241,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, WebAuthnCredentials)
@@ -233,7 +259,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, UserActiveRoles)
@@ -251,7 +277,7 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
             SchemaUtils.create(Users, Pets, PhotographyRequests)
@@ -269,10 +295,9 @@ class DatabaseIntegrationTest {
             password = ""
         )
         
-        org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager.defaultDatabase = db
+        TransactionManager.defaultDatabase = db
         
         transaction {
-            // Create in correct order due to foreign keys
             SchemaUtils.create(Users)
             SchemaUtils.create(UserActiveRoles)
             SchemaUtils.create(Photographers)
@@ -312,4 +337,99 @@ class DatabaseIntegrationTest {
         
         assertNotNull(db)
     }
+
+    @Test
+    fun `can insert user into database`() {
+        val db = Database.connect(
+            url = "jdbc:h2:mem:testinsert;DB_CLOSE_DELAY=-1",
+            driver = "org.h2.Driver",
+            user = "sa",
+            password = ""
+        )
+        
+        TransactionManager.defaultDatabase = db
+        
+        transaction {
+            SchemaUtils.create(Users, UserActiveRoles)
+            val userId = Users.insert {
+                it[username] = "test@example.com"
+                it[displayName] = "Test User"
+                it[createdAt] = System.currentTimeMillis()
+            } get Users.id
+            
+            assertNotNull(userId)
+        }
+    }
+
+    @Test
+    fun `can insert and query user roles`() {
+        val db = Database.connect(
+            url = "jdbc:h2:mem:testroles;DB_CLOSE_DELAY=-1",
+            driver = "org.h2.Driver",
+            user = "sa",
+            password = ""
+        )
+        
+        TransactionManager.defaultDatabase = db
+        
+        transaction {
+            SchemaUtils.create(Users, UserActiveRoles)
+            val userId = Users.insert {
+                it[username] = "admin@example.com"
+                it[displayName] = "Admin User"
+                it[createdAt] = System.currentTimeMillis()
+            } get Users.id
+            
+            UserActiveRoles.insert {
+                it[UserActiveRoles.userId] = userId
+                it[UserActiveRoles.role] = "ADMIN"
+            }
+            
+            val roleCount = UserActiveRoles.selectAll().count()
+            assertEquals(1, roleCount)
+        }
+    }
+
+    @Test
+    fun `TemporalHomeRequests table can be created`() {
+        val db = Database.connect(
+            url = "jdbc:h2:mem:testtemporalhome;DB_CLOSE_DELAY=-1",
+            driver = "org.h2.Driver",
+            user = "sa",
+            password = ""
+        )
+        
+        TransactionManager.defaultDatabase = db
+        
+        transaction {
+            SchemaUtils.create(
+                Users,
+                Pets,
+                TemporalHomes,
+                BlockedRescuers,
+                TemporalHomeRequests
+            )
+        }
+        
+        assertTrue(true)
+    }
+
+    @Test
+    fun `BlockedRescuers table can be created`() {
+        val db = Database.connect(
+            url = "jdbc:h2:mem:testblocked;DB_CLOSE_DELAY=-1",
+            driver = "org.h2.Driver",
+            user = "sa",
+            password = ""
+        )
+        
+        TransactionManager.defaultDatabase = db
+        
+        transaction {
+            SchemaUtils.create(Users, TemporalHomes, BlockedRescuers)
+        }
+        
+        assertTrue(true)
+    }
 }
+

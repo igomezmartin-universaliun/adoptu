@@ -86,9 +86,9 @@ object UserService {
             val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
             val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
             
-            if (user != null && photographer != null) {
-                val photographerCountry = photographer[Photographers.country]
-                val photographerState = photographer[Photographers.state]
+            if (user != null) {
+                val photographerCountry = photographer?.get(Photographers.country)
+                val photographerState = photographer?.get(Photographers.state)
                 
                 val matchesCountry = country.isNullOrBlank() || photographerCountry == country
                 val matchesState = state.isNullOrBlank() || photographerState == state
@@ -98,8 +98,8 @@ object UserService {
                         userId = userId,
                         displayName = user[Users.displayName],
                         username = user[Users.username],
-                        photographerFee = photographer[Photographers.photographerFee]?.toDouble(),
-                        photographerCurrency = photographer[Photographers.photographerCurrency],
+                        photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
+                        photographerCurrency = photographer?.get(Photographers.photographerCurrency),
                         country = photographerCountry,
                         state = photographerState
                     )

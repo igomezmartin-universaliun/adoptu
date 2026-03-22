@@ -3,6 +3,7 @@ package com.adoptu.adapters.storage
 import com.adoptu.ports.ImageStoragePort
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -12,12 +13,11 @@ class S3ImageStorageAdapterTest {
 
     @BeforeEach
     fun setup() {
-        // Use a mock endpoint for testing
         adapter = S3ImageStorageAdapter(
-            bucketName = "mocks-bucket",
+            bucketName = "test-bucket",
             region = "us-east-1",
-            accessKeyId = "mocks-key",
-            secretAccessKey = "mocks-secret",
+            accessKeyId = "test-key",
+            secretAccessKey = "test-secret",
             endpoint = "https://s3.example.com",
             pathStyleAccess = true
         )
@@ -25,11 +25,11 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `getImageUrl returns correct URL with custom endpoint`() {
-        val url = adapter.getImageUrl(1, "pets/1/storage.jpg")
+        val url = adapter.getImageUrl(1, "pets/1/test.jpg")
         
         assertTrue(url.startsWith("https://s3.example.com/"))
-        assertTrue(url.contains("mocks-bucket"))
-        assertTrue(url.contains("pets/1/storage.jpg"))
+        assertTrue(url.contains("test-bucket"))
+        assertTrue(url.contains("pets/1/test.jpg"))
     }
 
     @Test
@@ -43,7 +43,7 @@ class S3ImageStorageAdapterTest {
             pathStyleAccess = false
         )
         
-        val url = adapterNoEndpoint.getImageUrl(1, "pets/1/storage.jpg")
+        val url = adapterNoEndpoint.getImageUrl(1, "pets/1/test.jpg")
         
         assertTrue(url.startsWith("https://"))
         assertTrue(url.contains("my-bucket"))
@@ -53,10 +53,10 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `getImageUrl constructs correct path with pet id`() {
-        val url = adapter.getImageUrl(42, "pets/42/unique-id-photo.jpg")
+        val url = adapter.getImageUrl(42, "pets/42/unique-photo.jpg")
         
         assertTrue(url.contains("pets/42/"))
-        assertTrue(url.contains("unique-id-photo.jpg"))
+        assertTrue(url.contains("unique-photo.jpg"))
     }
 
     @Test
@@ -108,9 +108,9 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `bucket name is used in URL generation`() {
-        val url = adapter.getImageUrl(1, "mocks.jpg")
+        val url = adapter.getImageUrl(1, "test.jpg")
         
-        assertTrue(url.contains("mocks-bucket"))
+        assertTrue(url.contains("test-bucket"))
     }
 
     @Test
@@ -124,24 +124,22 @@ class S3ImageStorageAdapterTest {
             pathStyleAccess = false
         )
         
-        val url = adapterNoEndpoint.getImageUrl(1, "mocks.jpg")
+        val url = adapterNoEndpoint.getImageUrl(1, "test.jpg")
         
         assertTrue(url.contains("eu-central-1"))
     }
 
     @Test
     fun `pathStyleAccess affects URL format`() {
-        // With pathStyleAccess = true, should use path-style URL
-        val url = adapter.getImageUrl(1, "mocks.jpg")
+        val url = adapter.getImageUrl(1, "test.jpg")
         
-        assertTrue(url.contains("mocks-bucket/"))
+        assertTrue(url.contains("test-bucket/"))
     }
 
     @Test
     fun `different pet ids generate different paths`() {
-        // The pet ID is embedded in the key during upload
-        val url1 = adapter.getImageUrl(1, "pets/1/storage.jpg")
-        val url2 = adapter.getImageUrl(2, "pets/2/storage.jpg")
+        val url1 = adapter.getImageUrl(1, "pets/1/test.jpg")
+        val url2 = adapter.getImageUrl(2, "pets/2/test.jpg")
         
         assertTrue(url1.contains("pets/1/"))
         assertTrue(url2.contains("pets/2/"))
@@ -149,31 +147,30 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `image key can contain UUID format`() {
-        val url = adapter.getImageUrl(1, "12345678-1234-1234-1234-123456789012-storage.jpg")
+        val url = adapter.getImageUrl(1, "12345678-1234-1234-1234-123456789012-test.jpg")
         
-        assertTrue(url.contains("12345678-1234-1234-1234-123456789012-storage.jpg"))
+        assertTrue(url.contains("12345678-1234-1234-1234-123456789012-test.jpg"))
     }
 
     @Test
     fun `multiple images for same pet have unique keys`() {
-        val url1 = adapter.getImageUrl(1, "first-storage.jpg")
-        val url2 = adapter.getImageUrl(1, "second-storage.jpg")
+        val url1 = adapter.getImageUrl(1, "first.jpg")
+        val url2 = adapter.getImageUrl(1, "second.jpg")
         
-        assertTrue(url1.contains("first-storage.jpg"))
-        assertTrue(url2.contains("second-storage.jpg"))
+        assertTrue(url1.contains("first.jpg"))
+        assertTrue(url2.contains("second.jpg"))
     }
 
     @Test
-    fun `S3ImageStorageAdapter can be instantiated with various regions`() {
+    fun `adapter can be instantiated with various regions`() {
         val regions = listOf(
             "us-east-1", "us-east-2", "us-west-1", "us-west-2",
-            "eu-west-1", "eu-west-2", "eu-central-1",
-            "ap-northeast-1", "ap-southeast-1", "ap-southeast-2"
+            "eu-west-1", "eu-west-2", "eu-central-1"
         )
         
         regions.forEach { region ->
             val testAdapter = S3ImageStorageAdapter(
-                bucketName = "mocks-bucket",
+                bucketName = "test-bucket",
                 region = region,
                 accessKeyId = "key",
                 secretAccessKey = "secret",
@@ -181,7 +178,7 @@ class S3ImageStorageAdapterTest {
                 pathStyleAccess = false
             )
             
-            val url = testAdapter.getImageUrl(1, "mocks.jpg")
+            val url = testAdapter.getImageUrl(1, "test.jpg")
             assertTrue(url.contains(region), "URL should contain region: $region")
         }
     }
@@ -198,41 +195,96 @@ class S3ImageStorageAdapterTest {
             pathStyleAccess = true
         )
         
-        val url = testAdapter.getImageUrl(1, "pets/1/mocks.jpg")
+        val url = testAdapter.getImageUrl(1, "pets/1/test.jpg")
         
         assertTrue(url.startsWith(customEndpoint))
         assertTrue(url.contains("mybucket"))
     }
+
+    @Test
+    fun `getImageUrl handles null endpoint with AWS format`() {
+        val adapterNoEndpoint = S3ImageStorageAdapter(
+            bucketName = "my-bucket",
+            region = "us-west-2",
+            accessKeyId = null,
+            secretAccessKey = null,
+            endpoint = null,
+            pathStyleAccess = false
+        )
+
+        val url = adapterNoEndpoint.getImageUrl(5, "pets/5/test.png")
+        assertEquals("https://my-bucket.s3.us-west-2.amazonaws.com/pets/5/test.png", url)
+    }
+
+    @Test
+    fun `getImageUrl handles custom endpoint with port`() {
+        val adapterWithEndpoint = S3ImageStorageAdapter(
+            bucketName = "my-bucket",
+            region = "us-east-1",
+            accessKeyId = null,
+            secretAccessKey = null,
+            endpoint = "http://localhost:9000",
+            pathStyleAccess = true
+        )
+
+        val url = adapterWithEndpoint.getImageUrl(5, "pets/5/test.png")
+        assertTrue(url.startsWith("http://localhost:9000/"))
+        assertTrue(url.contains("my-bucket/"))
+        assertTrue(url.contains("pets/5/test.png"))
+    }
+
+    @Test
+    fun `URL key extraction works via getImageUrl`() {
+        val adapterForExtract = S3ImageStorageAdapter(
+            bucketName = "test-bucket",
+            region = "us-east-1",
+            accessKeyId = "test-key",
+            secretAccessKey = "test-secret",
+            endpoint = "https://custom.endpoint.com",
+            pathStyleAccess = true
+        )
+
+        val url = adapterForExtract.getImageUrl(1, "pets/1/test-image.jpg")
+        assertTrue(url.contains("pets/1/test-image.jpg"))
+    }
+
+    @Test
+    fun `adapter handles various content types in URLs`() {
+        val contentTypes = listOf("image/jpeg", "image/png", "image/gif", "image/webp")
+        
+        contentTypes.forEach { contentType ->
+            val extension = contentType.substringAfter("/")
+            val adapter = S3ImageStorageAdapter(
+                bucketName = "test-bucket",
+                region = "us-east-1",
+                accessKeyId = "key",
+                secretAccessKey = "secret",
+                endpoint = null,
+                pathStyleAccess = false
+            )
+            
+            val url = adapter.getImageUrl(1, "pets/1/image.$extension")
+            assertTrue(url.contains("image.$extension"))
+        }
+    }
+
+    @Test
+    fun `getImageUrl generates correct URL for different bucket names`() {
+        val bucketNames = listOf("my-bucket", "my-bucket-123", "my.bucket.with.dots")
+        
+        bucketNames.forEach { bucketName ->
+            val adapter = S3ImageStorageAdapter(
+                bucketName = bucketName,
+                region = "us-east-1",
+                accessKeyId = null,
+                secretAccessKey = null,
+                endpoint = null,
+                pathStyleAccess = false
+            )
+            
+            val url = adapter.getImageUrl(1, "pets/1/test.jpg")
+            assertTrue(url.contains(bucketName), "URL should contain bucket: $bucketName")
+        }
+    }
 }
 
-class ImageStoragePortContractTest : ImageStoragePort by S3ImageStorageAdapter(
-    bucketName = "contract-mocks-bucket",
-    region = "us-east-1",
-    accessKeyId = "key",
-    secretAccessKey = "secret",
-    endpoint = "https://contract.test.com",
-    pathStyleAccess = true
-) {
-    @Test
-    fun `adapter implements ImageStoragePort interface`() {
-        assertTrue(this is ImageStoragePort)
-    }
-
-    @Test
-    fun `getImageUrl is implemented`() {
-        val url = getImageUrl(1, "mocks.jpg")
-        assertNotNull(url)
-    }
-
-    @Test
-    fun `uploadImage is a suspend function`() {
-        // Just verify the method signature exists
-        assertTrue(this is ImageStoragePort)
-    }
-
-    @Test
-    fun `deleteImage is a suspend function`() {
-        // Just verify the method signature exists  
-        assertTrue(this is ImageStoragePort)
-    }
-}

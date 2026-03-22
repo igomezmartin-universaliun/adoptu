@@ -16,6 +16,7 @@ class SnsNotificationAdapter(config: ApplicationConfig) : NotificationPort {
         val region = config.propertyOrNull("sns.region")?.getString() ?: "us-east-1"
         val accessKeyId = config.propertyOrNull("sns.access_key_id")?.getString()
         val secretAccessKey = config.propertyOrNull("sns.secret_access_key")?.getString()
+        val endpoint = config.propertyOrNull("sns.endpoint")?.getString()
         
         val builder = SnsClient.builder().region(Region.of(region))
         
@@ -23,6 +24,10 @@ class SnsNotificationAdapter(config: ApplicationConfig) : NotificationPort {
             builder.credentialsProvider(StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(accessKeyId, secretAccessKey)
             ))
+        }
+        
+        if (!endpoint.isNullOrBlank()) {
+            builder.endpointOverride(java.net.URI.create(endpoint))
         }
         
         builder.build()

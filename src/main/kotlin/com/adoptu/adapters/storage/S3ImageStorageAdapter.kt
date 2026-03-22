@@ -51,7 +51,7 @@ class S3ImageStorageAdapter(
         contentType: String,
         inputStream: InputStream
     ): String {
-            val key = "pets/$petId/${UUID.randomUUID()}-$imageName"
+        val key = "pets/$petId/${UUID.randomUUID()}-$imageName"
 
         val request = PutObjectRequest.builder()
             .bucket(bucketName)
