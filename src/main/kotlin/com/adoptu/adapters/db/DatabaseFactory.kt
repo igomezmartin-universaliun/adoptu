@@ -1,7 +1,6 @@
 package com.adoptu.adapters.db
 
 import com.adoptu.dto.UserRole
-import com.adoptu.models.*
 import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database

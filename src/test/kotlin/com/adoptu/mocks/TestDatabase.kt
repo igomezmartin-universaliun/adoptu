@@ -1,6 +1,16 @@
 package com.adoptu.mocks
 
-import com.adoptu.models.*
+import com.adoptu.adapters.db.AdoptionRequests
+import com.adoptu.adapters.db.BlockedRescuers
+import com.adoptu.adapters.db.PetImages
+import com.adoptu.adapters.db.Pets
+import com.adoptu.adapters.db.Photographers
+import com.adoptu.adapters.db.PhotographyRequests
+import com.adoptu.adapters.db.TemporalHomeRequests
+import com.adoptu.adapters.db.TemporalHomes
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.WebAuthnCredentials
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager

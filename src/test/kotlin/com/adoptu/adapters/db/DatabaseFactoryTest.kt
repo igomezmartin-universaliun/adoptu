@@ -1,16 +1,5 @@
 package com.adoptu.adapters.db
 
-import com.adoptu.models.Users
-import com.adoptu.models.WebAuthnCredentials
-import com.adoptu.models.Pets
-import com.adoptu.models.AdoptionRequests
-import com.adoptu.models.PetImages
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.models.PhotographyRequests
-import com.adoptu.models.Photographers
-import com.adoptu.models.TemporalHomes
-import com.adoptu.models.BlockedRescuers
-import com.adoptu.models.TemporalHomeRequests
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.insert

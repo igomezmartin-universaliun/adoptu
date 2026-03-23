@@ -1,9 +1,12 @@
 package com.adoptu.plugins.routes
 
 import com.adoptu.dto.*
-import com.adoptu.models.Users
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.repositories.PetRepository
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.ports.PetRepositoryPort
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
+import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
+import com.adoptu.adapters.db.repositories.UserRepository
 import com.adoptu.services.PetService
 import com.adoptu.services.ServiceResult
 import com.adoptu.mocks.MockNotificationAdapter
@@ -22,7 +25,7 @@ import kotlin.test.assertTrue
 class PetsRoutesIntegrationTest {
 
     private lateinit var petService: PetService
-    private lateinit var petRepository: PetRepository
+    private lateinit var petRepository: PetRepositoryPort
     private lateinit var mockImageStorage: MockImageStorage
     private lateinit var mockNotificationAdapter: MockNotificationAdapter
 
@@ -74,8 +77,12 @@ class PetsRoutesIntegrationTest {
         
         mockImageStorage = MockImageStorage()
         mockNotificationAdapter = MockNotificationAdapter()
-        petRepository = PetRepository
-        petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter)
+        val userRepository = UserRepository()
+        petRepository = PetRepositoryImpl()
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
+        val photographerService = com.adoptu.services.PhotographerService(photographerRepository, null, userRepository)
+        val userService = com.adoptu.services.UserService(userRepository, photographerService)
+        petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter, userService)
     }
 
     // ==================== GET /api/pets ====================
@@ -442,7 +449,7 @@ class PetsRoutesIntegrationTest {
         rescuerId: Int = 1,
         status: String = "AVAILABLE"
     ): PetDto {
-        return PetRepository.create(
+        return PetRepositoryImpl().create(
             rescuerId = rescuerId,
             name = name,
             type = type,

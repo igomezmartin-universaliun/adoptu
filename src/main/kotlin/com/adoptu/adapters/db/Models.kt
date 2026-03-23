@@ -1,4 +1,4 @@
-package com.adoptu.models
+package com.adoptu.adapters.db
 
 import org.jetbrains.exposed.v1.core.Table
 import java.math.BigDecimal

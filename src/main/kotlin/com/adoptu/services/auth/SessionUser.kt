@@ -1,4 +1,4 @@
-package com.adoptu.auth
+package com.adoptu.services.auth
 
 import kotlinx.serialization.Serializable
 

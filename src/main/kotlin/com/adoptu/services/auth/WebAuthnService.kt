@@ -1,8 +1,8 @@
-package com.adoptu.auth
+package com.adoptu.services.auth
 
-import com.adoptu.models.Users
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.models.WebAuthnCredentials
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.WebAuthnCredentials
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.AttestedCredentialDataConverter
 import com.webauthn4j.converter.util.ObjectConverter

@@ -1,12 +1,12 @@
-package com.adoptu.repositories
+package com.adoptu.adapters.db.repositories
 
+import com.adoptu.adapters.db.AdoptionRequests
+import com.adoptu.adapters.db.PetImages
+import com.adoptu.adapters.db.Pets
+import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.dto.*
-import com.adoptu.models.AdoptionRequests
-import com.adoptu.models.PetImages
-import com.adoptu.models.Pets
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.models.Users
 import com.adoptu.dto.Currency
+import com.adoptu.ports.PetRepositoryPort
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
@@ -15,7 +15,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import java.math.BigDecimal
 
-object PetRepository {
+class PetRepositoryImpl : PetRepositoryPort {
 
     private fun rowToPetDto(row: ResultRow): PetDto {
         val petId = row[Pets.id]
@@ -70,7 +70,7 @@ object PetRepository {
             }
     }
 
-    fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = transaction {
+    override fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = transaction {
         val baseCondition = Pets.status eq "AVAILABLE"
         val finalCondition = if (type != null) {
             if (showPromotedOnly) {
@@ -87,7 +87,7 @@ object PetRepository {
         }
         
         val rescuerIds = UserActiveRoles.select(UserActiveRoles.userId)
-            .where { UserActiveRoles.role eq com.adoptu.dto.UserRole.RESCUER.name }
+            .where { UserActiveRoles.role eq UserRole.RESCUER.name }
             .map { it[UserActiveRoles.userId] }
         
         Pets.selectAll()
@@ -96,11 +96,11 @@ object PetRepository {
             .map(::rowToPetDto)
     }
 
-    fun getById(id: Int): PetDto? = transaction {
+    override fun getById(id: Int): PetDto? = transaction {
         Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).firstOrNull()
     }
 
-    fun create(
+    override fun create(
         rescuerId: Int,
         name: String,
         type: String,
@@ -109,27 +109,27 @@ object PetRepository {
         ageYears: Int,
         ageMonths: Int,
         sex: Gender,
-        breed: String? = null,
-        color: String? = null,
-        size: String? = null,
-        temperament: String? = null,
-        isSterilized: Boolean = false,
-        isMicrochipped: Boolean = false,
-        microchipId: String? = null,
-        vaccinations: String? = null,
-        isGoodWithKids: Boolean = true,
-        isGoodWithDogs: Boolean = true,
-        isGoodWithCats: Boolean = true,
-        isHouseTrained: Boolean = false,
-        energyLevel: String? = null,
-        rescueDate: Long? = null,
-        rescueLocation: String? = null,
-        specialNeeds: String? = null,
-        adoptionFee: Double = 0.0,
-        currency: Currency = Currency.USD,
-        isUrgent: Boolean = false,
-        isPromoted: Boolean = false,
-        status: String = "AVAILABLE"
+        breed: String?,
+        color: String?,
+        size: String?,
+        temperament: String?,
+        isSterilized: Boolean,
+        isMicrochipped: Boolean,
+        microchipId: String?,
+        vaccinations: String?,
+        isGoodWithKids: Boolean,
+        isGoodWithDogs: Boolean,
+        isGoodWithCats: Boolean,
+        isHouseTrained: Boolean,
+        energyLevel: String?,
+        rescueDate: Long?,
+        rescueLocation: String?,
+        specialNeeds: String?,
+        adoptionFee: Double,
+        currency: Currency,
+        isUrgent: Boolean,
+        isPromoted: Boolean,
+        status: String
     ): PetDto = transaction {
         val id = Pets.insert {
             it[Pets.rescuerId] = rescuerId
@@ -167,7 +167,7 @@ object PetRepository {
         getById(id!!)!!
     }
 
-    fun update(id: Int, body: UpdatePetRequest): PetDto? = transaction {
+    override fun update(id: Int, body: UpdatePetRequest): PetDto? = transaction {
         Pets.update({ Pets.id eq id }) {
             body.name?.let { name -> it[Pets.name] = name }
             body.type?.let { type -> it[Pets.type] = type.uppercase() }
@@ -201,13 +201,13 @@ object PetRepository {
         getById(id)
     }
 
-    fun delete(petId: Int) = transaction {
+    override fun delete(petId: Int): Unit = transaction {
         exec("DELETE FROM pet_images WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
         exec("DELETE FROM adoption_requests WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
         exec("DELETE FROM pets WHERE id = ?", listOf(IntegerColumnType() to petId))
     }
 
-    fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = transaction {
+    override fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = transaction {
         val createdAt = System.currentTimeMillis()
         val id = AdoptionRequests.insert {
             it[AdoptionRequests.petId] = petId
@@ -227,7 +227,7 @@ object PetRepository {
         )
     }
 
-    fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = transaction {
+    override fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = transaction {
         AdoptionRequests.selectAll()
             .where { AdoptionRequests.petId eq petId }
             .map { row ->
@@ -242,7 +242,7 @@ object PetRepository {
             }
     }
 
-    fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = transaction {
+    override fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = transaction {
         AdoptionRequests.selectAll()
             .where { AdoptionRequests.adopterId eq userId }
             .map { row ->
@@ -257,14 +257,14 @@ object PetRepository {
             }
     }
 
-    fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = transaction {
+    override fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = transaction {
         val updated = AdoptionRequests.update({ AdoptionRequests.id eq requestId }) {
             it[AdoptionRequests.status] = status
         }
         updated > 0
     }
 
-    fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = transaction {
+    override fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = transaction {
         AdoptionRequests.selectAll()
             .where { AdoptionRequests.id eq requestId }
             .firstOrNull()
@@ -280,7 +280,7 @@ object PetRepository {
             }
     }
 
-    fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean = false, sortOrder: Int = 0): PetImageDto = transaction {
+    override fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean, sortOrder: Int): PetImageDto = transaction {
         if (isPrimary) {
             PetImages.update({ PetImages.petId eq petId }) {
                 it[PetImages.isPrimary] = false
@@ -308,7 +308,7 @@ object PetRepository {
         )
     }
 
-    fun removeImage(petId: Int, imageId: Int): Boolean = transaction {
+    override fun removeImage(petId: Int, imageId: Int): Boolean = transaction {
         val image = PetImages.selectAll()
             .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
             .firstOrNull()
@@ -320,7 +320,7 @@ object PetRepository {
         }
     }
 
-    fun setPrimaryImage(petId: Int, imageId: Int): Boolean = transaction {
+    override fun setPrimaryImage(petId: Int, imageId: Int): Boolean = transaction {
         val image = PetImages.selectAll()
             .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
             .firstOrNull()
@@ -337,5 +337,5 @@ object PetRepository {
         }
     }
 
-    fun getImages(petId: Int): List<PetImageDto> = getPetImages(petId)
+    override fun getImages(petId: Int): List<PetImageDto> = getPetImages(petId)
 }

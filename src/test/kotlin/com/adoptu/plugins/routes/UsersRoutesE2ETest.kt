@@ -1,17 +1,17 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.di.appModule
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
+import com.adoptu.adapters.db.repositories.UserRepository
 import com.adoptu.dto.AcceptTermsRequest
 import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.TestDatabase
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.models.Users
-import com.adoptu.plugins.configureRouting
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Users
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
 import com.adoptu.ports.ImageStoragePort
-import io.ktor.client.call.*
+import com.adoptu.services.auth.WebAuthnService
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -76,13 +76,16 @@ class UsersRoutesE2ETest {
 
         val testModules = module {
             single<io.ktor.server.config.ApplicationConfig> { config }
-            single { com.adoptu.auth.WebAuthnService }
+            single { WebAuthnService }
             single<ImageStoragePort> { MockImageStorage() }
             single { MockNotificationAdapter() }
             single<com.adoptu.ports.NotificationPort> { get<MockNotificationAdapter>() }
-            single { com.adoptu.repositories.PetRepository }
-            single { com.adoptu.services.UserService }
-            single { com.adoptu.services.PetService(get(), get(), get()) }
+            single<com.adoptu.ports.PetRepositoryPort> { PetRepositoryImpl() }
+            single<com.adoptu.ports.UserRepositoryPort> { UserRepository() }
+            single<com.adoptu.ports.PhotographerRepositoryPort> { com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl(get(), get()) }
+            single { com.adoptu.services.PhotographerService(get(), get(), get()) }
+            single { com.adoptu.services.UserService(get(), get()) }
+            single { com.adoptu.services.PetService(get(), get(), get(), get()) }
         }
 
         environment {

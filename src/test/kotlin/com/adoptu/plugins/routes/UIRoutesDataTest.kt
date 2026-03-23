@@ -3,9 +3,9 @@ package com.adoptu.plugins.routes
 import com.adoptu.dto.Gender
 import com.adoptu.dto.Status
 import com.adoptu.dto.Currency
-import com.adoptu.models.Users
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.repositories.PetRepository
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
 import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -66,7 +66,7 @@ class UIRoutesDataTest {
     @Test
     fun `pets list returns all available pets`() {
         // Create pets
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Buddy",
             type = "DOG",
@@ -78,7 +78,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Luna",
             type = "CAT",
@@ -90,14 +90,14 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pets = PetRepository.getAll()
+        val pets = PetRepositoryImpl().getAll()
         
         assertEquals(2, pets.size)
     }
 
     @Test
     fun `pets list filters by type DOG`() {
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Dog1",
             type = "DOG",
@@ -109,7 +109,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Cat1",
             type = "CAT",
@@ -121,7 +121,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val dogs = PetRepository.getAll("DOG")
+        val dogs = PetRepositoryImpl().getAll("DOG")
         
         assertEquals(1, dogs.size)
         assertEquals("DOG", dogs[0].type)
@@ -129,7 +129,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets list filters by type CAT`() {
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Cat1",
             type = "CAT",
@@ -141,7 +141,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Dog1",
             type = "DOG",
@@ -153,7 +153,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val cats = PetRepository.getAll("CAT")
+        val cats = PetRepositoryImpl().getAll("CAT")
         
         assertEquals(1, cats.size)
         assertEquals("CAT", cats[0].type)
@@ -161,7 +161,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets list excludes adopted pets`() {
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Available",
             type = "DOG",
@@ -173,7 +173,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.create(
+        PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Adopted",
             type = "DOG",
@@ -185,7 +185,7 @@ class UIRoutesDataTest {
             status = "ADOPTED"
         )
         
-        val pets = PetRepository.getAll()
+        val pets = PetRepositoryImpl().getAll()
         
         assertEquals(1, pets.size)
         assertEquals(Status.AVAILABLE, pets[0].status)
@@ -195,7 +195,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pet detail returns pet by id`() {
-        val created = PetRepository.create(
+        val created = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Buddy",
             type = "DOG",
@@ -207,7 +207,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pet = PetRepository.getById(created.id)
+        val pet = PetRepositoryImpl().getById(created.id)
         
         assertNotNull(pet)
         assertEquals("Buddy", pet.name)
@@ -215,14 +215,14 @@ class UIRoutesDataTest {
 
     @Test
     fun `pet detail returns null for non-existent id`() {
-        val pet = PetRepository.getById(999)
+        val pet = PetRepositoryImpl().getById(999)
         
         assertNull(pet)
     }
 
     @Test
     fun `pet detail includes all attributes`() {
-        val created = PetRepository.create(
+        val created = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "Max",
             type = "DOG",
@@ -252,7 +252,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pet = PetRepository.getById(created.id)
+        val pet = PetRepositoryImpl().getById(created.id)
         
         assertNotNull(pet)
         assertEquals("Max", pet.name)
@@ -286,7 +286,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pet images returns empty list when no images`() {
-        val created = PetRepository.create(
+        val created = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "NoImages",
             type = "DOG",
@@ -298,14 +298,14 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val images = PetRepository.getImages(created.id)
+        val images = PetRepositoryImpl().getImages(created.id)
         
         assertEquals(0, images.size)
     }
 
     @Test
     fun `pet images returns added images`() {
-        val created = PetRepository.create(
+        val created = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "WithImages",
             type = "DOG",
@@ -317,17 +317,17 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.addImage(created.id, "https://s3.example.com/img1.jpg", true, 0)
-        PetRepository.addImage(created.id, "https://s3.example.com/img2.jpg", false, 1)
+        PetRepositoryImpl().addImage(created.id, "https://s3.example.com/img1.jpg", true, 0)
+        PetRepositoryImpl().addImage(created.id, "https://s3.example.com/img2.jpg", false, 1)
         
-        val images = PetRepository.getImages(created.id)
+        val images = PetRepositoryImpl().getImages(created.id)
         
         assertEquals(2, images.size)
     }
 
     @Test
     fun `pet images first added is primary by default`() {
-        val created = PetRepository.create(
+        val created = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "PrimaryTest",
             type = "DOG",
@@ -339,10 +339,10 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        PetRepository.addImage(created.id, "https://s3.example.com/first.jpg", false, 0)
-        PetRepository.addImage(created.id, "https://s3.example.com/second.jpg", true, 1)
+        PetRepositoryImpl().addImage(created.id, "https://s3.example.com/first.jpg", false, 0)
+        PetRepositoryImpl().addImage(created.id, "https://s3.example.com/second.jpg", true, 1)
         
-        val images = PetRepository.getImages(created.id)
+        val images = PetRepositoryImpl().getImages(created.id)
         
         val primary = images.find { it.isPrimary }
         assertNotNull(primary)
@@ -353,7 +353,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `urgent pets show isUrgent flag`() {
-        val urgent = PetRepository.create(
+        val urgent = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "UrgentBuddy",
             type = "DOG",
@@ -366,7 +366,7 @@ class UIRoutesDataTest {
             isUrgent = true
         )
         
-        val pet = PetRepository.getById(urgent.id)
+        val pet = PetRepositoryImpl().getById(urgent.id)
         
         assertNotNull(pet)
         assertTrue(pet.isUrgent)
@@ -374,7 +374,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `non-urgent pets show isUrgent false`() {
-        val normal = PetRepository.create(
+        val normal = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "NormalBuddy",
             type = "DOG",
@@ -387,7 +387,7 @@ class UIRoutesDataTest {
             isUrgent = false
         )
         
-        val pet = PetRepository.getById(normal.id)
+        val pet = PetRepositoryImpl().getById(normal.id)
         
         assertNotNull(pet)
         assertFalse(pet.isUrgent)
@@ -397,7 +397,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show MALE gender`() {
-        val male = PetRepository.create(
+        val male = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "MalePet",
             type = "DOG",
@@ -409,7 +409,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pet = PetRepository.getById(male.id)
+        val pet = PetRepositoryImpl().getById(male.id)
         
         assertNotNull(pet)
         assertEquals(Gender.MALE, pet.sex)
@@ -417,7 +417,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show FEMALE gender`() {
-        val female = PetRepository.create(
+        val female = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "FemalePet",
             type = "CAT",
@@ -429,7 +429,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pet = PetRepository.getById(female.id)
+        val pet = PetRepositoryImpl().getById(female.id)
         
         assertNotNull(pet)
         assertEquals(Gender.FEMALE, pet.sex)
@@ -439,7 +439,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show SMALL size`() {
-        val pet = PetRepository.create(
+        val pet = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "SmallPet",
             type = "CAT",
@@ -452,7 +452,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val retrieved = PetRepository.getById(pet.id)
+        val retrieved = PetRepositoryImpl().getById(pet.id)
         
         assertNotNull(retrieved)
         assertEquals("SMALL", retrieved.size)
@@ -460,7 +460,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show MEDIUM size`() {
-        val pet = PetRepository.create(
+        val pet = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "MediumPet",
             type = "DOG",
@@ -473,7 +473,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val retrieved = PetRepository.getById(pet.id)
+        val retrieved = PetRepositoryImpl().getById(pet.id)
         
         assertNotNull(retrieved)
         assertEquals("MEDIUM", retrieved.size)
@@ -481,7 +481,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show LARGE size`() {
-        val pet = PetRepository.create(
+        val pet = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "LargePet",
             type = "DOG",
@@ -494,7 +494,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val retrieved = PetRepository.getById(pet.id)
+        val retrieved = PetRepositoryImpl().getById(pet.id)
         
         assertNotNull(retrieved)
         assertEquals("LARGE", retrieved.size)
@@ -505,7 +505,7 @@ class UIRoutesDataTest {
     @Test
     fun `pets show rescue date when present`() {
         val rescueTime = System.currentTimeMillis()
-        val pet = PetRepository.create(
+        val pet = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "RescuedPet",
             type = "DOG",
@@ -518,7 +518,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val retrieved = PetRepository.getById(pet.id)
+        val retrieved = PetRepositoryImpl().getById(pet.id)
         
         assertNotNull(retrieved)
         assertNotNull(retrieved.rescueDate)
@@ -526,7 +526,7 @@ class UIRoutesDataTest {
 
     @Test
     fun `pets show null rescue date when not set`() {
-        val pet = PetRepository.create(
+        val pet = PetRepositoryImpl().create(
             rescuerId = 1,
             name = "NoRescueDate",
             type = "DOG",
@@ -538,7 +538,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val retrieved = PetRepository.getById(pet.id)
+        val retrieved = PetRepositoryImpl().getById(pet.id)
         
         assertNotNull(retrieved)
         assertNull(retrieved.rescueDate)

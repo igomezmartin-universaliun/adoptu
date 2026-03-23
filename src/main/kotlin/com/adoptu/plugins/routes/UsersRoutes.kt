@@ -1,14 +1,13 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.auth.SessionUser
+import com.adoptu.services.auth.SessionUser
 import com.adoptu.dto.AcceptTermsRequest
 import com.adoptu.dto.CreateMultiPhotographerRequestRequest
 import com.adoptu.dto.CreatePhotographyRequestRequest
 import com.adoptu.dto.PhotographerSettingsRequest
 import com.adoptu.dto.RoleActivationRequest
 import com.adoptu.dto.UpdatePhotographyRequestRequest
-import com.adoptu.dto.UserRole
-import com.adoptu.models.PhotographyRequests
+import com.adoptu.adapters.db.PhotographyRequests
 import com.adoptu.plugins.respondError
 import com.adoptu.services.PhotographerService
 import com.adoptu.services.UserService
@@ -160,11 +159,9 @@ fun Route.usersRoutes() {
                 ?: return@post call.respondError("Unauthorized", 401)
 
             val body = call.receive<CreatePhotographyRequestRequest>()
-            
+
             val photographer = userService.getPhotographerById(body.photographerId)
-            if (photographer == null) {
-                return@post call.respondError("Photographer not found or not active", 404)
-            }
+                ?: return@post call.respondError("Photographer not found or not active", 404)
 
             val createdAt = System.currentTimeMillis()
             val requestId = transaction {

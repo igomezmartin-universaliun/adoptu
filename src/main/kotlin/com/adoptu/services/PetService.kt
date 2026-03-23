@@ -3,15 +3,16 @@ package com.adoptu.services
 import com.adoptu.ports.ImageStoragePort
 import com.adoptu.dto.*
 import com.adoptu.ports.NotificationPort
-import com.adoptu.repositories.PetRepository
+import com.adoptu.ports.PetRepositoryPort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PetService(
-    private val petRepository: PetRepository,
+    private val petRepository: PetRepositoryPort,
     private val imageStorage: ImageStoragePort,
-    private val notificationPort: NotificationPort
+    private val notificationPort: NotificationPort,
+    private val userService: UserService
 ) {
 
     fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = petRepository.getAll(type, showPromotedOnly)
@@ -161,8 +162,8 @@ class PetService(
         
         val pet = petRepository.getById(petId)
         if (pet != null) {
-            val rescuer = UserService.getById(pet.rescuerId)
-            val adopter = UserService.getById(adopterId)
+            val rescuer = userService.getById(pet.rescuerId)
+            val adopter = userService.getById(adopterId)
             if (rescuer?.username != null && rescuer.activeRoles.contains(UserRole.RESCUER) && adopter != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     notificationPort.sendAdoptionRequestNotification(

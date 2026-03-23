@@ -1,6 +1,6 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.auth.SessionUser
+import com.adoptu.services.auth.SessionUser
 import com.adoptu.dto.CreateAdoptionRequestRequest
 import com.adoptu.dto.CreatePetRequest
 import com.adoptu.dto.UpdatePetRequest
@@ -11,7 +11,6 @@ import com.adoptu.services.PetService
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.UserService
 import io.ktor.http.content.*
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

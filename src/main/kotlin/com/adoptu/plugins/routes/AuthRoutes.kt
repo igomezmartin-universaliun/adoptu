@@ -1,12 +1,11 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.auth.SessionUser
-import com.adoptu.auth.WebAuthnService
+import com.adoptu.services.auth.SessionUser
+import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.dto.UserRole
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
 import com.adoptu.services.UserService
-import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*

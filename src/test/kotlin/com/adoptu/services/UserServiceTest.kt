@@ -3,17 +3,19 @@ package com.adoptu.services
 import com.adoptu.dto.AcceptTermsRequest
 import com.adoptu.dto.PhotographerSettingsRequest
 import com.adoptu.dto.UserRole
-import com.adoptu.models.Users
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.models.Photographers
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Photographers
+import com.adoptu.adapters.db.repositories.UserRepository
+import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
 import com.adoptu.mocks.TestDatabase
-import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.update
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -21,14 +23,20 @@ import kotlin.test.assertTrue
 
 class UserServiceTest {
 
+    private lateinit var userService: UserService
+
     @BeforeEach
     fun setup() {
         TestDatabase.initH2()
+        val userRepository = UserRepository()
+        val photographerRepository = PhotographerRepositoryImpl(PetRepositoryImpl(), userRepository)
+        val photographerService = PhotographerService(photographerRepository, null, userRepository)
+        userService = UserService(userRepository, photographerService)
     }
 
     @Test
     fun `getById returns null for non-existent user`() {
-        val result = UserService.getById(999)
+        val result = userService.getById(999)
         assertNull(result)
     }
 
@@ -36,7 +44,7 @@ class UserServiceTest {
     fun `getById returns user by id`() {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
-        val result = UserService.getById(userId)
+        val result = userService.getById(userId)
 
         assertNotNull(result)
         assertEquals("testuser@test.com", result.username)
@@ -49,9 +57,9 @@ class UserServiceTest {
         val rescuerId = createTestUser(username = "rescuer@test.com", displayName = "Rescuer", role = "RESCUER")
         val adopterId = createTestUser(username = "adopter@test.com", displayName = "Adopter", role = "ADOPTER")
 
-        val admin = UserService.getById(adminId)
-        val rescuer = UserService.getById(rescuerId)
-        val adopter = UserService.getById(adopterId)
+        val admin = userService.getById(adminId)
+        val rescuer = userService.getById(rescuerId)
+        val adopter = userService.getById(adopterId)
 
         assertTrue(admin?.activeRoles?.contains(UserRole.ADMIN) == true)
         assertTrue(rescuer?.activeRoles?.contains(UserRole.RESCUER) == true)
@@ -63,7 +71,7 @@ class UserServiceTest {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val beforeTime = System.currentTimeMillis()
-        val result = UserService.acceptTerms(userId, AcceptTermsRequest(
+        val result = userService.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
             acceptTermsAndConditions = false
         ))
@@ -81,7 +89,7 @@ class UserServiceTest {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val beforeTime = System.currentTimeMillis()
-        val result = UserService.acceptTerms(userId, AcceptTermsRequest(
+        val result = userService.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = false,
             acceptTermsAndConditions = true
         ))
@@ -99,7 +107,7 @@ class UserServiceTest {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val beforeTime = System.currentTimeMillis()
-        val result = UserService.acceptTerms(userId, AcceptTermsRequest(
+        val result = userService.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
             acceptTermsAndConditions = true
         ))
@@ -119,13 +127,13 @@ class UserServiceTest {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         // First accept privacy policy
-        UserService.acceptTerms(userId, AcceptTermsRequest(
+        userService.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
             acceptTermsAndConditions = false
         ))
 
         // Then accept terms
-        val result = UserService.acceptTerms(userId, AcceptTermsRequest(
+        val result = userService.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = false,
             acceptTermsAndConditions = true
         ))
@@ -137,7 +145,7 @@ class UserServiceTest {
 
     @Test
     fun `acceptTerms returns null for non-existent user`() {
-        val result = UserService.acceptTerms(999, AcceptTermsRequest(
+        val result = userService.acceptTerms(999, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
             acceptTermsAndConditions = false
         ))
@@ -151,7 +159,7 @@ class UserServiceTest {
             displayName = "Full User"
         )
 
-        val result = UserService.getById(userId)
+        val result = userService.getById(userId)
 
         assertNotNull(result)
         assertEquals("fulluser@test.com", result.username)
@@ -188,7 +196,7 @@ class UserServiceTest {
         createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
         createTestUser(username = "rescuer@test.com", displayName = "Rescuer", role = "RESCUER")
 
-        val result = UserService.getPhotographers()
+        val result = userService.getPhotographers()
 
         assertEquals(2, result.size)
     }
@@ -197,7 +205,7 @@ class UserServiceTest {
     fun `getPhotographers returns empty list when no photographers`() {
         createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
-        val result = UserService.getPhotographers()
+        val result = userService.getPhotographers()
 
         assertTrue(result.isEmpty())
     }
@@ -213,12 +221,12 @@ class UserServiceTest {
         transaction {
             Photographers.insert {
                 it[Photographers.userId] = photographerId
-                it[photographerFee] = java.math.BigDecimal("50.00")
+                it[photographerFee] = BigDecimal("50.00")
                 it[photographerCurrency] = "USD"
             }
         }
 
-        val result = UserService.getPhotographers()
+        val result = userService.getPhotographers()
 
         assertEquals(1, result.size)
         assertEquals(50.0, result.first().photographerFee)
@@ -229,7 +237,7 @@ class UserServiceTest {
     fun `updateProfile updates display name`() {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Old Name")
 
-        val result = UserService.updateProfile(userId, "New Name")
+        val result = userService.updateProfile(userId, "New Name")
 
         assertNotNull(result)
         assertEquals("New Name", result.displayName)
@@ -240,7 +248,7 @@ class UserServiceTest {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Old Name")
 
         val exception = assertThrows<IllegalArgumentException> {
-            UserService.updateProfile(userId, "")
+            userService.updateProfile(userId, "")
         }
 
         assertEquals("Display name cannot be empty", exception.message)
@@ -248,7 +256,7 @@ class UserServiceTest {
 
     @Test
     fun `updateProfile returns null for non-existent user`() {
-        val result = UserService.updateProfile(999, "New Name")
+        val result = userService.updateProfile(999, "New Name")
 
         assertNull(result)
     }
@@ -257,7 +265,7 @@ class UserServiceTest {
     fun `updatePhotographerSettings updates fee and currency`() {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
-        val result = UserService.updatePhotographerSettings(
+        val result = userService.updatePhotographerSettings(
             userId,
             PhotographerSettingsRequest(photographerFee = 75.0, photographerCurrency = "EUR")
         )
@@ -272,7 +280,7 @@ class UserServiceTest {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         val exception = assertThrows<IllegalArgumentException> {
-            UserService.updatePhotographerSettings(
+            userService.updatePhotographerSettings(
                 userId,
                 PhotographerSettingsRequest(photographerFee = -10.0, photographerCurrency = "USD")
             )
@@ -285,7 +293,7 @@ class UserServiceTest {
     fun `updatePhotographerSettings allows zero fee`() {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
-        val result = UserService.updatePhotographerSettings(
+        val result = userService.updatePhotographerSettings(
             userId,
             PhotographerSettingsRequest(photographerFee = 0.0, photographerCurrency = "USD")
         )
@@ -296,7 +304,7 @@ class UserServiceTest {
 
     @Test
     fun `updatePhotographerSettings returns null for non-existent user`() {
-        val result = UserService.updatePhotographerSettings(
+        val result = userService.updatePhotographerSettings(
             999,
             PhotographerSettingsRequest(photographerFee = 50.0, photographerCurrency = "USD")
         )

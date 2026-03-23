@@ -2,32 +2,35 @@ package com.adoptu.services
 
 import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.TestDatabase
-import com.adoptu.models.PhotographyRequests
-import com.adoptu.models.Pets
-import com.adoptu.models.Photographers
-import com.adoptu.models.Users
-import com.adoptu.models.UserActiveRoles
-import com.adoptu.repositories.PetRepository
-import com.adoptu.services.PhotographerService.ONE_WEEK
-import org.jetbrains.exposed.v1.core.eq
+import com.adoptu.adapters.db.PhotographyRequests
+import com.adoptu.adapters.db.Pets
+import com.adoptu.adapters.db.Photographers
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
+import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
+import com.adoptu.adapters.db.repositories.UserRepository
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.update
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PhotographerServiceTest {
+
+    private lateinit var photographerService: PhotographerService
 
     @BeforeEach
     fun setup() {
         TestDatabase.initH2()
         TestDatabase.clearAllData()
-        PhotographerService.setNotificationAdapter(MockNotificationAdapter())
+        val petRepository = PetRepositoryImpl()
+        val userRepository = UserRepository()
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
+        photographerService = PhotographerService(photographerRepository, MockNotificationAdapter(), userRepository)
     }
 
     @Test
@@ -35,7 +38,7 @@ class PhotographerServiceTest {
         createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
-        val result = PhotographerService.getPhotographers()
+        val result = photographerService.getPhotographers()
 
         assertEquals(1, result.size)
         assertEquals("Photo 1", result.first().displayName)
@@ -45,7 +48,7 @@ class PhotographerServiceTest {
     fun `canSendMessage returns true when no recent requests`() {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
-        val result = PhotographerService.canSendMessage(userId)
+        val result = photographerService.canSendMessage(userId)
 
         assertTrue(result)
     }
@@ -65,7 +68,7 @@ class PhotographerServiceTest {
             }
         }
 
-        val result = PhotographerService.canSendMessage(requesterId)
+        val result = photographerService.canSendMessage(requesterId)
 
         assertFalse(result)
     }
@@ -74,7 +77,7 @@ class PhotographerServiceTest {
     fun `canSendMessage returns true when request older than week`() {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
-        val oneWeekAgo = System.currentTimeMillis() - (ONE_WEEK + 1000)
+        val oneWeekAgo = System.currentTimeMillis() - (PhotographerRepositoryImpl.ONE_WEEK + 1000)
 
         transaction {
             PhotographyRequests.insert {
@@ -86,7 +89,7 @@ class PhotographerServiceTest {
             }
         }
 
-        val result = PhotographerService.canSendMessage(requesterId)
+        val result = photographerService.canSendMessage(requesterId)
 
         assertTrue(result)
     }
@@ -95,7 +98,7 @@ class PhotographerServiceTest {
     fun `createPhotographyRequest fails with empty photographer list`() {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = emptyList(),
             petId = null,
@@ -114,7 +117,7 @@ class PhotographerServiceTest {
         createTestUser(username = "photographer3@test.com", displayName = "Photo 3", role = "PHOTOGRAPHER")
         createTestUser(username = "photographer4@test.com", displayName = "Photo 4", role = "PHOTOGRAPHER")
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(2, 3, 4, 5),
             petId = null,
@@ -140,7 +143,7 @@ class PhotographerServiceTest {
             }
         }
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(photographerId),
             petId = null,
@@ -153,7 +156,7 @@ class PhotographerServiceTest {
 
     @Test
     fun `createPhotographyRequest fails when user not found`() {
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = 999,
             photographerIds = listOf(1),
             petId = null,
@@ -172,12 +175,12 @@ class PhotographerServiceTest {
         transaction {
             Photographers.insert {
                 it[Photographers.userId] = photographerId
-                it[photographerFee] = java.math.BigDecimal("50.00")
+                it[photographerFee] = BigDecimal("50.00")
                 it[photographerCurrency] = "USD"
             }
         }
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(photographerId),
             petId = null,
@@ -187,7 +190,7 @@ class PhotographerServiceTest {
         assertTrue(result.isSuccess)
         assertEquals(1, result.getOrNull()?.size)
 
-        val requests = PhotographerService.getMyRequests(requesterId)
+        val requests = photographerService.getMyRequests(requesterId)
         assertEquals(1, requests.size)
         assertEquals("Photo 1", requests.first()["photographerName"])
         assertEquals("Please take photos of my pet", requests.first()["message"])
@@ -200,7 +203,7 @@ class PhotographerServiceTest {
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         val petId = createTestPet(rescuerId = requesterId, name = "Buddy", type = "DOG")
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(photographerId),
             petId = petId,
@@ -209,7 +212,7 @@ class PhotographerServiceTest {
 
         assertTrue(result.isSuccess)
 
-        val requests = PhotographerService.getMyRequests(requesterId)
+        val requests = photographerService.getMyRequests(requesterId)
         assertEquals(petId, requests.first()["petId"])
     }
 
@@ -219,9 +222,12 @@ class PhotographerServiceTest {
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
         val mockAdapter = MockNotificationAdapter()
-        PhotographerService.setNotificationAdapter(mockAdapter)
+        val petRepository = PetRepositoryImpl()
+        val userRepository = UserRepository()
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
+        val serviceWithMock = PhotographerService(photographerRepository, mockAdapter, userRepository)
 
-        PhotographerService.createPhotographyRequest(
+        serviceWithMock.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(photographerId),
             petId = null,
@@ -239,7 +245,7 @@ class PhotographerServiceTest {
     fun `getMyRequests returns empty list when no requests`() {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
-        val result = PhotographerService.getMyRequests(userId)
+        val result = photographerService.getMyRequests(userId)
 
         assertTrue(result.isEmpty())
     }
@@ -259,7 +265,7 @@ class PhotographerServiceTest {
             }
         }
 
-        val result = PhotographerService.getMyRequests(requesterId)
+        val result = photographerService.getMyRequests(requesterId)
 
         assertEquals(1, result.size)
         assertEquals("Photo 1", result.first()["photographerName"])
@@ -269,7 +275,7 @@ class PhotographerServiceTest {
     fun `getRequestsForPhotographer returns empty list when no requests`() {
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
-        val result = PhotographerService.getRequestsForPhotographer(photographerId)
+        val result = photographerService.getRequestsForPhotographer(photographerId)
 
         assertTrue(result.isEmpty())
     }
@@ -291,7 +297,7 @@ class PhotographerServiceTest {
             }
         }
 
-        val result = PhotographerService.getRequestsForPhotographer(photographerId)
+        val result = photographerService.getRequestsForPhotographer(photographerId)
 
         assertEquals(1, result.size)
         assertEquals("User 1", result.first()["requesterName"])
@@ -303,7 +309,7 @@ class PhotographerServiceTest {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(2, 999),
             petId = null,
@@ -311,7 +317,7 @@ class PhotographerServiceTest {
         )
 
         assertTrue(result.isSuccess)
-        val requests = PhotographerService.getMyRequests(requesterId)
+        val requests = photographerService.getMyRequests(requesterId)
         assertEquals(1, requests.size)
     }
 
@@ -322,7 +328,7 @@ class PhotographerServiceTest {
         createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
         createTestUser(username = "photographer3@test.com", displayName = "Photo 3", role = "PHOTOGRAPHER")
 
-        val result = PhotographerService.createPhotographyRequest(
+        val result = photographerService.createPhotographyRequest(
             requesterId = requesterId,
             photographerIds = listOf(2, 3, 4),
             petId = null,
@@ -330,7 +336,7 @@ class PhotographerServiceTest {
         )
 
         assertTrue(result.isSuccess)
-        val requests = PhotographerService.getMyRequests(requesterId)
+        val requests = photographerService.getMyRequests(requesterId)
         assertEquals(3, requests.size)
     }
 
@@ -364,7 +370,7 @@ class PhotographerServiceTest {
                 it[Pets.name] = name
                 it[Pets.type] = type
                 it[Pets.description] = "Test description"
-                it[Pets.weight] = java.math.BigDecimal("10.0")
+                it[Pets.weight] = BigDecimal("10.0")
                 it[Pets.ageYears] = 2
                 it[Pets.ageMonths] = 0
                 it[Pets.sex] = "MALE"

@@ -2,10 +2,17 @@ package com.adoptu.di
 
 import com.adoptu.adapters.storage.S3ImageStorageAdapter
 import com.adoptu.adapters.notification.SnsNotificationAdapter
-import com.adoptu.auth.WebAuthnService
+import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.ports.ImageStoragePort
 import com.adoptu.ports.NotificationPort
-import com.adoptu.repositories.PetRepository
+import com.adoptu.ports.PetRepositoryPort
+import com.adoptu.ports.PhotographerRepositoryPort
+import com.adoptu.ports.TemporalHomeRepositoryPort
+import com.adoptu.ports.UserRepositoryPort
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
+import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
+import com.adoptu.adapters.db.repositories.TemporalHomeRepositoryImpl
+import com.adoptu.adapters.db.repositories.UserRepository
 import com.adoptu.services.PetService
 import com.adoptu.services.PhotographerService
 import com.adoptu.services.TemporalHomeService
@@ -15,15 +22,16 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { WebAuthnService }
-    single { PetRepository }
-    single { UserService }
+    single<PetRepositoryPort> { PetRepositoryImpl() }
+    single<UserRepositoryPort> { UserRepository() }
+    single<PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get()) }
+    single<TemporalHomeRepositoryPort> { TemporalHomeRepositoryImpl(get(), get()) }
     single<ImageStoragePort> { createImageStorageAdapter(get()) }
     single<NotificationPort> { SnsNotificationAdapter(get()) }
-    single<PetService> { PetService(get(), get(), get()) }
-    single { PhotographerService }
-    single { PhotographerService.apply { setNotificationAdapter(get()) } }
-    single { TemporalHomeService }
-    single { TemporalHomeService.apply { setNotificationAdapter(get()) } }
+    single<PhotographerService> { PhotographerService(get(), get(), get()) }
+    single<UserService> { UserService(get(), get()) }
+    single<PetService> { PetService(get(), get(), get(), get()) }
+    single<TemporalHomeService> { TemporalHomeService(get(), get(), get()) }
 }
 
 private fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {

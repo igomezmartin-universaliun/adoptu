@@ -1,12 +1,11 @@
 package com.adoptu.plugins.routes
 
-import com.adoptu.auth.SessionUser
+import com.adoptu.services.auth.SessionUser
 import com.adoptu.dto.BlockRescuerRequest
 import com.adoptu.dto.CreateTemporalHomeRequest
 import com.adoptu.dto.UpdateTemporalHomeRequest
 import com.adoptu.dto.SendTemporalHomeRequestRequest
 import com.adoptu.dto.TemporalHomeSearchParams
-import com.adoptu.dto.UserRole
 import com.adoptu.plugins.respondError
 import com.adoptu.services.TemporalHomeService
 import com.adoptu.services.UserService
