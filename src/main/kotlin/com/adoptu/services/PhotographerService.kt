@@ -1,6 +1,7 @@
 package com.adoptu.services
 
 import com.adoptu.dto.PhotographerDto
+import com.adoptu.dto.PhotographerSettingsRequest
 import com.adoptu.ports.NotificationPort
 import com.adoptu.ports.PhotographerRepositoryPort
 import com.adoptu.ports.UserRepositoryPort
@@ -17,6 +18,9 @@ class PhotographerService(
         photographerRepository.getPhotographers(country, state)
 
     fun getPhotographerById(userId: Int): PhotographerDto? = photographerRepository.getPhotographerById(userId)
+
+    fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? =
+        photographerRepository.updatePhotographerSettings(userId, request)
 
     fun canSendMessage(userId: Int): Boolean = photographerRepository.canSendMessage(userId)
 

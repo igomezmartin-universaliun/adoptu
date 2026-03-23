@@ -17,4 +17,9 @@ interface UserRepositoryPort {
     fun updateLanguage(userId: Int, language: String): UserDto?
     fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto?
     fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto?
+    fun isEmailVerified(userId: Int): Boolean
+    fun setEmailVerified(userId: Int, verified: Boolean): Boolean
+    fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean
+    fun verifyToken(token: String): Int?
+    fun deleteVerificationTokens(userId: Int)
 }

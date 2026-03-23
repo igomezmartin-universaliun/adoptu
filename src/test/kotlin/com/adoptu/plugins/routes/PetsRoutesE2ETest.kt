@@ -109,7 +109,7 @@ class PetsRoutesE2ETest {
             single<com.adoptu.ports.UserRepositoryPort> { UserRepository() }
             single<com.adoptu.ports.PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get()) }
             single { com.adoptu.services.PhotographerService(get(), get(), get()) }
-            single { com.adoptu.services.UserService(get(), get()) }
+            single { com.adoptu.services.UserService(get()) }
             single { PetService(get(), get(), get(), get()) }
         }
 

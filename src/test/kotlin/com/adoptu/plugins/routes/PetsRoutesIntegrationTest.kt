@@ -81,7 +81,7 @@ class PetsRoutesIntegrationTest {
         petRepository = PetRepositoryImpl()
         val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
         val photographerService = com.adoptu.services.PhotographerService(photographerRepository, null, userRepository)
-        val userService = com.adoptu.services.UserService(userRepository, photographerService)
+        val userService = com.adoptu.services.UserService(userRepository)
         petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter, userService)
     }
 

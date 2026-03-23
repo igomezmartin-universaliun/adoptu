@@ -11,6 +11,17 @@ object Users : Table("users") {
     val createdAt = long("created_at")
     val lastAcceptedPrivacyPolicy = long("last_accepted_privacy_policy").nullable()
     val lastAcceptedTermsAndConditions = long("last_accepted_terms_and_conditions").nullable()
+    val isEmailVerified = bool("is_email_verified").default(false)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object EmailVerificationTokens : Table("email_verification_tokens") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id)
+    val token = varchar("token", 64)
+    val expiresAt = long("expires_at")
+    val createdAt = long("created_at")
 
     override val primaryKey = PrimaryKey(id)
 }

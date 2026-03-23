@@ -11,6 +11,7 @@ import com.adoptu.adapters.db.TemporalHomes
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.WebAuthnCredentials
+import com.adoptu.adapters.db.EmailVerificationTokens
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
@@ -29,6 +30,7 @@ object TestDatabase {
         
         transaction {
             SchemaUtils.drop(
+                EmailVerificationTokens,
                 Users,
                 WebAuthnCredentials,
                 Pets,
@@ -42,6 +44,7 @@ object TestDatabase {
                 TemporalHomeRequests
             )
             SchemaUtils.create(
+                EmailVerificationTokens,
                 Users,
                 WebAuthnCredentials,
                 Pets,
@@ -59,6 +62,7 @@ object TestDatabase {
 
     fun clearAllData() {
         transaction {
+            exec("DELETE FROM email_verification_tokens")
             exec("DELETE FROM temporal_home_requests")
             exec("DELETE FROM blocked_rescuers")
             exec("DELETE FROM temporal_homes")

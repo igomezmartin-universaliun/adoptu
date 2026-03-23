@@ -92,7 +92,7 @@ class PetServiceTest {
         petRepository = PetRepositoryImpl()
         val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
         val photographerService = PhotographerService(photographerRepository, null, userRepository)
-        val userService = UserService(userRepository, photographerService)
+        val userService = UserService(userRepository)
         petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter, userService)
     }
 

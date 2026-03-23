@@ -84,7 +84,7 @@ class UsersRoutesE2ETest {
             single<com.adoptu.ports.UserRepositoryPort> { UserRepository() }
             single<com.adoptu.ports.PhotographerRepositoryPort> { com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl(get(), get()) }
             single { com.adoptu.services.PhotographerService(get(), get(), get()) }
-            single { com.adoptu.services.UserService(get(), get()) }
+            single { com.adoptu.services.UserService(get()) }
             single { com.adoptu.services.PetService(get(), get(), get(), get()) }
         }
 

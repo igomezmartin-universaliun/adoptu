@@ -5,6 +5,7 @@ import com.adoptu.plugins.routes.petsRoutes
 import com.adoptu.plugins.routes.uiRoutes
 import com.adoptu.plugins.routes.usersRoutes
 import com.adoptu.plugins.routes.temporalHomeRoutes
+import com.adoptu.plugins.routes.photographerRoutes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,6 +19,7 @@ fun Application.configureRouting() {
         authRoutes()
         petsRoutes()
         usersRoutes()
+        photographerRoutes()
         temporalHomeRoutes()
     }
 }

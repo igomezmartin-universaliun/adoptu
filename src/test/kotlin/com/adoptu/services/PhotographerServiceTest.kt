@@ -1,5 +1,6 @@
 package com.adoptu.services
 
+import com.adoptu.dto.PhotographerSettingsRequest
 import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.TestDatabase
 import com.adoptu.adapters.db.PhotographyRequests
@@ -14,9 +15,12 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PhotographerServiceTest {
@@ -338,6 +342,101 @@ class PhotographerServiceTest {
         assertTrue(result.isSuccess)
         val requests = photographerService.getMyRequests(requesterId)
         assertEquals(3, requests.size)
+    }
+
+    @Test
+    fun `getPhotographers returns only photographers`() {
+        createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+        createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
+        createTestUser(username = "rescuer@test.com", displayName = "Rescuer", role = "RESCUER")
+
+        val result = photographerService.getPhotographers()
+
+        assertEquals(2, result.size)
+    }
+
+    @Test
+    fun `getPhotographers returns empty list when no photographers`() {
+        createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+
+        val result = photographerService.getPhotographers()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `getPhotographers includes photographer fee and currency`() {
+        val photographerId = createTestUser(
+            username = "photographer1@test.com",
+            displayName = "Photo 1",
+            role = "PHOTOGRAPHER"
+        )
+
+        transaction {
+            Photographers.insert {
+                it[Photographers.userId] = photographerId
+                it[photographerFee] = BigDecimal("50.00")
+                it[photographerCurrency] = "USD"
+            }
+        }
+
+        val result = photographerService.getPhotographers()
+
+        assertEquals(1, result.size)
+        assertEquals(50.0, result.first().photographerFee)
+        assertEquals("USD", result.first().photographerCurrency)
+    }
+
+    @Test
+    fun `updatePhotographerSettings updates fee and currency`() {
+        val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
+
+        val result = photographerService.updatePhotographerSettings(
+            userId,
+            PhotographerSettingsRequest(photographerFee = 75.0, photographerCurrency = "EUR")
+        )
+
+        assertNotNull(result)
+        assertEquals(75.0, result.photographerFee)
+        assertEquals("EUR", result.photographerCurrency)
+    }
+
+    @Test
+    fun `updatePhotographerSettings throws exception for negative fee`() {
+        val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
+
+        val exception = assertThrows<IllegalArgumentException> {
+            photographerService.updatePhotographerSettings(
+                userId,
+                PhotographerSettingsRequest(photographerFee = -10.0, photographerCurrency = "USD")
+            )
+        }
+
+        assertEquals("Photographer fee must be zero or positive", exception.message)
+    }
+
+    @Test
+    fun `updatePhotographerSettings allows zero fee`() {
+        val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
+
+        val result = photographerService.updatePhotographerSettings(
+            userId,
+            PhotographerSettingsRequest(photographerFee = 0.0, photographerCurrency = "USD")
+        )
+
+        assertNotNull(result)
+        assertEquals(0.0, result.photographerFee)
+    }
+
+    @Test
+    fun `updatePhotographerSettings returns null for non-existent user`() {
+        val result = photographerService.updatePhotographerSettings(
+            999,
+            PhotographerSettingsRequest(photographerFee = 50.0, photographerCurrency = "USD")
+        )
+
+        assertNull(result)
     }
 
     private fun createTestUser(

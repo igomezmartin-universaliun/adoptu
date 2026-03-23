@@ -4,6 +4,7 @@ import com.adoptu.adapters.db.Pets
 import com.adoptu.adapters.db.Photographers
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.EmailVerificationTokens
 import com.adoptu.dto.AcceptTermsRequest
 import com.adoptu.dto.PhotographerDto
 import com.adoptu.dto.PhotographerSettingsRequest
@@ -282,5 +283,61 @@ class UserRepository : UserRepositoryPort {
             }
         }
         return getById(userId)
+    }
+
+    override fun isEmailVerified(userId: Int): Boolean {
+        return transaction {
+            Users.selectAll()
+                .where { Users.id eq userId }
+                .firstOrNull()
+                ?.get(Users.isEmailVerified) ?: false
+        }
+    }
+
+    override fun setEmailVerified(userId: Int, verified: Boolean): Boolean {
+        return transaction {
+            val rowsUpdated = Users.update({ Users.id eq userId }) {
+                it[Users.isEmailVerified] = verified
+            }
+            rowsUpdated > 0
+        }
+    }
+
+    override fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean {
+        return transaction {
+            try {
+                EmailVerificationTokens.insert {
+                    it[EmailVerificationTokens.userId] = userId
+                    it[EmailVerificationTokens.token] = token
+                    it[EmailVerificationTokens.expiresAt] = expiresAt
+                    it[EmailVerificationTokens.createdAt] = System.currentTimeMillis()
+                }
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    override fun verifyToken(token: String): Int? {
+        return transaction {
+            val now = System.currentTimeMillis()
+            val tokenRow = EmailVerificationTokens
+                .selectAll()
+                .where { EmailVerificationTokens.token eq token }
+                .firstOrNull()
+
+            if (tokenRow != null && tokenRow[EmailVerificationTokens.expiresAt] > now) {
+                tokenRow[EmailVerificationTokens.userId]
+            } else {
+                null
+            }
+        }
+    }
+
+    override fun deleteVerificationTokens(userId: Int) {
+        transaction {
+            EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
+        }
     }
 }

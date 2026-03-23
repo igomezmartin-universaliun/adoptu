@@ -5,6 +5,8 @@ import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.dto.UserRole
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
+import com.adoptu.services.EmailVerificationService
+import com.adoptu.services.PhotographerService
 import com.adoptu.services.UserService
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -27,15 +29,24 @@ private data class AuthMeResponse(
     val photographerFee: Double? = null,
     val photographerCurrency: String? = null,
     val photographerCountry: String? = null,
-    val photographerState: String? = null
+    val photographerState: String? = null,
+    val emailVerified: Boolean = false
 )
 
 @Serializable
 private data class SuccessWithErrorResponse(val success: Boolean, val error: String? = null, val needsProfileCompletion: Boolean = false)
 
+@Serializable
+private data class RegistrationResponse(val success: Boolean, val message: String? = null, val emailVerificationSent: Boolean = false)
+
+@Serializable
+private data class VerificationResponse(val success: Boolean, val message: String? = null)
+
 fun Route.authRoutes() {
     val webAuthnService by inject<WebAuthnService>()
     val userService by inject<UserService>()
+    val photographerService by inject<PhotographerService>()
+    val emailVerificationService by inject<EmailVerificationService>()
     val config by inject<ApplicationConfig>()
     val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com"
 
@@ -65,11 +76,61 @@ fun Route.authRoutes() {
 
             val userId = webAuthnService.verifyAndRegister(email, displayName, primaryRole.name, roles, registrationResponse)
             if (userId != null) {
-                call.sessions.set(SessionUser(userId, email, displayName))
                 val needsProfileCompletion = roles.contains("PHOTOGRAPHER") || roles.contains("TEMPORAL_HOME")
-                call.respond(SuccessWithErrorResponse(success = true, needsProfileCompletion = needsProfileCompletion))
+                
+                val emailSent = emailVerificationService.generateAndSendVerificationEmail(userId, email, displayName)
+                if (emailSent) {
+                    call.respond(RegistrationResponse(
+                        success = true,
+                        message = "Registration successful. Please check your email to verify your account.",
+                        emailVerificationSent = true
+                    ))
+                } else {
+                    call.respond(RegistrationResponse(
+                        success = false,
+                        message = "Registration successful but failed to send verification email. Please request a new verification link.",
+                        emailVerificationSent = false
+                    ))
+                }
             } else {
-                call.respond(SuccessWithErrorResponse(success = false, error = "Registration failed"))
+                call.respond(RegistrationResponse(success = false, message = "Registration failed"))
+            }
+        }
+
+        get("/verify-email") {
+            val token = call.request.queryParameters["token"]
+            if (token.isNullOrBlank()) {
+                return@get call.respond(VerificationResponse(success = false, message = "Token is required"))
+            }
+
+            val verified = emailVerificationService.verifyToken(token)
+            if (verified) {
+                call.respond(VerificationResponse(success = true, message = "Email verified successfully. You can now login."))
+            } else {
+                call.respond(VerificationResponse(success = false, message = "Invalid or expired token"))
+            }
+        }
+
+        post("/resend-verification") {
+            val session = call.sessions.get<SessionUser>()
+            if (session == null) {
+                return@post call.respondError("Not authenticated", 401)
+            }
+
+            val user = userService.getById(session.userId)
+            if (user == null) {
+                return@post call.respondError("User not found", 404)
+            }
+
+            if (emailVerificationService.isUserVerified(session.userId)) {
+                return@post call.respond(VerificationResponse(success = true, message = "Email already verified"))
+            }
+
+            val sent = emailVerificationService.resendVerificationEmail(session.userId, user.email ?: session.email, user.displayName)
+            if (sent) {
+                call.respond(VerificationResponse(success = true, message = "Verification email sent"))
+            } else {
+                call.respond(VerificationResponse(success = false, message = "Failed to send verification email"))
             }
         }
 
@@ -84,6 +145,10 @@ fun Route.authRoutes() {
 
             val result = webAuthnService.verifyAndAuthenticate(body)
             if (result != null) {
+                if (!emailVerificationService.isUserVerified(result.userId)) {
+                    call.respond(SuccessWithErrorResponse(success = false, error = "Please verify your email before logging in"))
+                    return@post
+                }
                 val user = result.user
                 println("DEBUG /authenticate: success for userId=${result.userId}, username=${user.username}")
                 call.sessions.set(
@@ -112,7 +177,7 @@ fun Route.authRoutes() {
                         val activeRolesList = user.activeRoles.map { it.name }
                         val isPhotographer = activeRolesList.contains("PHOTOGRAPHER") || activeRolesList.contains("ADMIN")
                         val photographerData = if (isPhotographer) {
-                            userService.getPhotographerById(session.userId)
+                            photographerService.getPhotographerById(session.userId)
                         } else null
                         
                         call.respond(
@@ -128,7 +193,8 @@ fun Route.authRoutes() {
                                 photographerFee = photographerData?.photographerFee,
                                 photographerCurrency = photographerData?.photographerCurrency,
                                 photographerCountry = photographerData?.country,
-                                photographerState = photographerData?.state
+                                photographerState = photographerData?.state,
+                                emailVerified = emailVerificationService.isUserVerified(session.userId)
                             )
                         )
                     } else {

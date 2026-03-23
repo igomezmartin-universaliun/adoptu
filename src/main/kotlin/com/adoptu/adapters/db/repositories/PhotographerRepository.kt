@@ -6,6 +6,7 @@ import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
 import com.adoptu.dto.PhotographyRequestDto
 import com.adoptu.dto.PhotographerDto
+import com.adoptu.dto.PhotographerSettingsRequest
 import com.adoptu.dto.UserRole
 import com.adoptu.ports.PhotographerRepositoryPort
 import com.adoptu.ports.PetRepositoryPort
@@ -16,6 +17,8 @@ import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
+import java.math.BigDecimal
 
 class PhotographerRepositoryImpl(
     private val petRepository: PetRepositoryPort,
@@ -153,5 +156,38 @@ class PhotographerRepositoryImpl(
                 } else null
             } else null
         }
+    }
+
+    override fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? {
+        if (request.photographerFee < 0) {
+            throw IllegalArgumentException("Photographer fee must be zero or positive")
+        }
+        
+        val userExists = transaction {
+            Users.selectAll().where { Users.id eq userId }.firstOrNull() != null
+        }
+        if (!userExists) return null
+        
+        transaction {
+            val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
+            if (existing != null) {
+                Photographers.update({ Photographers.userId eq userId }) {
+                    it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
+                    it[photographerCurrency] = request.photographerCurrency
+                    it[country] = request.country
+                    it[state] = request.state
+                }
+            } else {
+                Photographers.insert {
+                    it[Photographers.userId] = userId
+                    it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
+                    it[photographerCurrency] = request.photographerCurrency
+                    it[country] = request.country
+                    it[state] = request.state
+                }
+            }
+        }
+        
+        return getPhotographerById(userId)
     }
 }

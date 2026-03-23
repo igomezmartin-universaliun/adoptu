@@ -17,6 +17,7 @@ import com.adoptu.services.PetService
 import com.adoptu.services.PhotographerService
 import com.adoptu.services.TemporalHomeService
 import com.adoptu.services.UserService
+import com.adoptu.services.EmailVerificationService
 import io.ktor.server.config.*
 import org.koin.dsl.module
 
@@ -29,9 +30,10 @@ val appModule = module {
     single<ImageStoragePort> { createImageStorageAdapter(get()) }
     single<NotificationPort> { SnsNotificationAdapter(get()) }
     single<PhotographerService> { PhotographerService(get(), get(), get()) }
-    single<UserService> { UserService(get(), get()) }
+    single<UserService> { UserService(get()) }
     single<PetService> { PetService(get(), get(), get(), get()) }
     single<TemporalHomeService> { TemporalHomeService(get(), get(), get()) }
+    single { EmailVerificationService(get(), get()) }
 }
 
 private fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {
