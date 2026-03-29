@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
@@ -13,8 +14,7 @@ import software.amazon.awssdk.services.s3.model.NoSuchBucketException
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.util.UUID
-import software.amazon.awssdk.core.sync.RequestBody
+import java.util.*
 
 class S3ImageStorageAdapter(
     private val bucketName: String,

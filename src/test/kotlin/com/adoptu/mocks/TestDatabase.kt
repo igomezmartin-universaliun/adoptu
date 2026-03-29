@@ -1,17 +1,6 @@
 package com.adoptu.mocks
 
-import com.adoptu.adapters.db.AdoptionRequests
-import com.adoptu.adapters.db.BlockedRescuers
-import com.adoptu.adapters.db.PetImages
-import com.adoptu.adapters.db.Pets
-import com.adoptu.adapters.db.Photographers
-import com.adoptu.adapters.db.PhotographyRequests
-import com.adoptu.adapters.db.TemporalHomeRequests
-import com.adoptu.adapters.db.TemporalHomes
-import com.adoptu.adapters.db.UserActiveRoles
-import com.adoptu.adapters.db.Users
-import com.adoptu.adapters.db.WebAuthnCredentials
-import com.adoptu.adapters.db.EmailVerificationTokens
+import com.adoptu.adapters.db.*
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
@@ -30,6 +19,7 @@ object TestDatabase {
         
         transaction {
             SchemaUtils.drop(
+                EmailVerificationAttempts,
                 EmailVerificationTokens,
                 Users,
                 WebAuthnCredentials,
@@ -41,9 +31,12 @@ object TestDatabase {
                 Photographers,
                 TemporalHomes,
                 BlockedRescuers,
-                TemporalHomeRequests
+                TemporalHomeRequests,
+                AnimalShelters,
+                SterilizationLocations
             )
             SchemaUtils.create(
+                EmailVerificationAttempts,
                 EmailVerificationTokens,
                 Users,
                 WebAuthnCredentials,
@@ -55,13 +48,16 @@ object TestDatabase {
                 Photographers,
                 TemporalHomes,
                 BlockedRescuers,
-                TemporalHomeRequests
+                TemporalHomeRequests,
+                AnimalShelters,
+                SterilizationLocations
             )
         }
     }
 
     fun clearAllData() {
         transaction {
+            exec("DELETE FROM email_verification_attempts")
             exec("DELETE FROM email_verification_tokens")
             exec("DELETE FROM temporal_home_requests")
             exec("DELETE FROM blocked_rescuers")
@@ -74,6 +70,8 @@ object TestDatabase {
             exec("DELETE FROM user_active_roles")
             exec("DELETE FROM photographers")
             exec("DELETE FROM users")
+            exec("DELETE FROM animal_shelters")
+            exec("DELETE FROM sterilization_locations")
         }
     }
 }

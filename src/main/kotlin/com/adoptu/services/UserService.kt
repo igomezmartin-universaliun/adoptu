@@ -1,7 +1,8 @@
 package com.adoptu.services
 
-import com.adoptu.dto.AcceptTermsRequest
-import com.adoptu.dto.UserDto
+import com.adoptu.dto.input.AcceptTermsRequest
+import com.adoptu.dto.input.UserDto
+import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.UserRepositoryPort
 
 class UserService(
@@ -9,18 +10,24 @@ class UserService(
 ) {
     fun getById(userId: Int): UserDto? = userRepository.getById(userId)
     
+    fun getByEmail(email: String): UserDto? = userRepository.getByEmail(email)
+    
+    fun getAllUsers(): List<UserDto> = userRepository.getAllUsers()
+    
     fun getRescuers(): List<UserDto> = userRepository.getRescuers()
     
-    fun isRoleActive(userId: Int, role: com.adoptu.dto.UserRole): Boolean = 
+    fun banUser(userId: Int, reason: String? = null): Boolean = userRepository.banUser(userId, reason)
+    
+    fun unbanUser(userId: Int): Boolean = userRepository.unbanUser(userId)
+    
+    fun isBanned(userId: Int): Boolean = userRepository.isBanned(userId)
+    
+    fun isRoleActive(userId: Int, role: UserRole): Boolean =
         userRepository.isRoleActive(userId, role)
     
     fun activateRescuerProfile(userId: Int): UserDto? = userRepository.activateRescuerProfile(userId)
     
     fun deactivateRescuerProfile(userId: Int): UserDto? = userRepository.deactivateRescuerProfile(userId)
-    
-    fun activatePhotographerProfile(userId: Int): UserDto? = userRepository.activatePhotographerProfile(userId)
-    
-    fun deactivatePhotographerProfile(userId: Int): UserDto? = userRepository.deactivatePhotographerProfile(userId)
     
     fun activateTemporalHomeProfile(userId: Int): UserDto? = userRepository.activateTemporalHomeProfile(userId)
     
@@ -32,4 +39,26 @@ class UserService(
     fun updateLanguage(userId: Int, language: String): UserDto? = userRepository.updateLanguage(userId, language)
     
     fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? = userRepository.acceptTerms(userId, request)
+    
+    fun isUserVerified(userId: Int): Boolean = userRepository.isEmailVerified(userId)
+    
+    fun verifyToken(token: String): Boolean {
+        val userId = userRepository.verifyToken(token) ?: return false
+        val updated = userRepository.setEmailVerified(userId, true)
+        if (updated) {
+            userRepository.deleteVerificationTokens(userId)
+        }
+        return updated
+    }
+
+    fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
+        val userId = userRepository.verifyToken(token) ?: return false to "en"
+        val user = userRepository.getById(userId)
+        val language = user?.language ?: "en"
+        val updated = userRepository.setEmailVerified(userId, true)
+        if (updated) {
+            userRepository.deleteVerificationTokens(userId)
+        }
+        return updated to language
+    }
 }

@@ -1,8 +1,11 @@
 package com.adoptu.services.auth
 
-import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.WebAuthnCredentials
+import com.adoptu.dto.input.UserRole
+import com.adoptu.services.EmailVerificationService
+import com.adoptu.services.UserService
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.AttestedCredentialDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
@@ -13,6 +16,7 @@ import com.webauthn4j.data.RegistrationParameters
 import com.webauthn4j.data.client.Origin
 import com.webauthn4j.data.client.challenge.DefaultChallenge
 import com.webauthn4j.server.ServerProperty
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -21,15 +25,23 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import java.security.SecureRandom
 import java.util.*
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-object WebAuthnService {
+@OptIn(ExperimentalTime::class)
+class WebAuthnService(
+    private val clock: Clock,
+    private val emailVerificationService: EmailVerificationService,
+    private val userService: UserService,
+    private val adminEmail: String
+) {
     private val objectConverter = ObjectConverter()
     private val webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager(objectConverter)
     private val attestedCredentialDataConverter = AttestedCredentialDataConverter(objectConverter)
     private val secureRandom = SecureRandom()
-    private const val RP_ID = "localhost"
-    private const val RP_NAME = "Adopt-U Pet Adoption"
-    private const val ORIGIN = "http://localhost:8080"
+    private val rpId = "localhost"
+    private val rpName = "Adopt-U Pet Adoption"
+    private val origin = "http://localhost:8080"
 
     @Serializable
     data class RelyingParty(
@@ -79,6 +91,11 @@ object WebAuthnService {
         val user: AuthenticatedUser
     )
 
+    data class RegistrationResult(
+        val userId: Int,
+        val emailSent: Boolean
+    )
+
     private fun base64UrlEncode(bytes: ByteArray): String =
         Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
 
@@ -89,7 +106,7 @@ object WebAuthnService {
         val userId = ByteArray(32).also { secureRandom.nextBytes(it) }
 
         return RegistrationOptionsResponse(
-            rp = RelyingParty(id = RP_ID, name = RP_NAME),
+            rp = RelyingParty(id = rpId, name = rpName),
             user = PublicKeyUser(
                 id = base64UrlEncode(userId),
                 name = email,
@@ -106,16 +123,16 @@ object WebAuthnService {
     fun verifyAndRegister(
         email: String,
         displayName: String,
-        role: String,
-        roles: List<String> = listOf(role),
-        registrationResponseJson: String
-    ): Int? {
+        roles: Set<UserRole>,
+        registrationResponseJson: String,
+        language: String = "en"
+    ): RegistrationResult? {
         val storedChallenge = ChallengeStore.retrieve(email) ?: return null
         ChallengeStore.remove(email)
 
         val serverProperty = ServerProperty.builder()
-            .origin(Origin(ORIGIN))
-            .rpId(RP_ID)
+            .origin(Origin(origin))
+            .rpId(rpId)
             .challenge(DefaultChallenge(storedChallenge))
             .build()
 
@@ -129,46 +146,58 @@ object WebAuthnService {
                 registrationData.attestationObject!!.authenticatorData.attestedCredentialData!!
             val acdBytes = attestedCredentialDataConverter.convert(attestedCredentialData)
 
-            transaction {
+            val userId = transaction {
                 val existingUser = Users.selectAll().where { Users.username eq email }.firstOrNull()
 
-                val userId = if (existingUser != null) {
+                val id = if (existingUser != null) {
                     existingUser[Users.id]
                 } else {
                     Users.insert {
                         it[Users.username] = email
                         it[Users.displayName] = displayName
-                        it[Users.createdAt] = System.currentTimeMillis()
+                        it[Users.createdAt] = clock.now().toEpochMilliseconds()
                     } get Users.id
                 }
 
                 val existingCredential = WebAuthnCredentials
                     .selectAll()
-                    .where { WebAuthnCredentials.userId eq userId }
+                    .where { WebAuthnCredentials.userId eq id }
                     .firstOrNull()
 
                 if (existingCredential == null) {
                     WebAuthnCredentials.insert {
-                        it[WebAuthnCredentials.userId] = userId
+                        it[WebAuthnCredentials.userId] = id
                         it[WebAuthnCredentials.credentialId] = base64UrlEncode(attestedCredentialData.credentialId)
                         it[WebAuthnCredentials.attestedCredentialDataBase64] = Base64.getEncoder().encodeToString(acdBytes)
                         it[WebAuthnCredentials.signCount] = registrationData.attestationObject!!.authenticatorData.signCount
                         it[WebAuthnCredentials.transports] = null
-                        it[WebAuthnCredentials.createdAt] = System.currentTimeMillis()
+                        it[WebAuthnCredentials.createdAt] = clock.now().toEpochMilliseconds()
                     }
                 }
 
                 if (existingUser == null) {
-                    roles.forEach { roleName ->
+                    val effectiveRoles = if (email.equals(adminEmail, ignoreCase = true)) {
+                        roles + UserRole.ADMIN
+                    } else {
+                        roles
+                    }
+                    effectiveRoles.forEach { role ->
                         UserActiveRoles.insert {
-                            it[UserActiveRoles.userId] = userId
-                            it[UserActiveRoles.role] = roleName
+                            it[UserActiveRoles.userId] = id
+                            it[UserActiveRoles.role] = role.name
                         }
                     }
                 }
 
-                userId
+                id
             }
+
+            val emailResult = runBlocking {
+                emailVerificationService.generateAndSendVerificationEmail(userId, email, displayName, language)
+            }
+
+            val emailSent = emailResult.getOrDefault(false)
+            RegistrationResult(userId = userId, emailSent = emailSent)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -181,7 +210,7 @@ object WebAuthnService {
 
         return AssertionOptionsResponse(
             challenge = base64UrlEncode(challenge),
-            rpId = RP_ID,
+            rpId = rpId,
             userVerification = "required"
         )
     }
@@ -207,8 +236,8 @@ object WebAuthnService {
         ChallengeStore.removeAssertion()
 
         val serverProperty = ServerProperty.builder()
-            .origin(Origin(ORIGIN))
-            .rpId(RP_ID)
+            .origin(Origin(origin))
+            .rpId(rpId)
             .challenge(DefaultChallenge(storedChallenge))
             .build()
 
@@ -263,6 +292,49 @@ object WebAuthnService {
             e.printStackTrace()
             null
         }
+    }
+
+    suspend fun resendVerificationEmail(userId: Int): Boolean {
+        val user = userService.getById(userId) ?: return false
+        
+        if (userService.isUserVerified(userId)) {
+            return false
+        }
+
+        if (!emailVerificationService.canSendVerificationEmail(userId)) {
+            return false
+        }
+
+        val email = user.email ?: return false
+        val result = emailVerificationService.resendVerificationEmail(userId, email, user.displayName, user.language)
+        return result.getOrDefault(false)
+    }
+
+    suspend fun resendVerificationEmailByEmail(email: String): Boolean {
+        val user = userService.getByEmail(email) ?: return false
+        
+        if (userService.isUserVerified(user.id!!)) {
+            return false
+        }
+
+        if (!emailVerificationService.canSendVerificationEmail(user.id!!)) {
+            return false
+        }
+
+        val result = emailVerificationService.resendVerificationEmail(user.id!!, email, user.displayName, user.language)
+        return result.getOrDefault(false)
+    }
+
+    fun verifyToken(token: String): Boolean {
+        return userService.verifyToken(token)
+    }
+
+    fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
+        return userService.verifyTokenAndGetLanguage(token)
+    }
+
+    fun isUserVerified(userId: Int): Boolean {
+        return userService.isUserVerified(userId)
     }
 
     private object ChallengeStore {

@@ -1,28 +1,34 @@
 package com.adoptu.adapters.db.repositories
 
-import com.adoptu.adapters.db.PhotographyRequests
 import com.adoptu.adapters.db.Photographers
+import com.adoptu.adapters.db.PhotographyRequests
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
-import com.adoptu.dto.PhotographyRequestDto
-import com.adoptu.dto.PhotographerDto
-import com.adoptu.dto.PhotographerSettingsRequest
-import com.adoptu.dto.UserRole
-import com.adoptu.ports.PhotographerRepositoryPort
+import com.adoptu.dto.input.PhotographerDto
+import com.adoptu.dto.input.PhotographerSettingsRequest
+import com.adoptu.dto.input.PhotographyRequestDto
+import com.adoptu.dto.input.UserDto
+import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.PetRepositoryPort
+import com.adoptu.ports.PhotographerRepositoryPort
 import com.adoptu.ports.UserRepositoryPort
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import java.math.BigDecimal
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class PhotographerRepositoryImpl(
     private val petRepository: PetRepositoryPort,
-    private val userRepository: UserRepositoryPort
+    private val userRepository: UserRepositoryPort,
+    private val clock: Clock
 ) : PhotographerRepositoryPort {
 
     companion object {
@@ -30,7 +36,7 @@ class PhotographerRepositoryImpl(
     }
 
     override fun canSendMessage(userId: Int): Boolean {
-        val oneWeekAgo = System.currentTimeMillis() - ONE_WEEK
+        val oneWeekAgo = clock.now().toEpochMilliseconds() - ONE_WEEK
         val requests = transaction {
             PhotographyRequests.selectAll()
                 .where { PhotographyRequests.requesterId.eq(userId).and(PhotographyRequests.createdAt.greaterEq(oneWeekAgo)) }
@@ -45,7 +51,7 @@ class PhotographerRepositoryImpl(
         petId: Int?,
         message: String
     ): Int = transaction {
-        val createdAt = System.currentTimeMillis()
+        val createdAt = clock.now().toEpochMilliseconds()
         val requestId = PhotographyRequests.insert {
             it[PhotographyRequests.photographerId] = photographerId
             it[PhotographyRequests.requesterId] = requesterId
@@ -99,6 +105,39 @@ class PhotographerRepositoryImpl(
                     createdAt = row[PhotographyRequests.createdAt]
                 )
             }
+    }
+
+    override fun getRequestById(requestId: Int): PhotographyRequestDto? = transaction {
+        val row = PhotographyRequests.selectAll()
+            .where { PhotographyRequests.id eq requestId }
+            .firstOrNull() ?: return@transaction null
+
+        val photographer = userRepository.getPhotographers().find { it.userId == row[PhotographyRequests.photographerId] }
+        val requester = userRepository.getById(row[PhotographyRequests.requesterId])
+        val pet = if (row[PhotographyRequests.petId] != null) petRepository.getById(row[PhotographyRequests.petId]!!) else null
+
+        PhotographyRequestDto(
+            id = row[PhotographyRequests.id],
+            photographerId = row[PhotographyRequests.photographerId],
+            photographerName = photographer?.displayName,
+            requesterId = row[PhotographyRequests.requesterId],
+            requesterName = requester?.displayName,
+            petId = row[PhotographyRequests.petId],
+            petName = pet?.name,
+            message = row[PhotographyRequests.message],
+            status = row[PhotographyRequests.status],
+            scheduledDate = row[PhotographyRequests.scheduledDate],
+            createdAt = row[PhotographyRequests.createdAt]
+        )
+    }
+
+    override fun updatePhotographyRequest(requestId: Int, status: String?, scheduledDate: Long?) {
+        transaction {
+            PhotographyRequests.update({ PhotographyRequests.id eq requestId }) {
+                if (status != null) it[PhotographyRequests.status] = status
+                if (scheduledDate != null) it[PhotographyRequests.scheduledDate] = scheduledDate
+            }
+        }
     }
 
     override fun getPhotographerById(userId: Int): PhotographerDto? {
@@ -189,5 +228,41 @@ class PhotographerRepositoryImpl(
         }
         
         return getPhotographerById(userId)
+    }
+
+    override fun activatePhotographerProfile(userId: Int): UserDto? {
+        val user = userRepository.getById(userId) ?: return null
+        
+        transaction {
+            val existingRole = UserActiveRoles.selectAll()
+                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name) }
+                .firstOrNull()
+            if (existingRole == null) {
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = userId
+                    it[UserActiveRoles.role] = UserRole.PHOTOGRAPHER.name
+                }
+            }
+            val existingPhotographer = Photographers.selectAll()
+                .where { Photographers.userId eq userId }
+                .firstOrNull()
+            if (existingPhotographer == null) {
+                Photographers.insert {
+                    it[Photographers.userId] = userId
+                    it[country] = null
+                    it[state] = null
+                }
+            }
+        }
+        return userRepository.getById(userId)
+    }
+
+    override fun deactivatePhotographerProfile(userId: Int): UserDto? {
+        transaction {
+            UserActiveRoles.deleteWhere {
+                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name)
+            }
+        }
+        return userRepository.getById(userId)
     }
 }

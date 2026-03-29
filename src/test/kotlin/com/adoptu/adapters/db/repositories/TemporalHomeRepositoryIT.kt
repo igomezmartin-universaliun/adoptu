@@ -1,36 +1,28 @@
 package com.adoptu.adapters.db.repositories
 
-import com.adoptu.adapters.db.BlockedRescuers
-import com.adoptu.adapters.db.DatabaseFactory
-import com.adoptu.adapters.db.Pets
-import com.adoptu.adapters.db.TemporalHomeRequests
-import com.adoptu.adapters.db.TemporalHomes
-import com.adoptu.adapters.db.UserActiveRoles
-import com.adoptu.adapters.db.Users
-import com.adoptu.dto.CreateTemporalHomeRequest
-import com.adoptu.dto.TemporalHomeSearchParams
-import com.adoptu.dto.UpdateTemporalHomeRequest
-import com.adoptu.dto.UserRole
-import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.MapApplicationConfig
+import com.adoptu.adapters.db.*
+import com.adoptu.dto.input.CreateTemporalHomeRequest
+import com.adoptu.dto.input.TemporalHomeSearchParams
+import com.adoptu.dto.input.UpdateTemporalHomeRequest
+import com.adoptu.dto.input.UserRole
+import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import java.math.BigDecimal
-import java.util.Properties
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TemporalHomeRepositoryIT {
 
@@ -39,6 +31,7 @@ class TemporalHomeRepositoryIT {
     private lateinit var userRepository: UserRepository
     private lateinit var petRepository: PetRepositoryImpl
     private var dbCounter = 0
+    private val clock = Clock.System
 
     @BeforeAll
     fun startContainer() {
@@ -96,9 +89,9 @@ class TemporalHomeRepositoryIT {
         TransactionManager.defaultDatabase = null
         val dbName = createDatabase()
         initDatabase(dbName)
-        petRepository = PetRepositoryImpl()
-        userRepository = UserRepository()
-        temporalHomeRepository = TemporalHomeRepositoryImpl(petRepository, userRepository)
+        petRepository = PetRepositoryImpl(clock)
+        userRepository = UserRepository(clock)
+        temporalHomeRepository = TemporalHomeRepositoryImpl(petRepository, userRepository, clock)
     }
 
     @Test
@@ -366,7 +359,7 @@ class TemporalHomeRepositoryIT {
             Users.insert {
                 it[Users.username] = username
                 it[Users.displayName] = displayName
-                it[Users.createdAt] = System.currentTimeMillis()
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
         }!!
 
@@ -398,7 +391,7 @@ class TemporalHomeRepositoryIT {
                 it[TemporalHomes.city] = city
                 it[TemporalHomes.zip] = zip
                 it[TemporalHomes.neighborhood] = neighborhood
-                it[TemporalHomes.createdAt] = System.currentTimeMillis()
+                it[TemporalHomes.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
     }
@@ -421,7 +414,7 @@ class TemporalHomeRepositoryIT {
                 it[Pets.isPromoted] = false
                 it[Pets.adoptionFee] = BigDecimal("100.0")
                 it[Pets.currency] = "USD"
-                it[Pets.createdAt] = System.currentTimeMillis()
+                it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
         }!!
     }

@@ -1,40 +1,40 @@
 package com.adoptu.services
 
-import com.adoptu.dto.PhotographerSettingsRequest
-import com.adoptu.mocks.MockNotificationAdapter
-import com.adoptu.mocks.TestDatabase
-import com.adoptu.adapters.db.PhotographyRequests
-import com.adoptu.adapters.db.Pets
-import com.adoptu.adapters.db.Photographers
-import com.adoptu.adapters.db.Users
-import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.*
 import com.adoptu.adapters.db.repositories.PetRepositoryImpl
 import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
 import com.adoptu.adapters.db.repositories.UserRepository
+import com.adoptu.dto.input.PhotographerSettingsRequest
+import com.adoptu.dto.input.UpdatePhotographyRequestRequest
+import com.adoptu.dto.input.UserDto
+import com.adoptu.dto.input.UserRole
+import com.adoptu.mocks.MockNotificationAdapter
+import com.adoptu.mocks.TestClock
+import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 class PhotographerServiceTest {
 
+    private val clock = TestClock(Instant.parse("2024-01-15T10:00:00Z"))
     private lateinit var photographerService: PhotographerService
 
     @BeforeEach
     fun setup() {
         TestDatabase.initH2()
         TestDatabase.clearAllData()
-        val petRepository = PetRepositoryImpl()
-        val userRepository = UserRepository()
-        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
-        photographerService = PhotographerService(photographerRepository, MockNotificationAdapter(), userRepository)
+        val petRepository = PetRepositoryImpl(clock)
+        val userRepository = UserRepository(clock)
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository, clock)
+        photographerService = PhotographerService(photographerRepository, MockNotificationAdapter(), userRepository, clock)
     }
 
     @Test
@@ -68,7 +68,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.photographerId] = photographerId
                 it[PhotographyRequests.message] = "Test message"
                 it[PhotographyRequests.status] = "PENDING"
-                it[PhotographyRequests.createdAt] = System.currentTimeMillis()
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
 
@@ -81,7 +81,7 @@ class PhotographerServiceTest {
     fun `canSendMessage returns true when request older than week`() {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
-        val oneWeekAgo = System.currentTimeMillis() - (PhotographerRepositoryImpl.ONE_WEEK + 1000)
+        val oneWeekAgo = clock.now().toEpochMilliseconds() - (PhotographerRepositoryImpl.ONE_WEEK + 1000)
 
         transaction {
             PhotographyRequests.insert {
@@ -143,7 +143,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.photographerId] = photographerId
                 it[PhotographyRequests.message] = "Test message"
                 it[PhotographyRequests.status] = "PENDING"
-                it[PhotographyRequests.createdAt] = System.currentTimeMillis()
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
 
@@ -226,10 +226,10 @@ class PhotographerServiceTest {
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
         val mockAdapter = MockNotificationAdapter()
-        val petRepository = PetRepositoryImpl()
-        val userRepository = UserRepository()
-        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
-        val serviceWithMock = PhotographerService(photographerRepository, mockAdapter, userRepository)
+        val petRepository = PetRepositoryImpl(clock)
+        val userRepository = UserRepository(clock)
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository, clock)
+        val serviceWithMock = PhotographerService(photographerRepository, mockAdapter, userRepository, clock)
 
         serviceWithMock.createPhotographyRequest(
             requesterId = requesterId,
@@ -265,7 +265,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.photographerId] = photographerId
                 it[PhotographyRequests.message] = "Test message"
                 it[PhotographyRequests.status] = "PENDING"
-                it[PhotographyRequests.createdAt] = System.currentTimeMillis()
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
 
@@ -297,7 +297,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.petId] = petId
                 it[PhotographyRequests.message] = "Test message"
                 it[PhotographyRequests.status] = "PENDING"
-                it[PhotographyRequests.createdAt] = System.currentTimeMillis()
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
 
@@ -448,7 +448,7 @@ class PhotographerServiceTest {
             Users.insert {
                 it[Users.username] = username
                 it[Users.displayName] = displayName
-                it[Users.createdAt] = System.currentTimeMillis()
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
         }!!
         
@@ -477,8 +477,312 @@ class PhotographerServiceTest {
                 it[Pets.status] = "AVAILABLE"
                 it[Pets.size] = "MEDIUM"
                 it[Pets.isUrgent] = false
-                it[Pets.createdAt] = System.currentTimeMillis()
+                it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
         }!!
+    }
+
+    @Test
+    fun `getPhotographerById returns photographer when exists`() {
+        val photographerId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
+
+        transaction {
+            Photographers.insert {
+                it[Photographers.userId] = photographerId
+                it[photographerFee] = BigDecimal("50.00")
+                it[photographerCurrency] = "USD"
+            }
+        }
+
+        val result = photographerService.getPhotographerById(photographerId)
+
+        assertNotNull(result)
+        assertEquals(photographerId, result.userId)
+        assertEquals(50.0, result.photographerFee)
+    }
+
+    @Test
+    fun `getPhotographerById returns null when not found`() {
+        val result = photographerService.getPhotographerById(999)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `createPhotographyRequest single creates request successfully`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        transaction {
+            Photographers.insert {
+                it[Photographers.userId] = photographerId
+                it[photographerFee] = BigDecimal("50.00")
+                it[photographerCurrency] = "USD"
+            }
+        }
+
+        val result = photographerService.createPhotographyRequest(
+            requesterId = requesterId,
+            photographerId = photographerId,
+            petId = null,
+            message = "Please take photos"
+        )
+
+        assertNotNull(result)
+        assertEquals(photographerId, result["photographerId"])
+        assertEquals("PENDING", result["status"])
+    }
+
+    @Test
+    fun `createPhotographyRequest single throws when photographer not found`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+
+        val exception = assertThrows<IllegalArgumentException> {
+            photographerService.createPhotographyRequest(
+                requesterId = requesterId,
+                photographerId = 999,
+                petId = null,
+                message = "Please take photos"
+            )
+        }
+
+        assertEquals("Photographer not found or not active", exception.message)
+    }
+
+    @Test
+    fun `getRequestsForUser returns requests for photographer role`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test message"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            }
+        }
+
+        val userDto = UserDto(
+            id = photographerId,
+            username = "photographer1@test.com",
+            displayName = "Photo 1",
+            language = "en",
+            activeRoles = setOf(UserRole.PHOTOGRAPHER),
+            lastAcceptedPrivacyPolicy = null,
+            lastAcceptedTermsAndConditions = null,
+            isBanned = false
+        )
+
+        val result = photographerService.getRequestsForUser(userDto)
+
+        assertEquals(1, result.size)
+        assertEquals(requesterId, result.first()["requesterId"])
+    }
+
+    @Test
+    fun `getRequestsForUser returns requests for non-photographer role`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test message"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            }
+        }
+
+        val userDto = UserDto(
+            id = requesterId,
+            username = "user1@test.com",
+            displayName = "User 1",
+            language = "en",
+            activeRoles = setOf(UserRole.ADOPTER),
+            lastAcceptedPrivacyPolicy = null,
+            lastAcceptedTermsAndConditions = null,
+            isBanned = false
+        )
+
+        val result = photographerService.getRequestsForUser(userDto)
+
+        assertEquals(1, result.size)
+        assertEquals(photographerId, result.first()["photographerId"])
+    }
+
+    @Test
+    fun `activatePhotographerProfile adds photographer role`() {
+        val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+
+        val result = photographerService.activatePhotographerProfile(userId)
+
+        assertNotNull(result)
+        assertTrue(result.activeRoles.contains(UserRole.PHOTOGRAPHER))
+    }
+
+    @Test
+    fun `deactivatePhotographerProfile removes photographer role`() {
+        val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "PHOTOGRAPHER")
+
+        val result = photographerService.deactivatePhotographerProfile(userId)
+
+        assertNotNull(result)
+        assertFalse(result.activeRoles.contains(UserRole.PHOTOGRAPHER))
+    }
+
+    @Test
+    fun `updatePhotographyRequest returns NotFound when request not exists`() {
+        val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
+
+        val result = photographerService.updatePhotographyRequest(
+            userId = userId,
+            user = null,
+            requestId = 999,
+            body = UpdatePhotographyRequestRequest(status = "APPROVED")
+        )
+
+        assertEquals(ServiceResult.NotFound, result)
+    }
+
+    @Test
+    fun `updatePhotographyRequest returns Forbidden when user not authorized`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+        val otherUserId = createTestUser(username = "other@test.com", displayName = "Other", role = "ADOPTER")
+
+        val requestId = transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            } get PhotographyRequests.id
+        }!!
+
+        val result = photographerService.updatePhotographyRequest(
+            userId = otherUserId,
+            user = null,
+            requestId = requestId,
+            body = UpdatePhotographyRequestRequest(status = "APPROVED")
+        )
+
+        assertEquals(ServiceResult.Forbidden, result)
+    }
+
+    @Test
+    fun `updatePhotographyRequest allows photographer to approve request`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        val requestId = transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            } get PhotographyRequests.id
+        }!!
+
+        val result = photographerService.updatePhotographyRequest(
+            userId = photographerId,
+            user = null,
+            requestId = requestId,
+            body = UpdatePhotographyRequestRequest(status = "APPROVED")
+        )
+
+        assertTrue(result is ServiceResult.Success)
+    }
+
+    @Test
+    fun `updatePhotographyRequest allows requester to cancel request`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        val requestId = transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            } get PhotographyRequests.id
+        }!!
+
+        val result = photographerService.updatePhotographyRequest(
+            userId = requesterId,
+            user = null,
+            requestId = requestId,
+            body = UpdatePhotographyRequestRequest(status = "CANCELLED")
+        )
+
+        assertTrue(result is ServiceResult.Success)
+    }
+
+    @Test
+    fun `updatePhotographyRequest allows admin to update any request`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        val requestId = transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test"
+                it[PhotographyRequests.status] = "PENDING"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            } get PhotographyRequests.id
+        }!!
+
+        val adminUser = UserDto(
+            id = 999,
+            username = "admin@test.com",
+            displayName = "Admin",
+            language = "en",
+            activeRoles = setOf(UserRole.ADMIN),
+            lastAcceptedPrivacyPolicy = null,
+            lastAcceptedTermsAndConditions = null,
+            isBanned = false
+        )
+
+        val result = photographerService.updatePhotographyRequest(
+            userId = 999,
+            user = adminUser,
+            requestId = requestId,
+            body = UpdatePhotographyRequestRequest(status = "APPROVED")
+        )
+
+        assertTrue(result is ServiceResult.Success)
+    }
+
+    @Test
+    fun `updatePhotographyRequest throws on invalid status transition`() {
+        val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
+        val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
+
+        val requestId = transaction {
+            PhotographyRequests.insert {
+                it[PhotographyRequests.requesterId] = requesterId
+                it[PhotographyRequests.photographerId] = photographerId
+                it[PhotographyRequests.message] = "Test"
+                it[PhotographyRequests.status] = "APPROVED"
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
+            } get PhotographyRequests.id
+        }!!
+
+        val exception = assertThrows<IllegalArgumentException> {
+            photographerService.updatePhotographyRequest(
+                userId = requesterId,
+                user = null,
+                requestId = requestId,
+                body = UpdatePhotographyRequestRequest(status = "PENDING")
+            )
+        }
+
+        assertEquals("Invalid status transition", exception.message)
     }
 }

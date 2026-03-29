@@ -1,26 +1,26 @@
 package com.adoptu.adapters.db.repositories
 
-import com.adoptu.adapters.db.Pets
-import com.adoptu.adapters.db.Photographers
-import com.adoptu.adapters.db.UserActiveRoles
-import com.adoptu.adapters.db.Users
-import com.adoptu.adapters.db.EmailVerificationTokens
-import com.adoptu.dto.AcceptTermsRequest
-import com.adoptu.dto.PhotographerDto
-import com.adoptu.dto.PhotographerSettingsRequest
-import com.adoptu.dto.UserDto
-import com.adoptu.dto.UserRole
+import com.adoptu.adapters.db.*
+import com.adoptu.dto.input.AcceptTermsRequest
+import com.adoptu.dto.input.PhotographerDto
+import com.adoptu.dto.input.PhotographerSettingsRequest
+import com.adoptu.dto.input.UserDto
+import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.UserRepositoryPort
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import java.math.BigDecimal
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-class UserRepository : UserRepositoryPort {
+@OptIn(ExperimentalTime::class)
+class UserRepository(private val clock: Clock) : UserRepositoryPort {
 
     private fun getActiveRolesForUser(userId: Int): Set<UserRole> {
         return transaction {
@@ -52,7 +52,49 @@ class UserRepository : UserRepositoryPort {
                     language = user[Users.language],
                     activeRoles = activeRoles,
                     lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
-                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions]
+                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                    isBanned = user[Users.isBanned],
+                    banReason = user[Users.banReason]
+                )
+            }
+    }
+
+    override fun getByEmail(email: String): UserDto? = transaction {
+        Users.selectAll()
+            .where { Users.username eq email }
+            .firstOrNull()
+            ?.let { user ->
+                val activeRoles = getActiveRolesForUser(user[Users.id])
+                UserDto(
+                    id = user[Users.id],
+                    username = user[Users.username],
+                    email = user[Users.username],
+                    displayName = user[Users.displayName],
+                    language = user[Users.language],
+                    activeRoles = activeRoles,
+                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                    isBanned = user[Users.isBanned],
+                    banReason = user[Users.banReason]
+                )
+            }
+    }
+
+    override fun getAllUsers(): List<UserDto> = transaction {
+        Users.selectAll()
+            .map { user ->
+                val activeRoles = getActiveRolesForUser(user[Users.id])
+                UserDto(
+                    id = user[Users.id],
+                    username = user[Users.username],
+                    email = user[Users.username],
+                    displayName = user[Users.displayName],
+                    language = user[Users.language],
+                    activeRoles = activeRoles,
+                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                    isBanned = user[Users.isBanned],
+                    banReason = user[Users.banReason]
                 )
             }
     }
@@ -97,6 +139,35 @@ class UserRepository : UserRepositoryPort {
             .mapNotNull { userId -> getById(userId) }
     }
 
+    override fun banUser(userId: Int, reason: String?): Boolean {
+        return transaction {
+            val rowsUpdated = Users.update({ Users.id eq userId }) {
+                it[Users.isBanned] = true
+                it[Users.banReason] = reason
+            }
+            rowsUpdated > 0
+        }
+    }
+
+    override fun unbanUser(userId: Int): Boolean {
+        return transaction {
+            val rowsUpdated = Users.update({ Users.id eq userId }) {
+                it[Users.isBanned] = false
+                it[Users.banReason] = null
+            }
+            rowsUpdated > 0
+        }
+    }
+
+    override fun isBanned(userId: Int): Boolean {
+        return transaction {
+            Users.selectAll()
+                .where { Users.id eq userId }
+                .firstOrNull()
+                ?.get(Users.isBanned) ?: false
+        }
+    }
+
     override fun isRoleActive(userId: Int, role: UserRole): Boolean {
         return transaction {
             UserActiveRoles.selectAll()
@@ -130,42 +201,6 @@ class UserRepository : UserRepositoryPort {
             
             Pets.update({ Pets.rescuerId eq userId }) {
                 it[Pets.isPromoted] = false
-            }
-        }
-        return getById(userId)
-    }
-
-    override fun activatePhotographerProfile(userId: Int): UserDto? {
-        val user = getById(userId) ?: return null
-        
-        transaction {
-            val existingRole = UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name) }
-                .firstOrNull()
-            if (existingRole == null) {
-                UserActiveRoles.insert {
-                    it[UserActiveRoles.userId] = userId
-                    it[UserActiveRoles.role] = UserRole.PHOTOGRAPHER.name
-                }
-            }
-            val existingPhotographer = Photographers.selectAll()
-                .where { Photographers.userId eq userId }
-                .firstOrNull()
-            if (existingPhotographer == null) {
-                Photographers.insert {
-                    it[Photographers.userId] = userId
-                    it[country] = null
-                    it[state] = null
-                }
-            }
-        }
-        return getById(userId)
-    }
-
-    override fun deactivatePhotographerProfile(userId: Int): UserDto? {
-        transaction {
-            UserActiveRoles.deleteWhere {
-                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name)
             }
         }
         return getById(userId)
@@ -271,7 +306,7 @@ class UserRepository : UserRepositoryPort {
     }
 
     override fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? {
-        val now = System.currentTimeMillis()
+        val now = clock.now().toEpochMilliseconds()
         transaction {
             Users.update({ Users.id eq userId }) {
                 if (request.acceptPrivacyPolicy) {
@@ -310,7 +345,7 @@ class UserRepository : UserRepositoryPort {
                     it[EmailVerificationTokens.userId] = userId
                     it[EmailVerificationTokens.token] = token
                     it[EmailVerificationTokens.expiresAt] = expiresAt
-                    it[EmailVerificationTokens.createdAt] = System.currentTimeMillis()
+                    it[EmailVerificationTokens.createdAt] = clock.now().toEpochMilliseconds()
                 }
                 true
             } catch (e: Exception) {
@@ -321,7 +356,7 @@ class UserRepository : UserRepositoryPort {
 
     override fun verifyToken(token: String): Int? {
         return transaction {
-            val now = System.currentTimeMillis()
+            val now = clock.now().toEpochMilliseconds()
             val tokenRow = EmailVerificationTokens
                 .selectAll()
                 .where { EmailVerificationTokens.token eq token }
@@ -339,5 +374,30 @@ class UserRepository : UserRepositoryPort {
         transaction {
             EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
         }
+    }
+
+    override fun getVerificationAttemptsToday(userId: Int): Int {
+        return transaction {
+            val startOfDay = getStartOfDayMillis()
+            EmailVerificationAttempts.selectAll()
+                .where { (EmailVerificationAttempts.userId eq userId) and (EmailVerificationAttempts.createdAt greaterEq startOfDay) }
+                .count()
+                .toInt()
+        }
+    }
+
+    override fun recordVerificationAttempt(userId: Int) {
+        transaction {
+            EmailVerificationAttempts.insert {
+                it[EmailVerificationAttempts.userId] = userId
+                it[EmailVerificationAttempts.createdAt] = clock.now().toEpochMilliseconds()
+            }
+        }
+    }
+
+    private fun getStartOfDayMillis(): Long {
+        val now = clock.now().toEpochMilliseconds()
+        val dayMillis = 24 * 60 * 60 * 1000L
+        return now - (now % dayMillis)
     }
 }

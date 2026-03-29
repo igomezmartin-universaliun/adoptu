@@ -1,16 +1,17 @@
 package com.adoptu.services
 
-import com.adoptu.dto.CreatePetRequest
-import com.adoptu.dto.Gender
-import com.adoptu.dto.UpdatePetRequest
-import com.adoptu.dto.UserRole
-import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.repositories.PetRepositoryImpl
 import com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl
 import com.adoptu.adapters.db.repositories.UserRepository
-import com.adoptu.mocks.MockNotificationAdapter
+import com.adoptu.dto.input.CreatePetRequest
+import com.adoptu.dto.input.Gender
+import com.adoptu.dto.input.UpdatePetRequest
+import com.adoptu.dto.input.UserRole
 import com.adoptu.mocks.MockImageStorage
+import com.adoptu.mocks.MockNotificationAdapter
+import com.adoptu.mocks.TestClock
 import com.adoptu.mocks.TestDatabase
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -21,13 +22,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 class PetServiceTest {
 
     private lateinit var petService: PetService
     private lateinit var petRepository: PetRepositoryImpl
     private lateinit var mockImageStorage: MockImageStorage
     private lateinit var mockNotificationAdapter: MockNotificationAdapter
+    private val clock = TestClock(Instant.parse("2024-01-15T10:00:00Z"))
 
     @BeforeEach
     fun setup() {
@@ -40,7 +45,7 @@ class PetServiceTest {
                     it[Users.id] = 1
                     it[Users.username] = "rescuer@mocks.com"
                     it[Users.displayName] = "Test Rescuer"
-                    it[Users.createdAt] = System.currentTimeMillis()
+                    it[Users.createdAt] = clock.now().toEpochMilliseconds()
                 }
                 UserActiveRoles.insert {
                     it[UserActiveRoles.userId] = 1
@@ -54,7 +59,7 @@ class PetServiceTest {
                     it[Users.id] = 2
                     it[Users.username] = "adopter@mocks.com"
                     it[Users.displayName] = "Test Adopter"
-                    it[Users.createdAt] = System.currentTimeMillis()
+                    it[Users.createdAt] = clock.now().toEpochMilliseconds()
                 }
                 UserActiveRoles.insert {
                     it[UserActiveRoles.userId] = 2
@@ -68,7 +73,7 @@ class PetServiceTest {
                     it[Users.id] = 3
                     it[Users.username] = "other@mocks.com"
                     it[Users.displayName] = "Other User"
-                    it[Users.createdAt] = System.currentTimeMillis()
+                    it[Users.createdAt] = clock.now().toEpochMilliseconds()
                 }
                 UserActiveRoles.insert {
                     it[UserActiveRoles.userId] = 3
@@ -88,10 +93,10 @@ class PetServiceTest {
         
         mockImageStorage = MockImageStorage()
         mockNotificationAdapter = MockNotificationAdapter()
-        val userRepository = UserRepository()
-        petRepository = PetRepositoryImpl()
-        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
-        val photographerService = PhotographerService(photographerRepository, null, userRepository)
+        val userRepository = UserRepository(clock)
+        petRepository = PetRepositoryImpl(clock)
+        val photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository, clock)
+        val photographerService = PhotographerService(photographerRepository, null, userRepository, clock)
         val userService = UserService(userRepository)
         petService = PetService(petRepository, mockImageStorage, mockNotificationAdapter, userService)
     }
@@ -166,7 +171,7 @@ class PetServiceTest {
 
     @Test
     fun `update returns NotFound for non-existent pet`() {
-        val result = petService.update(999, 1, UserRole.RESCUER, UpdatePetRequest(name = "Test"))
+        val result = petService.update(999, 1, setOf("RESCUER"), UpdatePetRequest(name = "Test"))
         assertEquals(ServiceResult.NotFound, result)
     }
 
@@ -174,14 +179,14 @@ class PetServiceTest {
     fun `update returns Forbidden when user is not owner`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.update(created.id, 2, UserRole.RESCUER, UpdatePetRequest(name = "Hacked"))
+        val result = petService.update(created.id, 2, setOf("RESCUER"), UpdatePetRequest(name = "Hacked"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
 
     @Test
     fun `delete returns NotFound for non-existent pet`() {
-        val result = petService.delete(999, 1, UserRole.ADMIN)
+        val result = petService.delete(999, 1, setOf("ADMIN"))
         assertEquals(ServiceResult.NotFound, result)
     }
 
@@ -189,14 +194,14 @@ class PetServiceTest {
     fun `delete returns Forbidden when user is not owner`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.delete(created.id, 2, UserRole.RESCUER)
+        val result = petService.delete(created.id, 2, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
 
     @Test
     fun `addImage returns NotFound for non-existent pet`() {
-        val result = petService.addImage(999, 1, UserRole.ADMIN, "https://example.com/image.jpg", false)
+        val result = petService.addImage(999, 1, setOf("ADMIN"), "https://example.com/image.jpg", false)
         assertEquals(ServiceResult.NotFound, result)
     }
 
@@ -204,7 +209,7 @@ class PetServiceTest {
     fun `addImage returns Forbidden when user is not owner`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.addImage(created.id, 2, UserRole.RESCUER, "https://example.com/image.jpg", false)
+        val result = petService.addImage(created.id, 2, setOf("RESCUER"), "https://example.com/image.jpg", false)
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -213,7 +218,7 @@ class PetServiceTest {
     fun `addImage adds image successfully`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image.jpg", true)
+        val result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", true)
 
         assertTrue(result is ServiceResult.Success)
         assertTrue((result as ServiceResult.Success).data.isPrimary)
@@ -223,7 +228,7 @@ class PetServiceTest {
     fun `addImage allows admin to add image`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.addImage(created.id, 999, UserRole.ADMIN, "https://example.com/admin-image.jpg", false)
+        val result = petService.addImage(created.id, 999, setOf("ADMIN"), "https://example.com/admin-image.jpg", false)
 
         assertTrue(result is ServiceResult.Success)
     }
@@ -313,7 +318,7 @@ class PetServiceTest {
     fun `update updates pet successfully`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.update(created.id, 1, UserRole.RESCUER, UpdatePetRequest(name = "Max", weight = 30.0))
+        val result = petService.update(created.id, 1, setOf("RESCUER"), UpdatePetRequest(name = "Max", weight = 30.0))
 
         assertTrue(result is ServiceResult.Success)
         val pet = (result as ServiceResult.Success).data
@@ -325,7 +330,7 @@ class PetServiceTest {
     fun `update allows admin to update any pet`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.update(created.id, 999, UserRole.ADMIN, UpdatePetRequest(name = "Admin Buddy"))
+        val result = petService.update(created.id, 999, setOf("ADMIN"), UpdatePetRequest(name = "Admin Buddy"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals("Admin Buddy", (result as ServiceResult.Success).data.name)
@@ -336,7 +341,7 @@ class PetServiceTest {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val petId = created.id
 
-        val result = petService.delete(petId, 1, UserRole.RESCUER)
+        val result = petService.delete(petId, 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         assertNull(petService.getById(petId))
@@ -347,7 +352,7 @@ class PetServiceTest {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val petId = created.id
 
-        val result = petService.delete(petId, 999, UserRole.ADMIN)
+        val result = petService.delete(petId, 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
         assertNull(petService.getById(petId))
@@ -365,8 +370,8 @@ class PetServiceTest {
     @Test
     fun `getImages returns pet images`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image1.jpg", true)
-        petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image2.jpg", false)
+        petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
+        petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
 
         val result = petService.getImages(created.id)
 
@@ -377,12 +382,12 @@ class PetServiceTest {
     @Test
     fun `setPrimaryImage sets primary image successfully`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        val img1Result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image1.jpg", true)
-        val img2Result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image2.jpg", false)
+        val img1Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
+        val img2Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
         val img1 = (img1Result as ServiceResult.Success).data
         val img2 = (img2Result as ServiceResult.Success).data
 
-        val result = petService.setPrimaryImage(created.id, img2.id, 1, UserRole.RESCUER)
+        val result = petService.setPrimaryImage(created.id, img2.id, 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         val images = petService.getImages(created.id)
@@ -396,7 +401,7 @@ class PetServiceTest {
     fun `setPrimaryImage returns NotFound for non-existent image`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.setPrimaryImage(created.id, 999, 1, UserRole.RESCUER)
+        val result = petService.setPrimaryImage(created.id, 999, 1, setOf("RESCUER"))
 
         assertEquals(ServiceResult.NotFound, result)
     }
@@ -404,10 +409,10 @@ class PetServiceTest {
     @Test
     fun `setPrimaryImage returns Forbidden when user is not owner`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        val imgResult = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image.jpg", false)
+        val imgResult = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", false)
         val img = (imgResult as ServiceResult.Success).data
 
-        val result = petService.setPrimaryImage(created.id, img.id, 2, UserRole.RESCUER)
+        val result = petService.setPrimaryImage(created.id, img.id, 2, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -415,11 +420,11 @@ class PetServiceTest {
     @Test
     fun `setPrimaryImage allows admin to set primary image`() {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image1.jpg", true)
-        val img2Result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image2.jpg", false)
+        petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
+        val img2Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
         val img2 = (img2Result as ServiceResult.Success).data
 
-        val result = petService.setPrimaryImage(created.id, img2.id, 999, UserRole.ADMIN)
+        val result = petService.setPrimaryImage(created.id, img2.id, 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
     }
@@ -427,10 +432,10 @@ class PetServiceTest {
     @Test
     fun `removeImage removes image successfully`() = kotlinx.coroutines.runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        val imgResult = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image.jpg", false)
+        val imgResult = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", false)
         val img = (imgResult as ServiceResult.Success).data
 
-        val result = petService.removeImage(created.id, img.id, 1, UserRole.RESCUER)
+        val result = petService.removeImage(created.id, img.id, 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         assertTrue(petService.getImages(created.id).isEmpty())
@@ -440,7 +445,7 @@ class PetServiceTest {
     fun `removeImage returns NotFound for non-existent image`() = kotlinx.coroutines.runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.removeImage(created.id, 999, 1, UserRole.RESCUER)
+        val result = petService.removeImage(created.id, 999, 1, setOf("RESCUER"))
 
         assertEquals(ServiceResult.NotFound, result)
     }
@@ -448,10 +453,10 @@ class PetServiceTest {
     @Test
     fun `removeImage returns Forbidden when user is not owner`() = kotlinx.coroutines.runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        val imgResult = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image.jpg", false)
+        val imgResult = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", false)
         val img = (imgResult as ServiceResult.Success).data
 
-        val result = petService.removeImage(created.id, img.id, 2, UserRole.RESCUER)
+        val result = petService.removeImage(created.id, img.id, 2, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -459,11 +464,11 @@ class PetServiceTest {
     @Test
     fun `updatePetImages updates images successfully`() = kotlinx.coroutines.runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        val img1Result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image1.jpg", false)
-        val img2Result = petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image2.jpg", false)
+        val img1Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", false)
+        val img2Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
         val img2 = (img2Result as ServiceResult.Success).data
 
-        val result = petService.updatePetImages(created.id, 1, UserRole.RESCUER, listOf(img2.id))
+        val result = petService.updatePetImages(created.id, 1, setOf("RESCUER"), listOf(img2.id))
 
         assertTrue(result is ServiceResult.Success)
         val images = petService.getImages(created.id)
@@ -474,10 +479,10 @@ class PetServiceTest {
     @Test
     fun `updatePetImages removes deleted images from storage`() = kotlinx.coroutines.runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
-        petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image1.jpg", false)
-        petService.addImage(created.id, 1, UserRole.RESCUER, "https://example.com/image2.jpg", false)
+        petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", false)
+        petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
 
-        petService.updatePetImages(created.id, 1, UserRole.RESCUER, emptyList())
+        petService.updatePetImages(created.id, 1, setOf("RESCUER"), emptyList())
 
         assertEquals(0, mockImageStorage.getStoredImages().size)
     }
@@ -500,7 +505,7 @@ class PetServiceTest {
         petService.createAdoptionRequest(pet.id, 2, "Request 1")
         petService.createAdoptionRequest(pet.id, 3, "Request 2")
 
-        val result = petService.getAdoptionRequestsForPet(pet.id, 1, UserRole.RESCUER)
+        val result = petService.getAdoptionRequestsForPet(pet.id, 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals(2, (result as ServiceResult.Success).data.size)
@@ -510,7 +515,7 @@ class PetServiceTest {
     fun `getAdoptionRequestsForPet returns Forbidden when user is not owner`() {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
-        val result = petService.getAdoptionRequestsForPet(pet.id, 2, UserRole.RESCUER)
+        val result = petService.getAdoptionRequestsForPet(pet.id, 2, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -520,7 +525,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.createAdoptionRequest(pet.id, 2, "Request 1")
 
-        val result = petService.getAdoptionRequestsForPet(pet.id, 999, UserRole.ADMIN)
+        val result = petService.getAdoptionRequestsForPet(pet.id, 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals(1, (result as ServiceResult.Success).data.size)
@@ -544,7 +549,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
-        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 1, UserRole.RESCUER)
+        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals("APPROVED", (result as ServiceResult.Success).data.status)
@@ -555,7 +560,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
-        val result = petService.updateAdoptionRequest(request.id, "REJECTED", 1, UserRole.RESCUER)
+        val result = petService.updateAdoptionRequest(request.id, "REJECTED", 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals("REJECTED", (result as ServiceResult.Success).data.status)
@@ -563,7 +568,7 @@ class PetServiceTest {
 
     @Test
     fun `updateAdoptionRequest returns NotFound for non-existent request`() {
-        val result = petService.updateAdoptionRequest(999, "APPROVED", 1, UserRole.RESCUER)
+        val result = petService.updateAdoptionRequest(999, "APPROVED", 1, setOf("RESCUER"))
 
         assertEquals(ServiceResult.NotFound, result)
     }
@@ -573,7 +578,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
-        val result = petService.updateAdoptionRequest(request.id, "INVALID_STATUS", 1, UserRole.RESCUER)
+        val result = petService.updateAdoptionRequest(request.id, "INVALID_STATUS", 1, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -583,7 +588,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
-        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 3, UserRole.RESCUER)
+        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 3, setOf("RESCUER"))
 
         assertEquals(ServiceResult.Forbidden, result)
     }
@@ -593,7 +598,7 @@ class PetServiceTest {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
-        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 999, UserRole.ADMIN)
+        val result = petService.updateAdoptionRequest(request.id, "APPROVED", 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
         assertEquals("APPROVED", (result as ServiceResult.Success).data.status)

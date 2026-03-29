@@ -1,6 +1,11 @@
 package com.adoptu.ports
 
-import com.adoptu.dto.*
+import com.adoptu.dto.input.AdoptionRequestDto
+import com.adoptu.dto.input.Currency
+import com.adoptu.dto.input.Gender
+import com.adoptu.dto.input.PetDto
+import com.adoptu.dto.input.PetImageDto
+import com.adoptu.dto.input.UpdatePetRequest
 
 interface PetRepositoryPort {
     fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto>

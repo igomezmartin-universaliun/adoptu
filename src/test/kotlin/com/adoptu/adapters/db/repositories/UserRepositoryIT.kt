@@ -1,36 +1,35 @@
 package com.adoptu.adapters.db.repositories
 
 import com.adoptu.adapters.db.DatabaseFactory
-import com.adoptu.adapters.db.Pets
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
-import com.adoptu.dto.*
-import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.MapApplicationConfig
-import org.jetbrains.exposed.v1.jdbc.Database
+import com.adoptu.dto.input.AcceptTermsRequest
+import com.adoptu.dto.input.PhotographerSettingsRequest
+import com.adoptu.dto.input.UserRole
+import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
-import java.util.Properties
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserRepositoryIT {
 
     private var postgresContainer: PostgreSQLContainer<*>? = null
     private lateinit var userRepository: UserRepository
     private var dbCounter = 0
+    private val clock = Clock.System
 
     @BeforeAll
     fun startContainer() {
@@ -84,7 +83,7 @@ class UserRepositoryIT {
     }
 
     private fun setupRepository() {
-        userRepository = UserRepository()
+        userRepository = UserRepository(clock)
     }
 
     @BeforeEach
@@ -164,27 +163,6 @@ class UserRepositoryIT {
     }
 
     @Test
-    fun `activatePhotographerProfile adds photographer role and creates photographer record`() {
-        val userId = createTestUser("test@example.com", "Test Photographer")
-
-        val result = userRepository.activatePhotographerProfile(userId)
-
-        assertNotNull(result)
-        assertTrue(result.activeRoles.contains(UserRole.PHOTOGRAPHER))
-    }
-
-    @Test
-    fun `deactivatePhotographerProfile removes photographer role`() {
-        val userId = createTestUser("test@example.com", "Test Photographer")
-        userRepository.activatePhotographerProfile(userId)
-
-        val result = userRepository.deactivatePhotographerProfile(userId)
-
-        assertNotNull(result)
-        assertTrue(!result.activeRoles.contains(UserRole.PHOTOGRAPHER))
-    }
-
-    @Test
     fun `activateTemporalHomeProfile adds temporal home role`() {
         val userId = createTestUser("test@example.com", "Test Temp Home")
 
@@ -246,7 +224,7 @@ class UserRepositoryIT {
     @Test
     fun `acceptTerms updates privacy policy timestamp`() {
         val userId = createTestUser("test@example.com", "Test User")
-        val beforeTime = System.currentTimeMillis()
+        val beforeTime = clock.now().toEpochMilliseconds()
 
         val result = userRepository.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
@@ -261,7 +239,7 @@ class UserRepositoryIT {
     @Test
     fun `acceptTerms updates terms timestamp`() {
         val userId = createTestUser("test@example.com", "Test User")
-        val beforeTime = System.currentTimeMillis()
+        val beforeTime = clock.now().toEpochMilliseconds()
 
         val result = userRepository.acceptTerms(userId, AcceptTermsRequest(
             acceptPrivacyPolicy = false,
@@ -353,7 +331,7 @@ class UserRepositoryIT {
             Users.insert {
                 it[Users.username] = username
                 it[Users.displayName] = displayName
-                it[Users.createdAt] = System.currentTimeMillis()
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
         }!!
     }

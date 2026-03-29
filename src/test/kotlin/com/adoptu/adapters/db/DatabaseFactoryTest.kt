@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class DatabaseFactoryTest {
 
     @Test
@@ -25,8 +28,8 @@ class DatabaseFactoryTest {
     }
 
     @Test
-    fun `DatabaseFactory has 11 tables`() {
-        assertEquals(11, DatabaseFactory.listOfTables.size)
+    fun `DatabaseFactory has 15 tables`() {
+        assertEquals(15, DatabaseFactory.listOfTables.size)
     }
 
     @Test
@@ -35,8 +38,23 @@ class DatabaseFactoryTest {
     }
 
     @Test
+    fun `EmailVerificationTokens table is in listOfTables`() {
+        assertTrue(DatabaseFactory.listOfTables.contains(EmailVerificationTokens))
+    }
+
+    @Test
+    fun `EmailVerificationAttempts table is in listOfTables`() {
+        assertTrue(DatabaseFactory.listOfTables.contains(EmailVerificationAttempts))
+    }
+
+    @Test
     fun `WebAuthnCredentials table is in listOfTables`() {
         assertTrue(DatabaseFactory.listOfTables.contains(WebAuthnCredentials))
+    }
+
+    @Test
+    fun `SterilizationLocations table is in listOfTables`() {
+        assertTrue(DatabaseFactory.listOfTables.contains(SterilizationLocations))
     }
 
     @Test
@@ -83,6 +101,8 @@ class DatabaseFactoryTest {
     fun `listOfTables contains all expected tables in correct order`() {
         val expectedTables = listOf(
             Users,
+            EmailVerificationTokens,
+            EmailVerificationAttempts,
             UserActiveRoles,
             Photographers,
             WebAuthnCredentials,
@@ -92,7 +112,9 @@ class DatabaseFactoryTest {
             PhotographyRequests,
             TemporalHomes,
             BlockedRescuers,
-            TemporalHomeRequests
+            TemporalHomeRequests,
+            AnimalShelters,
+            SterilizationLocations
         )
         
         assertEquals(expectedTables.size, DatabaseFactory.listOfTables.size)
@@ -105,6 +127,7 @@ class DatabaseFactoryTest {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 class DatabaseIntegrationTest {
 
     @Test
@@ -343,7 +366,7 @@ class DatabaseIntegrationTest {
             val userId = Users.insert {
                 it[username] = "test@example.com"
                 it[displayName] = "Test User"
-                it[createdAt] = System.currentTimeMillis()
+                it[createdAt] = Clock.System.now().toEpochMilliseconds()
             } get Users.id
             
             assertNotNull(userId)
@@ -366,7 +389,7 @@ class DatabaseIntegrationTest {
             val userId = Users.insert {
                 it[username] = "admin@example.com"
                 it[displayName] = "Admin User"
-                it[createdAt] = System.currentTimeMillis()
+                it[createdAt] = Clock.System.now().toEpochMilliseconds()
             } get Users.id
             
             UserActiveRoles.insert {

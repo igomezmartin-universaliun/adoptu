@@ -3,20 +3,29 @@ package com.adoptu.adapters.db.repositories
 import com.adoptu.adapters.db.BlockedRescuers
 import com.adoptu.adapters.db.TemporalHomeRequests
 import com.adoptu.adapters.db.TemporalHomes
-import com.adoptu.dto.*
+import com.adoptu.dto.input.CreateTemporalHomeRequest
+import com.adoptu.dto.input.TemporalHomeDto
+import com.adoptu.dto.input.TemporalHomeRequestDto
+import com.adoptu.dto.input.TemporalHomeSearchParams
+import com.adoptu.dto.input.UpdateTemporalHomeRequest
 import com.adoptu.ports.PetRepositoryPort
 import com.adoptu.ports.TemporalHomeRepositoryPort
 import com.adoptu.ports.UserRepositoryPort
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class TemporalHomeRepositoryImpl(
     private val petRepository: PetRepositoryPort,
-    private val userRepository: UserRepositoryPort
+    private val userRepository: UserRepositoryPort,
+    private val clock: Clock
 ) : TemporalHomeRepositoryPort {
 
     override fun getTemporalHome(userId: Int): TemporalHomeDto? = transaction {
@@ -38,7 +47,7 @@ class TemporalHomeRepositoryImpl(
     }
 
     override fun createTemporalHome(userId: Int, request: CreateTemporalHomeRequest): TemporalHomeDto {
-        val createdAt = System.currentTimeMillis()
+        val createdAt = clock.now().toEpochMilliseconds()
         return transaction {
             TemporalHomes.insert {
                 it[TemporalHomes.userId] = userId
@@ -99,22 +108,28 @@ class TemporalHomeRepositoryImpl(
     }
 
     override fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> = transaction {
-        var query = TemporalHomes.selectAll()
+        var conditions: Op<Boolean>? = null
 
         params.country?.let { country ->
-            query = query.where { TemporalHomes.country eq country }
+            conditions = conditions?.and(TemporalHomes.country eq country) ?: (TemporalHomes.country eq country)
         }
         params.state?.let { state ->
-            query = query.where { TemporalHomes.state eq state }
+            conditions = conditions?.and(TemporalHomes.state eq state) ?: (TemporalHomes.state eq state)
         }
         params.city?.let { city ->
-            query = query.where { TemporalHomes.city eq city }
+            conditions = conditions?.and(TemporalHomes.city eq city) ?: (TemporalHomes.city eq city)
         }
         params.zip?.let { zip ->
-            query = query.where { TemporalHomes.zip eq zip }
+            conditions = conditions?.and(TemporalHomes.zip eq zip) ?: (TemporalHomes.zip eq zip)
         }
         params.neighborhood?.let { neighborhood ->
-            query = query.where { TemporalHomes.neighborhood eq neighborhood }
+            conditions = conditions?.and(TemporalHomes.neighborhood eq neighborhood) ?: (TemporalHomes.neighborhood eq neighborhood)
+        }
+
+        val query = if (conditions != null) {
+            TemporalHomes.selectAll().where { conditions!! }
+        } else {
+            TemporalHomes.selectAll()
         }
 
         query.map { row ->
@@ -137,7 +152,7 @@ class TemporalHomeRepositoryImpl(
         petId: Int?,
         message: String
     ): Int = transaction {
-        val createdAt = System.currentTimeMillis()
+        val createdAt = clock.now().toEpochMilliseconds()
         val requestId = TemporalHomeRequests.insert {
             it[TemporalHomeRequests.temporalHomeId] = temporalHomeId
             it[TemporalHomeRequests.rescuerId] = rescuerId
@@ -166,7 +181,7 @@ class TemporalHomeRepositoryImpl(
             return@transaction false
         }
 
-        val createdAt = System.currentTimeMillis()
+        val createdAt = clock.now().toEpochMilliseconds()
         BlockedRescuers.insert {
             it[BlockedRescuers.temporalHomeId] = temporalHomeId
             it[BlockedRescuers.rescuerId] = rescuerId

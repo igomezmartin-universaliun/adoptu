@@ -45,12 +45,19 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:$koinVersion")
     implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
 
+    // DateTime
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+
     // Logging
     implementation("ch.qos.logback:logback-classic:1.5.3")
 
     // AWS S3
     implementation("software.amazon.awssdk:s3:2.29.0")
-    implementation("software.amazon.awssdk:sns:2.29.0")
+    implementation("software.amazon.awssdk:ses:2.29.0")
+    implementation("software.amazon.awssdk:sesv2:2.29.0")
+
+    // Email
+    implementation("org.apache.commons:commons-email:1.6.0")
 
     // Testing
     val kotestVersion = "5.8.1"
@@ -66,6 +73,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:localstack:1.19.3")
+    testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 }
 
 application {
@@ -78,6 +87,7 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true

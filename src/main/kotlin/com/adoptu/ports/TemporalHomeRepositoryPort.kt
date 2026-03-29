@@ -1,6 +1,10 @@
 package com.adoptu.ports
 
-import com.adoptu.dto.*
+import com.adoptu.dto.input.CreateTemporalHomeRequest
+import com.adoptu.dto.input.TemporalHomeDto
+import com.adoptu.dto.input.TemporalHomeRequestDto
+import com.adoptu.dto.input.TemporalHomeSearchParams
+import com.adoptu.dto.input.UpdateTemporalHomeRequest
 
 interface TemporalHomeRepositoryPort {
     fun getTemporalHome(userId: Int): TemporalHomeDto?

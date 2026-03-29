@@ -56,21 +56,21 @@ document.getElementById('temporal-home-form').onsubmit = async (e) => {
     }
     
     try {
-        const response = await fetch('/api/users/temporal-home', {
+        const output = await fetch('/api/users/temporal-home', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ alias, country, state: state || null, city, zip: zip || null, neighborhood: neighborhood || null })
         });
-        if (!response.ok) throw new Error('Failed to create temporal home');
+        if (!output.ok) throw new Error('Failed to create temporal home');
         msg.className = 'message success'; msg.textContent = 'Profile created!';
     } catch (err) { msg.className = 'message error'; msg.textContent = err.message; }
 };
 
 async function loadRequests() {
     try {
-        const response = await fetch('/api/users/temporal-home/requests');
-        if (!response.ok) throw new Error('Failed to load requests');
-        const requests = await response.json();
+        const output = await fetch('/api/users/temporal-home/requests');
+        if (!output.ok) throw new Error('Failed to load requests');
+        const requests = await output.json();
         const container = document.getElementById('requests-container');
         if (!requests.length) { container.innerHTML = '<p>No requests yet.</p>'; return; }
         container.innerHTML = requests.map(r => '<div class="request-card"><p><strong>'+r.rescuerName+'</strong> wants help with '+(r.petName || 'a pet')+'</p><p>'+r.message+'</p><button class="btn btn-small" onclick="blockRescuer('+r.rescuerId+')">Block Rescuer</button></div>').join('');
@@ -81,12 +81,12 @@ loadRequests();
 window.blockRescuer = async (rescuerId) => {
     if (!confirm('Block this rescuer from sending you more requests?')) return;
     try {
-        const response = await fetch('/api/temporal-homes/block', {
+        const output = await fetch('/api/temporal-homes/block', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ rescuerId })
         });
-        const result = await response.json();
+        const result = await output.json();
         alert(result.blocked ? 'Rescuer blocked!' : 'Already blocked');
         loadRequests();
     } catch (err) { alert(err.message); }

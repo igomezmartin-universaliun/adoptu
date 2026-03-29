@@ -9,18 +9,19 @@ class MockNotificationAdapter : NotificationPort {
     data class EmailRecord(
         val to: String,
         val subject: String,
-        val body: String
+        val body: String,
+        val userId: Int? = null
     )
 
     fun setFailMode(fail: Boolean) {
         shouldFail = fail
     }
 
-    override suspend fun sendEmail(to: String, subject: String, body: String): Boolean {
+    override suspend fun sendEmail(to: String, subject: String, body: String, userId: Int?): Boolean {
         if (shouldFail) {
             return false
         }
-        sentEmails.add(EmailRecord(to, subject, body))
+        sentEmails.add(EmailRecord(to, subject, body, userId))
         return true
     }
 

@@ -4,27 +4,28 @@ import com.adoptu.adapters.db.DatabaseFactory
 import com.adoptu.adapters.db.Pets
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
-import com.adoptu.dto.*
-import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.MapApplicationConfig
+import com.adoptu.dto.input.Currency
+import com.adoptu.dto.input.Gender
+import com.adoptu.dto.input.UpdatePetRequest
+import com.adoptu.dto.input.UserRole
+import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import java.math.BigDecimal
-import java.util.Properties
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PetRepositoryIT {
 
@@ -33,6 +34,7 @@ class PetRepositoryIT {
     private lateinit var userRepository: UserRepository
     private var rescuerId: Int = 0
     private var dbCounter = 0
+    private val clock = Clock.System
 
     @BeforeAll
     fun startContainer() {
@@ -90,8 +92,8 @@ class PetRepositoryIT {
         TransactionManager.defaultDatabase = null
         val dbName = createDatabase()
         initDatabase(dbName)
-        petRepository = PetRepositoryImpl()
-        userRepository = UserRepository()
+        petRepository = PetRepositoryImpl(clock)
+        userRepository = UserRepository(clock)
         rescuerId = createTestUserWithRole("rescuer@example.com", "Test Rescuer", UserRole.RESCUER)
     }
 
@@ -175,7 +177,7 @@ class PetRepositoryIT {
             isGoodWithCats = false,
             isHouseTrained = true,
             energyLevel = "HIGH",
-            rescueDate = System.currentTimeMillis(),
+            rescueDate = clock.now().toEpochMilliseconds(),
             rescueLocation = "Shelter",
             specialNeeds = null,
             adoptionFee = 200.0,
@@ -381,7 +383,7 @@ class PetRepositoryIT {
                 it[Pets.isPromoted] = isPromoted
                 it[Pets.adoptionFee] = BigDecimal("100.0")
                 it[Pets.currency] = "USD"
-                it[Pets.createdAt] = System.currentTimeMillis()
+                it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
         }!!
     }
@@ -391,7 +393,7 @@ class PetRepositoryIT {
             Users.insert {
                 it[Users.username] = username
                 it[Users.displayName] = displayName
-                it[Users.createdAt] = System.currentTimeMillis()
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
         }!!
 

@@ -1,5 +1,5 @@
 const webauthn = {
-    async register(email, displayName, role) {
+    async register(email, displayName, roles, temporalHomeProfile = null) {
         const optsRes = await fetch('/api/auth/registration-options', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -9,19 +9,30 @@ const webauthn = {
         const credential = await navigator.credentials.create({
             publicKey: this.parseCreationOptions(options)
         });
+        
+        const body = new URLSearchParams({
+            email, displayName,
+            roles: roles.join(','),
+            registrationResponse: JSON.stringify(credential.toJSON?.() ?? this.toJSON(credential))
+        });
+        
+        if (temporalHomeProfile) {
+            body.append('temporalHomeProfile', JSON.stringify(temporalHomeProfile));
+        }
+        
         const regRes = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                email, displayName, role,
-                registrationResponse: JSON.stringify(credential.toJSON?.() ?? this.toJSON(credential))
-            }),
+            body: body,
             credentials: 'include'
         });
         const result = await regRes.json();
         return result;
     },
     async authenticate() {
+        return (await this.authenticateWithResponse()).success;
+    },
+    async authenticateWithResponse() {
         const optsRes = await fetch('/api/auth/assertion-options', { credentials: 'include' });
         const options = await optsRes.json();
         const credential = await navigator.credentials.get({
@@ -33,8 +44,7 @@ const webauthn = {
             body: JSON.stringify(credential.toJSON?.() ?? this.toJSON(credential)),
             credentials: 'include'
         });
-        const result = await authRes.json();
-        return result.success;
+        return await authRes.json();
     },
     parseCreationOptions(opts) {
         if (window.PublicKeyCredential?.parseCreationOptionsFromJSON) {

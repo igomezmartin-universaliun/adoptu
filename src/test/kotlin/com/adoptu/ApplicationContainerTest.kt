@@ -12,7 +12,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @Testcontainers
 @Execution(ExecutionMode.SAME_THREAD)

@@ -1,32 +1,25 @@
 package com.adoptu.adapters.db.repositories
 
-import com.adoptu.adapters.db.DatabaseFactory
-import com.adoptu.adapters.db.Photographers
-import com.adoptu.adapters.db.PhotographyRequests
-import com.adoptu.adapters.db.Pets
-import com.adoptu.adapters.db.UserActiveRoles
-import com.adoptu.adapters.db.Users
-import com.adoptu.dto.UserRole
-import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.MapApplicationConfig
+import com.adoptu.adapters.db.*
+import com.adoptu.dto.input.UserRole
+import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 import java.math.BigDecimal
-import java.util.Properties
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PhotographerRepositoryIT {
 
@@ -35,6 +28,7 @@ class PhotographerRepositoryIT {
     private lateinit var userRepository: UserRepository
     private lateinit var petRepository: PetRepositoryImpl
     private var dbCounter = 0
+    private val clock = Clock.System
 
     @BeforeAll
     fun startContainer() {
@@ -92,9 +86,9 @@ class PhotographerRepositoryIT {
         TransactionManager.defaultDatabase = null
         val dbName = createDatabase()
         initDatabase(dbName)
-        petRepository = PetRepositoryImpl()
-        userRepository = UserRepository()
-        photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository)
+        petRepository = PetRepositoryImpl(clock)
+        userRepository = UserRepository(clock)
+        photographerRepository = PhotographerRepositoryImpl(petRepository, userRepository, clock)
     }
 
     @Test
@@ -123,7 +117,7 @@ class PhotographerRepositoryIT {
         val requesterId = createTestUserWithRole("user@example.com", "Test User", UserRole.ADOPTER)
         val photographerId = createTestPhotographer("photo@example.com", "Photographer")
 
-        val oneWeekAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L + 1000)
+        val oneWeekAgo = clock.now().toEpochMilliseconds() - (7 * 24 * 60 * 60 * 1000L + 1000)
         createPhotographyRequestWithTimestamp(requesterId, photographerId, null, "Test message", oneWeekAgo)
 
         val result = photographerRepository.canSendMessage(requesterId)
@@ -295,7 +289,7 @@ class PhotographerRepositoryIT {
             Users.insert {
                 it[Users.username] = username
                 it[Users.displayName] = displayName
-                it[Users.createdAt] = System.currentTimeMillis()
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
         }!!
 
@@ -339,7 +333,7 @@ class PhotographerRepositoryIT {
                 it[PhotographyRequests.petId] = petId
                 it[PhotographyRequests.message] = message
                 it[PhotographyRequests.status] = "PENDING"
-                it[PhotographyRequests.createdAt] = System.currentTimeMillis()
+                it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             }
         }
     }
@@ -375,7 +369,7 @@ class PhotographerRepositoryIT {
                 it[Pets.isPromoted] = false
                 it[Pets.adoptionFee] = BigDecimal("100.0")
                 it[Pets.currency] = "USD"
-                it[Pets.createdAt] = System.currentTimeMillis()
+                it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
         }!!
     }

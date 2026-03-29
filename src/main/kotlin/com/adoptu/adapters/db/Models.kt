@@ -12,6 +12,8 @@ object Users : Table("users") {
     val lastAcceptedPrivacyPolicy = long("last_accepted_privacy_policy").nullable()
     val lastAcceptedTermsAndConditions = long("last_accepted_terms_and_conditions").nullable()
     val isEmailVerified = bool("is_email_verified").default(false)
+    val isBanned = bool("is_banned").default(false)
+    val banReason = varchar("ban_reason", 500).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -21,6 +23,14 @@ object EmailVerificationTokens : Table("email_verification_tokens") {
     val userId = integer("user_id").references(Users.id)
     val token = varchar("token", 64)
     val expiresAt = long("expires_at")
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object EmailVerificationAttempts : Table("email_verification_attempts") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id)
     val createdAt = long("created_at")
 
     override val primaryKey = PrimaryKey(id)
@@ -155,6 +165,49 @@ object TemporalHomeRequests : Table("temporal_home_requests") {
     val message = text("message")
     val status = varchar("status", 50) // SENT, READ
     val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object AnimalShelters : Table("animal_shelters") {
+    val id = integer("id").autoIncrement()
+    val name = varchar("name", 255)
+    val country = varchar("country", 100)
+    val state = varchar("state", 100).nullable()
+    val city = varchar("city", 100)
+    val address = varchar("address", 500)
+    val zip = varchar("zip", 20).nullable()
+    val phone = varchar("phone", 50).nullable()
+    val email = varchar("email", 255).nullable()
+    val website = varchar("website", 500).nullable()
+    val fiscalId = varchar("fiscal_id", 100).nullable()
+    val bankName = varchar("bank_name", 255).nullable()
+    val accountHolderName = varchar("account_holder_name", 255).nullable()
+    val accountNumber = varchar("account_number", 100).nullable()
+    val iban = varchar("iban", 50).nullable()
+    val swiftBic = varchar("swift_bic", 20).nullable()
+    val currency = varchar("currency", 10).default("USD")
+    val description = text("description").nullable()
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object SterilizationLocations : Table("sterilization_locations") {
+    val id = integer("id").autoIncrement()
+    val name = varchar("name", 255)
+    val country = varchar("country", 100)
+    val state = varchar("state", 100).nullable()
+    val city = varchar("city", 100)
+    val address = varchar("address", 500)
+    val zip = varchar("zip", 20).nullable()
+    val phone = varchar("phone", 50).nullable()
+    val email = varchar("email", 255).nullable()
+    val website = varchar("website", 500).nullable()
+    val description = text("description").nullable()
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
 
     override val primaryKey = PrimaryKey(id)
 }

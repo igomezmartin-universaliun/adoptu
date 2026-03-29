@@ -1,8 +1,7 @@
 package com.adoptu.adapters.db
 
-import com.adoptu.dto.UserRole
-import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.MapApplicationConfig
+import com.adoptu.dto.input.UserRole
+import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -13,11 +12,14 @@ import org.junit.jupiter.api.TestInstance
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
-import java.util.Properties
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DatabaseFactoryInitIT {
 
@@ -163,12 +165,12 @@ class DatabaseFactoryInitIT {
 
     @Test
     fun `init sets correct timestamp on admin user`() {
-        val beforeInit = System.currentTimeMillis()
+        val beforeInit = Clock.System.now().toEpochMilliseconds()
         val config = createConfig("adoptu_test6")
 
         DatabaseFactory.init(config)
 
-        val afterInit = System.currentTimeMillis()
+        val afterInit = Clock.System.now().toEpochMilliseconds()
 
         transaction {
             val admin = Users.selectAll().where { Users.username.eq("adopt-u@adopt-u.org") }.firstOrNull()

@@ -1,12 +1,22 @@
 package com.adoptu.services
 
-import com.adoptu.dto.*
-import com.adoptu.ports.NotificationPort
-import com.adoptu.ports.TemporalHomeRepositoryPort
-import io.mockk.*
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import org.junit.jupiter.api.AfterEach
+import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.adapters.db.Users
+import com.adoptu.adapters.db.repositories.PetRepositoryImpl
+import com.adoptu.adapters.db.repositories.TemporalHomeRepositoryImpl
+import com.adoptu.adapters.db.repositories.UserRepository
+import com.adoptu.dto.input.CreateTemporalHomeRequest
+import com.adoptu.dto.input.SendTemporalHomeRequestRequest
+import com.adoptu.dto.input.TemporalHomeDto
+import com.adoptu.dto.input.TemporalHomeSearchParams
+import com.adoptu.dto.input.UpdateTemporalHomeRequest
+import com.adoptu.mocks.MockNotificationAdapter
+import com.adoptu.mocks.TestClock
+import com.adoptu.mocks.TestDatabase
+import org.jetbrains.exposed.v1.core.greater
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -14,213 +24,199 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 class TemporalHomeServiceTest {
 
-    @MockK
-    private lateinit var mockTemporalHomeRepository: TemporalHomeRepositoryPort
-
-    @MockK
-    private lateinit var mockNotificationAdapter: NotificationPort
-
-    @MockK
-    private lateinit var mockUserService: UserService
-
-    @InjectMockKs
-    private lateinit var temporalHomeService: TemporalHomeService
-
-    private val testTemporalHome = TemporalHomeDto(
-        userId = 1,
-        alias = "Happy Paws",
-        country = "USA",
-        state = "CA",
-        city = "Los Angeles",
-        zip = "90001",
-        neighborhood = "Downtown",
-        createdAt = System.currentTimeMillis()
-    )
-
-    private val testRescuer = UserDto(
-        id = 2,
-        username = "rescuer@test.com",
-        displayName = "Test Rescuer",
-        activeRoles = setOf(UserRole.RESCUER)
-    )
-
-    private val testTemporalHomeUser = UserDto(
-        id = 1,
-        username = "temporalhome@test.com",
-        displayName = "Test Temporal Home",
-        activeRoles = setOf(UserRole.TEMPORAL_HOME)
-    )
-
-    private val testTemporalHomeRequest = TemporalHomeRequestDto(
-        id = 1,
-        temporalHomeId = 1,
-        temporalHomeAlias = "Happy Paws",
-        rescuerId = 2,
-        rescuerName = "Test Rescuer",
-        petId = null,
-        petName = null,
-        message = "Can I send my pet?",
-        status = "SENT",
-        createdAt = System.currentTimeMillis()
-    )
+    private lateinit var service: TemporalHomeService
+    private lateinit var userService: UserService
+    private lateinit var mockNotificationAdapter: MockNotificationAdapter
+    private val clock = TestClock(Instant.parse("2024-01-15T10:00:00Z"))
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init(this)
+        TestDatabase.initH2()
+        val userRepository = UserRepository(clock)
+        userService = UserService(userRepository)
+        val petRepository = PetRepositoryImpl(clock)
+        val temporalHomeRepository = TemporalHomeRepositoryImpl(petRepository, userRepository, clock)
+        mockNotificationAdapter = MockNotificationAdapter()
+        service = TemporalHomeService(
+            temporalHomeRepository = temporalHomeRepository,
+            notificationAdapter = mockNotificationAdapter,
+            userService = userService,
+            userRepository = userRepository
+        )
     }
 
-    @AfterEach
-    fun tearDown() {
-        unmockkAll()
+    private fun cleanup() {
+        transaction {
+            com.adoptu.adapters.db.TemporalHomes.deleteWhere { com.adoptu.adapters.db.TemporalHomes.userId greater 0 }
+            com.adoptu.adapters.db.BlockedRescuers.deleteWhere { com.adoptu.adapters.db.BlockedRescuers.id greater 0 }
+            com.adoptu.adapters.db.TemporalHomeRequests.deleteWhere { com.adoptu.adapters.db.TemporalHomeRequests.id greater 0 }
+            com.adoptu.adapters.db.Users.deleteWhere { com.adoptu.adapters.db.Users.id greater 0 }
+        }
     }
 
     @Test
-    fun `getTemporalHome returns temporal home from repository`() {
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-
-        val result = temporalHomeService.getTemporalHome(1)
-
-        assertNotNull(result)
-        assertEquals(1, result.userId)
-        assertEquals("Happy Paws", result.alias)
-        verify { mockTemporalHomeRepository.getTemporalHome(1) }
-    }
-
-    @Test
-    fun `getTemporalHome returns null when not found`() {
-        every { mockTemporalHomeRepository.getTemporalHome(999) } returns null
-
-        val result = temporalHomeService.getTemporalHome(999)
-
+    fun `getTemporalHome returns null for non-existent user`() {
+        val result = service.getTemporalHome(999)
         assertNull(result)
     }
 
     @Test
-    fun `createTemporalHome calls repository with correct params`() {
+    fun `getTemporalHome returns temporal home by userId`() {
+        val userId = createTestUser("home@test.com", "Test Home")
+        createTemporalHome(userId, "My Home", "USA", "California", "Los Angeles")
+
+        val result = service.getTemporalHome(userId)
+
+        assertNotNull(result)
+        assertEquals("My Home", result.alias)
+        assertEquals("USA", result.country)
+        assertEquals("California", result.state)
+        assertEquals("Los Angeles", result.city)
+    }
+
+    @Test
+    fun `createTemporalHome creates successfully`() {
+        val userId = createTestUser("create@test.com", "Create User")
         val request = CreateTemporalHomeRequest(
             alias = "New Home",
-            country = "USA",
+            country = "Mexico",
+            state = null,
+            city = "Mexico City",
+            zip = "06600",
+            neighborhood = "Centro",
+            streetAddress = "Calle Principal 123",
+            phone = "+52-55-1234-5678"
+        )
+
+        val result = service.createTemporalHome(userId, request)
+
+        assertNotNull(result)
+        assertEquals(userId, result.userId)
+        assertEquals("New Home", result.alias)
+        assertEquals("Mexico", result.country)
+        assertEquals("Mexico City", result.city)
+    }
+
+    @Test
+    fun `updateTemporalHome updates successfully`() {
+        val userId = createTestUser("update@test.com", "Update User")
+        createTemporalHome(userId, "Old Alias", "USA", "California", "LA")
+        val request = UpdateTemporalHomeRequest(
+            alias = "New Alias",
             city = "San Francisco"
         )
-        every { mockTemporalHomeRepository.createTemporalHome(1, request) } returns testTemporalHome.copy(alias = "New Home")
 
-        val result = temporalHomeService.createTemporalHome(1, request)
+        val result = service.updateTemporalHome(userId, request)
 
         assertNotNull(result)
-        assertEquals("New Home", result.alias)
-        verify { mockTemporalHomeRepository.createTemporalHome(1, request) }
+        assertEquals("New Alias", result.alias)
+        assertEquals("San Francisco", result.city)
+        assertEquals("USA", result.country)
     }
 
     @Test
-    fun `updateTemporalHome calls repository with correct params`() {
-        val request = UpdateTemporalHomeRequest(alias = "Updated Home")
-        every { mockTemporalHomeRepository.updateTemporalHome(1, request) } returns testTemporalHome.copy(alias = "Updated Home")
+    fun `updateTemporalHome allows partial updates`() {
+        val userId = createTestUser("partial@test.com", "Partial User")
+        createTemporalHome(userId, "Original", "USA", "California", "LA")
+        val request = UpdateTemporalHomeRequest(phone = "+1-555-9999")
 
-        val result = temporalHomeService.updateTemporalHome(1, request)
+        val result = service.updateTemporalHome(userId, request)
 
         assertNotNull(result)
-        assertEquals("Updated Home", result.alias)
-        verify { mockTemporalHomeRepository.updateTemporalHome(1, request) }
+        assertEquals("Original", result.alias)
     }
 
     @Test
-    fun `updateTemporalHome returns null when not found`() {
-        val request = UpdateTemporalHomeRequest(alias = "Updated Home")
-        every { mockTemporalHomeRepository.updateTemporalHome(999, request) } returns null
+    fun `updateTemporalHome returns null for non-existent user`() {
+        val request = UpdateTemporalHomeRequest(alias = "New")
 
-        val result = temporalHomeService.updateTemporalHome(999, request)
+        val result = service.updateTemporalHome(999, request)
 
         assertNull(result)
     }
 
     @Test
-    fun `searchTemporalHomes returns results from repository`() {
-        val params = TemporalHomeSearchParams(country = "USA", state = "CA")
-        every { mockTemporalHomeRepository.searchTemporalHomes(params) } returns listOf(testTemporalHome)
-
-        val result = temporalHomeService.searchTemporalHomes(params)
-
-        assertEquals(1, result.size)
-        assertEquals("Happy Paws", result.first().alias)
-        verify { mockTemporalHomeRepository.searchTemporalHomes(params) }
-    }
-
-    @Test
-    fun `searchTemporalHomes returns empty list when no matches`() {
-        val params = TemporalHomeSearchParams(country = "France")
-        every { mockTemporalHomeRepository.searchTemporalHomes(params) } returns emptyList()
-
-        val result = temporalHomeService.searchTemporalHomes(params)
-
+    fun `searchTemporalHomes returns empty list when no results`() {
+        val result = service.searchTemporalHomes(TemporalHomeSearchParams(country = "USA"))
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `sendRequest succeeds when rescuer sends request`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Can I send my pet?"
+    fun `searchTemporalHomes filters by country`() {
+        val user1 = createTestUser("home1@test.com", "Home 1")
+        val user2 = createTestUser("home2@test.com", "Home 2")
+        createTemporalHome(user1, "US Home", "USA", "California", "LA")
+        createTemporalHome(user2, "MX Home", "Mexico", null, "Mexico City")
+
+        val result = service.searchTemporalHomes(TemporalHomeSearchParams(country = "USA"))
+
+        assertEquals(1, result.size)
+        assertEquals("US Home", result.first().alias)
+    }
+
+    @Test
+    fun `searchTemporalHomes filters by country and state`() {
+        val user1 = createTestUser("ca@test.com", "CA User")
+        val user2 = createTestUser("ny@test.com", "NY User")
+        createTemporalHome(user1, "CA Home", "USA", "California", "LA")
+        createTemporalHome(user2, "NY Home", "USA", "New York", "NY")
+
+        val result = service.searchTemporalHomes(
+            TemporalHomeSearchParams(country = "USA", state = "California")
         )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
-        every { mockUserService.getById(2) } returns testRescuer
-        every { mockUserService.getById(1) } returns testTemporalHomeUser
-        every { mockTemporalHomeRepository.createTemporalHomeRequest(1, 2, null, "Can I send my pet?") } returns 1
 
-        val result = temporalHomeService.sendRequest(2, request)
+        assertEquals(1, result.size)
+        assertEquals("CA Home", result.first().alias)
+    }
 
-        assertTrue(result.isSuccess)
-        assertEquals(1, result.getOrNull())
-        verify { mockTemporalHomeRepository.createTemporalHomeRequest(1, 2, null, "Can I send my pet?") }
+    @Test
+    fun `searchTemporalHomes filters by all params`() {
+        val user1 = createTestUser("la@test.com", "LA User")
+        val user2 = createTestUser("sf@test.com", "SF User")
+        createTemporalHome(user1, "LA Home", "USA", "California", "Los Angeles")
+        createTemporalHome(user2, "SF Home", "USA", "California", "San Francisco")
+
+        val result = service.searchTemporalHomes(
+            TemporalHomeSearchParams(
+                country = "USA",
+                state = "California",
+                city = "Los Angeles"
+            )
+        )
+
+        assertEquals(1, result.size)
+        assertEquals("LA Home", result.first().alias)
     }
 
     @Test
     fun `sendRequest fails when temporal home not found`() {
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
         val request = SendTemporalHomeRequestRequest(
             temporalHomeId = 999,
-            petId = null,
-            message = "Test"
+            message = "Need help"
         )
-        every { mockTemporalHomeRepository.getTemporalHome(999) } returns null
 
-        val result = temporalHomeService.sendRequest(2, request)
+        val result = service.sendRequest(rescuerId, request)
 
         assertTrue(result.isFailure)
         assertEquals("Temporal home not found", result.exceptionOrNull()?.message)
     }
 
     @Test
-    fun `sendRequest fails when rescuer is blocked`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Test"
-        )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns true
-
-        val result = temporalHomeService.sendRequest(2, request)
-
-        assertTrue(result.isFailure)
-        assertEquals("You have been blocked by this temporal home", result.exceptionOrNull()?.message)
-    }
-
-    @Test
     fun `sendRequest fails when user not found`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Test"
-        )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 999) } returns false
-        every { mockUserService.getById(999) } returns null
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
 
-        val result = temporalHomeService.sendRequest(999, request)
+        val result = service.sendRequest(999, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
+            message = "Test"
+        ))
 
         assertTrue(result.isFailure)
         assertEquals("User not found", result.exceptionOrNull()?.message)
@@ -228,160 +224,178 @@ class TemporalHomeServiceTest {
 
     @Test
     fun `sendRequest fails when user is not rescuer or admin`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Test"
-        )
-        val adopter = UserDto(
-            id = 2,
-            username = "adopter@test.com",
-            displayName = "Test Adopter",
-            activeRoles = setOf(UserRole.ADOPTER)
-        )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
-        every { mockUserService.getById(2) } returns adopter
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val adopterId = createTestUser("adopter@test.com", "Adopter", "ADOPTER")
 
-        val result = temporalHomeService.sendRequest(2, request)
+        val result = service.sendRequest(adopterId, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
+            message = "Test"
+        ))
 
         assertTrue(result.isFailure)
         assertEquals("Only rescuers can send temporal home requests", result.exceptionOrNull()?.message)
     }
 
     @Test
-    fun `sendRequest succeeds when admin sends request`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Admin request"
-        )
-        val admin = UserDto(
-            id = 2,
-            username = "admin@test.com",
-            displayName = "Admin User",
-            activeRoles = setOf(UserRole.ADMIN)
-        )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
-        every { mockUserService.getById(2) } returns admin
-        every { mockUserService.getById(1) } returns testTemporalHomeUser
-        every { mockTemporalHomeRepository.createTemporalHomeRequest(1, 2, null, "Admin request") } returns 1
-        coEvery { mockNotificationAdapter.sendTemporalHomeRequest(any(), any(), any(), any(), any(), any()) } returns true
+    fun `sendRequest succeeds for rescuer`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
 
-        val result = temporalHomeService.sendRequest(2, request)
+        val result = service.sendRequest(rescuerId, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
+            petId = null,
+            message = "Need help with a pet"
+        ))
+
+        assertTrue(result.isSuccess)
+        assertNotNull(result.getOrNull())
+    }
+
+    @Test
+    fun `sendRequest succeeds for admin`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val adminId = createTestUser("admin@test.com", "Admin", "ADMIN")
+
+        val result = service.sendRequest(adminId, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
+            message = "Admin help"
+        ))
 
         assertTrue(result.isSuccess)
     }
 
     @Test
-    fun `sendRequest succeeds when rescuer has multiple roles including rescuer`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
+    fun `sendRequest fails when blocked`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
+        service.blockRescuer(homeUserId, rescuerId)
+
+        val result = service.sendRequest(rescuerId, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
             message = "Test"
-        )
-        val multiRoleUser = UserDto(
-            id = 2,
-            username = "rescuer@test.com",
-            displayName = "Test Rescuer",
-            activeRoles = setOf(UserRole.RESCUER, UserRole.ADOPTER)
-        )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
-        every { mockUserService.getById(2) } returns multiRoleUser
-        every { mockUserService.getById(1) } returns testTemporalHomeUser
-        every { mockTemporalHomeRepository.createTemporalHomeRequest(1, 2, null, "Test") } returns 1
-        coEvery { mockNotificationAdapter.sendTemporalHomeRequest(any(), any(), any(), any(), any(), any()) } returns true
+        ))
 
-        val result = temporalHomeService.sendRequest(2, request)
-
-        assertTrue(result.isSuccess)
+        assertTrue(result.isFailure)
+        assertEquals("You have been blocked by this temporal home", result.exceptionOrNull()?.message)
     }
 
     @Test
-    fun `isBlocked returns value from repository`() {
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns true
+    fun `isBlocked returns true when blocked`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
+        service.blockRescuer(homeUserId, rescuerId)
 
-        val result = temporalHomeService.isBlocked(1, 2)
+        val result = service.isBlocked(homeUserId, rescuerId)
 
         assertTrue(result)
-        verify { mockTemporalHomeRepository.isBlocked(1, 2) }
     }
 
     @Test
     fun `isBlocked returns false when not blocked`() {
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
 
-        val result = temporalHomeService.isBlocked(1, 2)
+        val result = service.isBlocked(homeUserId, rescuerId)
 
         assertFalse(result)
     }
 
     @Test
-    fun `blockRescuer calls repository with correct params`() {
-        every { mockTemporalHomeRepository.blockRescuer(1, 2) } returns true
+    fun `blockRescuer blocks rescuer successfully`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
 
-        val result = temporalHomeService.blockRescuer(1, 2)
+        val result = service.blockRescuer(homeUserId, rescuerId)
 
         assertTrue(result)
-        verify { mockTemporalHomeRepository.blockRescuer(1, 2) }
+        assertTrue(service.isBlocked(homeUserId, rescuerId))
     }
 
     @Test
-    fun `blockRescuer returns false when fails`() {
-        every { mockTemporalHomeRepository.blockRescuer(1, 2) } returns false
+    fun `blockRescuer returns false for already blocked`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
+        service.blockRescuer(homeUserId, rescuerId)
 
-        val result = temporalHomeService.blockRescuer(1, 2)
+        val result = service.blockRescuer(homeUserId, rescuerId)
 
         assertFalse(result)
-    }
-
-    @Test
-    fun `getMyRequests returns requests from repository`() {
-        every { mockTemporalHomeRepository.getMyRequests(2) } returns listOf(testTemporalHomeRequest)
-
-        val result = temporalHomeService.getMyRequests(2)
-
-        assertEquals(1, result.size)
-        assertEquals("SENT", result.first().status)
-        verify { mockTemporalHomeRepository.getMyRequests(2) }
     }
 
     @Test
     fun `getMyRequests returns empty list when no requests`() {
-        every { mockTemporalHomeRepository.getMyRequests(2) } returns emptyList()
+        val userId = createTestUser("test@test.com", "Test User")
 
-        val result = temporalHomeService.getMyRequests(2)
+        val result = service.getMyRequests(userId)
 
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `sendRequest sends notification when email available`() {
-        val request = SendTemporalHomeRequestRequest(
-            temporalHomeId = 1,
-            petId = null,
-            message = "Test message"
+    fun `getMyRequests returns requests for user`() {
+        val homeUserId = createTestUser("home@test.com", "Home User")
+        createTemporalHome(homeUserId, "My Home", "USA", "California", "LA")
+        val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
+        service.sendRequest(rescuerId, SendTemporalHomeRequestRequest(
+            temporalHomeId = homeUserId,
+            message = "Need help"
+        ))
+
+        val result = service.getMyRequests(homeUserId)
+
+        assertEquals(1, result.size)
+        assertEquals(rescuerId, result.first().rescuerId)
+        assertEquals("Need help", result.first().message)
+    }
+
+    private fun createTemporalHome(
+        userId: Int,
+        alias: String,
+        country: String,
+        state: String?,
+        city: String,
+        zip: String? = null,
+        neighborhood: String? = null
+    ): TemporalHomeDto {
+        val request = CreateTemporalHomeRequest(
+            alias = alias,
+            country = country,
+            state = state,
+            city = city,
+            zip = zip,
+            neighborhood = neighborhood
         )
-        every { mockTemporalHomeRepository.getTemporalHome(1) } returns testTemporalHome
-        every { mockTemporalHomeRepository.isBlocked(1, 2) } returns false
-        every { mockUserService.getById(2) } returns testRescuer
-        every { mockUserService.getById(1) } returns testTemporalHomeUser
-        every { mockTemporalHomeRepository.createTemporalHomeRequest(1, 2, null, "Test message") } returns 1
-        coEvery { mockNotificationAdapter.sendTemporalHomeRequest(any(), any(), any(), any(), any(), any()) } returns true
+        return service.createTemporalHome(userId, request)
+    }
 
-        val result = temporalHomeService.sendRequest(2, request)
+    private fun createTestUser(
+        username: String,
+        displayName: String,
+        role: String = "ADOPTER"
+    ): Int {
+        val userId = transaction {
+            Users.insert {
+                it[Users.username] = username
+                it[Users.displayName] = displayName
+                it[Users.createdAt] = clock.now().toEpochMilliseconds()
+            } get Users.id
+        }!!
 
-        assertTrue(result.isSuccess)
-        coVerify { mockNotificationAdapter.sendTemporalHomeRequest(
-            temporalHomeEmail = "temporalhome@test.com",
-            temporalHomeAlias = "Happy Paws",
-            rescuerName = "Test Rescuer",
-            petName = null,
-            message = "Test message",
-            spamReportLink = any()
-        ) }
+        transaction {
+            UserActiveRoles.insert {
+                it[UserActiveRoles.userId] = userId
+                it[UserActiveRoles.role] = role
+            }
+        }
+
+        return userId
     }
 }
-

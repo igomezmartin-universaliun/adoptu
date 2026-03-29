@@ -1,6 +1,6 @@
 package com.adoptu.adapters.db
 
-import com.adoptu.dto.UserRole
+import com.adoptu.dto.input.UserRole
 import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -9,10 +9,19 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
+import org.slf4j.LoggerFactory
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 object DatabaseFactory {
+    private val clock: Clock = Clock.System
+    private val logger = LoggerFactory.getLogger(DatabaseFactory::class.java)
+
     val listOfTables = listOf(
         Users,
+        EmailVerificationTokens,
+        EmailVerificationAttempts,
         UserActiveRoles,
         Photographers,
         WebAuthnCredentials,
@@ -22,7 +31,9 @@ object DatabaseFactory {
         PhotographyRequests,
         TemporalHomes,
         BlockedRescuers,
-        TemporalHomeRequests)
+        TemporalHomeRequests,
+        AnimalShelters,
+        SterilizationLocations)
     fun init(config: ApplicationConfig) {
         val env = config.propertyOrNull("env")?.getString() ?: "prod"
         val prefix = "db.$env"
@@ -53,7 +64,7 @@ object DatabaseFactory {
                 val userId = Users.insert {
                     it[username] = adminEmail
                     it[displayName] = "Admin"
-                    it[createdAt] = System.currentTimeMillis()
+                    it[createdAt] = clock.now().toEpochMilliseconds()
                 } get Users.id
                 
                 UserActiveRoles.insert {
@@ -61,7 +72,7 @@ object DatabaseFactory {
                     it[UserActiveRoles.role] = UserRole.ADMIN.name
                 }
                 
-                println("Default admin user created: $adminEmail")
+                logger.info("Default admin user created: $adminEmail")
             }
         }
     }

@@ -4,8 +4,14 @@ import com.adoptu.adapters.db.AdoptionRequests
 import com.adoptu.adapters.db.PetImages
 import com.adoptu.adapters.db.Pets
 import com.adoptu.adapters.db.UserActiveRoles
-import com.adoptu.dto.*
-import com.adoptu.dto.Currency
+import com.adoptu.dto.input.AdoptionRequestDto
+import com.adoptu.dto.input.Currency
+import com.adoptu.dto.input.Gender
+import com.adoptu.dto.input.PetDto
+import com.adoptu.dto.input.PetImageDto
+import com.adoptu.dto.input.Status
+import com.adoptu.dto.input.UpdatePetRequest
+import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.PetRepositoryPort
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -14,8 +20,11 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 import java.math.BigDecimal
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-class PetRepositoryImpl : PetRepositoryPort {
+@OptIn(ExperimentalTime::class)
+class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
 
     private fun rowToPetDto(row: ResultRow): PetDto {
         val petId = row[Pets.id]
@@ -161,7 +170,7 @@ class PetRepositoryImpl : PetRepositoryPort {
             it[Pets.currency] = currency.name
             it[Pets.isUrgent] = isUrgent
             it[Pets.isPromoted] = isPromoted
-            it[Pets.createdAt] = System.currentTimeMillis()
+            it[Pets.createdAt] = clock.now().toEpochMilliseconds()
         } get Pets.id
 
         getById(id!!)!!
@@ -208,7 +217,7 @@ class PetRepositoryImpl : PetRepositoryPort {
     }
 
     override fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = transaction {
-        val createdAt = System.currentTimeMillis()
+        val createdAt = clock.now().toEpochMilliseconds()
         val id = AdoptionRequests.insert {
             it[AdoptionRequests.petId] = petId
             it[AdoptionRequests.adopterId] = adopterId

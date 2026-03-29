@@ -1,7 +1,7 @@
 package com.adoptu.ports
 
 interface NotificationPort {
-    suspend fun sendEmail(to: String, subject: String, body: String): Boolean
+    suspend fun sendEmail(to: String, subject: String, body: String, userId: Int? = null): Boolean
     suspend fun sendPhotographerRequest(
         photographerEmail: String,
         photographerName: String,

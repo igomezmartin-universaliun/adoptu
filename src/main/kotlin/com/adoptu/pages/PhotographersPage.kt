@@ -57,9 +57,9 @@ function searchPhotographers() {
 
 async function loadPhotographers(url) {
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to load photographers');
-        const photographers = await response.json();
+        const output = await fetch(url);
+        if (!output.ok) throw new Error('Failed to load photographers');
+        const photographers = await output.json();
         const container = document.getElementById('photographers');
         if (!photographers || photographers.length === 0) {
             container.innerHTML = '<p>'+t('noPhotographersAvailable')+'</p>';
