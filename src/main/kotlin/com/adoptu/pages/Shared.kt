@@ -32,112 +32,117 @@ function updateLangButton() {
     }
 }
 
-document.querySelectorAll('.lang-option').forEach(opt => {
-    opt.onclick = () => { i18n.setLang(opt.dataset.lang); updateLangButton(); document.querySelector('.lang-dropdown-content').style.display = 'none'; };
-});
-document.querySelector('.lang-dropbtn').onclick = () => {
-    const content = document.querySelector('.lang-dropdown-content');
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-};
-document.querySelector('.user-avatar')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const dropdown = document.getElementById('user-dropdown');
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-});
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.lang-dropdown')) {
-        document.querySelector('.lang-dropdown-content').style.display = 'none';
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.onclick = () => { i18n.setLang(opt.dataset.lang); updateLangButton(); document.querySelector('.lang-dropdown-content').style.display = 'none'; };
+    });
+    const langDropBtn = document.querySelector('.lang-dropbtn');
+    if (langDropBtn) {
+        langDropBtn.onclick = () => {
+            const content = document.querySelector('.lang-dropdown-content');
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        };
     }
-    const userDropdown = document.getElementById('user-dropdown');
-    if (userDropdown && userDropdown.style.display !== 'none' && !e.target.closest('.user-menu')) {
-        userDropdown.style.display = 'none';
-    }
-});
-i18n.updatePage();
-updateLangButton();
-window.userDataPromise = (async () => {
-    if (window.cachedUserData) return window.cachedUserData;
-    try {
-        const user = await api.me();
-        window.cachedUserData = user;
-        return user;
-    } catch (e) { return null; }
-})();
-
-async function checkProfileCompletion(user) {
-    const roles = user.activeRoles || [];
-    const needsRedirect = [];
-    
-    if (roles.includes('PHOTOGRAPHER')) {
-        if (!user.photographerCountry || !user.photographerState) {
-            needsRedirect.push('PHOTOGRAPHER');
+    document.querySelector('.user-avatar')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('user-dropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.lang-dropdown')) {
+            document.querySelector('.lang-dropdown-content').style.display = 'none';
         }
-    }
-    
-    if (roles.includes('TEMPORAL_HOME')) {
+        const userDropdown = document.getElementById('user-dropdown');
+        if (userDropdown && userDropdown.style.display !== 'none' && !e.target.closest('.user-menu')) {
+            userDropdown.style.display = 'none';
+        }
+    });
+    i18n.updatePage();
+    updateLangButton();
+    window.userDataPromise = (async () => {
+        if (window.cachedUserData) return window.cachedUserData;
         try {
-            await api.getTemporalHome();
-        } catch (e) {
-            needsRedirect.push('TEMPORAL_HOME');
-        }
-    }
-    
-    return needsRedirect.length > 0;
-}
+            const user = await api.me();
+            window.cachedUserData = user;
+            return user;
+        } catch (e) { return null; }
+    })();
 
-window.userDataPromise.then(async user => {
-    if (user && user.authenticated !== false) {
+    async function checkProfileCompletion(user) {
         const roles = user.activeRoles || [];
-        if (roles.includes('PHOTOGRAPHER') || roles.includes('TEMPORAL_HOME')) {
-            const currentPath = window.location.pathname;
-            if (currentPath !== '/profile') {
-                const needsCompletion = await checkProfileCompletion(user);
-                if (needsCompletion) {
-                    window.location.href = '/profile';
-                    return;
-                }
+        const needsRedirect = [];
+        
+        if (roles.includes('PHOTOGRAPHER')) {
+            if (!user.photographerCountry || !user.photographerState) {
+                needsRedirect.push('PHOTOGRAPHER');
             }
         }
-        if (user.language) {
-            i18n.setLang(user.language, false);
+        
+        if (roles.includes('TEMPORAL_HOME')) {
+            try {
+                await api.getTemporalHome();
+            } catch (e) {
+                needsRedirect.push('TEMPORAL_HOME');
+            }
         }
-        document.getElementById('nav-login')?.style?.setProperty('display', 'none');
-        document.getElementById('nav-register')?.style?.setProperty('display', 'none');
-        document.getElementById('nav-photographers')?.style?.setProperty('display', 'inline');
-        document.getElementById('nav-temporal-homes')?.style?.setProperty('display', 'inline');
-        document.getElementById('user-avatar')?.style?.setProperty('display', 'flex');
-        document.getElementById('user-dropdown')?.style?.setProperty('display', 'none');
-        document.getElementById('dropdown-profile')?.style?.setProperty('display', 'flex');
-        document.getElementById('dropdown-mypets')?.style?.setProperty('display', 'flex');
-        if (user.activeRoles?.includes('RESCUER') || user.activeRoles?.includes('ADMIN')) {
-            document.getElementById('dropdown-mypets')?.style?.setProperty('display', 'flex');
-        }
-        if (user.activeRoles?.includes('TEMPORAL_HOME') || user.activeRoles?.includes('ADMIN')) {
-            document.getElementById('dropdown-temporal-home')?.style?.setProperty('display', 'flex');
-        }
-        document.getElementById('dropdown-logout')?.style?.setProperty('display', 'flex');
-        if (user.activeRoles?.includes('ADMIN')) {
-            document.getElementById('dropdown-admin')?.style?.setProperty('display', 'block');
-            document.getElementById('dropdown-admin-shelters')?.style?.setProperty('display', 'flex');
-        }
-        const logoutLink = document.getElementById('dropdown-logout');
-        if (logoutLink) {
-            logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
-        }
-        const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
-        let inactivityTimer;
-        const resetInactivityTimer = () => {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(async () => {
-                await api.logout();
-                location.reload();
-            }, INACTIVITY_TIMEOUT);
-        };
-        ['click', 'keypress', 'mousemove', 'scroll', 'touchstart'].forEach(event => {
-            document.addEventListener(event, resetInactivityTimer, { passive: true });
-        });
-        resetInactivityTimer();
+        
+        return needsRedirect.length > 0;
     }
+
+    window.userDataPromise.then(async user => {
+        if (user && user.authenticated !== false) {
+            const roles = user.activeRoles || [];
+            if (roles.includes('PHOTOGRAPHER') || roles.includes('TEMPORAL_HOME')) {
+                const currentPath = window.location.pathname;
+                if (currentPath !== '/profile') {
+                    const needsCompletion = await checkProfileCompletion(user);
+                    if (needsCompletion) {
+                        window.location.href = '/profile';
+                        return;
+                    }
+                }
+            }
+            if (user.language) {
+                i18n.setLang(user.language, false);
+            }
+            document.getElementById('nav-login')?.style?.setProperty('display', 'none');
+            document.getElementById('nav-register')?.style?.setProperty('display', 'none');
+            document.getElementById('nav-photographers')?.style?.setProperty('display', 'inline');
+            document.getElementById('nav-temporal-homes')?.style?.setProperty('display', 'inline');
+            document.getElementById('user-avatar')?.style?.setProperty('display', 'flex');
+            document.getElementById('user-dropdown')?.style?.setProperty('display', 'none');
+            document.getElementById('dropdown-profile')?.style?.setProperty('display', 'flex');
+            document.getElementById('dropdown-mypets')?.style?.setProperty('display', 'flex');
+            if (user.activeRoles?.includes('RESCUER') || user.activeRoles?.includes('ADMIN')) {
+                document.getElementById('dropdown-mypets')?.style?.setProperty('display', 'flex');
+            }
+            if (user.activeRoles?.includes('TEMPORAL_HOME') || user.activeRoles?.includes('ADMIN')) {
+                document.getElementById('dropdown-temporal-home')?.style?.setProperty('display', 'flex');
+            }
+            document.getElementById('dropdown-logout')?.style?.setProperty('display', 'flex');
+            if (user.activeRoles?.includes('ADMIN')) {
+                document.getElementById('dropdown-admin')?.style?.setProperty('display', 'block');
+                document.getElementById('dropdown-admin-shelters')?.style?.setProperty('display', 'flex');
+            }
+            const logoutLink = document.getElementById('dropdown-logout');
+            if (logoutLink) {
+                logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+            }
+            const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
+            let inactivityTimer;
+            const resetInactivityTimer = () => {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(async () => {
+                    await api.logout();
+                    location.reload();
+                }, INACTIVITY_TIMEOUT);
+            };
+            ['click', 'keypress', 'mousemove', 'scroll', 'touchstart'].forEach(event => {
+                document.addEventListener(event, resetInactivityTimer, { passive: true });
+            });
+            resetInactivityTimer();
+        }
+    });
 });
 """) } }
 }

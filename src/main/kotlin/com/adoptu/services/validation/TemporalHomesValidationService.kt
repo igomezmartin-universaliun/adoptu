@@ -74,20 +74,14 @@ class TemporalHomesValidationService : KoinComponent {
     }
 
     fun validateRescuerRole(userId: Int): ServiceResult<UserDto> {
-        val user = userService.getById(userId)
-        if (user == null) {
-            return ServiceResult.NotFound
-        }
+        val user = userService.getById(userId) ?: return ServiceResult.NotFound
         val activeRoles = user.activeRoles.map { it.name }
         return if (activeRoles.contains("RESCUER") || activeRoles.contains("ADMIN")) ServiceResult.Success(user)
         else ServiceResult.Error(ValidationConstants.ONLY_RESCUERS_CAN_SEND_REQUESTS)
     }
 
     fun validateBlockRescuerRequest(userId: Int): ServiceResult<UserDto> {
-        val user = userService.getById(userId)
-        if (user == null) {
-            return ServiceResult.NotFound
-        }
+        val user = userService.getById(userId) ?: return ServiceResult.NotFound
         val activeRoles = user.activeRoles.map { it.name }
         return if (activeRoles.contains("TEMPORAL_HOME") || activeRoles.contains("ADMIN")) ServiceResult.Success(user)
         else ServiceResult.Forbidden

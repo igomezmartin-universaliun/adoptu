@@ -75,6 +75,9 @@ dependencies {
     testImplementation("org.testcontainers:localstack:1.19.3")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
+    // Playwright for E2E frontend tests
+    testImplementation("com.microsoft.playwright:playwright:1.49.0")
 }
 
 application {

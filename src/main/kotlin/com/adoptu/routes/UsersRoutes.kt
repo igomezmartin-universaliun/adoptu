@@ -2,6 +2,7 @@ package com.adoptu.routes
 
 import com.adoptu.dto.input.AcceptTermsRequest
 import com.adoptu.dto.input.BanUserRequest
+import com.adoptu.dto.input.PhotographerSettingsRequest
 import com.adoptu.dto.input.RoleActivationRequest
 import com.adoptu.dto.input.UserRole
 import com.adoptu.plugins.SuccessResponse
@@ -10,6 +11,7 @@ import com.adoptu.plugins.respondForbidden
 import com.adoptu.plugins.respondInvalidId
 import com.adoptu.plugins.respondNotFound
 import com.adoptu.plugins.respondUnauthorized
+import com.adoptu.services.PhotographerService
 import com.adoptu.services.validation.ValidationConstants
 import com.adoptu.services.UserService
 import com.adoptu.services.auth.SessionUser
@@ -28,6 +30,7 @@ data class UpdateLanguageRequest(val language: String)
 
 fun Route.usersRoutes() {
     val userService by inject<UserService>()
+    val photographerService by inject<PhotographerService>()
 
     route("/api/users") {
         post("/accept-terms") {
@@ -99,6 +102,32 @@ fun Route.usersRoutes() {
                 userService.activateTemporalHomeProfile(session.userId)
             } else {
                 userService.deactivateTemporalHomeProfile(session.userId)
+            }
+                ?: return@post call.respondNotFound()
+
+            call.respond(user)
+        }
+
+        put("/photographer-settings") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@put call.respondUnauthorized()
+
+            val body = call.receive<PhotographerSettingsRequest>()
+            val photographer = photographerService.updatePhotographerSettings(session.userId, body)
+                ?: return@put call.respondNotFound()
+
+            call.respond(photographer)
+        }
+
+        post("/photographer-profile") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@post call.respondUnauthorized()
+
+            val body = call.receive<RoleActivationRequest>()
+            val user = if (body.activate) {
+                photographerService.activatePhotographerProfile(session.userId)
+            } else {
+                photographerService.deactivatePhotographerProfile(session.userId)
             }
                 ?: return@post call.respondNotFound()
 

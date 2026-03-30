@@ -11,6 +11,7 @@ COPY src src
 RUN chmod +x gradlew
 RUN ./gradlew assemble --no-daemon -x test
 
+
 FROM amazoncorretto:25-alpine-jdk
 
 WORKDIR /app

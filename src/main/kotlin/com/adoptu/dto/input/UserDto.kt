@@ -17,7 +17,11 @@ data class UserDto(
     val lastAcceptedPrivacyPolicy: Long? = null,
     val lastAcceptedTermsAndConditions: Long? = null,
     val isBanned: Boolean = false,
-    val banReason: String? = null
+    val banReason: String? = null,
+    val photographerFee: Double? = null,
+    val photographerCurrency: String? = null,
+    val photographerCountry: String? = null,
+    val photographerState: String? = null
 )
 
 @Serializable

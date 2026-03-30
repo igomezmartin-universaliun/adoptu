@@ -14,6 +14,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 fun appModule(config: ApplicationConfig) = module {
+    single { config }
     single<Clock> { Clock.System }
     single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com") }
     single<PetRepositoryPort> { PetRepositoryImpl(get()) }

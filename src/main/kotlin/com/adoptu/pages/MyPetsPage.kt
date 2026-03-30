@@ -205,8 +205,14 @@ function fillForm(pet) {
 }
 window.edit = async (id) => { const pet = await api.getPet(id); fillForm(pet); document.getElementById('form-title').textContent = 'Edit Pet'; document.getElementById('form-container').style.display = 'block'; };
 window.del = async (id) => { if (!confirm('Delete this pet?')) return; await api.deletePet(id); load(); };
-document.getElementById('add-btn').onclick = () => { document.getElementById('pet-form').reset(); document.getElementById('pet-id').value = ''; document.getElementById('currency').value = 'USD'; selectedFiles = []; existingImages = []; updatePreviews(); document.getElementById('form-title').textContent = 'Add Pet'; document.getElementById('form-container').style.display = 'block'; };
-document.getElementById('cancel-btn').onclick = () => { document.getElementById('form-container').style.display = 'none'; history.replaceState({}, '', '/my-pets'); };
+const addBtn = document.getElementById('add-btn');
+if (addBtn) {
+    addBtn.onclick = () => { document.getElementById('pet-form').reset(); document.getElementById('pet-id').value = ''; document.getElementById('currency').value = 'USD'; selectedFiles = []; existingImages = []; updatePreviews(); document.getElementById('form-title').textContent = 'Add Pet'; document.getElementById('form-container').style.display = 'block'; };
+}
+const cancelBtn = document.getElementById('cancel-btn');
+if (cancelBtn) {
+    cancelBtn.onclick = () => { document.getElementById('form-container').style.display = 'none'; history.replaceState({}, '', '/my-pets'); };
+}
 ['weight', 'ageYears', 'ageMonths'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', () => { if (parseFloat(el.value) < 0) el.value = 0; });
@@ -340,7 +346,10 @@ document.getElementById('pet-form').onsubmit = async (e) => {
     } 
 };
 load();
-document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+const logoutLink = document.getElementById('logout-link');
+if (logoutLink) {
+    logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+}
 """.trimIndent()) } }
     }
 }

@@ -209,112 +209,118 @@ async function loadTemporalHome() {
         }
     } catch(e) { console.log('No temporal home profile yet'); }
 }
-document.getElementById('save-profile-btn').onclick = async () => {
-    const msg = document.getElementById('message');
-    const displayName = document.getElementById('displayName').value;
-    const language = document.getElementById('language').value;
-    if (!displayName.trim()) {
-        msg.className = 'message error';
-        msg.textContent = 'Display name cannot be empty';
-        return;
-    }
-    try {
-        await api.updateProfile(displayName);
-        await api.updateLanguage(language);
-        i18n.setLang(language);
-    } catch (err) { throw err; }
-    
-    const roleRescuer = document.getElementById('role-rescuer').checked;
-    const rolePhotographer = document.getElementById('role-photographer').checked;
-    const roleTemporalHome = document.getElementById('role-temporal-home').checked;
-    
-    try {
-        if (roleRescuer !== currentRoles.includes('RESCUER')) {
-            await api.activateRescuer(roleRescuer);
+const saveBtn = document.getElementById('save-profile-btn');
+if (saveBtn) {
+    saveBtn.onclick = async () => {
+        const msg = document.getElementById('message');
+        const displayName = document.getElementById('displayName').value;
+        const language = document.getElementById('language').value;
+        if (!displayName.trim()) {
+            msg.className = 'message error';
+            msg.textContent = 'Display name cannot be empty';
+            return;
         }
-        if (rolePhotographer !== currentRoles.includes('PHOTOGRAPHER')) {
-            if (rolePhotographer) {
+        try {
+            await api.updateProfile(displayName);
+            await api.updateLanguage(language);
+            i18n.setLang(language);
+        } catch (err) { throw err; }
+        
+        const roleRescuer = document.getElementById('role-rescuer').checked;
+        const rolePhotographer = document.getElementById('role-photographer').checked;
+        const roleTemporalHome = document.getElementById('role-temporal-home').checked;
+        
+        try {
+            if (roleRescuer !== currentRoles.includes('RESCUER')) {
+                await api.activateRescuer(roleRescuer);
+            }
+            if (rolePhotographer !== currentRoles.includes('PHOTOGRAPHER')) {
+                if (rolePhotographer) {
+                    const phCountry = document.getElementById('photographerCountry').value.trim();
+                    const phState = document.getElementById('photographerState').value.trim();
+                    if (!phCountry || !phState) {
+                        msg.className = 'message error';
+                        msg.textContent = 'Please fill in country and state for photographer services';
+                        return;
+                    }
+                    await api.activatePhotographer(true);
+                    const phFee = parseFloat(document.getElementById('photographerFee').value) || 0;
+                    const phCurrency = document.getElementById('photographerCurrency').value;
+                    await api.updatePhotographerSettings(phFee, phCurrency, phCountry, phState);
+                } else {
+                    await api.activatePhotographer(false);
+                }
+            } else if (rolePhotographer && currentRoles.includes('PHOTOGRAPHER')) {
                 const phCountry = document.getElementById('photographerCountry').value.trim();
                 const phState = document.getElementById('photographerState').value.trim();
-                if (!phCountry || !phState) {
-                    msg.className = 'message error';
-                    msg.textContent = 'Please fill in country and state for photographer services';
-                    return;
-                }
                 const phFee = parseFloat(document.getElementById('photographerFee').value) || 0;
                 const phCurrency = document.getElementById('photographerCurrency').value;
-                await api.updatePhotographerSettings(phFee, phCurrency, phCountry, phState);
-                await api.activatePhotographer(true);
-            } else {
-                await api.activatePhotographer(false);
+                if (phCountry && phState) {
+                    await api.updatePhotographerSettings(phFee, phCurrency, phCountry, phState);
+                }
             }
-        } else if (rolePhotographer && currentRoles.includes('PHOTOGRAPHER')) {
-            const phCountry = document.getElementById('photographerCountry').value.trim();
-            const phState = document.getElementById('photographerState').value.trim();
-            const phFee = parseFloat(document.getElementById('photographerFee').value) || 0;
-            const phCurrency = document.getElementById('photographerCurrency').value;
-            if (phCountry && phState) {
-                await api.updatePhotographerSettings(phFee, phCurrency, phCountry, phState);
-            }
-        }
-        if (roleTemporalHome !== currentRoles.includes('TEMPORAL_HOME')) {
-            if (roleTemporalHome) {
+            if (roleTemporalHome !== currentRoles.includes('TEMPORAL_HOME')) {
+                if (roleTemporalHome) {
+                    const thAlias = document.getElementById('th-alias').value.trim();
+                    const thCountry = document.getElementById('th-country').value.trim();
+                    const thCity = document.getElementById('th-city').value.trim();
+                    if (!thAlias || !thCountry || !thCity) {
+                        msg.className = 'message error';
+                        msg.textContent = 'Please fill in alias, country and city for temporal home';
+                        return;
+                    }
+                    const thData = {
+                        alias: thAlias,
+                        country: thCountry,
+                        state: document.getElementById('th-state').value.trim() || null,
+                        city: thCity,
+                        zip: document.getElementById('th-zip').value.trim() || null,
+                        neighborhood: document.getElementById('th-neighborhood').value.trim() || null
+                    };
+                    if (hasTemporalHomeProfile) {
+                        await api.updateTemporalHome(thData);
+                    } else {
+                        await api.createTemporalHome(thData);
+                        hasTemporalHomeProfile = true;
+                    }
+                } else {
+                    await api.activateTemporalHome(false);
+                }
+            } else if (roleTemporalHome && currentRoles.includes('TEMPORAL_HOME')) {
                 const thAlias = document.getElementById('th-alias').value.trim();
                 const thCountry = document.getElementById('th-country').value.trim();
                 const thCity = document.getElementById('th-city').value.trim();
-                if (!thAlias || !thCountry || !thCity) {
-                    msg.className = 'message error';
-                    msg.textContent = 'Please fill in alias, country and city for temporal home';
-                    return;
-                }
-                const thData = {
-                    alias: thAlias,
-                    country: thCountry,
-                    state: document.getElementById('th-state').value.trim() || null,
-                    city: thCity,
-                    zip: document.getElementById('th-zip').value.trim() || null,
-                    neighborhood: document.getElementById('th-neighborhood').value.trim() || null
-                };
-                if (hasTemporalHomeProfile) {
-                    await api.updateTemporalHome(thData);
-                } else {
-                    await api.createTemporalHome(thData);
-                    hasTemporalHomeProfile = true;
-                }
-            } else {
-                await api.activateTemporalHome(false);
-            }
-        } else if (roleTemporalHome && currentRoles.includes('TEMPORAL_HOME')) {
-            const thAlias = document.getElementById('th-alias').value.trim();
-            const thCountry = document.getElementById('th-country').value.trim();
-            const thCity = document.getElementById('th-city').value.trim();
-            if (thAlias && thCountry && thCity) {
-                const thData = {
-                    alias: thAlias,
-                    country: thCountry,
-                    state: document.getElementById('th-state').value.trim() || null,
-                    city: thCity,
-                    zip: document.getElementById('th-zip').value.trim() || null,
-                    neighborhood: document.getElementById('th-neighborhood').value.trim() || null
-                };
-                if (hasTemporalHomeProfile) {
-                    await api.updateTemporalHome(thData);
-                } else {
-                    await api.createTemporalHome(thData);
-                    hasTemporalHomeProfile = true;
+                if (thAlias && thCountry && thCity) {
+                    const thData = {
+                        alias: thAlias,
+                        country: thCountry,
+                        state: document.getElementById('th-state').value.trim() || null,
+                        city: thCity,
+                        zip: document.getElementById('th-zip').value.trim() || null,
+                        neighborhood: document.getElementById('th-neighborhood').value.trim() || null
+                    };
+                    if (hasTemporalHomeProfile) {
+                        await api.updateTemporalHome(thData);
+                    } else {
+                        await api.createTemporalHome(thData);
+                        hasTemporalHomeProfile = true;
+                    }
                 }
             }
+            msg.className = 'message success';
+            msg.textContent = 'Profile updated!';
+            location.reload();
+        } catch (err) {
+            msg.className = 'message error';
+            msg.textContent = err.message;
         }
-        msg.className = 'message success';
-        msg.textContent = 'Profile updated!';
-        location.reload();
-    } catch (err) {
-        msg.className = 'message error';
-        msg.textContent = err.message;
-    }
-};
+    };
+}
 load();
-document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+const logoutLink = document.getElementById('logout-link');
+if (logoutLink) {
+    logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+}
 """.trimIndent()) } }
     }
 }
