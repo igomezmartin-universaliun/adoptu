@@ -1,4 +1,4 @@
-FROM amazoncorretto:25-alpine-jdk AS builder
+FROM docker.io/amazoncorretto:25-alpine-jdk AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN chmod +x gradlew
 RUN ./gradlew assemble --no-daemon -x test
 
 
-FROM amazoncorretto:25-alpine-jdk
+FROM docker.io/amazoncorretto:25-alpine-jdk
 
 WORKDIR /app
 
