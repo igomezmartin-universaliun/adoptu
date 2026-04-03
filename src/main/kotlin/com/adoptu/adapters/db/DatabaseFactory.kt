@@ -39,9 +39,16 @@ object DatabaseFactory {
         val prefix = "db.$env"
 
         val driverClassName = config.property("$prefix.postgres.driver").getString()
-        val jdbcURL = config.property("$prefix.postgres.url").getString()
+        var jdbcURL = config.property("$prefix.postgres.url").getString()
         val user = config.property("$prefix.postgres.user").getString()
         val password = config.property("$prefix.postgres.password").getString()
+
+        if (!jdbcURL.startsWith("jdbc:")) {
+            val parts = jdbcURL.split(":")
+            val host = parts.getOrElse(0) { jdbcURL }
+            val port = parts.getOrElse(1) { "5432" }
+            jdbcURL = "jdbc:postgresql://$host:$port/adoptu"
+        }
 
         Database.connect(jdbcURL, driverClassName, user = user, password = password)
 

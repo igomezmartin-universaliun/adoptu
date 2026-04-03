@@ -12,16 +12,18 @@ fun HTML.sheltersPage() {
         main {
             h1 { attributes["data-i18n"] = "animalShelters"; +"Animal Shelters" }
             p { attributes["data-i18n"] = "sheltersDescription"; +"Find animal shelters where you can make donations" }
-            div(classes = "shelter-search-form") {
+            div(classes = "temporal-search-form") {
                 div(classes = "search-country") {
-                    label { htmlFor = "search-country"; attributes["data-i18n"] = "countryLabel"; +"Country *" }
-                    select { id = "search-country"; name = "country"; onChange = "onCountryChange()"; countrySelect("search-country", true) }
+                    label { htmlFor = "search-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
+                    select { id = "search-country"; name = "country"; onChange = "onCountryChange()"; countrySelect("search-country", false) }
                 }
-                div(classes = "search-state") {
-                    label { htmlFor = "search-state"; attributes["data-i18n"] = "state"; +"State/Region" }
-                    select { id = "search-state"; name = "state" }
+                div(classes = "search-filters") {
+                    div(classes = "search-filter") {
+                        label { htmlFor = "search-state"; attributes["data-i18n"] = "state"; +"State" }
+                        input(InputType.text) { id = "search-state"; disabled = true }
+                    }
                 }
-                button(classes = "btn", type = ButtonType.button) { id = "search-btn"; attributes["data-i18n"] = "searchShelters"; onClick = "searchShelters()"; +"Search Shelters" }
+                button(classes = "btn", type = ButtonType.button) { id = "search-btn"; attributes["data-i18n"] = "searchShelters"; onClick = "searchShelters()"; +"Search" }
             }
             div { id = "shelters-error"; classes = setOf("error-message"); style = "display:none" }
             div { id = "shelters"; classes = setOf("shelter-grid"); +"" }
@@ -29,37 +31,16 @@ fun HTML.sheltersPage() {
         footer()
         commonScripts()
         script { unsafe { raw("""
-async function onCountryChange() {
-    const country = document.getElementById('search-country').value;
-    const stateSelect = document.getElementById('search-state');
-    stateSelect.innerHTML = '<option value="">' + t('allStates') + '</option>';
-    
-    if (!country) {
-        stateSelect.disabled = true;
-        return;
-    }
-    
-    try {
-        const output = await fetch('/api/shelters/countries/' + encodeURIComponent(country) + '/states');
-        if (output.ok) {
-            const data = await output.json();
-            if (data.states && data.states.length > 0) {
-                data.states.forEach(state => {
-                    const option = document.createElement('option');
-                    option.value = state;
-                    option.textContent = state;
-                    stateSelect.appendChild(option);
-                });
-            }
-        }
-    } catch (e) {
-        console.error('Error loading states:', e);
-    }
+function onCountryChange() {
+    const hasCountry = document.getElementById('search-country').value !== '';
+    const stateInput = document.getElementById('search-state');
+    stateInput.disabled = !hasCountry;
+    if (!hasCountry) stateInput.value = '';
 }
 
 async function searchShelters() {
     const country = document.getElementById('search-country').value;
-    const state = document.getElementById('search-state').value;
+    const state = document.getElementById('search-state').value.trim();
     const errorDiv = document.getElementById('shelters-error');
     const container = document.getElementById('shelters');
     
@@ -120,8 +101,8 @@ async function searchShelters() {
 
 // Initial state setup
 document.addEventListener('DOMContentLoaded', () => {
-    const stateSelect = document.getElementById('search-state');
-    stateSelect.disabled = true;
+    const stateInput = document.getElementById('search-state');
+    stateInput.disabled = true;
 });
 """.trimIndent()) } }
     }

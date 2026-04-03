@@ -11,19 +11,6 @@ fun HTML.temporalHomeProfilePage() {
         }
         main {
             h1 { attributes["data-i18n"] = "myTemporalHome"; +"My Temporal Home" }
-            div { id = "message"; +"" }
-            div(classes = "temporal-home-form") {
-                h2 { attributes["data-i18n"] = "createTemporalHome"; +"Create Temporal Home Profile" }
-                form { id = "temporal-home-form"
-                    label { htmlFor = "alias"; attributes["data-i18n"] = "alias"; +"Alias" }; input(InputType.text) { name = "alias"; id = "alias"; required = true }
-                    label { htmlFor = "country"; attributes["data-i18n"] = "countryLabel"; +"Country" }; input(InputType.text) { name = "country"; id = "country"; required = true }
-                    label { htmlFor = "state"; attributes["data-i18n"] = "state"; +"State" }; input(InputType.text) { name = "state"; id = "state" }
-                    label { htmlFor = "city"; attributes["data-i18n"] = "city"; +"City" }; input(InputType.text) { name = "city"; id = "city"; required = true }
-                    label { htmlFor = "zip"; attributes["data-i18n"] = "zipCode"; +"Zip Code" }; input(InputType.text) { name = "zip"; id = "zip" }
-                    label { htmlFor = "neighborhood"; attributes["data-i18n"] = "neighborhood"; +"Neighborhood" }; input(InputType.text) { name = "neighborhood"; id = "neighborhood" }
-                    button(classes = "btn", type = ButtonType.submit) { attributes["data-i18n"] = "save"; +"Save" }
-                }
-            }
             div(classes = "requests-section") {
                 h2 { attributes["data-i18n"] = "requestsFromRescuers"; +"Requests from Rescuers" }
                 div { id = "requests-container"; +"" }
@@ -39,32 +26,6 @@ fun HTML.temporalHomeProfilePage() {
         if (!user.activeRoles?.includes('TEMPORAL_HOME') && !user.activeRoles?.includes('ADMIN')) { location.href = '/'; return; }
     } catch (e) { location.href = '/login'; return; }
 })();
-
-document.getElementById('temporal-home-form').onsubmit = async (e) => {
-    e.preventDefault();
-    const alias = document.getElementById('alias').value.trim();
-    const country = document.getElementById('country').value.trim();
-    const state = document.getElementById('state').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const zip = document.getElementById('zip').value.trim();
-    const neighborhood = document.getElementById('neighborhood').value.trim();
-    const msg = document.getElementById('message');
-    
-    if (!alias || !country || !city) {
-        msg.className = 'message error'; msg.textContent = 'Please fill in required fields.';
-        return;
-    }
-    
-    try {
-        const output = await fetch('/api/users/temporal-home', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ alias, country, state: state || null, city, zip: zip || null, neighborhood: neighborhood || null })
-        });
-        if (!output.ok) throw new Error('Failed to create temporal home');
-        msg.className = 'message success'; msg.textContent = 'Profile created!';
-    } catch (err) { msg.className = 'message error'; msg.textContent = err.message; }
-};
 
 async function loadRequests() {
     try {

@@ -16,7 +16,7 @@ import kotlin.time.ExperimentalTime
 fun appModule(config: ApplicationConfig) = module {
     single { config }
     single<Clock> { Clock.System }
-    single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com") }
+    single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
     single<PetRepositoryPort> { PetRepositoryImpl(get()) }
     single<UserRepositoryPort> { UserRepository(get()) }
     single<PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get(), get()) }
@@ -32,6 +32,9 @@ fun appModule(config: ApplicationConfig) = module {
     single { ShelterService(get()) }
     single { SterilizationLocationService(get()) }
     single { EmailVerificationService(get(), get(), get()) }
+    single { PasswordService(get(), get(), get()) }
+    single { MagicLinkService(get(), get(), get()) }
+    single { EmailChangeService(get(), get(), get()) }
     single { UsersValidationService() }
     single { PetsValidationService() }
     single { PhotographersValidationService() }

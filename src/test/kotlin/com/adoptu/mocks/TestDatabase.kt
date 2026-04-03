@@ -21,6 +21,10 @@ object TestDatabase {
             SchemaUtils.drop(
                 EmailVerificationAttempts,
                 EmailVerificationTokens,
+                EmailChangeTokens,
+                PasswordResetTokens,
+                MagicLinkTokens,
+                UserPasswords,
                 Users,
                 WebAuthnCredentials,
                 Pets,
@@ -38,6 +42,10 @@ object TestDatabase {
             SchemaUtils.create(
                 EmailVerificationAttempts,
                 EmailVerificationTokens,
+                EmailChangeTokens,
+                PasswordResetTokens,
+                MagicLinkTokens,
+                UserPasswords,
                 Users,
                 WebAuthnCredentials,
                 Pets,
@@ -59,6 +67,10 @@ object TestDatabase {
         transaction {
             exec("DELETE FROM email_verification_attempts")
             exec("DELETE FROM email_verification_tokens")
+            exec("DELETE FROM email_change_tokens")
+            exec("DELETE FROM password_reset_tokens")
+            exec("DELETE FROM magic_link_tokens")
+            exec("DELETE FROM user_passwords")
             exec("DELETE FROM temporal_home_requests")
             exec("DELETE FROM blocked_rescuers")
             exec("DELETE FROM temporal_homes")

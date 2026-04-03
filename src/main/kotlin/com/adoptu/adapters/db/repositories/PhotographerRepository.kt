@@ -61,7 +61,7 @@ class PhotographerRepositoryImpl(
             it[PhotographyRequests.createdAt] = createdAt
         } get PhotographyRequests.id
 
-        requestId!!
+        requestId
     }
 
     override fun getMyRequests(userId: Int): List<PhotographyRequestDto> = transaction {

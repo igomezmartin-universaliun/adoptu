@@ -127,7 +127,7 @@ class TemporalHomeRepositoryImpl(
         }
 
         val query = if (conditions != null) {
-            TemporalHomes.selectAll().where { conditions!! }
+            TemporalHomes.selectAll().where { conditions }
         } else {
             TemporalHomes.selectAll()
         }
@@ -162,7 +162,7 @@ class TemporalHomeRepositoryImpl(
             it[TemporalHomeRequests.createdAt] = createdAt
         } get TemporalHomeRequests.id
 
-        requestId!!
+        requestId
     }
 
     override fun isBlocked(temporalHomeId: Int, rescuerId: Int): Boolean = transaction {

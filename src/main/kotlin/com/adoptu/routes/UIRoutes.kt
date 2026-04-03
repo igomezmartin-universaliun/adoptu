@@ -14,6 +14,7 @@ fun Route.uiRoutes() {
     val webAuthnService by inject<WebAuthnService>()
     staticResources("/static", "static")
 
+    head("/") { call.respond(HttpStatusCode.OK) }
     get("/") { call.respondHtml(HttpStatusCode.OK) { indexPage() } }
     get("/login") { call.respondHtml(HttpStatusCode.OK) { loginPage() } }
     get("/register") { call.respondHtml(HttpStatusCode.OK) { registerPage() } }
@@ -49,6 +50,10 @@ fun Route.uiRoutes() {
         }
         call.respondHtml(HttpStatusCode.OK) { emailVerificationPage(success, language) }
     }
+    get("/forgot-password") { call.respondHtml(HttpStatusCode.OK) { forgotPasswordPage() } }
+    get("/reset-password") { call.respondHtml(HttpStatusCode.OK) { resetPasswordPage() } }
+    get("/magic-link-login") { call.respondHtml(HttpStatusCode.OK) { magicLinkLoginPage() } }
+    get("/verify-email-change") { call.respondHtml(HttpStatusCode.OK) { emailChangeVerificationPage() } }
     get("/temporal-home/block/{temporalHomeId}") {
         val temporalHomeId = call.parameters["temporalHomeId"]?.toIntOrNull()
         val rescuerId = call.request.queryParameters["rescuer"]?.toIntOrNull()

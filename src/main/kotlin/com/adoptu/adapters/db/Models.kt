@@ -28,6 +28,47 @@ object EmailVerificationTokens : Table("email_verification_tokens") {
     override val primaryKey = PrimaryKey(id)
 }
 
+object UserPasswords : Table("user_passwords") {
+    val userId = integer("user_id").references(Users.id)
+    val passwordHash = text("password_hash")
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(userId)
+}
+
+object MagicLinkTokens : Table("magic_link_tokens") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id)
+    val token = varchar("token", 64)
+    val expiresAt = long("expires_at")
+    val createdAt = long("created_at")
+    val usedAt = long("used_at").nullable()
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PasswordResetTokens : Table("password_reset_tokens") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id)
+    val token = varchar("token", 64)
+    val expiresAt = long("expires_at")
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object EmailChangeTokens : Table("email_change_tokens") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id)
+    val newEmail = varchar("new_email", 255)
+    val token = varchar("token", 64)
+    val expiresAt = long("expires_at")
+    val createdAt = long("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
 object EmailVerificationAttempts : Table("email_verification_attempts") {
     val id = integer("id").autoIncrement()
     val userId = integer("user_id").references(Users.id)

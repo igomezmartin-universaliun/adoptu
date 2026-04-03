@@ -53,14 +53,14 @@ fun HTML.adminPage() {
                         button(type = ButtonType.button) {
                             classes = setOf("btn", "btn-danger")
                             attributes["data-i18n"] = "banUser"
-                            +"Ban User"
                             onClick = "confirmBan()"
+                            +"Ban User"
                         }
                         button(type = ButtonType.button) {
                             classes = setOf("btn", "btn-secondary")
                             attributes["data-i18n"] = "cancel"
-                            +"Cancel"
                             onClick = "hideBanModal()"
+                            +"Cancel"
                         }
                     }
                 }
@@ -68,22 +68,6 @@ fun HTML.adminPage() {
         }
         footer()
         commonScripts()
-        style = """
-            .admin-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
-            .admin-tab-btn { background: transparent; border: none; padding: 0.75rem 1rem; cursor: pointer; color: var(--text); font-size: 1rem; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-            .admin-tab-btn:hover { color: var(--primary-light); }
-            .admin-tab-btn.active { color: var(--primary-light); border-bottom-color: var(--primary-light); }
-            .admin-tab-content { display: none; }
-            .admin-tab-content.active { display: block; }
-            .user-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-            .user-table th, .user-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
-            .user-table th { color: var(--accent); font-weight: 600; }
-            .user-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-right: 0.25rem; }
-            .user-badge.admin { background: var(--primary); color: white; }
-            .user-badge.banned { background: #dc3545; color: white; }
-            .user-badge.active { background: #28a745; color: white; }
-            .banned-row { background: rgba(220, 53, 69, 0.1); }
-        """.trimIndent()
         script { unsafe { raw("""
 const emoji = { DOG: '🐕', CAT: '🐱', BIRD: '🐦', FISH: '🐟' };
 let banningUserId = null;
@@ -107,12 +91,14 @@ async function loadUsers() {
             '<td>'+(!u.activeRoles?.includes('ADMIN') ? (
                 u.isBanned ? 
                     '<button class="btn" onclick="unbanUser('+u.id+')">'+t('unban')+'</button>' :
-                    '<button class="btn btn-danger" onclick="showBanModal('+u.id+', \\''+u.displayName.replace(/'/g, "\\\\'")+'\\')">'+t('ban')+'</button>'
+                    '<button class="btn btn-danger" data-id="'+u.id+'" data-name="'+encodeURIComponent(u.displayName)+'" onclick="showBanModal(this.dataset.id, this.dataset.name)">'+t('ban')+'</button>'
             ) : '<small>'+t('cannotModifyAdmin')+'</small>')+'</td>' +
         '</tr>').join('') + '</tbody></table>';
 }
 
 function showBanModal(userId, userName) {
+    banningUserId = parseInt(userId);
+    userName = decodeURIComponent(userName);
     banningUserId = userId;
     document.getElementById('ban-user-name').textContent = userName;
     document.getElementById('ban-reason').value = '';

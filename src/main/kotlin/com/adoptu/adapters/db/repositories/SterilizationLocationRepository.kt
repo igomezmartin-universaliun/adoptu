@@ -58,7 +58,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
             SterilizationLocations.selectAll().where { 
                 (SterilizationLocations.country eq country!!) and 
                 (SterilizationLocations.state eq state!!) and 
-                (SterilizationLocations.city eq city!!) 
+                (SterilizationLocations.city eq city)
             }
         }
         query.map { rowToDto(it) }

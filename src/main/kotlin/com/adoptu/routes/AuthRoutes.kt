@@ -8,6 +8,8 @@ import com.adoptu.dto.output.SuccessWithErrorResponse
 import com.adoptu.dto.output.VerificationResponse
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
+import com.adoptu.services.MagicLinkService
+import com.adoptu.services.PasswordService
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.auth.WebAuthnService
@@ -18,11 +20,25 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
+
+@Serializable
+data class EncryptedLoginRequest(
+    val encryptedData: String
+)
+
+@Serializable
+data class PasswordLoginRequest(
+    val email: String,
+    val encryptedPassword: String
+)
 
 fun Route.authRoutes() {
     val webAuthnService by inject<WebAuthnService>()
     val validationService by inject<AuthValidationService>()
+    val passwordService by inject<PasswordService>()
+    val magicLinkService by inject<MagicLinkService>()
     val config by inject<ApplicationConfig>()
     val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com"
 
@@ -172,6 +188,152 @@ fun Route.authRoutes() {
                 call.respond(AuthMeResponse(authenticated = false))
             }
         }
+
+        post("/request-magic-link") {
+            val body = try {
+                call.receive<EncryptedLoginRequest>()
+            } catch (e: Exception) {
+                return@post call.respondError("Invalid request body", 400)
+            }
+            
+            val email = com.hash_net.beelinecrypto.CryptoService.decrypt(body.encryptedData)
+                ?: return@post call.respondError("Failed to decrypt email", 400)
+            
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(email)) {
+                return@post call.respondError("Invalid email format", 400)
+            }
+            
+            val user = webAuthnService.getUserByEmail(email)
+            val language = user?.language ?: "en"
+            
+            val result = magicLinkService.requestMagicLink(email, language)
+            if (result.isFailure) {
+                call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to send magic link"))
+            } else {
+                call.respond(SuccessResponse(success = true))
+            }
+        }
+
+        get("/magic-link-login") {
+            val token = call.request.queryParameters["token"]
+            if (token.isNullOrBlank()) {
+                return@get call.respond(VerificationResponse(success = false, message = "Token is required"))
+            }
+            
+            val result = magicLinkService.verifyAndConsumeMagicLink(token)
+            if (result == null) {
+                call.respond(VerificationResponse(success = false, message = "Invalid or expired magic link"))
+                return@get
+            }
+            
+            val verifiedResult = validationService.validateVerified(result.userId, result.username)
+            if (verifiedResult is ServiceResult.Error) {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Please verify your email before logging in", email = result.username))
+                return@get
+            }
+            
+            val bannedResult = validationService.validateNotBanned(result.userId)
+            if (bannedResult is ServiceResult.Error) {
+                call.respond(SuccessWithErrorResponse(success = false, error = bannedResult.message, email = result.username))
+                return@get
+            }
+            
+            application.log.debug("Magic link login: success for userId=${result.userId}, username=${result.username}")
+            call.sessions.set(SessionUser(result.userId, result.username, result.displayName))
+            call.respond(SuccessResponse(success = true))
+        }
+
+        post("/login-with-password") {
+            val body = try {
+                call.receive<PasswordLoginRequest>()
+            } catch (e: Exception) {
+                return@post call.respondError("Invalid request body", 400)
+            }
+            
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(body.email)) {
+                return@post call.respondError("Invalid email format", 400)
+            }
+            
+            val user = webAuthnService.getUserByEmail(body.email)
+            if (user == null) {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Invalid credentials"))
+                return@post
+            }
+            
+            if (!passwordService.verifyPassword(user.id, body.encryptedPassword)) {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Invalid credentials"))
+                return@post
+            }
+            
+            val verifiedResult = validationService.validateVerified(user.id, body.email)
+            if (verifiedResult is ServiceResult.Error) {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Please verify your email before logging in", email = body.email))
+                return@post
+            }
+            
+            val bannedResult = validationService.validateNotBanned(user.id)
+            if (bannedResult is ServiceResult.Error) {
+                call.respond(SuccessWithErrorResponse(success = false, error = bannedResult.message, email = body.email))
+                return@post
+            }
+            
+            application.log.debug("Password login: success for userId=${user.id}, username=${body.email}")
+            call.sessions.set(SessionUser(user.id, body.email, user.displayName))
+            call.respond(SuccessResponse(success = true))
+        }
+
+        post("/forgot-password") {
+            val body = try {
+                call.receive<EncryptedLoginRequest>()
+            } catch (e: Exception) {
+                return@post call.respondError("Invalid request body", 400)
+            }
+            
+            val email = com.hash_net.beelinecrypto.CryptoService.decrypt(body.encryptedData)
+                ?: return@post call.respondError("Failed to decrypt email", 400)
+            
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(email)) {
+                return@post call.respondError("Invalid email format", 400)
+            }
+            
+            val user = webAuthnService.getUserByEmail(email)
+            val language = user?.language ?: "en"
+            
+            val result = passwordService.requestPasswordReset(email, language)
+            if (result.isFailure) {
+                call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to send reset email"))
+            } else {
+                call.respond(SuccessResponse(success = true))
+            }
+        }
+
+        post("/reset-password") {
+            val token = call.request.queryParameters["token"]
+            if (token.isNullOrBlank()) {
+                return@post call.respondError("Token is required", 400)
+            }
+            
+            val body = try {
+                call.receive<EncryptedLoginRequest>()
+            } catch (e: Exception) {
+                return@post call.respondError("Invalid request body", 400)
+            }
+            
+            val success = passwordService.resetPassword(token, body.encryptedData)
+            if (success) {
+                call.respond(SuccessResponse(success = true))
+            } else {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to reset password. Token may be invalid or expired."))
+            }
+        }
+
+        get("/encryption-key") {
+            val publicKey = com.hash_net.beelinecrypto.CryptoService.getPublicKey()
+            call.respond(mapOf("publicKey" to publicKey))
+        }
     }
 }
 
@@ -198,7 +360,11 @@ private suspend fun userAuthenticationSuccess(
             lastAcceptedTermsAndConditions = user.lastAcceptedTermsAndConditions,
             emailVerified = webAuthnService.isUserVerified(session.userId),
             isBanned = user.isBanned,
-            banReason = user.banReason
+            banReason = user.banReason,
+            photographerFee = user.photographerFee,
+            photographerCurrency = user.photographerCurrency,
+            photographerCountry = user.photographerCountry,
+            photographerState = user.photographerState
         )
     )
 }

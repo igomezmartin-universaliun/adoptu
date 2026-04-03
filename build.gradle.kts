@@ -1,8 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.2.21"
-    kotlin("plugin.serialization") version "2.2.21"
+    kotlin("jvm") version "2.3.20"
+    kotlin("plugin.serialization") version "2.3.20"
     application
     id("io.miret.etienne.sass") version "1.6.0"
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 group = "com.adoptu"
@@ -14,7 +15,7 @@ repositories {
 
 dependencies {
     // Ktor
-        val ktorVersion = "3.4.0"
+    val ktorVersion = "3.4.1"
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -49,15 +50,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.3")
+    implementation("ch.qos.logback:logback-classic:1.5.16")
 
     // AWS S3
-    implementation("software.amazon.awssdk:s3:2.29.0")
-    implementation("software.amazon.awssdk:ses:2.29.0")
-    implementation("software.amazon.awssdk:sesv2:2.29.0")
+    implementation(platform("software.amazon.awssdk:bom:2.29.0"))
+    implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:ses")
+    implementation("software.amazon.awssdk:sesv2")
 
     // Email
     implementation("org.apache.commons:commons-email:1.6.0")
+
+    // Argon2id password hashing
+    implementation("com.password4j:password4j:1.8.4")
 
     // Testing
     val kotestVersion = "5.8.1"
@@ -66,26 +71,31 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-property:$kotestVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") // Corrected from ktor-server-mocks-host
+    testImplementation("io.mockk:mockk:1.14.2")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("com.h2database:h2:2.3.232")
-    testImplementation("org.testcontainers:testcontainers:1.19.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    testImplementation("org.testcontainers:postgresql:1.19.3")
-    testImplementation("org.testcontainers:localstack:1.19.3")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:localstack")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     // Playwright for E2E frontend tests
-    testImplementation("com.microsoft.playwright:playwright:1.49.0")
+    testImplementation("com.microsoft.playwright:playwright:1.51.0")
 }
 
 application {
     mainClass.set("com.adoptu.ApplicationKt")
 }
 
+tasks.run<JavaExec> {
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+}
+
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
 }
 
 tasks.test {
@@ -108,4 +118,13 @@ tasks.processResources {
     from(tasks.compileSass.get().outputDir) {
         into("static/css")
     }
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.adoptu.ApplicationKt"
+        attributes["Implementation-Version"] = version
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }

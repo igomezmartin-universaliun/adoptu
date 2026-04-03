@@ -6,6 +6,7 @@ import com.adoptu.plugins.configureRouting
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
 import com.adoptu.plugins.configureWebAuthn
+import com.hash_net.beelinecrypto.CryptoService
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import org.koin.dsl.module
@@ -28,6 +29,7 @@ fun Application.module() {
         modules(appModule(config))
     }
     DatabaseFactory.init(config)
+    CryptoService.initialize()
     configureSerialization()
     configureSessions()
     configureWebAuthn()

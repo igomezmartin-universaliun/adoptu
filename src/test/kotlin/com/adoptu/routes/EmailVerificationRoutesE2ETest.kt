@@ -59,7 +59,7 @@ class EmailVerificationRoutesE2ETest {
         val testModules = module {
             single<ApplicationConfig> { config }
             single<kotlin.time.Clock> { kotlin.time.Clock.System }
-            single { com.adoptu.services.auth.WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com") }
+            single { com.adoptu.services.auth.WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
             single { MockImageStorage() }
             single { mockNotificationAdapter }
             single<com.adoptu.ports.NotificationPort> { mockNotificationAdapter }

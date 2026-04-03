@@ -97,7 +97,7 @@ function renderImages() {
     return currentPet.images.map(img => '<div class="pet-image-item'+(img.isPrimary ? ' primary' : '')+'"><img src="'+img.imageUrl+'" alt="Pet photo">'+(img.isPrimary ? '<span class="primary-badge">Primary</span>' : '')+'</div>').join('');
 }
 load().catch(() => location.href = '/');
-(async () => { try { const u = await api.me(); if (u.authenticated !== false) { document.getElementById('login-link').style.display = 'none'; document.getElementById('register-link').style.display = 'none'; if (u.activeRoles?.includes('RESCUER') || u.activeRoles?.includes('ADMIN')) document.getElementById('my-pets-link').style.display = 'inline'; document.getElementById('logout-link').style.display = 'inline'; if (u.activeRoles?.includes('ADMIN')) document.getElementById('admin-link').style.display = 'inline'; document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); }; } } catch (e) {} })();
+(async () => { try { const u = await api.me(); if (u.authenticated !== false) { document.getElementById('login-link').style.display = 'none'; document.getElementById('register-link').style.display = 'none'; if (u.activeRoles?.includes('RESCUER') || u.activeRoles?.includes('ADMIN')) document.getElementById('my-pets-link').style.display = 'inline'; document.getElementById('logout-link').style.display = 'inline'; if (u.activeRoles?.includes('ADMIN')) document.getElementById('admin-link').style.display = 'inline'; document.getElementById('logout-link').onclick = async (e) => { e.preventDefault(); await api.logout(); window.location.href = '/'; }; } } catch (e) {} })();
 """.trimIndent()) } }
     }
 }

@@ -5,12 +5,16 @@ import com.adoptu.dto.input.BanUserRequest
 import com.adoptu.dto.input.PhotographerSettingsRequest
 import com.adoptu.dto.input.RoleActivationRequest
 import com.adoptu.dto.input.UserRole
+import com.adoptu.dto.output.SuccessWithErrorResponse
+import com.adoptu.dto.output.VerificationResponse
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
 import com.adoptu.plugins.respondForbidden
 import com.adoptu.plugins.respondInvalidId
 import com.adoptu.plugins.respondNotFound
 import com.adoptu.plugins.respondUnauthorized
+import com.adoptu.services.EmailChangeService
+import com.adoptu.services.PasswordService
 import com.adoptu.services.PhotographerService
 import com.adoptu.services.validation.ValidationConstants
 import com.adoptu.services.UserService
@@ -28,9 +32,20 @@ data class UpdateProfileRequest(val displayName: String)
 @Serializable
 data class UpdateLanguageRequest(val language: String)
 
+@Serializable
+data class SetPasswordRequest(val encryptedPassword: String)
+
+@Serializable
+data class ChangePasswordRequest(val encryptedCurrentPassword: String, val encryptedNewPassword: String)
+
+@Serializable
+data class RequestEmailChangeRequest(val newEmail: String)
+
 fun Route.usersRoutes() {
     val userService by inject<UserService>()
     val photographerService by inject<PhotographerService>()
+    val passwordService by inject<PasswordService>()
+    val emailChangeService by inject<EmailChangeService>()
 
     route("/api/users") {
         post("/accept-terms") {
@@ -132,6 +147,79 @@ fun Route.usersRoutes() {
                 ?: return@post call.respondNotFound()
 
             call.respond(user)
+        }
+
+        get("/has-password") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@get call.respondUnauthorized()
+
+            val hasPassword = passwordService.hasPassword(session.userId)
+            call.respond(mapOf("hasPassword" to hasPassword))
+        }
+
+        post("/password") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@post call.respondUnauthorized()
+
+            val body = call.receive<SetPasswordRequest>()
+            val success = passwordService.setPassword(session.userId, body.encryptedPassword)
+            if (success) {
+                call.respond(SuccessResponse(success = true))
+            } else {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to set password. Password must be between 8 and 128 characters."))
+            }
+        }
+
+        put("/password") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@put call.respondUnauthorized()
+
+            val body = call.receive<ChangePasswordRequest>()
+            val success = passwordService.changePassword(
+                session.userId,
+                body.encryptedCurrentPassword,
+                body.encryptedNewPassword
+            )
+            if (success) {
+                call.respond(SuccessResponse(success = true))
+            } else {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to change password. Current password may be incorrect or new password is invalid."))
+            }
+        }
+
+        post("/request-email-change") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@post call.respondUnauthorized()
+
+            val body = call.receive<RequestEmailChangeRequest>()
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(body.newEmail)) {
+                return@post call.respondError("Invalid email format", 400)
+            }
+
+            val user = userService.getById(session.userId)
+                ?: return@post call.respondNotFound()
+
+            val result = emailChangeService.requestEmailChange(session.userId, body.newEmail, user.language)
+            if (result.isFailure) {
+                call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to request email change"))
+            } else {
+                call.respond(SuccessResponse(success = true))
+            }
+        }
+
+        get("/verify-email-change") {
+            val token = call.request.queryParameters["token"]
+            if (token.isNullOrBlank()) {
+                return@get call.respondError("Token is required", 400)
+            }
+
+            val success = emailChangeService.verifyEmailChange(token)
+            if (success) {
+                call.respond(VerificationResponse(success = true, message = "Email changed successfully"))
+            } else {
+                call.respond(VerificationResponse(success = false, message = "Failed to change email. Token may be invalid or expired."))
+            }
         }
     }
 }

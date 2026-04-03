@@ -162,5 +162,57 @@ const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ language })
         });
+    },
+    async hasPassword() {
+        return this.fetch('/api/users/has-password');
+    },
+    async setPassword(encryptedPassword) {
+        return this.fetch('/api/users/password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encryptedPassword })
+        });
+    },
+    async changePassword(encryptedCurrentPassword, encryptedNewPassword) {
+        return this.fetch('/api/users/password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encryptedCurrentPassword, encryptedNewPassword })
+        });
+    },
+    async requestEmailChange(newEmail) {
+        return this.fetch('/api/users/request-email-change', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newEmail })
+        });
+    },
+    async requestMagicLink(encryptedData) {
+        return this.fetch('/api/auth/request-magic-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encryptedData })
+        });
+    },
+    async loginWithPassword(email, encryptedPassword) {
+        return this.fetch('/api/auth/login-with-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, encryptedPassword })
+        });
+    },
+    async forgotPassword(encryptedData) {
+        return this.fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encryptedData })
+        });
+    },
+    async resetPassword(token, encryptedPassword) {
+        return this.fetch('/api/auth/reset-password?token=' + encodeURIComponent(token), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ encryptedData: encryptedPassword })
+        });
     }
 };

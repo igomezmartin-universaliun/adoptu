@@ -39,22 +39,8 @@ fun HTML.registerPage() {
                         div {
                             style = "display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0;"
                             input(InputType.checkBox) { name = "roles"; value = "TEMPORAL_HOME"; id = "role-temporal-home"; style = "width: auto; height: auto; margin: 0;" }
-                            span { attributes["data-i18n"] = "offerTemporalHome"; +"Offer a temporary home" }
+                            span { attributes["data-i18n"] = "provideTemporaryHome"; +"Provide temporary home for pets" }
                         }
-                    }
-                    
-                    div(classes = "temporal-home-fields") {
-                        id = "temporal-home-section"
-                        style = "display: none; margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 8px;"
-                        h3 { attributes["data-i18n"] = "temporalHomeProfile"; +"Temporal Home Profile" }
-                        p { small { attributes["data-i18n"] = "temporalHomeDescription"; +"Provide your location details to help rescuers find temporary homes near them." } }
-                        
-                        label { htmlFor = "th-alias"; attributes["data-i18n"] = "homeAlias"; +"Home Name/Alias" }; input(InputType.text) { name = "thAlias"; id = "th-alias"; placeholder = "e.g., John's Home" }
-                        label { htmlFor = "th-country"; attributes["data-i18n"] = "country"; +"Country" }; input(InputType.text) { name = "thCountry"; id = "th-country"; required = true }
-                        label { htmlFor = "th-state"; attributes["data-i18n"] = "state"; +"State/Province" }; input(InputType.text) { name = "thState"; id = "th-state" }
-                        label { htmlFor = "th-city"; attributes["data-i18n"] = "city"; +"City" }; input(InputType.text) { name = "thCity"; id = "th-city"; required = true }
-                        label { htmlFor = "th-zip"; attributes["data-i18n"] = "zip"; +"ZIP/Postal Code" }; input(InputType.text) { name = "thZip"; id = "th-zip" }
-                        label { htmlFor = "th-neighborhood"; attributes["data-i18n"] = "neighborhood"; +"Neighborhood" }; input(InputType.text) { name = "thNeighborhood"; id = "th-neighborhood" }
                     }
                     
                     p { id = "message"; +"" }
@@ -83,45 +69,15 @@ document.getElementById('register-form').onsubmit = async (e) => {
     const roles = ['ADOPTER'];
     if (document.getElementById('role-rescuer').checked) roles.push('RESCUER');
     if (document.getElementById('role-photographer').checked) roles.push('PHOTOGRAPHER');
-    if (document.getElementById('role-temporal-home').checked) roles.push('TEMPORAL_HOME');
-    
-    const temporalHomeSection = document.getElementById('temporal-home-section');
-    let temporalHomeProfile = null;
-    if (document.getElementById('role-temporal-home').checked) {
-        temporalHomeSection.style.display = 'block';
-        const thAlias = document.getElementById('th-alias').value.trim();
-        const thCountry = document.getElementById('th-country').value.trim();
-        const thState = document.getElementById('th-state').value.trim();
-        const thCity = document.getElementById('th-city').value.trim();
-        const thZip = document.getElementById('th-zip').value.trim();
-        const thNeighborhood = document.getElementById('th-neighborhood').value.trim();
-        
-        if (!thCountry || !thCity) {
-            const msg = document.getElementById('message');
-            msg.className = 'message error';
-            msg.textContent = 'Please fill in Country and City for temporal home profile.';
-            return;
-        }
-        
-        temporalHomeProfile = {
-            alias: thAlias || thCity + ' Home',
-            country: thCountry,
-            state: thState || null,
-            city: thCity,
-            zip: thZip || null,
-            neighborhood: thNeighborhood || null
-        };
-    } else {
-        temporalHomeSection.style.display = 'none';
-    }
+    if (document.getElementById('role-temporal-home')) roles.push('TEMPORAL_HOME');
     
     const msg = document.getElementById('message');
     if (!email || !displayName) { msg.className = 'message error'; msg.textContent = 'Please fill in all fields.'; return; }
-    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) { msg.className = 'message error'; msg.textContent = 'Please enter a valid email address.'; return; }
     try {
         msg.textContent = 'Creating passkey...';
-        const result = await webauthn.register(email, displayName, roles, temporalHomeProfile);
+        const result = await webauthn.register(email, displayName, roles);
         if (result) { 
             msg.className = 'message success'; 
             msg.textContent = 'Success! Redirecting...';

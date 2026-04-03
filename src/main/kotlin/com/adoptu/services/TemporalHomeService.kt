@@ -58,7 +58,7 @@ class TemporalHomeService(
         )
 
         val temporalHomeEmail = userService.getById(request.temporalHomeId)?.username
-        if (temporalHomeEmail != null && notificationAdapter != null) {
+        if (temporalHomeEmail != null) {
             val baseUrl = "https://adopt-u.com"
             val spamReportLink = "$baseUrl/temporal-home/block/${request.temporalHomeId}?rescuer=$requesterId"
             val pet = if (request.petId != null) temporalHomeRepository.getTemporalHome(request.temporalHomeId) else null

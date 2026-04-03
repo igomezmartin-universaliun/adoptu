@@ -33,15 +33,15 @@ class WebAuthnService(
     private val clock: Clock,
     private val emailVerificationService: EmailVerificationService,
     private val userService: UserService,
-    private val adminEmail: String
+    private val adminEmail: String,
+    private val rpId: String,
+    private val rpName: String,
+    private val origin: String
 ) {
     private val objectConverter = ObjectConverter()
     private val webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager(objectConverter)
     private val attestedCredentialDataConverter = AttestedCredentialDataConverter(objectConverter)
     private val secureRandom = SecureRandom()
-    private val rpId = "localhost"
-    private val rpName = "Adopt-U Pet Adoption"
-    private val origin = "http://localhost:8080"
 
     @Serializable
     data class RelyingParty(
@@ -313,15 +313,15 @@ class WebAuthnService(
     suspend fun resendVerificationEmailByEmail(email: String): Boolean {
         val user = userService.getByEmail(email) ?: return false
         
-        if (userService.isUserVerified(user.id!!)) {
+        if (userService.isUserVerified(user.id)) {
             return false
         }
 
-        if (!emailVerificationService.canSendVerificationEmail(user.id!!)) {
+        if (!emailVerificationService.canSendVerificationEmail(user.id)) {
             return false
         }
 
-        val result = emailVerificationService.resendVerificationEmail(user.id!!, email, user.displayName, user.language)
+        val result = emailVerificationService.resendVerificationEmail(user.id, email, user.displayName, user.language)
         return result.getOrDefault(false)
     }
 
@@ -335,6 +335,10 @@ class WebAuthnService(
 
     fun isUserVerified(userId: Int): Boolean {
         return userService.isUserVerified(userId)
+    }
+
+    fun getUserByEmail(email: String): com.adoptu.dto.input.UserDto? {
+        return userService.getByEmail(email)
     }
 
     private object ChallengeStore {

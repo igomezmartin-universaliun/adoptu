@@ -348,7 +348,7 @@ document.getElementById('pet-form').onsubmit = async (e) => {
 load();
 const logoutLink = document.getElementById('logout-link');
 if (logoutLink) {
-    logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); location.reload(); };
+    logoutLink.onclick = async (e) => { e.preventDefault(); await api.logout(); window.location.href = '/'; };
 }
 """.trimIndent()) } }
     }

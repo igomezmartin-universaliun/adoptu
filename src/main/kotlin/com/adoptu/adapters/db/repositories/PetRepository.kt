@@ -173,7 +173,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             it[Pets.createdAt] = clock.now().toEpochMilliseconds()
         } get Pets.id
 
-        getById(id!!)!!
+        getById(id)!!
     }
 
     override fun update(id: Int, body: UpdatePetRequest): PetDto? = transaction {
@@ -227,7 +227,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         } get AdoptionRequests.id
 
         AdoptionRequestDto(
-            id = id!!,
+            id = id,
             petId = petId,
             adopterId = adopterId,
             message = message,

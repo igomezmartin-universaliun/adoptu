@@ -151,7 +151,7 @@ class SheltersRoutesE2ETest {
         val testModules = module {
             single<ApplicationConfig> { config }
             single<Clock> { testClock }
-            single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com") }
+            single { WebAuthnService(get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
             single<UserRepositoryPort> { com.adoptu.adapters.db.repositories.UserRepository(get()) }
             single<PetRepositoryPort> { com.adoptu.adapters.db.repositories.PetRepositoryImpl(get()) }
             single<PhotographerRepositoryPort> { com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl(get(), get(), get()) }
