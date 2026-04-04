@@ -10,19 +10,13 @@ fun HTML.loginPage() {
             nav { guestNav() }
         }
         main {
-            div(classes = "auth-tabs") {
-                button(classes = "auth-tab active", type = ButtonType.button) { id = "tab-passkey"; +"Passkey" }
-                button(classes = "auth-tab", type = ButtonType.button) { id = "tab-magic-link"; +"Email Link" }
-                button(classes = "auth-tab", type = ButtonType.button) { id = "tab-password"; +"Password" }
-            }
-
             div(classes = "auth-form-container") {
                 id = "passkey-form"
                 div(classes = "auth-form") {
                     h1 { attributes["data-i18n"] = "loginWithPasskey"; +"Login with Passkey" }
                     p { id = "passkey-message"; +"" }
-                    button(classes = "btn", type = ButtonType.button) { id = "login-btn"; attributes["data-i18n"] = "signInWithPasskey"; +"Sign in with Passkey" }
-                    button(classes = "btn btn-secondary", type = ButtonType.button) { id = "resend-btn"; attributes["data-i18n"] = "resendVerificationEmail"; onClick = "this.style.display='none'"; +"Resend Verification Email" }
+                    button(classes = "btn", type = ButtonType.button) { id = "login-btn"; attributes["data-i18n"] = "signInWithPasskey"; style = "width: 100%; display: block; margin-bottom: 8px;"; +"Sign in with Passkey" }
+                    button(classes = "btn btn-secondary", type = ButtonType.button) { id = "resend-btn"; attributes["data-i18n"] = "resendVerificationEmail"; style = "width: 100%; display: none;"; onClick = "this.style.display='none'"; +"Resend Verification Email" }
                     p { small { attributes["data-i18n"] = "usesFido"; +"Uses FIDO2 / WebAuthn for secure passwordless authentication." } }
                 }
             }
@@ -97,6 +91,7 @@ async function checkProfileCompletion(user) {
 function showResendButton() {
     document.getElementById('login-btn').style.display = 'none';
     document.getElementById('resend-btn').style.display = 'block';
+    document.getElementById('resend-btn').style.width = '100%';
 }
 
 let pendingEmail = null;
@@ -204,7 +199,7 @@ document.getElementById('magic-link-btn').onclick = async () => {
         const result = await res.json();
         if (result.success) {
             msg.className = 'message success';
-            msg.textContent = i18n.t('magicLinkSent') || 'Login link sent! Check your email.';
+            msg.textContent = i18n.t('magicLinkSent') || 'Check your inbox! We sent you a login link (valid for 5 minutes).';
             document.getElementById('magic-email').value = '';
         } else {
             msg.className = 'message error';
@@ -271,22 +266,7 @@ document.getElementById('password-login-btn').onclick = async () => {
     }
 };
 
-document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        document.querySelectorAll('.auth-form-container').forEach(f => f.style.display = 'none');
-        
-        if (tab.id === 'tab-passkey') {
-            document.getElementById('passkey-form').style.display = 'block';
-        } else if (tab.id === 'tab-magic-link') {
-            document.getElementById('magic-link-form').style.display = 'block';
-        } else if (tab.id === 'tab-password') {
-            document.getElementById('password-form').style.display = 'block';
-        }
-    };
-});
+document.querySelectorAll('.auth-form-container').forEach(f => f.style.display = 'block');
 
 if (window.location.hash === '#magic-link') {
     document.getElementById('tab-magic-link').click();

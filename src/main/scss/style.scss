@@ -284,6 +284,28 @@ main {
         color: lightgrey;
         background: var(--card-bg);
     }
+
+    input[type="password"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg) !important;
+        color: var(--text) !important;
+        box-sizing: border-box;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px var(--bg) inset !important;
+        -webkit-text-fill-color: var(--text) !important;
+    }
+}
+
+.password-hidden {
+    display: none;
 }
 
 .form-row-two-col {
@@ -556,6 +578,18 @@ form {
         border-radius: 6px;
         box-sizing: border-box;
     }
+}
+
+.security-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.auth-form-container {
+    margin-bottom: 2rem;
 }
 
 .temporal-search-form {
@@ -845,7 +879,9 @@ form {
             width: 100%;
         }
     }
-    #login-btn {
+    #login-btn,
+    #magic-link-btn,
+    #password-login-btn {
         width: 100%;
     }
     .form-actions{

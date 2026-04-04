@@ -166,7 +166,7 @@ fun Route.usersRoutes() {
             if (success) {
                 call.respond(SuccessResponse(success = true))
             } else {
-                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to set password. Password must be between 8 and 128 characters."))
+                call.respond(SuccessWithErrorResponse(success = false, error = "Password must be at least 8 characters with uppercase, lowercase, number, and symbol."))
             }
         }
 

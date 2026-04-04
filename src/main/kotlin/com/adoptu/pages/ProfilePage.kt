@@ -126,15 +126,24 @@ fun HTML.profilePage() {
                 h2 { attributes["data-i18n"] = "securitySettings"; +"Security Settings" }
                 div(classes = "form-row") {
                     id = "password-section"
-                    div {
-                        p { id = "password-status"; +"" }
-                        button(classes = "btn btn-secondary", type = ButtonType.button) { id = "set-password-btn"; attributes["data-i18n"] = "setPassword"; +"Set Password" }
-                    }
+                    p { id = "password-status"; +"" }
                 }
                 div(classes = "form-row") {
-                    id = "change-password-section"
-                    button(classes = "btn btn-secondary", type = ButtonType.button) { id = "change-password-btn"; attributes["data-i18n"] = "changePassword"; +"Change Password" }
+                    id = "current-password-row"
+                    classes = setOf("form-row", "password-hidden")
+                    label { htmlFor = "current-password"; attributes["data-i18n"] = "currentPassword"; +"Current Password" }
+                    input(InputType.password) { id = "current-password"; disabled = true }
                 }
+                div(classes = "form-row") {
+                    label { htmlFor = "new-password"; attributes["data-i18n"] = "newPassword"; +"New Password" }
+                    input(InputType.password) { id = "new-password"; }
+                }
+                div(classes = "form-row") {
+                    label { htmlFor = "confirm-password"; attributes["data-i18n"] = "confirmPassword"; +"Confirm Password" }
+                    input(InputType.password) { id = "confirm-password"; }
+                }
+                p { id = "password-message"; +"" }
+                button(classes = "btn btn-secondary", type = ButtonType.button) { id = "save-password-btn"; attributes["data-i18n"] = "savePassword"; +"Save Password" }
             }
 
             div(classes = "card-bg profile-section") {
@@ -350,52 +359,117 @@ async function loadPasswordStatus() {
         const res = await fetch('/api/users/has-password');
         const data = await res.json();
         const passwordStatus = document.getElementById('password-status');
-        const setPasswordBtn = document.getElementById('set-password-btn');
-        const changePasswordBtn = document.getElementById('change-password-btn');
+        const currentPasswordRow = document.getElementById('current-password-row');
         
         if (data.hasPassword) {
             passwordStatus.textContent = i18n.t('passwordSet') || 'Password is set';
-            setPasswordBtn.style.display = 'none';
-            changePasswordBtn.style.display = 'block';
+            currentPasswordRow.classList.remove('password-hidden');
+            document.getElementById('current-password').disabled = false;
         } else {
             passwordStatus.textContent = i18n.t('noPassword') || 'No password set';
-            setPasswordBtn.style.display = 'block';
-            changePasswordBtn.style.display = 'none';
+            currentPasswordRow.classList.add('password-hidden');
+            document.getElementById('current-password').disabled = true;
         }
     } catch (e) {
         console.error('Error loading password status:', e);
     }
 }
 
-document.getElementById('set-password-btn')?.addEventListener('click', async () => {
-    const password = prompt(i18n.t('enterNewPassword') || 'Enter new password (min 8 characters):');
-    if (!password || password.length < 8) {
-        alert(i18n.t('passwordTooShort') || 'Password must be at least 8 characters.');
+document.getElementById('save-password-btn')?.addEventListener('click', async () => {
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const msg = document.getElementById('password-message');
+    const hasPassword = document.getElementById('current-password').disabled === false;
+    
+    if (!msg) return;
+    
+    const checks = [
+        { valid: newPassword.length >= 8, key: 'password8Chars' },
+        { valid: /[A-Z]/.test(newPassword), key: 'passwordUppercase' },
+        { valid: /[a-z]/.test(newPassword), key: 'passwordLowercase' },
+        { valid: /[0-9]/.test(newPassword), key: 'passwordNumber' },
+        { valid: /[!@#$%^&*(),.?":{}|<>\-_+=/\[\]\\|°º«»¿]/.test(newPassword), key: 'passwordSymbol' }
+    ];
+    
+    const allValid = checks.every(c => c.valid);
+    
+    let html = '<div class="password-checks">';
+    checks.forEach(check => {
+        const label = i18n.t(check.key) || '';
+        const color = check.valid ? '#28a745' : '#dc3545';
+        html += '<div style="color:' + color + '; margin: 0.25rem 0;">' + (check.valid ? '✓' : '✗') + ' ' + label + '</div>';
+    });
+    html += '</div>';
+    
+    if (!allValid) {
+        msg.className = 'message error';
+        msg.innerHTML = html;
         return;
     }
     
-    const msg = document.getElementById('message');
+    if (newPassword !== confirmPassword) {
+        msg.className = 'message error';
+        msg.textContent = i18n.t('passwordsDoNotMatch') || 'Passwords do not match.';
+        return;
+    }
+    
+    if (hasPassword && !currentPassword) {
+        msg.className = 'message error';
+        msg.textContent = i18n.t('currentPasswordRequired') || 'Current password is required.';
+        return;
+    }
+    
     msg.textContent = i18n.t('saving') || 'Saving...';
     msg.className = '';
     
     try {
         const publicKey = await getPublicKey();
-        const encryptedPassword = await rsaCrypto.encrypt(password, publicKey);
         
-        const res = await fetch('/api/users/password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ encryptedPassword })
-        });
-        
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = i18n.t('passwordSetSuccess') || 'Password set successfully!';
-            loadPasswordStatus();
+        if (hasPassword) {
+            const encryptedCurrent = await rsaCrypto.encrypt(currentPassword, publicKey);
+            const encryptedNew = await rsaCrypto.encrypt(newPassword, publicKey);
+            
+            const res = await fetch('/api/users/password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    encryptedCurrentPassword: encryptedCurrent,
+                    encryptedNewPassword: encryptedNew
+                })
+            });
+            
+            const result = await res.json();
+            if (result.success) {
+                msg.className = 'message success';
+                msg.textContent = i18n.t('passwordChangeSuccess') || 'Password changed successfully!';
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            } else {
+                msg.className = 'message error';
+                msg.textContent = result.error || i18n.t('passwordChangeFailed') || 'Failed to change password.';
+            }
         } else {
-            msg.className = 'message error';
-            msg.textContent = result.error || i18n.t('passwordSetFailed') || 'Failed to set password.';
+            const encryptedPassword = await rsaCrypto.encrypt(newPassword, publicKey);
+            
+            const res = await fetch('/api/users/password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ encryptedPassword })
+            });
+            
+            const result = await res.json();
+            if (result.success) {
+                msg.className = 'message success';
+                msg.textContent = i18n.t('passwordSetSuccess') || 'Password set successfully!';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+                loadPasswordStatus();
+            } else {
+                msg.className = 'message error';
+                msg.textContent = result.error || i18n.t('passwordSetFailed') || 'Failed to set password.';
+            }
         }
     } catch (e) {
         msg.className = 'message error';
@@ -403,51 +477,11 @@ document.getElementById('set-password-btn')?.addEventListener('click', async () 
     }
 });
 
-document.getElementById('change-password-btn')?.addEventListener('click', async () => {
-    const currentPassword = prompt(i18n.t('enterCurrentPassword') || 'Enter current password:');
-    if (!currentPassword) return;
-    
-    const newPassword = prompt(i18n.t('enterNewPassword') || 'Enter new password (min 8 characters):');
-    if (!newPassword || newPassword.length < 8) {
-        alert(i18n.t('passwordTooShort') || 'Password must be at least 8 characters.');
-        return;
-    }
-    
-    const msg = document.getElementById('message');
-    msg.textContent = i18n.t('saving') || 'Saving...';
-    msg.className = '';
-    
-    try {
-        const publicKey = await getPublicKey();
-        const encryptedCurrent = await rsaCrypto.encrypt(currentPassword, publicKey);
-        const encryptedNew = await rsaCrypto.encrypt(newPassword, publicKey);
-        
-        const res = await fetch('/api/users/password', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                encryptedCurrentPassword: encryptedCurrent,
-                encryptedNewPassword: encryptedNew
-            })
-        });
-        
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = i18n.t('passwordChangeSuccess') || 'Password changed successfully!';
-        } else {
-            msg.className = 'message error';
-            msg.textContent = result.error || i18n.t('passwordChangeFailed') || 'Failed to change password.';
-        }
-    } catch (e) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordChangeFailed') || 'Failed to change password.';
-    }
-});
-
 document.getElementById('change-email-btn')?.addEventListener('click', async () => {
     const newEmail = document.getElementById('new-email').value;
     const msg = document.getElementById('email-change-message');
+    
+    if (!msg) return;
     
     if (!newEmail) {
         msg.className = 'message error';

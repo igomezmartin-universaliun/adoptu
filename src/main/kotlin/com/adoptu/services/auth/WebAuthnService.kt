@@ -5,7 +5,10 @@ import com.adoptu.adapters.db.Users
 import com.adoptu.adapters.db.WebAuthnCredentials
 import com.adoptu.dto.input.UserRole
 import com.adoptu.services.EmailVerificationService
+import com.adoptu.services.MagicLinkService
+import com.adoptu.services.PasswordService
 import com.adoptu.services.UserService
+import com.hash_net.beelinecrypto.CryptoService
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.AttestedCredentialDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
@@ -33,6 +36,8 @@ class WebAuthnService(
     private val clock: Clock,
     private val emailVerificationService: EmailVerificationService,
     private val userService: UserService,
+    private val passwordService: PasswordService,
+    private val magicLinkService: MagicLinkService,
     private val adminEmail: String,
     private val rpId: String,
     private val rpName: String,
@@ -339,6 +344,32 @@ class WebAuthnService(
 
     fun getUserByEmail(email: String): com.adoptu.dto.input.UserDto? {
         return userService.getByEmail(email)
+    }
+
+    fun getLanguageByEmail(email: String): String {
+        return userService.getByEmail(email)?.language ?: "en"
+    }
+
+    fun verifyPassword(userId: Int, encryptedPassword: String): Boolean {
+        return passwordService.verifyPassword(userId, encryptedPassword)
+    }
+
+    fun requestMagicLink(email: String): Result<Boolean> {
+        val language = userService.getByEmail(email)?.language ?: "en"
+        return magicLinkService.requestMagicLink(email, language)
+    }
+
+    fun requestPasswordReset(email: String): Result<Boolean> {
+        val language = userService.getByEmail(email)?.language ?: "en"
+        return passwordService.requestPasswordReset(email, language)
+    }
+
+    fun resetPassword(token: String, encryptedNewPassword: String): Boolean {
+        return passwordService.resetPassword(token, encryptedNewPassword)
+    }
+
+    fun verifyAndConsumeMagicLink(token: String): MagicLinkService.MagicLinkResult? {
+        return magicLinkService.verifyAndConsumeMagicLink(token)
     }
 
     private object ChallengeStore {

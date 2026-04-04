@@ -48,6 +48,15 @@ fun HTML.registerPage() {
                         id="register-button"
                         attributes["data-i18n"] = "registerWithPasskey"; +"Register with Passkey" }
                 }
+                div(classes = "security-info") {
+                    p { style = "margin: 0 0 0.5rem 0; font-weight: bold;"; attributes["data-i18n"] = "securityInfo"; +"Security Information" }
+                    ul {
+                        style = "margin: 0; padding-left: 1.5rem;"
+                        li { attributes["data-i18n"] = "passkeyMostSecure"; +"Passkey: Most secure, recommended" }
+                        li { style = "margin-top: 0.25rem;"; attributes["data-i18n"] = "passkeyBrowserCompat"; +"Passkey may not work on all browsers" }
+                        li { style = "margin-top: 0.25rem;"; attributes["data-i18n"] = "passwordLeastSecure"; +"Password: Less secure, not recommended" }
+                    }
+                }
                 p { style = "margin-top: 1rem;"; small { attributes["data-i18n"] = "useFido"; +"Uses FIDO2 / WebAuthn - no password needed." } }
                 div(classes = "form-actions") {
                     p { style = "margin-top: 1rem; text-align: center; width: 100%;"; attributes["data-i18n"] = "alreadyHaveAccount"; +"Already have an account?" }

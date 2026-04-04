@@ -14,6 +14,7 @@ import com.adoptu.services.ServiceResult
 import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.services.validation.AuthValidationService
+import com.hash_net.beelinecrypto.CryptoService
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -37,8 +38,6 @@ data class PasswordLoginRequest(
 fun Route.authRoutes() {
     val webAuthnService by inject<WebAuthnService>()
     val validationService by inject<AuthValidationService>()
-    val passwordService by inject<PasswordService>()
-    val magicLinkService by inject<MagicLinkService>()
     val config by inject<ApplicationConfig>()
     val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com"
 
@@ -196,18 +195,13 @@ fun Route.authRoutes() {
                 return@post call.respondError("Invalid request body", 400)
             }
             
-            val email = com.hash_net.beelinecrypto.CryptoService.decrypt(body.encryptedData)
-                ?: return@post call.respondError("Failed to decrypt email", 400)
-            
-            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
-            if (!emailRegex.matches(email)) {
-                return@post call.respondError("Invalid email format", 400)
+            val emailResult = validationService.validateAndDecryptEmail(body.encryptedData)
+            if (emailResult is ServiceResult.Error) {
+                return@post call.respondError(emailResult.message, 400)
             }
+            val email = (emailResult as ServiceResult.Success).data
             
-            val user = webAuthnService.getUserByEmail(email)
-            val language = user?.language ?: "en"
-            
-            val result = magicLinkService.requestMagicLink(email, language)
+            val result = webAuthnService.requestMagicLink(email)
             if (result.isFailure) {
                 call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to send magic link"))
             } else {
@@ -221,7 +215,7 @@ fun Route.authRoutes() {
                 return@get call.respond(VerificationResponse(success = false, message = "Token is required"))
             }
             
-            val result = magicLinkService.verifyAndConsumeMagicLink(token)
+            val result = webAuthnService.verifyAndConsumeMagicLink(token)
             if (result == null) {
                 call.respond(VerificationResponse(success = false, message = "Invalid or expired magic link"))
                 return@get
@@ -251,18 +245,14 @@ fun Route.authRoutes() {
                 return@post call.respondError("Invalid request body", 400)
             }
             
-            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
-            if (!emailRegex.matches(body.email)) {
-                return@post call.respondError("Invalid email format", 400)
-            }
-            
-            val user = webAuthnService.getUserByEmail(body.email)
-            if (user == null) {
+            val userResult = validationService.validateEmailAndUser(body.email)
+            if (userResult is ServiceResult.Error) {
                 call.respond(SuccessWithErrorResponse(success = false, error = "Invalid credentials"))
                 return@post
             }
+            val user = (userResult as ServiceResult.Success).data
             
-            if (!passwordService.verifyPassword(user.id, body.encryptedPassword)) {
+            if (!webAuthnService.verifyPassword(user.id, body.encryptedPassword)) {
                 call.respond(SuccessWithErrorResponse(success = false, error = "Invalid credentials"))
                 return@post
             }
@@ -291,18 +281,11 @@ fun Route.authRoutes() {
                 return@post call.respondError("Invalid request body", 400)
             }
             
-            val email = com.hash_net.beelinecrypto.CryptoService.decrypt(body.encryptedData)
-                ?: return@post call.respondError("Failed to decrypt email", 400)
-            
-            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
-            if (!emailRegex.matches(email)) {
-                return@post call.respondError("Invalid email format", 400)
+            val emailResult = validationService.validateAndDecryptEmail(body.encryptedData)
+            if (emailResult is ServiceResult.Error) {
+                return@post call.respondError(emailResult.message, 400)
             }
-            
-            val user = webAuthnService.getUserByEmail(email)
-            val language = user?.language ?: "en"
-            
-            val result = passwordService.requestPasswordReset(email, language)
+            val result = webAuthnService.requestPasswordReset((emailResult as ServiceResult.Success).data)
             if (result.isFailure) {
                 call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to send reset email"))
             } else {
@@ -322,11 +305,11 @@ fun Route.authRoutes() {
                 return@post call.respondError("Invalid request body", 400)
             }
             
-            val success = passwordService.resetPassword(token, body.encryptedData)
+            val success = webAuthnService.resetPassword(token, body.encryptedData)
             if (success) {
                 call.respond(SuccessResponse(success = true))
             } else {
-                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to reset password. Token may be invalid or expired."))
+                call.respond(SuccessWithErrorResponse(success = false, error = "Failed to reset password. Token may be invalid/expired or password doesn't meet requirements (min 8 chars with uppercase, lowercase, number, symbol)."))
             }
         }
 

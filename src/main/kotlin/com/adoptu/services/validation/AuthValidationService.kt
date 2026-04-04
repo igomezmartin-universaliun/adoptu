@@ -4,12 +4,36 @@ import com.adoptu.dto.input.UserDto
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.UserService
 import com.adoptu.services.auth.SessionUser
+import com.hash_net.beelinecrypto.CryptoService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class AuthValidationService : KoinComponent {
 
     private val userService: UserService by inject()
+
+    fun validateAndDecryptEmail(encryptedData: String): ServiceResult<String> {
+        val email = CryptoService.decrypt(encryptedData) 
+            ?: return ServiceResult.Error("Failed to decrypt email")
+        
+        val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+        if (!emailRegex.matches(email)) {
+            return ServiceResult.Error("Invalid email format")
+        }
+        
+        return ServiceResult.Success(email)
+    }
+
+    fun validateEmailAndUser(email: String): ServiceResult<UserDto> {
+        val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+        if (!emailRegex.matches(email)) {
+            return ServiceResult.Error("Invalid email format")
+        }
+        
+        val user = userService.getByEmail(email)
+        return if (user != null) ServiceResult.Success(user)
+               else ServiceResult.Error("Invalid credentials")
+    }
 
     fun validateSession(session: SessionUser?): ServiceResult<SessionUser> {
         return if (session != null) ServiceResult.Success(session) 

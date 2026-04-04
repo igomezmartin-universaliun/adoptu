@@ -22,6 +22,8 @@ object DatabaseFactory {
         Users,
         EmailVerificationTokens,
         EmailVerificationAttempts,
+        UserPasswords,
+        MagicLinkTokens,
         UserActiveRoles,
         Photographers,
         WebAuthnCredentials,
