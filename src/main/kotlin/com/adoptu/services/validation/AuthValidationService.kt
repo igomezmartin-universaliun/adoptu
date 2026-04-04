@@ -4,7 +4,7 @@ import com.adoptu.dto.input.UserDto
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.UserService
 import com.adoptu.services.auth.SessionUser
-import com.hash_net.beelinecrypto.CryptoService
+import com.adoptu.services.crypto.CryptoService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

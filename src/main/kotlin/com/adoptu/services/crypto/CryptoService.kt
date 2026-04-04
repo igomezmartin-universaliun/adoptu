@@ -1,5 +1,7 @@
-package com.hash_net.beelinecrypto
+package com.adoptu.services.crypto
 
+import java.security.KeyFactory
+import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -16,9 +18,9 @@ object CryptoService {
     private const val ALGORITHM = "RSA/ECB/OAEPPadding"
     private const val KEY_ALGORITHM = "RSA"
     private const val KEY_SIZE = 2048
-    
-    private var keyPair: java.security.KeyPair? = null
-    
+
+    private var keyPair: KeyPair? = null
+
     private fun getOaepParameterSpec(): OAEPParameterSpec {
         return OAEPParameterSpec(
             "SHA-256",
@@ -27,7 +29,7 @@ object CryptoService {
             PSource.PSpecified.DEFAULT
         )
     }
-    
+
     fun initialize() {
         if (keyPair == null) {
             val generator = KeyPairGenerator.getInstance(KEY_ALGORITHM)
@@ -35,29 +37,29 @@ object CryptoService {
             keyPair = generator.generateKeyPair()
         }
     }
-    
+
     fun generateKeyPair(): Pair<String, String> {
         initialize()
         val publicKey = Base64.getEncoder().encodeToString(keyPair!!.public.encoded)
         val privateKey = Base64.getEncoder().encodeToString(keyPair!!.private.encoded)
         return publicKey to privateKey
     }
-    
+
     fun getPublicKey(): String {
         initialize()
         return Base64.getEncoder().encodeToString(keyPair!!.public.encoded)
     }
-    
+
     fun encrypt(plaintext: String, publicKeyBase64: String): String? {
         return try {
             val keyBytes = Base64.getDecoder().decode(publicKeyBase64)
             val keySpec = X509EncodedKeySpec(keyBytes)
-            val keyFactory = java.security.KeyFactory.getInstance("RSA")
+            val keyFactory = KeyFactory.getInstance("RSA")
             val publicKey = keyFactory.generatePublic(keySpec) as PublicKey
-            
+
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.ENCRYPT_MODE, publicKey, getOaepParameterSpec())
-            
+
             val ciphertext = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
             Base64.getEncoder().encodeToString(ciphertext)
         } catch (e: Exception) {
@@ -66,15 +68,15 @@ object CryptoService {
             null
         }
     }
-    
+
     fun decrypt(ciphertext: String): String? {
         return try {
             initialize()
             val privateKey = keyPair!!.private
-            
+
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.DECRYPT_MODE, privateKey, getOaepParameterSpec())
-            
+
             val ciphertextBytes = Base64.getDecoder().decode(ciphertext)
             val plaintext = cipher.doFinal(ciphertextBytes)
             String(plaintext, Charsets.UTF_8)
@@ -84,17 +86,17 @@ object CryptoService {
             null
         }
     }
-    
+
     fun decryptWithKey(ciphertext: String, privateKeyBase64: String): String? {
         return try {
             val keyBytes = Base64.getDecoder().decode(privateKeyBase64)
             val keySpec = PKCS8EncodedKeySpec(keyBytes)
-            val keyFactory = java.security.KeyFactory.getInstance("RSA")
+            val keyFactory = KeyFactory.getInstance("RSA")
             val privateKey = keyFactory.generatePrivate(keySpec) as PrivateKey
-            
+
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.DECRYPT_MODE, privateKey, getOaepParameterSpec())
-            
+
             val ciphertextBytes = Base64.getDecoder().decode(ciphertext)
             val plaintext = cipher.doFinal(ciphertextBytes)
             String(plaintext, Charsets.UTF_8)

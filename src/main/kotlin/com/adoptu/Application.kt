@@ -6,10 +6,9 @@ import com.adoptu.plugins.configureRouting
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
 import com.adoptu.plugins.configureWebAuthn
-import com.hash_net.beelinecrypto.CryptoService
+import com.adoptu.services.crypto.CryptoService
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
-import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import org.slf4j.LoggerFactory

@@ -8,13 +8,11 @@ import com.adoptu.dto.output.SuccessWithErrorResponse
 import com.adoptu.dto.output.VerificationResponse
 import com.adoptu.plugins.SuccessResponse
 import com.adoptu.plugins.respondError
-import com.adoptu.services.MagicLinkService
-import com.adoptu.services.PasswordService
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.services.validation.AuthValidationService
-import com.hash_net.beelinecrypto.CryptoService
+import com.adoptu.services.crypto.CryptoService
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -314,7 +312,7 @@ fun Route.authRoutes() {
         }
 
         get("/encryption-key") {
-            val publicKey = com.hash_net.beelinecrypto.CryptoService.getPublicKey()
+            val publicKey = CryptoService.getPublicKey()
             call.respond(mapOf("publicKey" to publicKey))
         }
     }

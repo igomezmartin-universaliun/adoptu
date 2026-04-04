@@ -1,5 +1,6 @@
 package com.hash_net.beelinecrypto
 
+import com.adoptu.services.crypto.CryptoService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.*

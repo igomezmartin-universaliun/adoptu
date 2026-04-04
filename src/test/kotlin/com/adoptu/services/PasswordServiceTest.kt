@@ -7,7 +7,7 @@ import com.adoptu.adapters.db.repositories.UserRepository
 import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.TestClock
 import com.adoptu.mocks.TestDatabase
-import com.hash_net.beelinecrypto.CryptoService
+import com.adoptu.services.crypto.CryptoService
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert

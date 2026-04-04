@@ -8,7 +8,6 @@ import com.adoptu.services.EmailVerificationService
 import com.adoptu.services.MagicLinkService
 import com.adoptu.services.PasswordService
 import com.adoptu.services.UserService
-import com.hash_net.beelinecrypto.CryptoService
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.AttestedCredentialDataConverter
 import com.webauthn4j.converter.util.ObjectConverter

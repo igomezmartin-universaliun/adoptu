@@ -2,9 +2,8 @@ package com.adoptu.services
 
 import com.adoptu.adapters.db.PasswordResetTokens
 import com.adoptu.adapters.db.UserPasswords
-import com.adoptu.adapters.db.Users
 import com.adoptu.ports.UserRepositoryPort
-import com.hash_net.beelinecrypto.CryptoService
+import com.adoptu.services.crypto.CryptoService
 import com.password4j.Password
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.v1.core.and

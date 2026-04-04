@@ -45,6 +45,7 @@ object DatabaseFactory {
         val user = config.property("$prefix.postgres.user").getString()
         val password = config.property("$prefix.postgres.password").getString()
 
+        logger.info("Postgres database url: $jdbcURL")
         if (!jdbcURL.startsWith("jdbc:")) {
             val parts = jdbcURL.split(":")
             val host = parts.getOrElse(0) { jdbcURL }
