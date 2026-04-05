@@ -128,8 +128,13 @@ class ApplicationTestcontainersIT {
         val testModules = module {
             single<ApplicationConfig> { config }
             single<Clock> { testClock }
-            single { WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
             single<UserRepositoryPort> { UserRepository(get()) }
+            single<com.adoptu.services.UserService> { com.adoptu.services.UserService(get()) }
+            single<com.adoptu.services.EmailVerificationService> { com.adoptu.services.EmailVerificationService(get(), get(), get()) }
+            single<com.adoptu.services.PasswordService> { com.adoptu.services.PasswordService(get(), get(), get()) }
+            single<com.adoptu.services.MagicLinkService> { com.adoptu.services.MagicLinkService(get(), get(), get()) }
+            single<NotificationPort> { SesEmailAdapter(get()) }
+            single { WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
             single<PetRepositoryPort> { PetRepositoryImpl(get()) }
             single<PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get(), get()) }
             single<TemporalHomeRepositoryPort> { TemporalHomeRepositoryImpl(get(), get(), get()) }
@@ -143,12 +148,9 @@ class ApplicationTestcontainersIT {
                     pathStyleAccess = true
                 )
             }
-            single<NotificationPort> { SesEmailAdapter(get()) }
-            single<com.adoptu.services.UserService> { com.adoptu.services.UserService(get()) }
             single<com.adoptu.services.PetService> { com.adoptu.services.PetService(get(), get(), get(), get()) }
             single<com.adoptu.services.PhotographerService> { com.adoptu.services.PhotographerService(get(), get(), get(), get()) }
             single<com.adoptu.services.TemporalHomeService> { com.adoptu.services.TemporalHomeService(get(), get(), get(), get()) }
-            single<com.adoptu.services.EmailVerificationService> { com.adoptu.services.EmailVerificationService(get(), get(), get()) }
         }
 
         environment {
@@ -340,7 +342,7 @@ class ApplicationTestcontainersIT {
             val body = response.bodyAsText()
             assertTrue(body.contains("Privacy Policy"), "Page should contain Privacy Policy heading")
             assertTrue(body.contains("Information We Collect"), "Page should contain information section")
-            assertTrue(body.contains("How We Use Information"), "Page should contain usage section")
+            assertTrue(body.contains("How We Use Your Information"), "Page should contain usage section")
             assertTrue(body.contains("Contact Us"), "Page should contain contact section")
         }
     }

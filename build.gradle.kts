@@ -3,7 +3,7 @@ plugins {
     kotlin("plugin.serialization") version "2.3.20"
     application
     id("io.miret.etienne.sass") version "1.6.0"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "8.3.10"
 }
 
 group = "com.adoptu"

@@ -78,6 +78,82 @@ fun Route.authRoutes() {
             processResult(result)
         }
 
+        post("/register-password") {
+            val body = call.receiveText()
+            val json = kotlinx.serialization.json.Json.decodeFromString<kotlinx.serialization.json.JsonObject>(body)
+            val email = json["email"]?.toString()?.removeSurrounding("\"") ?: return@post call.respondError("email required")
+            val displayName = json["displayName"]?.toString()?.removeSurrounding("\"") ?: return@post call.respondError("displayName required")
+            val encryptedPassword = json["encryptedPassword"]?.toString()?.removeSurrounding("\"") ?: return@post call.respondError("password required")
+            val rolesStr = json["roles"]?.toString()?.removeSurrounding("\"") ?: "ADOPTER"
+            
+            val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+            if (!emailRegex.matches(email)) return@post call.respondError("invalid email format")
+
+            val roles = rolesStr.split(",")
+                .filter { it.isNotBlank() }
+                .map { it.trim() }
+                .map { UserRole.valueOf(it) }
+                .toSet()
+
+            val effectiveRoles = if (email.equals(adminEmail, ignoreCase = true)) {
+                roles + UserRole.ADMIN
+            } else {
+                roles
+            }
+
+            val result = webAuthnService.registerWithPassword(email, displayName, effectiveRoles, encryptedPassword)
+            if (result != null) {
+                call.respond(RegistrationResponse(success = true, message = "Registration successful", emailVerificationSent = result.emailSent))
+            } else {
+                call.respondError("Registration failed")
+            }
+        }
+
+        get("/has-passkey") {
+            val session = call.sessions.get<SessionUser>()
+            if (session == null) {
+                call.respond(SuccessWithErrorResponse(success = false, error = "Not authenticated"))
+                return@get
+            }
+            val hasPasskey = webAuthnService.hasPasskey(session.userId)
+            call.respond(SuccessWithErrorResponse(success = hasPasskey, error = null))
+        }
+
+        post("/registration-options-for-user") {
+            val session = call.sessions.get<SessionUser>()
+            if (session == null) {
+                call.respondError("Not authenticated", 401)
+                return@post
+            }
+            val body = call.receiveText()
+            val json = kotlinx.serialization.json.Json.decodeFromString<kotlinx.serialization.json.JsonObject>(body)
+            val email = json["email"]?.toString()?.removeSurrounding("\"") ?: session.email
+            val displayName = json["displayName"]?.toString()?.removeSurrounding("\"") ?: session.displayName
+            
+            val options = webAuthnService.generateRegistrationOptionsForUser(session.userId, email, displayName)
+            call.respond(options)
+        }
+
+        post("/register-passkey") {
+            val session = call.sessions.get<SessionUser>()
+            if (session == null) {
+                call.respondError("Not authenticated", 401)
+                return@post
+            }
+            
+            val body = call.receiveText()
+            val json = kotlinx.serialization.json.Json.decodeFromString<kotlinx.serialization.json.JsonObject>(body)
+            val registrationResponseJson = json["registrationResponse"]?.toString()?.removeSurrounding("\"")
+                ?: return@post call.respondError("registrationResponse required")
+            
+            val result = webAuthnService.registerAdditionalPasskey(session.userId, registrationResponseJson)
+            if (result) {
+                call.respond(SuccessWithErrorResponse(success = true, error = null))
+            } else {
+                call.respondError("Failed to register passkey")
+            }
+        }
+
         get("/verify-email") {
             val token = call.request.queryParameters["token"]
             if (token.isNullOrBlank()) {

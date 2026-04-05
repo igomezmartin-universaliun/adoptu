@@ -147,6 +147,18 @@ fun HTML.profilePage() {
             }
 
             div(classes = "card-bg profile-section") {
+                h2 { attributes["data-i18n"] = "passkeySettings"; +"Passkey Settings" }
+                p { attributes["data-i18n"] = "passkeyDesc"; +"Add additional passkeys to your account for easy login across devices." }
+                p { id = "passkey-status"; +"Loading..." }
+                div(classes = "form-row") {
+                    label { htmlFor = "passkey-name"; attributes["data-i18n"] = "passkeyName"; +"Passkey Name" }
+                    input(InputType.text) { id = "passkey-name"; placeholder = "e.g., MacBook, iPhone, YubiKey" }
+                }
+                p { id = "passkey-message"; +"" }
+                button(classes = "btn", type = ButtonType.button) { id = "register-passkey-btn"; attributes["data-i18n"] = "registerNewPasskey"; +"Register New Passkey" }
+            }
+
+            div(classes = "card-bg profile-section") {
                 h2 { attributes["data-i18n"] = "emailChange"; +"Change Email" }
                 p { attributes["data-i18n"] = "emailChangeDesc"; +"Update your email address. A verification link will be sent to the new email." }
                 div(classes = "form-row") {
@@ -522,6 +534,88 @@ document.getElementById('change-email-btn')?.addEventListener('click', async () 
 });
 
 loadPasswordStatus();
+
+async function loadPasskeyStatus() {
+    try {
+        const res = await fetch('/api/auth/has-passkey');
+        const data = await res.json();
+        const passkeyStatus = document.getElementById('passkey-status');
+        if (data.success) {
+            passkeyStatus.textContent = i18n.t('passkeyRegistered') || 'You have a passkey registered.';
+        } else {
+            passkeyStatus.textContent = i18n.t('noPasskey') || 'No passkey registered yet.';
+        }
+    } catch (e) {
+        console.error('Error loading passkey status:', e);
+        const passkeyStatus = document.getElementById('passkey-status');
+        passkeyStatus.textContent = i18n.t('noPasskey') || 'No passkey registered yet.';
+    }
+}
+
+document.getElementById('register-passkey-btn')?.addEventListener('click', async () => {
+    const msg = document.getElementById('passkey-message');
+    const passkeyName = document.getElementById('passkey-name').value.trim();
+    
+    if (!passkeyName) {
+        msg.className = 'message error';
+        msg.textContent = i18n.t('passkeyNameRequired') || 'Please enter a name for this passkey.';
+        return;
+    }
+    
+    msg.textContent = i18n.t('registeringPasskey') || 'Registering passkey...';
+    msg.className = '';
+    
+    try {
+        const user = window.cachedUserData || await api.me();
+        if (!user) {
+            msg.className = 'message error';
+            msg.textContent = i18n.t('notAuthenticated') || 'Not authenticated.';
+            return;
+        }
+        
+        const optsRes = await fetch('/api/auth/registration-options-for-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, displayName: user.displayName })
+        });
+        
+        if (!optsRes.ok) {
+            throw new Error('Failed to get registration options');
+        }
+        
+        const options = await optsRes.json();
+        
+        const credential = await navigator.credentials.create({
+            publicKey: webauthn.parseCreationOptions(options)
+        });
+        
+        const regRes = await fetch('/api/auth/register-passkey', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                registrationResponse: JSON.stringify(credential),
+                passkeyName: passkeyName
+            })
+        });
+        
+        const result = await regRes.json();
+        if (result.success) {
+            msg.className = 'message success';
+            msg.textContent = i18n.t('passkeyRegisteredSuccess') || 'Passkey registered successfully!';
+            document.getElementById('passkey-name').value = '';
+            loadPasskeyStatus();
+        } else {
+            msg.className = 'message error';
+            msg.textContent = result.error || i18n.t('passkeyRegistrationFailed') || 'Failed to register passkey.';
+        }
+    } catch (e) {
+        console.error('Passkey registration error:', e);
+        msg.className = 'message error';
+        msg.textContent = i18n.t('passkeyRegistrationFailed') || 'Failed to register passkey.';
+    }
+});
+
+loadPasskeyStatus();
 
 const logoutLink = document.getElementById('logout-link');
 if (logoutLink) {

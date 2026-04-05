@@ -208,6 +208,127 @@ class WebAuthnService(
         }
     }
 
+    fun registerWithPassword(
+        email: String,
+        displayName: String,
+        roles: Set<UserRole>,
+        encryptedPassword: String
+    ): RegistrationResult? {
+        return try {
+            val userId = transaction {
+                val existingUser = Users.selectAll().where { Users.username eq email }.firstOrNull()
+
+                val id = if (existingUser != null) {
+                    existingUser[Users.id]
+                } else {
+                    Users.insert {
+                        it[Users.username] = email
+                        it[Users.displayName] = displayName
+                        it[Users.createdAt] = clock.now().toEpochMilliseconds()
+                    } get Users.id
+                }
+
+                if (existingUser == null) {
+                    val effectiveRoles = if (email.equals(adminEmail, ignoreCase = true)) {
+                        roles + UserRole.ADMIN
+                    } else {
+                        roles
+                    }
+                    effectiveRoles.forEach { role ->
+                        UserActiveRoles.insert {
+                            it[UserActiveRoles.userId] = id
+                            it[UserActiveRoles.role] = role.name
+                        }
+                    }
+                }
+
+                id
+            }
+
+            val passwordSet = passwordService.setPassword(userId, encryptedPassword)
+            if (!passwordSet) {
+                return null
+            }
+
+            val emailResult = runBlocking {
+                emailVerificationService.generateAndSendVerificationEmail(userId, email, displayName, "en")
+            }
+
+            val emailSent = emailResult.getOrDefault(false)
+            RegistrationResult(userId = userId, emailSent = emailSent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun hasPasskey(userId: Int): Boolean {
+        return transaction {
+            WebAuthnCredentials
+                .selectAll()
+                .where { WebAuthnCredentials.userId eq userId }
+                .firstOrNull() != null
+        }
+    }
+
+    fun generateRegistrationOptionsForUser(userId: Int, email: String, displayName: String): RegistrationOptionsResponse {
+        val challenge = ByteArray(32).also { secureRandom.nextBytes(it) }
+        ChallengeStore.storeForUser(userId, challenge)
+
+        val userIdBytes = userId.toString().toByteArray()
+
+        return RegistrationOptionsResponse(
+            rp = RelyingParty(id = rpId, name = rpName),
+            user = PublicKeyUser(
+                id = base64UrlEncode(userIdBytes),
+                name = email,
+                displayName = displayName
+            ),
+            challenge = base64UrlEncode(challenge),
+            pubKeyCredParams = listOf(
+                PubKeyCredParam(type = "public-key", alg = -7),
+                PubKeyCredParam(type = "public-key", alg = -257)
+            )
+        )
+    }
+
+    fun registerAdditionalPasskey(userId: Int, registrationResponseJson: String): Boolean {
+        val storedChallenge = ChallengeStore.retrieveForUser(userId) ?: return false
+        ChallengeStore.removeForUser(userId)
+
+        val serverProperty = ServerProperty.builder()
+            .origin(Origin(origin))
+            .rpId(rpId)
+            .challenge(DefaultChallenge(storedChallenge))
+            .build()
+
+        return try {
+            val registrationData: RegistrationData =
+                webAuthnManager.parseRegistrationResponseJSON(registrationResponseJson)
+            val params = RegistrationParameters(serverProperty, null, false, true)
+            webAuthnManager.verify(registrationData, params)
+
+            val attestedCredentialData =
+                registrationData.attestationObject!!.authenticatorData.attestedCredentialData!!
+            val acdBytes = attestedCredentialDataConverter.convert(attestedCredentialData)
+
+            transaction {
+                WebAuthnCredentials.insert {
+                    it[WebAuthnCredentials.userId] = userId
+                    it[WebAuthnCredentials.credentialId] = base64UrlEncode(attestedCredentialData.credentialId)
+                    it[WebAuthnCredentials.attestedCredentialDataBase64] = Base64.getEncoder().encodeToString(acdBytes)
+                    it[WebAuthnCredentials.signCount] = registrationData.attestationObject!!.authenticatorData.signCount
+                    it[WebAuthnCredentials.transports] = null
+                    it[WebAuthnCredentials.createdAt] = clock.now().toEpochMilliseconds()
+                }
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     fun generateAssertionOptions(): AssertionOptionsResponse {
         val challenge = ByteArray(32).also { secureRandom.nextBytes(it) }
         ChallengeStore.storeAssertion(challenge)
@@ -373,6 +494,7 @@ class WebAuthnService(
 
     private object ChallengeStore {
         private val challenges = mutableMapOf<String, ByteArray>()
+        private val userChallenges = mutableMapOf<Int, ByteArray>()
         private var assertionChallenge: ByteArray? = null
 
         fun store(username: String, challenge: ByteArray) {
@@ -383,6 +505,16 @@ class WebAuthnService(
 
         fun remove(username: String) {
             challenges.remove(username)
+        }
+
+        fun storeForUser(userId: Int, challenge: ByteArray) {
+            userChallenges[userId] = challenge
+        }
+
+        fun retrieveForUser(userId: Int): ByteArray? = userChallenges.remove(userId)
+
+        fun removeForUser(userId: Int) {
+            userChallenges.remove(userId)
         }
 
         fun storeAssertion(challenge: ByteArray) {

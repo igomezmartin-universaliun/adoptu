@@ -61,7 +61,9 @@ class EmailVerificationRoutesE2ETest {
             single<kotlin.time.Clock> { kotlin.time.Clock.System }
             single<com.adoptu.ports.UserRepositoryPort> { UserRepository(get()) }
             single { com.adoptu.services.UserService(get()) }
+            single { EmailVerificationService(get(), get(), get()) }
             single { com.adoptu.services.PasswordService(get(), mockNotificationAdapter, get()) }
+            single { com.adoptu.services.MagicLinkService(get(), mockNotificationAdapter, get()) }
             single { com.adoptu.services.auth.WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
             single { MockImageStorage() }
             single { mockNotificationAdapter }
@@ -70,7 +72,6 @@ class EmailVerificationRoutesE2ETest {
             single<com.adoptu.ports.PhotographerRepositoryPort> { com.adoptu.adapters.db.repositories.PhotographerRepositoryImpl(get(), get(), get()) }
             single { com.adoptu.services.PhotographerService(get(), get(), get(), get()) }
             single { com.adoptu.services.PetService(get(), get(), get(), get()) }
-            single { EmailVerificationService(get(), get(), get()) }
         }
 
         environment {
