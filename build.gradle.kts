@@ -94,6 +94,10 @@ tasks.run<JavaExec> {
     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
 
+tasks.withType<JavaExec> {
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+}
+
 kotlin {
     jvmToolchain(25)
 }

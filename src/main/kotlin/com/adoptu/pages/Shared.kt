@@ -34,24 +34,14 @@ function updateLangButton() {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lang-option').forEach(opt => {
-        opt.onclick = () => { i18n.setLang(opt.dataset.lang); updateLangButton(); document.querySelector('.lang-dropdown-content').style.display = 'none'; };
+        opt.onclick = () => { i18n.setLang(opt.dataset.lang); updateLangButton(); };
     });
-    const langDropBtn = document.querySelector('.lang-dropbtn');
-    if (langDropBtn) {
-        langDropBtn.onclick = () => {
-            const content = document.querySelector('.lang-dropdown-content');
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        };
-    }
     document.querySelector('.user-avatar')?.addEventListener('click', (e) => {
         e.stopPropagation();
         const dropdown = document.getElementById('user-dropdown');
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.lang-dropdown')) {
-            document.querySelector('.lang-dropdown-content').style.display = 'none';
-        }
         const userDropdown = document.getElementById('user-dropdown');
         if (userDropdown && userDropdown.style.display !== 'none' && !e.target.closest('.user-menu')) {
             userDropdown.style.display = 'none';
@@ -174,11 +164,8 @@ fun NAV.languageDropdown() {
 }
 
 fun NAV.commonNav() {
-
     div(classes = "nav-right") {
-        a("/photographers") { id = "nav-photographers"; style = "display:none"; attributes["data-i18n"] = "photographers"; +"Photographers" }
-        a("/temporal-homes") { id = "nav-temporal-homes"; style = "display:none"; attributes["data-i18n"] = "findTemporalHomes"; +"Find Temporal Homes" }
-        a("/shelters") { id = "nav-shelters"; attributes["data-i18n"] = "shelters"; +"Shelters" }
+        commonResourcesDropdown()
         a("https://paypal.me/adoptu") { target = "_blank"; id = "nav-donate"; attributes["data-i18n"] = "donate"; +"Donate" }
         a("/login") { id = "nav-login"; attributes["data-i18n"] = "login"; +"Login" }
         a("/register") { id = "nav-register"; attributes["data-i18n"] = "register"; +"Register" }
@@ -222,6 +209,33 @@ fun NAV.guestNav() {
         a("/login", classes = "nav-right") { id = "nav-login"; attributes["data-i18n"] = "login"; +"Login" }
         a("/register", classes = "nav-right") { id = "nav-register"; attributes["data-i18n"] = "register"; +"Register" }
         languageDropdown()
+    }
+}
+
+fun DIV.commonResourcesDropdown() {
+    div(classes = "resources-dropdown") {
+        a(href = "#", classes = "resources-dropbtn") { 
+            span { attributes["data-i18n"] = "resources"; +"Resources" }
+            +" ▼"
+        }
+        div(classes = "resources-dropdown-content") {
+            a("/shelters") { 
+                span { attributes["data-i18n"] = "shelters"; +"Shelters" }
+                unsafe { raw("""<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>""") }
+            }
+            a("/photographers") { 
+                span { attributes["data-i18n"] = "photographers"; +"Photographers" }
+                unsafe { raw("""<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>""") }
+            }
+            a("/sterilization-locations") { 
+                span { attributes["data-i18n"] = "sterilizationLocations"; +"Sterilization Locations" }
+                unsafe { raw("""<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>""") }
+            }
+            a("/temporal-homes") { 
+                span { attributes["data-i18n"] = "findTemporalHomes"; +"Temporal Homes" }
+                unsafe { raw("""<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>""") }
+            }
+        }
     }
 }
 

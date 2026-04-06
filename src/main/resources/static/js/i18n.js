@@ -327,6 +327,7 @@ const i18n = {
             becomeTemporalHome: "Become a temporal home",
             noResults: "No results",
             loading: "Loading...",
+            resources: "Resources",
             selectCountry: "Select a country",
             country: {
                 afghanistan: "Afghanistan",
@@ -770,6 +771,7 @@ const i18n = {
             becomeTemporalHome: "Convertirse en hogar temporal",
             noResults: "Sin resultados",
             loading: "Cargando...",
+            resources: "Recursos",
             selectCountry: "Seleccionar un país",
             country: {
                 afghanistan: "Afganistán",
@@ -1211,6 +1213,7 @@ const i18n = {
             becomeTemporalHome: "Devenir foyer temporaire",
             noResults: "Aucun résultat",
             loading: "Chargement...",
+            resources: "Ressources",
             selectCountry: "Sélectionner un pays",
             country: {
                 afghanistan: "Afghanistan",
@@ -1652,6 +1655,7 @@ const i18n = {
             becomeTemporalHome: "Tornar-se lar temporário",
             noResults: "Sem resultados",
             loading: "Carregando...",
+            resources: "Recursos",
             selectCountry: "Selecione um país",
             country: {
                 afghanistan: "Afeganistão",
@@ -2093,6 +2097,7 @@ const i18n = {
             becomeTemporalHome: "成为临时之家",
             noResults: "无结果",
             loading: "加载中...",
+            resources: "资源",
             selectCountry: "选择国家",
             country: {
                 afghanistan: "阿富汗",
