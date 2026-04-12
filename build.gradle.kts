@@ -40,17 +40,6 @@ kotlin {
     }
 }
 
-tasks.run<JavaExec> {
-    jvmArgs(
-        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
-        "--add-opens", "java.base/java.math=ALL-UNNAMED",
-        "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--enable-native-access=ALL-UNNAMED"
-    )
-}
-
 tasks.withType<JavaExec> {
     jvmArgs(
         "--add-opens", "java.base/java.lang=ALL-UNNAMED",
@@ -120,13 +109,7 @@ tasks.register<Copy>("copyAdminJsToRootResources") {
     rename { "admin.js" }
 }
 
-tasks.processResources {
-    dependsOn(tasks.compileSass)
-    dependsOn("copyAdminJsToRootResources")
-    from(tasks.compileSass.get().outputDir) {
-        into("static/css")
-    }
-}
+
 
 
 // Docker Compose tasks for integration tests
