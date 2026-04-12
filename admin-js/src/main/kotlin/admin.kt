@@ -118,7 +118,7 @@ fun loadPets() {
                 val sizeHtml = if ((p.size as? String).isNullOrEmpty()) "" else "<span class=\"pet-size\">${escapeHtml(p.size as? Any?)}</span>"
                 val urgent = if ((p.isUrgent as? Boolean) == true) " ⚠️" else ""
                 val breedHtml = if ((p.breed as? String).isNullOrEmpty()) "" else "<span class=\"pet-breed\">${escapeHtml(p.breed as? Any?)}</span>"
-                val rescueDateStr = if (p.rescueDate != null) Date(p.rescueDate).toLocaleDateString() else ""
+                val rescueDateStr = if (p.rescueDate != null) Date((p.rescueDate as dynamic)).toLocaleDateString() as String else ""
                 val rescueHtml = if (rescueDateStr.isNotEmpty()) " ${t("rescued")}: $rescueDateStr" else ""
                 val ageYears = p.ageYears ?: ""
                 val ageMonths = p.ageMonths ?: ""
