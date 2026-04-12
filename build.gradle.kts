@@ -23,7 +23,6 @@ val kotestVersion = "6.1.3"
 val playwrightVersion = "1.58.0"
 
 kotlin {
-    jvm()
     js(IR) {
         browser {
             binaries.executable()
@@ -33,77 +32,6 @@ kotlin {
         }
     }
     sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation("io.ktor:ktor-server-core:$ktorVersion")
-                implementation("io.ktor:ktor-server-netty:$ktorVersion")
-                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-                implementation("io.ktor:ktor-server-auth:$ktorVersion")
-                implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
-
-                implementation("com.webauthn4j:webauthn4j-core:0.31.0.RELEASE")
-
-                implementation("org.postgresql:postgresql:$postgresVersion")
-                implementation("org.checkerframework:checker-qual:3.47.0")
-                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-migration-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-migration-jdbc:$exposedVersion")
-
-                implementation("io.insert-koin:koin-ktor:$koinVersion")
-                implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
-
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetimeVersion")
-
-                implementation("ch.qos.logback:logback-classic:1.5.31")
-
-                implementation(platform("software.amazon.awssdk:bom:2.42.23"))
-                implementation("software.amazon.awssdk:s3") {
-                    exclude(group = "net.bytebuddy")
-                }
-                implementation("software.amazon.awssdk:ses") {
-                    exclude(group = "net.bytebuddy")
-                }
-                implementation("software.amazon.awssdk:sesv2") {
-                    exclude(group = "net.bytebuddy")
-                }
-
-                implementation("org.apache.commons:commons-email:1.6.0")
-                implementation("com.password4j:password4j:1.8.4")
-            }
-        }
-
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation("net.bytebuddy:byte-buddy:$byteBuddyVersion")
-                implementation("net.bytebuddy:byte-buddy-agent:$byteBuddyVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.10.2")
-                implementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-                implementation("io.kotest:kotest-assertions-core:$kotestVersion")
-                implementation("io.kotest:kotest-property:$kotestVersion")
-                implementation("org.junit.jupiter:junit-jupiter:5.10.0")
-                implementation("io.mockk:mockk:1.14.9")
-                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
-                implementation("com.h2database:h2:2.3.232")
-                implementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
-                implementation("org.testcontainers:testcontainers")
-                implementation("org.testcontainers:junit-jupiter:1.20.4")
-                implementation("org.testcontainers:localstack:1.20.4")
-                implementation("org.testcontainers:postgresql:1.20.4")
-                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-                implementation("com.microsoft.playwright:playwright:$playwrightVersion")
-            }
-        }
-
         val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
