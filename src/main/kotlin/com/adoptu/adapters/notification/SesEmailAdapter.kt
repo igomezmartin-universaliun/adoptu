@@ -31,7 +31,7 @@ class SesEmailAdapter(config: ApplicationConfig) : NotificationPort {
 
     @Suppress("DEPRECATION")
     private val sesClient: SesV2Client? = try {
-        val builder = SesClient.builder().region(Region.of(sesRegion))
+        val builder = SesV2Client.builder().region(Region.of(sesRegion))
 
         if (!isDev) {
             builder.credentialsProvider(DefaultCredentialsProvider.create())
