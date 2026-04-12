@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.3.20"
+    kotlin("multiplatform") version "2.3.20"
     kotlin("plugin.serialization") version "2.3.20"
     application
     id("io.miret.etienne.sass") version "1.6.0"
@@ -13,99 +13,107 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // Ktor
-    val ktorVersion = "3.4.2"
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-    implementation("io.ktor:ktor-server-auth:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-    implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
+// Version variables
+val ktorVersion = "3.4.2"
+val exposedVersion = "1.2.0"
+val postgresVersion = "42.7.10"
+val koinVersion = "4.1.1"
+val kotlinxDatetimeVersion = "0.6.1"
+val byteBuddyVersion = "1.17.0"
+val kotestVersion = "6.1.3"
+val playwrightVersion = "1.58.0"
 
-    // WebAuthn/FIDO2 - webauthn4j for server-side verification
-    implementation("com.webauthn4j:webauthn4j-core:0.31.0.RELEASE")
-
-    // Database
-    val exposedVersion = "1.2.0"
-    val postgresVersion = "42.7.10"
-    implementation("org.postgresql:postgresql:$postgresVersion")
-    // Checker framework for nullness annotations (required by PostgreSQL JDBC driver)
-    annotationProcessor("org.checkerframework:checker:3.47.0")
-    implementation("org.checkerframework:checker-qual:3.47.0")
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:${exposedVersion}")
-    implementation("org.jetbrains.exposed:exposed-json:${exposedVersion}")
-    implementation("org.jetbrains.exposed:exposed-java-time:${exposedVersion}")
-    implementation("org.jetbrains.exposed:exposed-migration-core:${exposedVersion}")
-    implementation("org.jetbrains.exposed:exposed-migration-jdbc:${exposedVersion}")
-
-    // Koin
-    val koinVersion = "4.1.1"
-    implementation("io.insert-koin:koin-ktor:$koinVersion")
-    implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
-
-    // DateTime
-    val kotlinxDatetimeVersion = "0.6.1"
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetimeVersion")
-
-    // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.31")
-
-    // AWS S3
-    implementation(platform("software.amazon.awssdk:bom:2.42.23"))
-    implementation("software.amazon.awssdk:s3") {
-        exclude(group = "net.bytebuddy")
+kotlin {
+    jvm {
+        withJava()
+        jvmToolchain(25)
     }
-    implementation("software.amazon.awssdk:ses") {
-        exclude(group = "net.bytebuddy")
+    js(IR) {
+        browser {
+            binaries.executable()
+            commonWebpackConfig {
+                outputFileName = "admin.js"
+            }
+        }
     }
-    implementation("software.amazon.awssdk:sesv2") {
-        exclude(group = "net.bytebuddy")
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
+                implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+                implementation("io.ktor:ktor-server-auth:$ktorVersion")
+                implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
+
+                implementation("com.webauthn4j:webauthn4j-core:0.31.0.RELEASE")
+
+                implementation("org.postgresql:postgresql:$postgresVersion")
+                implementation("org.checkerframework:checker-qual:3.47.0")
+                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-migration-core:$exposedVersion")
+                implementation("org.jetbrains.exposed:exposed-migration-jdbc:$exposedVersion")
+
+                implementation("io.insert-koin:koin-ktor:$koinVersion")
+                implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetimeVersion")
+
+                implementation("ch.qos.logback:logback-classic:1.5.31")
+
+                implementation(platform("software.amazon.awssdk:bom:2.42.23"))
+                implementation("software.amazon.awssdk:s3") {
+                    exclude(group = "net.bytebuddy")
+                }
+                implementation("software.amazon.awssdk:ses") {
+                    exclude(group = "net.bytebuddy")
+                }
+                implementation("software.amazon.awssdk:sesv2") {
+                    exclude(group = "net.bytebuddy")
+                }
+
+                implementation("org.apache.commons:commons-email:1.6.0")
+                implementation("com.password4j:password4j:1.8.4")
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("net.bytebuddy:byte-buddy:$byteBuddyVersion")
+                implementation("net.bytebuddy:byte-buddy-agent:$byteBuddyVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.10.2")
+                implementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+                implementation("io.kotest:kotest-assertions-core:$kotestVersion")
+                implementation("io.kotest:kotest-property:$kotestVersion")
+                implementation("org.junit.jupiter:junit-jupiter:5.10.0")
+                implementation("io.mockk:mockk:1.14.9")
+                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
+                implementation("com.h2database:h2:2.3.232")
+                implementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
+                implementation("org.testcontainers:testcontainers")
+                implementation("org.testcontainers:junit-jupiter:1.20.4")
+                implementation("org.testcontainers:localstack:1.20.4")
+                implementation("org.testcontainers:postgresql:1.20.4")
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("com.microsoft.playwright:playwright:$playwrightVersion")
+            }
+        }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-js"))
+            }
+        }
     }
-
-    // Email
-    implementation("org.apache.commons:commons-email:1.6.0")
-
-    // Argon2id password hashing
-    implementation("com.password4j:password4j:1.8.4")
-
-    // Testing
-    val byteBuddyVersion = "1.17.0"
-    testImplementation("net.bytebuddy:byte-buddy:$byteBuddyVersion")
-    testImplementation("net.bytebuddy:byte-buddy-agent:$byteBuddyVersion")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.10.2") {
-        exclude(group = "net.bytebuddy")
-    }
-    val kotestVersion = "6.1.3"
-    testImplementation(kotlin("test"))
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest:kotest-property:$kotestVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("io.mockk:mockk:1.14.9") {
-        exclude(group = "net.bytebuddy")
-        exclude(group = "net.bytebuddy", module = "byte-buddy")
-        exclude(group = "net.bytebuddy", module = "byte-buddy-agent")
-    }
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("com.h2database:h2:2.3.232")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
-    testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
-    testImplementation("org.testcontainers:localstack:1.20.4")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
-    testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-
-    // Playwright for E2E frontend tests
-    val playwrightVersion = "1.58.0"
-    testImplementation("com.microsoft.playwright:playwright:$playwrightVersion")
 }
 
 application {
@@ -134,9 +142,6 @@ tasks.withType<JavaExec> {
     )
 }
 
-kotlin {
-    jvmToolchain(25)
-}
 
 tasks.test {
     useJUnitPlatform()
@@ -187,9 +192,16 @@ tasks.compileSass {
     outputs.upToDateWhen { false }
 }
 
+tasks.register<Copy>("copyAdminJsToRootResources") {
+    dependsOn("browserProductionWebpack")
+    from(layout.buildDirectory.dir("distributions/admin.js"))
+    into(rootProject.layout.projectDirectory.dir("src/main/resources/static/js"))
+    rename { "admin.js" }
+}
+
 tasks.processResources {
     dependsOn(tasks.compileSass)
-    dependsOn(":admin-js:copyAdminJsToRootResources")
+    dependsOn("copyAdminJsToRootResources")
     from(tasks.compileSass.get().outputDir) {
         into("static/css")
     }

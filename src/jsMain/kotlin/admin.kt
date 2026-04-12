@@ -1,7 +1,7 @@
 @file:Suppress("UnsafeCastFromDynamic", "unused")
 
-import kotlin.js.Promise
 import kotlin.js.Date
+import kotlin.js.Promise
 
 external fun t(key: String): String
 external val api: dynamic
@@ -115,19 +115,19 @@ fun loadPets() {
                 val sex = (p.sex as? String) ?: ""
                 val sexLabel = t(sex.lowercase())
                 val sexClass = if (sex == "MALE") "male" else "female"
-                val sizeHtml = if ((p.size as? String).isNullOrEmpty()) "" else "<span class=\"pet-size\">${escapeHtml(p.size as? Any?)}</span>"
+                val sizeHtml = if ((p.size as? String).isNullOrEmpty()) "" else "<span class=\\"pet-size\\">${escapeHtml(p.size as? Any?)}</span>"
                 val urgent = if ((p.isUrgent as? Boolean) == true) " ⚠️" else ""
-                val breedHtml = if ((p.breed as? String).isNullOrEmpty()) "" else "<span class=\"pet-breed\">${escapeHtml(p.breed as? Any?)}</span>"
+                val breedHtml = if ((p.breed as? String).isNullOrEmpty()) "" else "<span class=\\"pet-breed\\">${escapeHtml(p.breed as? Any?)}</span>"
                 val rescueDateRaw = (p.rescueDate as? String) ?: (p.rescueDate as? Number)?.toString()
                 val rescueDateStr = if (rescueDateRaw != null) Date(rescueDateRaw).toString() else ""
                 val rescueHtml = if (rescueDateStr.isNotEmpty()) " ${t("rescued")}: $rescueDateStr" else ""
                 val ageYears = p.ageYears ?: ""
                 val ageMonths = p.ageMonths ?: ""
-                val ageStr = "${ageYears}${t("years")} ${ageMonths}${t("months")}"
+                val ageStr = "${'$'}ageYears${t("years")} ${'$'}ageMonths${t("months")}"
                 val weight = p.weight ?: ""
                 val petStatus = escapeHtml(p.status as? Any?)
 
-                "<div class=\"pet-card\"><div class=\"pet-card-placeholder\">$emojiChar</div><div class=\"pet-card-body\"><span class=\"pet-type\">$typeLabel</span><span class=\"pet-sex $sexClass\">$sexLabel</span>$sizeHtml<div class=\"pet-name\"><h3>${escapeHtml(p.name as? Any?)}$urgent</h3>$breedHtml</div><p class=\"pet-info\"><span class=\"pet-age\">$ageStr • $weight kg</span><span class=\"pet-rescue-date\">$rescueHtml</span></p><p>$petStatus</p><div class=\"pet-card-actions\"><a href=\"/pet/${p.id}\" class=\"btn\">${t("viewDetails")}</a><a href=\"/my-pets?edit=${p.id}\" class=\"btn btn-secondary\">${t("edit")}</a><button class=\"btn btn-secondary\" onclick=\"del(${p.id})\">${t("delete")}</button></div></div></div>"
+                "<div class=\\"pet-card\\"><div class=\\"pet-card-placeholder\\">${'$'}emojiChar</div><div class=\\"pet-card-body\\"><span class=\\"pet-type\\">${'$'}typeLabel</span><span class=\\"pet-sex ${'$'}sexClass\\">${'$'}sexLabel</span>${'$'}sizeHtml<div class=\\"pet-name\\"><h3>${'$'}{escapeHtml(p.name as? Any?)}${'$'}urgent</h3>${'$'}breedHtml</div><p class=\\"pet-info\\"><span class=\\"pet-age\\">${'$'}ageStr • ${'$'}weight kg</span><span class=\\"pet-rescue-date\\">${'$'}rescueHtml</span></p><p>${'$'}petStatus</p><div class=\\"pet-card-actions\\"><a href=\\"/pet/${'$'}{p.id}\\" class=\\"btn\\">${'$'}{t("viewDetails")}</a><a href=\\"/my-pets?edit=${'$'}{p.id}\\" class=\\"btn btn-secondary\\">${'$'}{t("edit")}</a><button class=\\"btn btn-secondary\\" onclick=\\"del(${ '$' }{p.id})\\">${'$'}{t("delete")}</button></div></div></div>"
             }
             container.innerHTML = html
         } else {
