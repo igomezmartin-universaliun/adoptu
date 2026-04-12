@@ -9,8 +9,8 @@ import org.apache.commons.mail.SimpleEmail
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ses.SesClient
-import software.amazon.awssdk.services.ses.model.*
+import software.amazon.awssdk.services.sesv2.SesV2Client
+import software.amazon.awssdk.services.sesv2.model.*
 import java.net.URI
 
 private val logger = LoggerFactory.getLogger("SesEmailAdapter")
@@ -30,7 +30,7 @@ class SesEmailAdapter(config: ApplicationConfig) : NotificationPort {
     private val sesEndpoint = config.propertyOrNull("ses.endpoint")?.getString()
 
     @Suppress("DEPRECATION")
-    private val sesClient: SesClient? = try {
+    private val sesClient: SesV2Client? = try {
         val builder = SesClient.builder().region(Region.of(sesRegion))
 
         if (!isDev) {
