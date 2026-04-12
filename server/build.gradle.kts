@@ -87,10 +87,10 @@ dependencies {
 }
 
 // Use existing root src dirs so files don't need to be moved
-sourceSets["main"].java.srcDirs = listOf("../src/main/kotlin")
-sourceSets["main"].resources.srcDirs = listOf("../src/main/resources")
-sourceSets["test"].java.srcDirs = listOf("../src/test/kotlin")
-sourceSets["test"].resources.srcDirs = listOf("../src/test/resources")
+sourceSets["main"].java.setSrcDirs(listOf("../src/main/kotlin"))
+sourceSets["main"].resources.setSrcDirs(listOf("../src/main/resources"))
+sourceSets["test"].java.setSrcDirs(listOf("../src/test/kotlin"))
+sourceSets["test"].resources.setSrcDirs(listOf("../src/test/resources"))
 
 application {
     // main class from existing project
