@@ -28,7 +28,7 @@ import kotlin.time.ExperimentalTime
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserRepositoryIT {
 
-    private var postgresContainer: PostgreSQLContainer<*>? = null
+    private lateinit var postgresContainer: PostgreSQLContainer<*>
     private lateinit var userRepository: UserRepository
     private var dbCounter = 0
     private val clock = Clock.System
@@ -41,28 +41,28 @@ class UserRepositoryIT {
             .withPassword("testpassword")
             .withExposedPorts(5432)
 
-        postgresContainer!!.start()
+        postgresContainer.start()
     }
 
     @AfterAll
     fun stopContainer() {
-        postgresContainer?.stop()
+        postgresContainer.stop()
     }
 
     private fun createConfig(databaseName: String): ApplicationConfig {
         return MapApplicationConfig(
             "env" to "test",
             "db.test.postgres.driver" to "org.postgresql.Driver",
-            "db.test.postgres.url" to "jdbc:postgresql://${postgresContainer!!.host}:${postgresContainer!!.firstMappedPort}/$databaseName",
-            "db.test.postgres.user" to (postgresContainer?.username ?: "testuser"),
-            "db.test.postgres.password" to (postgresContainer?.password ?: "testpassword")
+            "db.test.postgres.url" to "jdbc:postgresql://${postgresContainer.host}:${postgresContainer.firstMappedPort}/$databaseName",
+            "db.test.postgres.user" to postgresContainer.username,
+            "db.test.postgres.password" to postgresContainer.password
         )
     }
 
     private fun createDatabase(): String {
         val dbName = "repo_test_${++dbCounter}"
-        val host = postgresContainer!!.host
-        val port = postgresContainer!!.firstMappedPort
+        val host = postgresContainer.host
+        val port = postgresContainer.firstMappedPort
 
         val driver = Driver()
         val props = Properties().apply {

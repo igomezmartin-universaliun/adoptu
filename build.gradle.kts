@@ -94,12 +94,13 @@ dependencies {
     }
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("com.h2database:h2:2.3.232")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
     testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
-    testImplementation("org.testcontainers:testcontainers-postgresql")
-    testImplementation("org.testcontainers:testcontainers-localstack")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
+    testImplementation("org.testcontainers:localstack:1.20.4")
+    testImplementation("org.testcontainers:postgresql:1.20.4")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     // Playwright for E2E frontend tests
@@ -146,7 +147,6 @@ tasks.test {
         showStandardStreams = true
     }
     dependsOn("dockerUp")
-    finalizedBy("dockerDown")
     jvmArgs(
         "--add-opens", "java.base/java.lang=ALL-UNNAMED",
         "--add-opens", "java.base/java.util=ALL-UNNAMED",
@@ -252,7 +252,6 @@ tasks.register<Test>("integrationTest") {
     systemProperty("jdk.module.illegalAccess", "permit")
     systemProperty("jdk.suppressUnsupportedWarningWarnings", "true")
     dependsOn("dockerUp")
-    finalizedBy("dockerDown")
     filter {
         // Only run IT tests (integration tests)
         includeTestsMatching(".*IT")
