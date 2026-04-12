@@ -1,5 +1,5 @@
 plugins {
-    kotlin("js") version "2.3.20"
+    kotlin("js")
 }
 
 kotlin {
