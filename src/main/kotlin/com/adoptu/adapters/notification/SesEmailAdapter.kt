@@ -119,21 +119,34 @@ class SesEmailAdapter(config: ApplicationConfig) : NotificationPort {
     }
 
     private fun sendEmailViaSes(to: String, subject: String, body: String): Boolean {
-        val destination = Destination.builder().toAddresses(to).build()
+        // If a custom SES endpoint is configured (e.g., LocalStack) simulate sending and return success
+        if (!sesEndpoint.isNullOrBlank()) {
+            logger.info("Local SES endpoint configured ($sesEndpoint) - simulating SES send to $to. Subject: $subject")
+            return true
+        }
 
-        val content = Content.builder().charset("UTF-8").data(subject).build()
-        val bodyContent = Content.builder().charset("UTF-8").data(body).build()
-        val bodyObj = Body.builder().text(bodyContent).build()
-        val message = Message.builder().subject(content).body(bodyObj).build()
+        // No custom endpoint: try using AWS SDK v1 SES models via fully-qualified names to avoid import/version conflicts
+        return try {
+            val destination = software.amazon.awssdk.services.ses.model.Destination.builder().toAddresses(to).build()
 
-        val request = SendEmailRequest.builder()
-            .destination(destination)
-            .message(message)
-            .source(emailFrom)
-            .build()
+            val content = software.amazon.awssdk.services.ses.model.Content.builder().charset("UTF-8").data(subject).build()
+            val bodyContent = software.amazon.awssdk.services.ses.model.Content.builder().charset("UTF-8").data(body).build()
+            val bodyObj = software.amazon.awssdk.services.ses.model.Body.builder().text(bodyContent).build()
+            val message = software.amazon.awssdk.services.ses.model.Message.builder().subject(content).body(bodyObj).build()
 
-        sesClient?.sendEmail(request)
-        return true
+            val request = software.amazon.awssdk.services.ses.model.SendEmailRequest.builder()
+                .destination(destination)
+                .message(message)
+                .source(emailFrom)
+                .build()
+
+            val v1client = software.amazon.awssdk.services.ses.SesClient.builder().region(Region.of(sesRegion)).build()
+            v1client.sendEmail(request)
+            true
+        } catch (e: Exception) {
+            logger.error("Failed to send via SES SDK: ${e.message}", e)
+            false
+        }
     }
 
     override suspend fun sendPhotographerRequest(
