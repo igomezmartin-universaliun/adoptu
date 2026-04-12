@@ -103,7 +103,9 @@ application {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    maxParallelForks = Runtime.getRuntime().availableProcessors()
+    // Run tests serially to avoid H2 in-memory db concurrency issues
+    maxParallelForks = 1
+    forkEvery = 1
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true
