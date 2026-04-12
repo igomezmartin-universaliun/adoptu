@@ -108,6 +108,8 @@ tasks.withType<Test> {
         events("passed", "skipped", "failed")
         showStandardStreams = true
     }
+    // Ensure Docker test services are running for tests that need them
+    dependsOn("dockerUp")
 }
 
 // Docker tasks for integration tests
