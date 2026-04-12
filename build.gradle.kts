@@ -189,6 +189,7 @@ tasks.compileSass {
 
 tasks.processResources {
     dependsOn(tasks.compileSass)
+    dependsOn(":admin-js:copyAdminJsToRootResources")
     from(tasks.compileSass.get().outputDir) {
         into("static/css")
     }
