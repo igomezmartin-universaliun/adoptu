@@ -166,13 +166,7 @@ tasks.test {
     systemProperty("jdk.suppressUnsupportedWarningWarnings", "true")
     systemProperty("jdk.module.illegalAccess", "permit")
 
-    doFirst {
-        // Ensure test dependencies are started each run; non-blocking
-        project.exec {
-            environment["DOCKER_HOST"] = "unix:///run/docker.sock"
-            commandLine("sh", "-c", "docker compose -f docker-compose.test.yml up -d")
-        }
-    }
+    dependsOn("dockerUp")
 }
 
 tasks.compileSass {
