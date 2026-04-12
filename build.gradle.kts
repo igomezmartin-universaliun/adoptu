@@ -94,11 +94,11 @@ dependencies {
     }
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("com.h2database:h2:2.3.232")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.4"))
     testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:localstack")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("org.testcontainers:testcontainers-localstack")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
@@ -205,13 +205,11 @@ tasks.jar {
 // Docker Compose tasks for integration tests
 tasks.register<Exec>("dockerUp") {
     group = "docker"
-    description = "Start Podman containers for integration tests"
+    description = "Start Docker containers for integration tests"
     workingDir = rootProject.rootDir
-    environment["DOCKER_HOST"] = "unix:///run/user/1000/podman/podman.sock"
+    environment["DOCKER_HOST"] = "unix:///run/docker.sock"
     commandLine("sh", "-c", 
-        "nohup podman system service --time 0 >/dev/null 2>&1 & " +
-        "for i in 1 2 3 4 5; do [ -S /run/user/1000/podman/podman.sock ] && break || sleep 1; done; " +
-        "podman compose -f docker-compose.test.yml up -d"
+        "docker compose -f docker-compose.test.yml up -d"
     )
     doFirst {
         Thread.sleep(15000)
@@ -220,9 +218,9 @@ tasks.register<Exec>("dockerUp") {
 
 tasks.register<Exec>("dockerDown") {
     group = "docker"
-    description = "Stop Podman containers for integration tests"
+    description = "Stop Docker containers for integration tests"
     workingDir = rootProject.rootDir
-    commandLine("podman", "compose", "-f", "docker-compose.test.yml", "down", "-v")
+    commandLine("docker", "compose", "-f", "docker-compose.test.yml", "down", "-v")
 }
 
 // Run integration tests with Docker: ./gradlew integrationTest

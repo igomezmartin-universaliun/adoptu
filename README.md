@@ -67,7 +67,7 @@ A test has been added at `src/test/kotlin/com/adoptu/ApplicationStartTest.kt` to
 If the test fails, check the error output for details and ensure all dependencies and environment variables are correctly configured.
 
 
-Deploy:
+# Deploy:
 Retrieve an authentication token and authenticate your Docker client to your registry. Use the AWS CLI:
 ```
 aws ecr get-login-password --region us-east-1 | podman login --username AWS --password-stdin 174000857825.dkr.ecr.us-east-1.amazonaws.com
