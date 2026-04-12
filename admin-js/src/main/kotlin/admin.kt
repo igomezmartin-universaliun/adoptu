@@ -24,9 +24,9 @@ fun escapeHtml(s: Any?): String {
 
 @Suppress("RemoveExplicitTypeArguments")
 fun loadUsers() {
-    fetch("/api/admin/users").then { res ->
-        res.asDynamic().json()
-    }.then { users ->
+    fetch("/api/admin/users").then<dynamic> { res ->
+        (res.asDynamic().json() as Promise<dynamic>)
+    }.then<dynamic> { users ->
         val arr = (users as Array<dynamic>)
         val container = js("document.getElementById('users-container')")
         if (arr.isEmpty()) {
@@ -84,14 +84,21 @@ fun confirmBan() {
     val id = banningUserId ?: return
     val reason = js("document.getElementById('ban-reason').value") as? String
     val body = js("JSON.stringify({ reason: reason || null })")
-    fetch("/api/admin/users/$id/ban", js("({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: $body })"))
+    val options = js("{}")
+    options.method = "POST"
+    options.headers = js("{}")
+    options.headers["Content-Type"] = "application/json"
+    options.body = body
+    fetch("/api/admin/users/$id/ban", options)
     hideBanModal()
     loadUsers()
 }
 
 fun unbanUser(userId: dynamic) {
     if (!confirm(t("confirmUnban"))) return
-    fetch("/api/admin/users/${'$'}userId/unban", js("({ method: 'POST' })"))
+    val options = js("{}")
+    options.method = "POST"
+    fetch("/api/admin/users/${userId}/unban", options)
     loadUsers()
 }
 
