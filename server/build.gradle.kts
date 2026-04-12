@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     application
 }
 
@@ -84,6 +85,9 @@ dependencies {
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("com.microsoft.playwright:playwright:$playwrightVersion")
+
+    // serialization
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }
 
 // Use existing root src dirs so files don't need to be moved
