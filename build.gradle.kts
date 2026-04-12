@@ -146,7 +146,6 @@ tasks.test {
         events("passed", "skipped", "failed")
         showStandardStreams = true
     }
-    dependsOn("dockerUp")
     jvmArgs(
         "--add-opens", "java.base/java.lang=ALL-UNNAMED",
         "--add-opens", "java.base/java.util=ALL-UNNAMED",
