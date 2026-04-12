@@ -47,6 +47,22 @@ class SesEmailAdapter(config: ApplicationConfig) : NotificationPort {
         null
     }
 
+    init {
+        // If SES endpoint is provided (e.g., LocalStack for tests), try to create/verify the sender identity so sends succeed
+        try {
+            if (sesClient != null && !sesEndpoint.isNullOrBlank()) {
+                try {
+                    val request = CreateEmailIdentityRequest.builder().emailIdentity(emailFrom).build()
+                    sesClient.createEmailIdentity(request)
+                } catch (e: Exception) {
+                    logger.info("Could not create/verify SES identity for $emailFrom: ${e.message}")
+                }
+            }
+        } catch (e: Exception) {
+            logger.info("SES identity setup skipped: ${e.message}")
+        }
+    }
+
     private val isSesConfigured: Boolean
         get() = sesClient != null && !isDev
 
