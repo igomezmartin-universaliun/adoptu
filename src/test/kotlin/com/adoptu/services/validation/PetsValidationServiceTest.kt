@@ -22,7 +22,7 @@ class PetsValidationServiceTest {
             val result = service.validateSession(session)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(session, (result as ServiceResult.Success).data)
+            assertEquals(session, result.data)
         }
 
         @Test
@@ -42,7 +42,7 @@ class PetsValidationServiceTest {
             val result = service.validateUser(user)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(user, (result as ServiceResult.Success).data)
+            assertEquals(user, result.data)
         }
 
         @Test
@@ -60,7 +60,7 @@ class PetsValidationServiceTest {
             val result = service.validateId("123")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(123, (result as ServiceResult.Success).data)
+            assertEquals(123, result.data)
         }
 
         @Test
@@ -68,7 +68,7 @@ class PetsValidationServiceTest {
             val result = service.validateId("abc")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
 
         @Test
@@ -76,7 +76,7 @@ class PetsValidationServiceTest {
             val result = service.validateId(null)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
     }
 
@@ -87,7 +87,7 @@ class PetsValidationServiceTest {
             val result = service.validateRequired("test", "testField")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals("test", (result as ServiceResult.Success).data)
+            assertEquals("test", result.data)
         }
 
         @Test
@@ -95,7 +95,7 @@ class PetsValidationServiceTest {
             val result = service.validateRequired(null, "testField")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("testField is required", (result as ServiceResult.Error).message)
+            assertEquals("testField is required", result.message)
         }
 
         @Test
@@ -103,7 +103,7 @@ class PetsValidationServiceTest {
             val result = service.validateRequired("   ", "testField")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("testField is required", (result as ServiceResult.Error).message)
+            assertEquals("testField is required", result.message)
         }
     }
 
@@ -176,7 +176,7 @@ class PetsValidationServiceTest {
             val result = service.validateStatus("AVAILABLE", validStatuses)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals("AVAILABLE", (result as ServiceResult.Success).data)
+            assertEquals("AVAILABLE", result.data)
         }
 
         @Test
@@ -186,7 +186,7 @@ class PetsValidationServiceTest {
             val result = service.validateStatus("INVALID", validStatuses)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("Invalid status", (result as ServiceResult.Error).message)
+            assertEquals("Invalid status", result.message)
         }
 
         @Test
@@ -196,7 +196,7 @@ class PetsValidationServiceTest {
             val result = service.validateStatus(null, validStatuses)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("Invalid status", (result as ServiceResult.Error).message)
+            assertEquals("Invalid status", result.message)
         }
     }
 }

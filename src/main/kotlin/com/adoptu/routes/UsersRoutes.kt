@@ -149,6 +149,36 @@ fun Route.usersRoutes() {
             call.respond(user)
         }
 
+        post("/shelter-profile") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@post call.respondUnauthorized()
+
+            val body = call.receive<RoleActivationRequest>()
+            val user = if (body.activate) {
+                userService.activateShelterProfile(session.userId)
+            } else {
+                userService.deactivateShelterProfile(session.userId)
+            }
+                ?: return@post call.respondNotFound()
+
+            call.respond(user)
+        }
+
+        post("/sterilization-profile") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@post call.respondUnauthorized()
+
+            val body = call.receive<RoleActivationRequest>()
+            val user = if (body.activate) {
+                userService.activateSterilizationProfile(session.userId)
+            } else {
+                userService.deactivateSterilizationProfile(session.userId)
+            }
+                ?: return@post call.respondNotFound()
+
+            call.respond(user)
+        }
+
         get("/has-password") {
             val session = call.sessions.get<SessionUser>()
                 ?: return@get call.respondUnauthorized()

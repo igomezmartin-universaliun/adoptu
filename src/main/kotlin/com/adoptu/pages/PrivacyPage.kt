@@ -1,13 +1,14 @@
 package com.adoptu.pages
 
+import com.adoptu.routes.NavParams
 import kotlinx.html.*
 
-fun HTML.privacyPage() {
-    commonHead("Privacy Policy - Adopt-U")
+fun HTML.privacyPage(navParams: NavParams = NavParams()) {
+    commonHead("Privacy Policy - Adopt-U", "policy.css")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div(classes = "policy-content") {
@@ -106,6 +107,6 @@ fun HTML.privacyPage() {
             }
         }
         footer()
-        commonScripts()
+        commonScripts(navParams.isLoggedIn)
     }
 }

@@ -131,7 +131,7 @@ class UserServiceTest {
         assertTrue(result)
         val user = userService.getById(userId)
         assertTrue(user?.isBanned == true)
-        assertEquals("Spam activity", user?.banReason)
+        assertEquals("Spam activity", user.banReason)
     }
 
     @Test
@@ -220,7 +220,7 @@ class UserServiceTest {
         val result = userService.activateRescuerProfile(userId)
 
         assertNotNull(result)
-        assertTrue(result?.activeRoles?.contains(UserRole.RESCUER) == true)
+        assertTrue(result.activeRoles.contains(UserRole.RESCUER))
     }
 
     @Test
@@ -236,7 +236,7 @@ class UserServiceTest {
         val result = userService.deactivateRescuerProfile(userId)
 
         assertNotNull(result)
-        assertFalse(result?.activeRoles?.contains(UserRole.RESCUER) == true)
+        assertFalse(result.activeRoles.contains(UserRole.RESCUER))
     }
 
     @Test
@@ -246,7 +246,7 @@ class UserServiceTest {
         val result = userService.activateTemporalHomeProfile(userId)
 
         assertNotNull(result)
-        assertTrue(result?.activeRoles?.contains(UserRole.TEMPORAL_HOME) == true)
+        assertTrue(result.activeRoles.contains(UserRole.TEMPORAL_HOME))
     }
 
     @Test
@@ -256,7 +256,7 @@ class UserServiceTest {
         val result = userService.deactivateTemporalHomeProfile(userId)
 
         assertNotNull(result)
-        assertFalse(result?.activeRoles?.contains(UserRole.TEMPORAL_HOME) == true)
+        assertFalse(result.activeRoles.contains(UserRole.TEMPORAL_HOME))
     }
 
     @Test
@@ -375,8 +375,9 @@ class UserServiceTest {
             acceptTermsAndConditions = true
         ))
 
-        assertNotNull(result?.lastAcceptedPrivacyPolicy)
-        assertNotNull(result?.lastAcceptedTermsAndConditions)
+        assertNotNull(result)
+        assertNotNull(result.lastAcceptedPrivacyPolicy)
+        assertNotNull(result.lastAcceptedTermsAndConditions)
     }
 
     @Test
@@ -450,7 +451,7 @@ class UserServiceTest {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
         
         transaction {
             UserActiveRoles.insert {

@@ -387,7 +387,7 @@ class TemporalHomeServiceTest {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
 
         transaction {
             UserActiveRoles.insert {

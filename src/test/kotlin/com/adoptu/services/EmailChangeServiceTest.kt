@@ -226,7 +226,7 @@ class EmailChangeServiceTest {
                 it[Users.isEmailVerified] = true
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
     }
 
     private fun createEmailChangeToken(userId: Int, newEmail: String): String {

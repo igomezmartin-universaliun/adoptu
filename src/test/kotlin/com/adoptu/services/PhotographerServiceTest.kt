@@ -450,7 +450,7 @@ class PhotographerServiceTest {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
         
         transaction {
             UserActiveRoles.insert {
@@ -479,7 +479,7 @@ class PhotographerServiceTest {
                 it[Pets.isUrgent] = false
                 it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
-        }!!
+        }
     }
 
     @Test
@@ -661,7 +661,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.status] = "PENDING"
                 it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             } get PhotographyRequests.id
-        }!!
+        }
 
         val result = photographerService.updatePhotographyRequest(
             userId = otherUserId,
@@ -686,7 +686,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.status] = "PENDING"
                 it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             } get PhotographyRequests.id
-        }!!
+        }
 
         val result = photographerService.updatePhotographyRequest(
             userId = photographerId,
@@ -711,7 +711,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.status] = "PENDING"
                 it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             } get PhotographyRequests.id
-        }!!
+        }
 
         val result = photographerService.updatePhotographyRequest(
             userId = requesterId,
@@ -736,7 +736,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.status] = "PENDING"
                 it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             } get PhotographyRequests.id
-        }!!
+        }
 
         val adminUser = UserDto(
             id = 999,
@@ -772,7 +772,7 @@ class PhotographerServiceTest {
                 it[PhotographyRequests.status] = "APPROVED"
                 it[PhotographyRequests.createdAt] = clock.now().toEpochMilliseconds()
             } get PhotographyRequests.id
-        }!!
+        }
 
         val exception = assertThrows<IllegalArgumentException> {
             photographerService.updatePhotographyRequest(

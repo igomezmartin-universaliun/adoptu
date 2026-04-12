@@ -7,6 +7,7 @@ import com.adoptu.plugins.respondError
 import com.adoptu.plugins.respondSuccess
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.SterilizationLocationService
+import com.adoptu.services.validation.ValidationConstants
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -20,7 +21,9 @@ fun Route.sterilizationLocationRoutes() {
             val country = call.request.queryParameters["country"]
             val state = call.request.queryParameters["state"]
             val city = call.request.queryParameters["city"]
-            val locations = service.getAll(country, state, city)
+            val neighborhood = call.request.queryParameters["neighborhood"]
+            val zip = call.request.queryParameters["zip"]
+            val locations = service.getAll(country, state, city, neighborhood, zip)
             call.respond(locations)
         }
 
@@ -35,25 +38,25 @@ fun Route.sterilizationLocationRoutes() {
         }
 
         get("/countries/{country}/states") {
-            val country = call.parameters["country"] ?: return@get call.respondError("Country is required", 400)
+            val country = call.parameters["country"] ?: return@get call.respondError(ValidationConstants.COUNTRY_IS_REQUIRED, 400)
             val states = service.getStatesByCountry(country)
             call.respond(mapOf("states" to states))
         }
 
         get("/countries/{country}/states/{state}/cities") {
-            val country = call.parameters["country"] ?: return@get call.respondError("Country is required", 400)
+            val country = call.parameters["country"] ?: return@get call.respondError(ValidationConstants.COUNTRY_IS_REQUIRED, 400)
             val state = call.parameters["state"]
             val cities = service.getCitiesByCountryAndState(country, state)
             call.respond(mapOf("cities" to cities))
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
             val location = service.getById(id)
             if (location != null) {
                 call.respond(location)
             } else {
-                call.respondError("Sterilization location not found", 404)
+                call.respondError(ValidationConstants.STERILIZATION_LOCATION_NOT_FOUND, 404)
             }
         }
     }
@@ -67,17 +70,19 @@ fun Route.adminSterilizationLocationRoutes() {
             val country = call.request.queryParameters["country"]
             val state = call.request.queryParameters["state"]
             val city = call.request.queryParameters["city"]
-            val locations = service.getAll(country, state, city)
+            val neighborhood = call.request.queryParameters["neighborhood"]
+            val zip = call.request.queryParameters["zip"]
+            val locations = service.getAll(country, state, city, neighborhood, zip)
             call.respond(locations)
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
             val location = service.getById(id)
             if (location != null) {
                 call.respond(location)
             } else {
-                call.respondError("Sterilization location not found", 404)
+                call.respondError(ValidationConstants.STERILIZATION_LOCATION_NOT_FOUND, 404)
             }
         }
 
@@ -92,13 +97,13 @@ fun Route.adminSterilizationLocationRoutes() {
         }
 
         put("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respondError(ValidationConstants.INVALID_ID)
             val request = call.receive<UpdateSterilizationLocationRequest>()
             call.respondData(service.update(id, request))
         }
 
         delete("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respondError(ValidationConstants.INVALID_ID)
             call.respondSuccess(service.delete(id))
         }
     }

@@ -7,6 +7,7 @@ import com.adoptu.plugins.respondError
 import com.adoptu.plugins.respondSuccess
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.ShelterService
+import com.adoptu.services.validation.ValidationConstants
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -19,10 +20,13 @@ fun Route.shelterRoutes() {
         get {
             val country = call.request.queryParameters["country"]
             if (country.isNullOrBlank()) {
-                return@get call.respondError("Country is required", 400)
+                return@get call.respondError(ValidationConstants.COUNTRY_IS_REQUIRED, 400)
             }
             val state = call.request.queryParameters["state"]
-            val shelters = shelterService.getAll(country, state)
+            val city = call.request.queryParameters["city"]
+            val neighborhood = call.request.queryParameters["neighborhood"]
+            val zip = call.request.queryParameters["zip"]
+            val shelters = shelterService.getAll(country, state, city, neighborhood, zip)
             call.respond(shelters)
         }
 
@@ -32,18 +36,18 @@ fun Route.shelterRoutes() {
         }
 
         get("/countries/{country}/states") {
-            val country = call.parameters["country"] ?: return@get call.respondError("Country is required", 400)
+            val country = call.parameters["country"] ?: return@get call.respondError(ValidationConstants.COUNTRY_IS_REQUIRED, 400)
             val states = shelterService.getStatesByCountry(country)
             call.respond(mapOf("states" to states))
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
             val shelter = shelterService.getById(id)
             if (shelter != null) {
                 call.respond(shelter)
             } else {
-                call.respondError("Shelter not found", 404)
+                call.respondError(ValidationConstants.SHELTER_NOT_FOUND, 404)
             }
         }
     }
@@ -56,21 +60,24 @@ fun Route.adminShelterRoutes() {
         get {
             val country = call.request.queryParameters["country"]
             val state = call.request.queryParameters["state"]
+            val city = call.request.queryParameters["city"]
+            val neighborhood = call.request.queryParameters["neighborhood"]
+            val zip = call.request.queryParameters["zip"]
             val shelters = if (country.isNullOrBlank()) {
                 emptyList()
             } else {
-                shelterService.getAll(country, state)
+                shelterService.getAll(country, state, city, neighborhood, zip)
             }
             call.respond(shelters)
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
             val shelter = shelterService.getById(id)
             if (shelter != null) {
                 call.respond(shelter)
             } else {
-                call.respondError("Shelter not found", 404)
+                call.respondError(ValidationConstants.SHELTER_NOT_FOUND, 404)
             }
         }
 
@@ -85,13 +92,13 @@ fun Route.adminShelterRoutes() {
         }
 
         put("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@put call.respondError(ValidationConstants.INVALID_ID)
             val request = call.receive<UpdateShelterRequest>()
             call.respondData(shelterService.update(id, request))
         }
 
         delete("/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respondError("Invalid ID")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respondError(ValidationConstants.INVALID_ID)
             call.respondSuccess(shelterService.delete(id))
         }
     }

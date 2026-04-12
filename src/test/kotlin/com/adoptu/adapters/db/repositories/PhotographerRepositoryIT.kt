@@ -67,7 +67,7 @@ class PhotographerRepositoryIT {
             setProperty("password", "testpassword")
         }
 
-        val conn = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
+        val conn: java.sql.Connection = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
         conn.use { connection ->
             connection.createStatement().use { stmt ->
                 stmt.execute("CREATE DATABASE $dbName")
@@ -191,7 +191,7 @@ class PhotographerRepositoryIT {
         val result = photographerRepository.getPhotographerById(userId)
 
         assertNotNull(result)
-        assertEquals(userId, result!!.userId)
+        assertEquals(userId, result.userId)
         assertEquals("Photographer", result.displayName)
         assertEquals(50.0, result.photographerFee)
         assertEquals("USD", result.photographerCurrency)
@@ -291,7 +291,7 @@ class PhotographerRepositoryIT {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
 
         transaction {
             UserActiveRoles.insert {
@@ -371,6 +371,6 @@ class PhotographerRepositoryIT {
                 it[Pets.currency] = "USD"
                 it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
-        }!!
+        }
     }
 }

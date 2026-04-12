@@ -7,7 +7,7 @@ import com.adoptu.dto.input.UpdateSterilizationLocationRequest
 
 interface SterilizationLocationRepositoryPort {
     fun getById(id: Int): SterilizationLocationDto?
-    fun getAll(country: String? = null, state: String? = null, city: String? = null): List<SterilizationLocationDto>
+    fun getAll(country: String? = null, state: String? = null, city: String? = null, neighborhood: String? = null, zip: String? = null): List<SterilizationLocationDto>
     fun create(request: CreateSterilizationLocationRequest): SterilizationLocationDto
     fun update(id: Int, request: UpdateSterilizationLocationRequest): SterilizationLocationDto?
     fun delete(id: Int): Boolean

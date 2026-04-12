@@ -27,6 +27,7 @@ class S3ImageStorageAdapter(
     private val log = LoggerFactory.getLogger(S3ImageStorageAdapter::class.java)
 
     private val s3Client: S3Client by lazy {
+        @Suppress("DEPRECATION")
         val builder = S3Client.builder()
             .region(Region.of(region))
 
@@ -35,6 +36,7 @@ class S3ImageStorageAdapter(
                 StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey))
             )
         } else {
+            @Suppress("DEPRECATION")
             builder.credentialsProvider(DefaultCredentialsProvider.create())
         }
 

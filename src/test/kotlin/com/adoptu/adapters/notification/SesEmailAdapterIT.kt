@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.condition.EnabledIf
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.sesv2.SesV2Client
 import software.amazon.awssdk.services.sesv2.model.CreateEmailIdentityRequest
 import kotlin.test.Ignore
 import kotlin.test.assertTrue
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Ignore("SES LocalStack support is limited")

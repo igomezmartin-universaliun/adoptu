@@ -241,6 +241,58 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         return getById(userId)
     }
 
+    override fun activateShelterProfile(userId: Int): UserDto? {
+        val user = getById(userId) ?: return null
+        
+        transaction {
+            val existingRole = UserActiveRoles.selectAll()
+                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name) }
+                .firstOrNull()
+            if (existingRole == null) {
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = userId
+                    it[UserActiveRoles.role] = UserRole.SHELTER.name
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override fun deactivateShelterProfile(userId: Int): UserDto? {
+        transaction {
+            UserActiveRoles.deleteWhere {
+                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name)
+            }
+        }
+        return getById(userId)
+    }
+
+    override fun activateSterilizationProfile(userId: Int): UserDto? {
+        val user = getById(userId) ?: return null
+        
+        transaction {
+            val existingRole = UserActiveRoles.selectAll()
+                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name) }
+                .firstOrNull()
+            if (existingRole == null) {
+                UserActiveRoles.insert {
+                    it[UserActiveRoles.userId] = userId
+                    it[UserActiveRoles.role] = UserRole.STERILIZATION_SERVICE.name
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override fun deactivateSterilizationProfile(userId: Int): UserDto? {
+        transaction {
+            UserActiveRoles.deleteWhere {
+                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name)
+            }
+        }
+        return getById(userId)
+    }
+
     override fun updateProfile(userId: Int, displayName: String, language: String?): UserDto? {
         if (displayName.isBlank()) {
             throw IllegalArgumentException("Display name cannot be empty")

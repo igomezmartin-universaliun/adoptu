@@ -124,6 +124,7 @@ abstract class BaseE2ETest {
         clearErrors()
         page.navigate("${getBaseUrl()}$path")
         page.waitForLoadState()
+        page.waitForTimeout(500.0)
     }
 
     protected fun assertNoJsErrors() {

@@ -1,13 +1,14 @@
 package com.adoptu.pages
 
+import com.adoptu.routes.NavParams
 import kotlinx.html.*
 
-fun HTML.forgotPasswordPage() {
+fun HTML.forgotPasswordPage(navParams: NavParams = NavParams()) {
     commonHead("Forgot Password - Adopt-U")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div {
@@ -26,51 +27,18 @@ fun HTML.forgotPasswordPage() {
             }
         }
         footer()
-        commonScripts()
+        commonScripts(navParams.isLoggedIn)
         script(src = "/static/js/crypto.js") {}
-        script { unsafe { raw("""
-document.getElementById('submit-btn').onclick = async () => {
-    const msg = document.getElementById('message');
-    const email = document.getElementById('email').value;
-    if (!email) {
-        msg.className = 'message error';
-        msg.textContent = 'Email is required';
-        return;
-    }
-    msg.textContent = 'Sending...';
-    msg.className = '';
-    try {
-        const publicKey = await getPublicKey();
-        const encryptedEmail = await rsaCrypto.encrypt(email, publicKey);
-        const res = await fetch('/api/auth/forgot-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ encryptedData: encryptedEmail })
-        });
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = 'Password reset link sent! Check your email.';
-            document.getElementById('email').value = '';
-        } else {
-            msg.className = 'message error';
-            msg.textContent = result.error || 'Failed to send reset link.';
-        }
-    } catch (e) {
-        msg.className = 'message error';
-        msg.textContent = 'Failed to send reset link.';
-    }
-};
-""") } }
+        script(src = "/static/js/forgot-password.js") {}
     }
 }
 
-fun HTML.resetPasswordPage() {
+fun HTML.resetPasswordPage(navParams: NavParams = NavParams()) {
     commonHead("Reset Password - Adopt-U")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div {
@@ -93,94 +61,18 @@ fun HTML.resetPasswordPage() {
             }
         }
         footer()
-        commonScripts()
+        commonScripts(navParams.isLoggedIn)
         script(src = "/static/js/crypto.js") {}
-        script { unsafe { raw("""
-function getTokenFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('token');
-}
-document.getElementById('submit-btn').onclick = async () => {
-    const msg = document.getElementById('message');
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-    const token = getTokenFromUrl();
-    if (!token) {
-        msg.className = 'message error';
-        msg.textContent = 'Invalid or missing token.';
-        return;
-    }
-    if (!password || password.length < 8) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordTooShort') || 'Password must be at least 8 characters.';
-        return;
-    }
-    if (!/[A-Z]/.test(password)) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordNeedUppercase') || 'Password needs at least 1 uppercase letter.';
-        return;
-    }
-    if (!/[a-z]/.test(password)) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordNeedLowercase') || 'Password needs at least 1 lowercase letter.';
-        return;
-    }
-    if (!/[0-9]/.test(password)) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordNeedNumber') || 'Password needs at least 1 number.';
-        return;
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>\-_+=/\[\]\\|°º«»¿]/.test(password)) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordNeedSymbol') || 'Password needs at least 1 symbol.';
-        return;
-    }
-    if (password !== confirmPassword) {
-        msg.className = 'message error';
-        msg.textContent = i18n.t('passwordsDoNotMatch') || 'Passwords do not match.';
-        return;
-    }
-    msg.textContent = 'Resetting password...';
-    msg.className = '';
-    try {
-        const publicKey = await getPublicKey();
-        const encryptedPassword = await rsaCrypto.encrypt(password, publicKey);
-        const res = await fetch('/api/auth/reset-password?token=' + encodeURIComponent(token), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ encryptedData: encryptedPassword })
-        });
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = 'Password reset successfully! You can now login.';
-            document.getElementById('password').value = '';
-            document.getElementById('confirm-password').value = '';
-        } else {
-            msg.className = 'message error';
-            msg.textContent = result.error || 'Failed to reset password.';
-        }
-    } catch (e) {
-        msg.className = 'message error';
-        msg.textContent = 'Failed to reset password.';
-    }
-};
-const token = getTokenFromUrl();
-if (!token) {
-    document.getElementById('message').className = 'message error';
-    document.getElementById('message').textContent = 'Invalid or missing token.';
-    document.getElementById('submit-btn').disabled = true;
-}
-""") } }
+        script(src = "/static/js/reset-password.js") {}
     }
 }
 
-fun HTML.magicLinkLoginPage() {
+fun HTML.magicLinkLoginPage(navParams: NavParams = NavParams()) {
     commonHead("Magic Link Login - Adopt-U")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div {
@@ -191,44 +83,17 @@ fun HTML.magicLinkLoginPage() {
             }
         }
         footer()
-        commonScripts()
-        script { unsafe { raw("""
-async function checkLogin() {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const msg = document.getElementById('message');
-    if (!token) {
-        msg.className = 'message error';
-        msg.textContent = 'Invalid or missing token.';
-        return;
-    }
-    try {
-        const res = await fetch('/api/auth/magic-link-login?token=' + encodeURIComponent(token));
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = 'Login successful! Redirecting...';
-            setTimeout(() => { location.href = '/'; }, 1000);
-        } else {
-            msg.className = 'message error';
-            msg.textContent = result.error || 'Login failed. The link may be invalid or expired.';
-        }
-    } catch (e) {
-        msg.className = 'message error';
-        msg.textContent = 'Login failed.';
-    }
-}
-checkLogin();
-""") } }
+        commonScripts(navParams.isLoggedIn)
+        script(src = "/static/js/magic-link-login.js") {}
     }
 }
 
-fun HTML.emailChangeVerificationPage() {
+fun HTML.emailChangeVerificationPage(navParams: NavParams = NavParams()) {
     commonHead("Email Change - Adopt-U")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div {
@@ -239,33 +104,7 @@ fun HTML.emailChangeVerificationPage() {
             }
         }
         footer()
-        commonScripts()
-        script { unsafe { raw("""
-async function checkEmailChange() {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const msg = document.getElementById('message');
-    if (!token) {
-        msg.className = 'message error';
-        msg.textContent = 'Invalid or missing token.';
-        return;
-    }
-    try {
-        const res = await fetch('/api/users/verify-email-change?token=' + encodeURIComponent(token));
-        const result = await res.json();
-        if (result.success) {
-            msg.className = 'message success';
-            msg.textContent = result.message || 'Email changed successfully!';
-        } else {
-            msg.className = 'message error';
-            msg.textContent = result.message || 'Failed to change email. The link may be invalid or expired.';
-        }
-    } catch (e) {
-        msg.className = 'message error';
-        msg.textContent = 'Failed to change email.';
-    }
-}
-checkEmailChange();
-""") } }
+        commonScripts(navParams.isLoggedIn)
+        script(src = "/static/js/email-change-verification.js") {}
     }
 }

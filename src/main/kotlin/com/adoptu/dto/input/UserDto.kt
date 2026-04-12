@@ -3,7 +3,7 @@ package com.adoptu.dto.input
 import kotlinx.serialization.Serializable
 
 enum class UserRole {
-    ADMIN, RESCUER, ADOPTER, PHOTOGRAPHER, TEMPORAL_HOME
+    ADMIN, RESCUER, ADOPTER, PHOTOGRAPHER, TEMPORAL_HOME, SHELTER, STERILIZATION_SERVICE
 }
 
 @Serializable

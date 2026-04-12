@@ -221,7 +221,7 @@ class PetServiceTest {
         val result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", true)
 
         assertTrue(result is ServiceResult.Success)
-        assertTrue((result as ServiceResult.Success).data.isPrimary)
+        assertTrue(result.data.isPrimary)
     }
 
     @Test
@@ -321,7 +321,7 @@ class PetServiceTest {
         val result = petService.update(created.id, 1, setOf("RESCUER"), UpdatePetRequest(name = "Max", weight = 30.0))
 
         assertTrue(result is ServiceResult.Success)
-        val pet = (result as ServiceResult.Success).data
+        val pet = result.data
         assertEquals("Max", pet.name)
         assertEquals(30.0, pet.weight)
     }
@@ -333,7 +333,7 @@ class PetServiceTest {
         val result = petService.update(created.id, 999, setOf("ADMIN"), UpdatePetRequest(name = "Admin Buddy"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals("Admin Buddy", (result as ServiceResult.Success).data.name)
+        assertEquals("Admin Buddy", result.data.name)
     }
 
     @Test
@@ -508,7 +508,7 @@ class PetServiceTest {
         val result = petService.getAdoptionRequestsForPet(pet.id, 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals(2, (result as ServiceResult.Success).data.size)
+        assertEquals(2, result.data.size)
     }
 
     @Test
@@ -528,7 +528,7 @@ class PetServiceTest {
         val result = petService.getAdoptionRequestsForPet(pet.id, 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals(1, (result as ServiceResult.Success).data.size)
+        assertEquals(1, result.data.size)
     }
 
     @Test
@@ -552,7 +552,7 @@ class PetServiceTest {
         val result = petService.updateAdoptionRequest(request.id, "APPROVED", 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals("APPROVED", (result as ServiceResult.Success).data.status)
+        assertEquals("APPROVED", result.data.status)
     }
 
     @Test
@@ -563,7 +563,7 @@ class PetServiceTest {
         val result = petService.updateAdoptionRequest(request.id, "REJECTED", 1, setOf("RESCUER"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals("REJECTED", (result as ServiceResult.Success).data.status)
+        assertEquals("REJECTED", result.data.status)
     }
 
     @Test
@@ -601,7 +601,7 @@ class PetServiceTest {
         val result = petService.updateAdoptionRequest(request.id, "APPROVED", 999, setOf("ADMIN"))
 
         assertTrue(result is ServiceResult.Success)
-        assertEquals("APPROVED", (result as ServiceResult.Success).data.status)
+        assertEquals("APPROVED", result.data.status)
     }
 
     private fun createTestPet(rescuerId: Int, name: String, type: String, isPromoted: Boolean = false) =

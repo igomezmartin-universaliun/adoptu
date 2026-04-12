@@ -231,7 +231,7 @@ class ShelterServiceTest {
         ))
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Updated Name", updated.name)
         assertEquals("Brooklyn", updated.city)
         assertEquals("NY", updated.state)
@@ -251,7 +251,7 @@ class ShelterServiceTest {
         val result = shelterService.update(shelterId, UpdateShelterRequest(name = "Updated"))
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Updated", updated.name)
         assertEquals("USA", updated.country)
         assertEquals("NY", updated.state)
@@ -350,6 +350,6 @@ class ShelterServiceTest {
                 it[AnimalShelters.createdAt] = clock.now().toEpochMilliseconds()
                 it[AnimalShelters.updatedAt] = clock.now().toEpochMilliseconds()
             } get AnimalShelters.id
-        }!!
+        }
     }
 }

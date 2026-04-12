@@ -16,11 +16,14 @@ import kotlin.time.ExperimentalTime
 fun appModule(config: ApplicationConfig) = module {
     single { config }
     single<Clock> { Clock.System }
-    single { WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
+    single { WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", getOrigins(config)) }
     single<PetRepositoryPort> { PetRepositoryImpl(get()) }
     single<UserRepositoryPort> { UserRepository(get()) }
+    single { UserRepository(get()) }
     single<PhotographerRepositoryPort> { PhotographerRepositoryImpl(get(), get(), get()) }
     single<TemporalHomeRepositoryPort> { TemporalHomeRepositoryImpl(get(), get(), get()) }
+    single<UserShelterRepositoryPort> { UserShelterRepository(get()) }
+    single<UserSterilizationLocationRepositoryPort> { UserSterilizationLocationRepository(get()) }
     single<ShelterRepositoryPort> { ShelterRepository(get()) }
     single<SterilizationLocationRepositoryPort> { SterilizationLocationRepository(get()) }
     single<ImageStoragePort> { createImageStorageAdapter(config) }
@@ -29,6 +32,8 @@ fun appModule(config: ApplicationConfig) = module {
     single<UserService> { UserService(get()) }
     single<PetService> { PetService(get(), get(), get(), get()) }
     single<TemporalHomeService> { TemporalHomeService(get(), get(), get(), get()) }
+    single { UserShelterService(get()) }
+    single { UserSterilizationLocationService(get()) }
     single { ShelterService(get()) }
     single { SterilizationLocationService(get()) }
     single { EmailVerificationService(get(), get(), get()) }
@@ -42,6 +47,14 @@ fun appModule(config: ApplicationConfig) = module {
     single { SterilizationLocationsValidationService() }
     single { TemporalHomesValidationService() }
     single { AuthValidationService() }
+}
+
+private fun getOrigins(config: ApplicationConfig): List<String> {
+    val originsList = config.propertyOrNull("webauthn.origins")?.getList()
+    if (!originsList.isNullOrEmpty()) {
+        return originsList
+    }
+    return listOf("http://localhost:8080")
 }
 
 internal fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {

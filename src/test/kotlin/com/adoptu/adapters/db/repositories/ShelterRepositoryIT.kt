@@ -5,6 +5,7 @@ import com.adoptu.dto.input.CreateShelterRequest
 import com.adoptu.dto.input.UpdateShelterRequest
 import io.ktor.server.config.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.EnabledIf
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
@@ -15,6 +16,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+
 
 @OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -62,7 +64,7 @@ class ShelterRepositoryIT {
             setProperty("password", "testpassword")
         }
 
-        val conn = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
+        val conn: java.sql.Connection = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
         conn.use { connection ->
             connection.createStatement().use { stmt ->
                 stmt.execute("CREATE DATABASE $dbName")
@@ -111,6 +113,42 @@ class ShelterRepositoryIT {
 
         assertEquals(2, result.size)
         assertTrue(result.all { it.state == "NY" })
+    }
+
+    @Test
+    fun `getAll filters by city when provided`() {
+        createTestShelter("Shelter 1", "USA", "NY", "New York")
+        createTestShelter("Shelter 2", "USA", "NY", "Brooklyn")
+        createTestShelter("Shelter 3", "USA", "NY", "Queens")
+
+        val result = shelterRepository.getAll("USA", null, "Brooklyn")
+
+        assertEquals(1, result.size)
+        assertEquals("Brooklyn", result[0].city)
+    }
+
+    @Test
+    fun `getAll filters by neighborhood when provided`() {
+        createTestShelter("Shelter 1", "USA", "NY", "Manhattan", neighborhood = "Upper East Side")
+        createTestShelter("Shelter 2", "USA", "NY", "Brooklyn", neighborhood = "Williamsburg")
+        createTestShelter("Shelter 3", "USA", "NY", "Manhattan", neighborhood = "Chelsea")
+
+        val result = shelterRepository.getAll("USA", null, "Manhattan", neighborhood = "Upper East Side")
+
+        assertEquals(1, result.size)
+        assertEquals("Upper East Side", result[0].neighborhood)
+    }
+
+    @Test
+    fun `getAll filters by zip when provided`() {
+        createTestShelter("Shelter 1", "USA", "NY", "New York", zip = "10001")
+        createTestShelter("Shelter 2", "USA", "NY", "Brooklyn", zip = "11201")
+        createTestShelter("Shelter 3", "USA", "NY", "Manhattan", zip = "10001")
+
+        val result = shelterRepository.getAll("USA", null, null, null, "10001")
+
+        assertEquals(2, result.size)
+        assertTrue(result.all { it.zip == "10001" })
     }
 
     @Test
@@ -416,6 +454,7 @@ class ShelterRepositoryIT {
         state: String?,
         city: String,
         address: String = "123 Test St",
+        neighborhood: String? = null,
         zip: String? = null,
         phone: String? = null,
         email: String? = null,
@@ -434,6 +473,7 @@ class ShelterRepositoryIT {
             country = country,
             state = state,
             city = city,
+            neighborhood = neighborhood,
             address = address,
             zip = zip,
             phone = phone,

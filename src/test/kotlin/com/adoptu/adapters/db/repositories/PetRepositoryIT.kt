@@ -73,7 +73,7 @@ class PetRepositoryIT {
             setProperty("password", "testpassword")
         }
 
-        val conn = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
+        val conn: java.sql.Connection = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
         conn.use { connection ->
             connection.createStatement().use { stmt ->
                 stmt.execute("CREATE DATABASE $dbName")
@@ -149,7 +149,7 @@ class PetRepositoryIT {
         val result = petRepository.getById(petId)
 
         assertNotNull(result)
-        assertEquals("Buddy", result!!.name)
+        assertEquals("Buddy", result.name)
         assertEquals("DOG", result.type)
     }
 
@@ -204,7 +204,7 @@ class PetRepositoryIT {
         val result = petRepository.update(petId, UpdatePetRequest(name = "Max", weight = 30.0))
 
         assertNotNull(result)
-        assertEquals("Max", result!!.name)
+        assertEquals("Max", result.name)
         assertEquals(30.0, result.weight)
     }
 
@@ -355,7 +355,7 @@ class PetRepositoryIT {
         val result = petRepository.getAdoptionRequestById(request.id)
 
         assertNotNull(result)
-        assertEquals(petId, result!!.petId)
+        assertEquals(petId, result.petId)
         assertEquals(adopterId, result.adopterId)
     }
 
@@ -385,7 +385,7 @@ class PetRepositoryIT {
                 it[Pets.currency] = "USD"
                 it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
-        }!!
+        }
     }
 
     private fun createTestUserWithRole(username: String, displayName: String, role: UserRole): Int {
@@ -395,7 +395,7 @@ class PetRepositoryIT {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
 
         transaction {
             UserActiveRoles.insert {

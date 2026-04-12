@@ -10,6 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.EnabledIf
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
@@ -21,6 +22,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+
 
 @OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -70,7 +72,7 @@ class TemporalHomeRepositoryIT {
             setProperty("password", "testpassword")
         }
 
-        val conn = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
+        val conn: java.sql.Connection = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
         conn.use { connection ->
             connection.createStatement().use { stmt ->
                 stmt.execute("CREATE DATABASE $dbName")
@@ -111,7 +113,7 @@ class TemporalHomeRepositoryIT {
         val result = temporalHomeRepository.getTemporalHome(userId)
 
         assertNotNull(result)
-        assertEquals(userId, result!!.userId)
+        assertEquals(userId, result.userId)
         assertEquals("My Home", result.alias)
         assertEquals("USA", result.country)
         assertEquals("CA", result.state)
@@ -152,7 +154,7 @@ class TemporalHomeRepositoryIT {
         ))
 
         assertNotNull(result)
-        assertEquals("New Name", result!!.alias)
+        assertEquals("New Name", result.alias)
         assertEquals("Los Angeles", result.city)
         assertEquals("CA", result.state)
     }
@@ -361,7 +363,7 @@ class TemporalHomeRepositoryIT {
                 it[Users.displayName] = displayName
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
 
         transaction {
             UserActiveRoles.insert {
@@ -416,6 +418,6 @@ class TemporalHomeRepositoryIT {
                 it[Pets.currency] = "USD"
                 it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
-        }!!
+        }
     }
 }

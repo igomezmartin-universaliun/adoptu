@@ -17,7 +17,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("123")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(123, (result as ServiceResult.Success).data)
+            assertEquals(123, result.data)
         }
 
         @Test
@@ -25,7 +25,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("0")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(0, (result as ServiceResult.Success).data)
+            assertEquals(0, result.data)
         }
 
         @Test
@@ -33,7 +33,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("999999999")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(999999999, (result as ServiceResult.Success).data)
+            assertEquals(999999999, result.data)
         }
 
         @Test
@@ -41,7 +41,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("abc")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
 
         @Test
@@ -49,7 +49,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("123abc")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
 
         @Test
@@ -57,7 +57,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId(null)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
 
         @Test
@@ -65,7 +65,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateId("   ")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
     }
 
@@ -76,7 +76,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired("test", "testField")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals("test", (result as ServiceResult.Success).data)
+            assertEquals("test", result.data)
         }
 
         @Test
@@ -84,7 +84,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired("a", "field")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals("a", (result as ServiceResult.Success).data)
+            assertEquals("a", result.data)
         }
 
         @Test
@@ -92,7 +92,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired("  test  ", "testField")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals("  test  ", (result as ServiceResult.Success).data)
+            assertEquals("  test  ", result.data)
         }
 
         @Test
@@ -100,7 +100,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired(null, "testField")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("testField is required", (result as ServiceResult.Error).message)
+            assertEquals("testField is required", result.message)
         }
 
         @Test
@@ -108,7 +108,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired("", "testField")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("testField is required", (result as ServiceResult.Error).message)
+            assertEquals("testField is required", result.message)
         }
 
         @Test
@@ -116,7 +116,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired("   ", "testField")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("testField is required", (result as ServiceResult.Error).message)
+            assertEquals("testField is required", result.message)
         }
 
         @Test
@@ -124,7 +124,7 @@ class SterilizationLocationsValidationServiceTest {
             val result = service.validateRequired(null, "email")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("email is required", (result as ServiceResult.Error).message)
+            assertEquals("email is required", result.message)
         }
     }
 }

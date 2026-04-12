@@ -9,6 +9,7 @@ data class SterilizationLocationDto(
     val country: String,
     val state: String? = null,
     val city: String,
+    val neighborhood: String? = null,
     val address: String,
     val zip: String? = null,
     val phone: String? = null,
@@ -25,6 +26,7 @@ data class CreateSterilizationLocationRequest(
     val country: String,
     val state: String? = null,
     val city: String,
+    val neighborhood: String? = null,
     val address: String,
     val zip: String? = null,
     val phone: String? = null,
@@ -39,6 +41,7 @@ data class UpdateSterilizationLocationRequest(
     val country: String? = null,
     val state: String? = null,
     val city: String? = null,
+    val neighborhood: String? = null,
     val address: String? = null,
     val zip: String? = null,
     val phone: String? = null,
@@ -70,4 +73,51 @@ data class SterilizationLocationsByState(
 data class SterilizationLocationsByCity(
     val city: String,
     val locations: List<SterilizationLocationDto>
+)
+
+@Serializable
+data class UserSterilizationLocationDto(
+    val userId: Int,
+    val name: String,
+    val country: String,
+    val state: String? = null,
+    val city: String,
+    val neighborhood: String? = null,
+    val address: String,
+    val zip: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    val website: String? = null,
+    val description: String? = null,
+    val createdAt: Long
+)
+
+@Serializable
+data class CreateUserSterilizationLocationRequest(
+    val name: String,
+    val country: String,
+    val state: String? = null,
+    val city: String,
+    val neighborhood: String? = null,
+    val address: String,
+    val zip: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    val website: String? = null,
+    val description: String? = null
+)
+
+@Serializable
+data class UpdateUserSterilizationLocationRequest(
+    val name: String? = null,
+    val country: String? = null,
+    val state: String? = null,
+    val city: String? = null,
+    val neighborhood: String? = null,
+    val address: String? = null,
+    val zip: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    val website: String? = null,
+    val description: String? = null
 )

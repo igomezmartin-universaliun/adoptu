@@ -3,8 +3,10 @@ package com.adoptu.adapters.storage
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.condition.EnabledIf
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
@@ -17,6 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ImageStorageIT {
 
@@ -26,7 +29,7 @@ class ImageStorageIT {
     @BeforeAll
     fun startLocalStack() {
         localstackContainer = LocalStackContainer(
-            DockerImageName.parse("localstack/localstack:2.0.1")
+            DockerImageName.parse("localstack/localstack:4.0.0")
         ).withServices(LocalStackContainer.Service.S3)
 
         localstackContainer!!.start()

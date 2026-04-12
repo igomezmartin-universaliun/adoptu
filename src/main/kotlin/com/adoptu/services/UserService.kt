@@ -33,6 +33,14 @@ class UserService(
     
     fun deactivateTemporalHomeProfile(userId: Int): UserDto? = userRepository.deactivateTemporalHomeProfile(userId)
     
+    fun activateShelterProfile(userId: Int): UserDto? = userRepository.activateShelterProfile(userId)
+    
+    fun deactivateShelterProfile(userId: Int): UserDto? = userRepository.deactivateShelterProfile(userId)
+    
+    fun activateSterilizationProfile(userId: Int): UserDto? = userRepository.activateSterilizationProfile(userId)
+    
+    fun deactivateSterilizationProfile(userId: Int): UserDto? = userRepository.deactivateSterilizationProfile(userId)
+    
     fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto? = 
         userRepository.updateProfile(userId, displayName, language)
     

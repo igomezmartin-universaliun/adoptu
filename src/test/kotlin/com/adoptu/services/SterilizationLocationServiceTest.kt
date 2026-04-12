@@ -213,7 +213,7 @@ class SterilizationLocationServiceTest {
         val result = service.update(id, request)
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Updated Name", updated.name)
         assertEquals("California", updated.state)
         assertEquals("USA", updated.country)
@@ -233,7 +233,7 @@ class SterilizationLocationServiceTest {
         val result = service.update(id, request)
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Original", updated.name)
         assertEquals("+1-555-9999", updated.phone)
     }

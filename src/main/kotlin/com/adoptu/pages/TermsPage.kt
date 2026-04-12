@@ -1,13 +1,14 @@
 package com.adoptu.pages
 
+import com.adoptu.routes.NavParams
 import kotlinx.html.*
 
-fun HTML.termsPage() {
-    commonHead("Terms and Conditions - Adopt-U")
+fun HTML.termsPage(navParams: NavParams = NavParams()) {
+    commonHead("Terms and Conditions - Adopt-U", "policy.css")
     body {
         header {
             a("/") { commonLogo() }
-            nav { guestNav() }
+            nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
             div(classes = "policy-content") {
@@ -88,6 +89,6 @@ fun HTML.termsPage() {
             }
         }
         footer()
-        commonScripts()
+        commonScripts(navParams.isLoggedIn)
     }
 }

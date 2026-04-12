@@ -64,7 +64,7 @@ class EmailVerificationRoutesE2ETest {
             single { EmailVerificationService(get(), get(), get()) }
             single { com.adoptu.services.PasswordService(get(), mockNotificationAdapter, get()) }
             single { com.adoptu.services.MagicLinkService(get(), mockNotificationAdapter, get()) }
-            single { com.adoptu.services.auth.WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080") }
+            single { com.adoptu.services.auth.WebAuthnService(get(), get(), get(), get(), get(), config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com", config.propertyOrNull("webauthn.rpId")?.getString() ?: "localhost", config.propertyOrNull("webauthn.rpName")?.getString() ?: "Adopt-U Pet Adoption", listOf(config.propertyOrNull("webauthn.origin")?.getString() ?: "http://localhost:8080")) }
             single { MockImageStorage() }
             single { mockNotificationAdapter }
             single<com.adoptu.ports.NotificationPort> { mockNotificationAdapter }
@@ -155,7 +155,7 @@ class EmailVerificationRoutesE2ETest {
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
                 it[Users.isEmailVerified] = true
             } get Users.id
-        }!!
+        }
     }
 
     private fun createValidToken(userId: Int): String {

@@ -22,7 +22,7 @@ class PhotographersValidationServiceTest {
             val result = service.validateSession(session)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(session, (result as ServiceResult.Success).data)
+            assertEquals(session, result.data)
         }
 
         @Test
@@ -42,7 +42,7 @@ class PhotographersValidationServiceTest {
             val result = service.validateUser(user)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(user, (result as ServiceResult.Success).data)
+            assertEquals(user, result.data)
         }
 
         @Test
@@ -60,7 +60,7 @@ class PhotographersValidationServiceTest {
             val result = service.validateId("123")
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(123, (result as ServiceResult.Success).data)
+            assertEquals(123, result.data)
         }
 
         @Test
@@ -68,7 +68,7 @@ class PhotographersValidationServiceTest {
             val result = service.validateId("abc")
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
 
         @Test
@@ -76,7 +76,7 @@ class PhotographersValidationServiceTest {
             val result = service.validateId(null)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals(ValidationConstants.INVALID_ID, (result as ServiceResult.Error).message)
+            assertEquals(ValidationConstants.INVALID_ID, result.message)
         }
     }
 
@@ -117,7 +117,7 @@ class PhotographersValidationServiceTest {
             val result = service.validatePhotographerFee(0.0)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(0.0, (result as ServiceResult.Success).data)
+            assertEquals(0.0, result.data)
         }
 
         @Test
@@ -125,7 +125,7 @@ class PhotographersValidationServiceTest {
             val result = service.validatePhotographerFee(50.0)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(50.0, (result as ServiceResult.Success).data)
+            assertEquals(50.0, result.data)
         }
 
         @Test
@@ -133,7 +133,7 @@ class PhotographersValidationServiceTest {
             val result = service.validatePhotographerFee(-10.0)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("Photographer fee must be zero or positive", (result as ServiceResult.Error).message)
+            assertEquals("Photographer fee must be zero or positive", result.message)
         }
 
         @Test
@@ -141,7 +141,7 @@ class PhotographersValidationServiceTest {
             val result = service.validatePhotographerFee(null)
 
             assertTrue(result is ServiceResult.Error)
-            assertEquals("Photographer fee must be zero or positive", (result as ServiceResult.Error).message)
+            assertEquals("Photographer fee must be zero or positive", result.message)
         }
     }
 }

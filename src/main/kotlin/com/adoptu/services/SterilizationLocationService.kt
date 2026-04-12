@@ -8,8 +8,8 @@ import com.adoptu.ports.SterilizationLocationRepositoryPort
 
 class SterilizationLocationService(private val repository: SterilizationLocationRepositoryPort) {
 
-    fun getAll(country: String? = null, state: String? = null, city: String? = null): List<SterilizationLocationDto> {
-        return repository.getAll(country, state, city)
+    fun getAll(country: String? = null, state: String? = null, city: String? = null, neighborhood: String? = null, zip: String? = null): List<SterilizationLocationDto> {
+        return repository.getAll(country, state, city, neighborhood, zip)
     }
 
     fun getById(id: Int): SterilizationLocationDto? = repository.getById(id)

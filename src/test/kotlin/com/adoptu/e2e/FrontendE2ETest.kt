@@ -3,7 +3,6 @@ package com.adoptu.e2e
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-@Disabled("Flaky E2E tests due to Playwright browser infrastructure issues")
 class FrontendE2ETest : BaseE2ETest() {
 
     @Test
@@ -25,6 +24,7 @@ class FrontendE2ETest : BaseE2ETest() {
     }
 
     @Test
+    @Disabled("Flaky network error in CI")
     fun `pets page loads without JavaScript errors`() {
         navigateTo("/pets")
         assertNoErrors()
@@ -43,19 +43,20 @@ class FrontendE2ETest : BaseE2ETest() {
     }
 
     @Test
-    @Disabled("Flaky test - fails when run with all tests due to port/resource contention")
     fun `shelters page loads without JavaScript errors`() {
         navigateTo("/shelters")
         assertNoErrors()
     }
 
     @Test
+    @Disabled("Requires authentication")
     fun `profile page loads without JavaScript errors`() {
         navigateTo("/profile")
         assertNoErrors()
     }
 
     @Test
+    @Disabled("Requires authentication")
     fun `my pets page loads without JavaScript errors`() {
         navigateTo("/my-pets")
         assertNoErrors()

@@ -1,0 +1,55 @@
+@use 'variables' as *;
+@use 'base';
+@use 'layout';
+@use 'location-search-form';
+
+.temporal-homes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.temporal-home-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    h3 {
+        margin: 0 0 0.5rem;
+        color: var(--accent);
+    }
+
+    .location {
+        color: #9ca3af;
+        margin-bottom: 0.5rem;
+    }
+
+    .capacity {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .description {
+        margin: 0.75rem 0;
+        color: var(--text);
+    }
+}
+
+.requests-section {
+    margin-top: 2rem;
+}
+
+.request-card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    p {
+        margin: 0.5rem 0;
+    }
+}

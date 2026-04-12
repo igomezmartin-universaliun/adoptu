@@ -11,6 +11,7 @@ import com.adoptu.ports.SterilizationLocationRepositoryPort
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -29,6 +30,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
             country = row[SterilizationLocations.country],
             state = row[SterilizationLocations.state],
             city = row[SterilizationLocations.city],
+            neighborhood = row[SterilizationLocations.neighborhood],
             address = row[SterilizationLocations.address],
             zip = row[SterilizationLocations.zip],
             phone = row[SterilizationLocations.phone],
@@ -47,19 +49,34 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
             ?.let { rowToDto(it) }
     }
 
-    override fun getAll(country: String?, state: String?, city: String?): List<SterilizationLocationDto> = transaction {
-        val query = if (country.isNullOrBlank() && state.isNullOrBlank() && city.isNullOrBlank()) {
-            SterilizationLocations.selectAll()
-        } else if (state.isNullOrBlank() && city.isNullOrBlank()) {
-            SterilizationLocations.selectAll().where { SterilizationLocations.country eq country!! }
-        } else if (city.isNullOrBlank()) {
-            SterilizationLocations.selectAll().where { (SterilizationLocations.country eq country!!) and (SterilizationLocations.state eq state!!) }
+    override fun getAll(country: String?, state: String?, city: String?, neighborhood: String?, zip: String?): List<SterilizationLocationDto> = transaction {
+        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean>? = null
+        
+        if (!country.isNullOrBlank()) {
+            val countryCondition = SterilizationLocations.country eq country
+            conditions = countryCondition
+        }
+        if (!state.isNullOrBlank()) {
+            val stateCondition = SterilizationLocations.state eq state
+            conditions = conditions?.and(stateCondition) ?: stateCondition
+        }
+        if (!city.isNullOrBlank()) {
+            val cityCondition = SterilizationLocations.city eq city
+            conditions = conditions?.and(cityCondition) ?: cityCondition
+        }
+        if (!neighborhood.isNullOrBlank()) {
+            val neighborhoodCondition = SterilizationLocations.neighborhood eq neighborhood
+            conditions = conditions?.and(neighborhoodCondition) ?: neighborhoodCondition
+        }
+        if (!zip.isNullOrBlank()) {
+            val zipCondition = SterilizationLocations.zip eq zip
+            conditions = conditions?.and(zipCondition) ?: zipCondition
+        }
+        
+        val query = if (conditions != null) {
+            SterilizationLocations.selectAll().where { conditions }
         } else {
-            SterilizationLocations.selectAll().where { 
-                (SterilizationLocations.country eq country!!) and 
-                (SterilizationLocations.state eq state!!) and 
-                (SterilizationLocations.city eq city)
-            }
+            SterilizationLocations.selectAll()
         }
         query.map { rowToDto(it) }
     }
@@ -72,6 +89,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
                 it[country] = request.country
                 it[state] = request.state
                 it[city] = request.city
+                it[neighborhood] = request.neighborhood
                 it[address] = request.address
                 it[zip] = request.zip
                 it[phone] = request.phone
@@ -97,6 +115,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
                 request.country?.let { row[country] = it }
                 request.state?.let { row[state] = it }
                 request.city?.let { row[city] = it }
+                request.neighborhood?.let { row[neighborhood] = it }
                 request.address?.let { row[address] = it }
                 request.zip?.let { row[zip] = it }
                 request.phone?.let { row[phone] = it }

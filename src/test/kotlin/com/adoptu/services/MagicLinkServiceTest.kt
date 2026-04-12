@@ -232,7 +232,7 @@ class MagicLinkServiceTest {
                 it[Users.isEmailVerified] = true
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
     }
 
     private fun createMagicLinkToken(userId: Int, usedAt: Long? = null): String {

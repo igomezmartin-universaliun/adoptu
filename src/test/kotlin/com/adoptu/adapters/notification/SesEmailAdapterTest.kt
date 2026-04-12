@@ -188,7 +188,7 @@ class SesEmailAdapterTest {
         val config = MapApplicationConfig()
         val adapter: NotificationPort = SesEmailAdapter(config)
 
-        assertTrue(adapter is NotificationPort)
+        assertNotNull(adapter)
     }
 
     @Test

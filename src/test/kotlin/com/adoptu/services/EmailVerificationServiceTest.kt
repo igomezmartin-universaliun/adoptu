@@ -294,7 +294,7 @@ class EmailVerificationServiceTest {
                 it[Users.isEmailVerified] = isEmailVerified
                 it[Users.createdAt] = clock.now().toEpochMilliseconds()
             } get Users.id
-        }!!
+        }
     }
 
     private fun createVerificationToken(userId: Int): String {

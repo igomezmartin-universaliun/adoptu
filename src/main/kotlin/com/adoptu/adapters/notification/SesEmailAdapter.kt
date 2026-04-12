@@ -29,6 +29,7 @@ class SesEmailAdapter(config: ApplicationConfig) : NotificationPort {
     private val sesRegion = config.propertyOrNull("ses.region")?.getString() ?: "us-east-1"
     private val sesEndpoint = config.propertyOrNull("ses.endpoint")?.getString()
 
+    @Suppress("DEPRECATION")
     private val sesClient: SesClient? = try {
         val builder = SesClient.builder().region(Region.of(sesRegion))
 

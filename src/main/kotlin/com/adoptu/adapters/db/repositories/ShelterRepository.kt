@@ -8,6 +8,7 @@ import com.adoptu.ports.ShelterRepositoryPort
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -26,6 +27,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
             country = row[AnimalShelters.country],
             state = row[AnimalShelters.state],
             city = row[AnimalShelters.city],
+            neighborhood = row[AnimalShelters.neighborhood],
             address = row[AnimalShelters.address],
             zip = row[AnimalShelters.zip],
             phone = row[AnimalShelters.phone],
@@ -51,12 +53,24 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
             ?.let { rowToDto(it) }
     }
 
-    override fun getAll(country: String, state: String?): List<ShelterDto> = transaction {
-        val query = if (state.isNullOrBlank()) {
-            AnimalShelters.selectAll().where { AnimalShelters.country eq country }
-        } else {
-            AnimalShelters.selectAll().where { (AnimalShelters.country eq country) and (AnimalShelters.state eq state) }
+    override fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = transaction {
+        var conditions: Op<Boolean> = AnimalShelters.country eq country
+        
+        if (!state.isNullOrBlank()) {
+            conditions = conditions.and(AnimalShelters.state eq state)
         }
+        if (!city.isNullOrBlank()) {
+            conditions = conditions.and(AnimalShelters.city eq city)
+        }
+        if (!neighborhood.isNullOrBlank()) {
+            conditions = conditions.and(AnimalShelters.neighborhood eq neighborhood)
+        }
+        if (!zip.isNullOrBlank()) {
+            conditions = conditions.and(AnimalShelters.zip eq zip)
+        }
+        
+        val query = AnimalShelters.selectAll()
+            .where { conditions }
         query.map { rowToDto(it) }
     }
 
@@ -68,6 +82,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
                 it[country] = request.country
                 it[state] = request.state
                 it[city] = request.city
+                it[neighborhood] = request.neighborhood
                 it[address] = request.address
                 it[zip] = request.zip
                 it[phone] = request.phone
@@ -100,6 +115,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
                 request.country?.let { row[country] = it }
                 request.state?.let { row[state] = it }
                 request.city?.let { row[city] = it }
+                request.neighborhood?.let { row[neighborhood] = it }
                 request.address?.let { row[address] = it }
                 request.zip?.let { row[zip] = it }
                 request.phone?.let { row[phone] = it }

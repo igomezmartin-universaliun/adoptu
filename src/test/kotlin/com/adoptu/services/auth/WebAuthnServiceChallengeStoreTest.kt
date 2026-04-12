@@ -24,7 +24,7 @@ class WebAuthnServiceChallengeStoreTest {
             adminEmail = "admin@adopt-u.com",
             rpId = "localhost",
             rpName = "Adopt-U Pet Adoption",
-            origin = "http://localhost:8080"
+            origins = listOf("http://localhost:8080")
         )
     }
 

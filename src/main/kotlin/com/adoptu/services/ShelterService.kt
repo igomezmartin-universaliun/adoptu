@@ -7,9 +7,9 @@ import com.adoptu.ports.ShelterRepositoryPort
 
 class ShelterService(private val shelterRepository: ShelterRepositoryPort) {
 
-    fun getAll(country: String, state: String? = null): List<ShelterDto> {
+    fun getAll(country: String, state: String? = null, city: String? = null, neighborhood: String? = null, zip: String? = null): List<ShelterDto> {
         require(country.isNotBlank()) { "Country is required" }
-        return shelterRepository.getAll(country, state)
+        return shelterRepository.getAll(country, state, city, neighborhood, zip)
     }
 
     fun getById(id: Int): ShelterDto? = shelterRepository.getById(id)

@@ -20,7 +20,7 @@ class AuthValidationServiceTest {
             val result = service.validateSession(session)
 
             assertTrue(result is ServiceResult.Success)
-            assertEquals(session, (result as ServiceResult.Success).data)
+            assertEquals(session, result.data)
         }
 
         @Test

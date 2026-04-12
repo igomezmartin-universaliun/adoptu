@@ -65,7 +65,7 @@ const api = {
         return this.fetch('/api/pets/my-adoption-requests');
     },
     async getPhotographers() {
-        return this.fetch('/api/users/photographers');
+        return this.fetch('/api/photographers');
     },
     async updateProfile(displayName) {
         return this.fetch('/api/users/profile', {
@@ -75,34 +75,34 @@ const api = {
         });
     },
     async updatePhotographerSettings(fee, currency, country, state) {
-        return this.fetch('/api/users/photographer-settings', {
+        return this.fetch('/api/photographers/settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ photographerFee: fee, photographerCurrency: currency, country, state })
         });
     },
     async createPhotographyRequest(photographerId, petId, message) {
-        return this.fetch('/api/users/photography-requests', {
+        return this.fetch('/api/photographers/requests', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ photographerId, petId, message })
         });
     },
     async createMultiplePhotographyRequests(photographerIds, petId, message) {
-        return this.fetch('/api/users/photography-requests/multiple', {
+        return this.fetch('/api/photographers/requests/multiple', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ photographerIds, petId, message })
         });
     },
     async getPhotographyRequests() {
-        return this.fetch('/api/users/photography-requests');
+        return this.fetch('/api/photographers/requests');
     },
     async updatePhotographyRequest(requestId, status, scheduledDate) {
         const body = {};
         if (status) body.status = status;
         if (scheduledDate) body.scheduledDate = scheduledDate;
-        return this.fetch('/api/users/photography-requests/' + requestId, {
+        return this.fetch('/api/photographers/requests/' + requestId, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -116,7 +116,7 @@ const api = {
         });
     },
     async activatePhotographer(activate) {
-        return this.fetch('/api/users/photographer-profile', {
+        return this.fetch('/api/photographers/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ activate })

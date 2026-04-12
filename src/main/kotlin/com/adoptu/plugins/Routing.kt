@@ -21,5 +21,7 @@ fun Application.configureRouting() {
         adminShelterRoutes()
         sterilizationLocationRoutes()
         adminSterilizationLocationRoutes()
+        userShelterRoutes()
+        userSterilizationLocationRoutes()
     }
 }

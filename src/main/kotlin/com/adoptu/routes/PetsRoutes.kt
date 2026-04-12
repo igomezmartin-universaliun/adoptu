@@ -40,9 +40,9 @@ fun Route.petsRoutes() {
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]!!.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]!!.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
             val pet = petService.getById(id)
-            if (pet != null) call.respond(pet) else call.respondError("Not found", 404)
+            if (pet != null) call.respond(pet) else call.respondError(ValidationConstants.NOT_FOUND, 404)
         }
 
         post {
@@ -70,7 +70,7 @@ fun Route.petsRoutes() {
             }
             val user = (userResult as ServiceResult.Success).data
             val activeRoles = user.activeRoles.map { it.name }.toSet()
-            val id = call.parameters["id"]!!.toIntOrNull() ?: return@put call.respondError("Invalid ID")
+            val id = call.parameters["id"]!!.toIntOrNull() ?: return@put call.respondError(ValidationConstants.INVALID_ID)
 
             val body = call.receive<UpdatePetRequest>()
             call.respondData(petService.update(id, session.userId, activeRoles, body))
@@ -85,7 +85,7 @@ fun Route.petsRoutes() {
             }
             val user = (userResult as ServiceResult.Success).data
             val activeRoles = user.activeRoles.map { it.name }.toSet()
-            val id = call.parameters["id"]!!.toIntOrNull() ?: return@delete call.respondError("Invalid ID")
+            val id = call.parameters["id"]!!.toIntOrNull() ?: return@delete call.respondError(ValidationConstants.INVALID_ID)
 
             call.respondSuccess(petService.delete(id, session.userId, activeRoles))
         }
@@ -99,7 +99,7 @@ fun Route.petsRoutes() {
             }
             val user = (userResult as ServiceResult.Success).data
             val activeRoles = user.activeRoles.map { it.name }.toSet()
-            val petId = call.parameters["id"]?.toIntOrNull() ?: return@post call.respondError("Invalid ID")
+            val petId = call.parameters["id"]?.toIntOrNull() ?: return@post call.respondError(ValidationConstants.INVALID_ID)
 
             val imageIdsParam = call.request.queryParameters["imageIds"]
             if (imageIdsParam != null) {
@@ -108,7 +108,7 @@ fun Route.petsRoutes() {
                     val result = runBlocking { petService.updatePetImages(petId, session.userId, activeRoles, imageIds) }
                     when (result) {
                         is ServiceResult.Success -> call.respond(mapOf("images" to result.data))
-                        is ServiceResult.NotFound -> call.respondError("Not found", 404)
+                        is ServiceResult.NotFound -> call.respondError(ValidationConstants.NOT_FOUND, 404)
                         is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
                         is ServiceResult.Error -> call.respondError(result.message)
                     }
@@ -129,6 +129,7 @@ fun Route.petsRoutes() {
                     is PartData.FileItem -> {
                         fileName = part.originalFileName ?: "image"
                         contentType = part.contentType?.toString() ?: "image/jpeg"
+                        @Suppress("DEPRECATION")
                         imageData = part.streamProvider().readBytes()
                     }
                     is PartData.FormItem -> {
@@ -136,7 +137,7 @@ fun Route.petsRoutes() {
                             isPrimary = part.value.toBoolean()
                         }
                     }
-                    else -> {}
+                    else -> { /* NO action */ }
                 }
             }
 
@@ -214,7 +215,7 @@ fun Route.petsRoutes() {
             val activeRoles = user.activeRoles.map { UserRole.valueOf(it.name) }
             if (!activeRoles.contains(UserRole.ADOPTER)) return@post call.respondError("Only adopters can request adoption", 403)
 
-            val id = call.parameters["id"]!!.toIntOrNull() ?: return@post call.respondError("Invalid ID")
+            val id = call.parameters["id"]!!.toIntOrNull() ?: return@post call.respondError(ValidationConstants.INVALID_ID)
             val body = call.receive<CreateAdoptionRequestRequest>()
             val message = body.message
 
@@ -231,7 +232,7 @@ fun Route.petsRoutes() {
             }
             val user = (userResult as ServiceResult.Success).data
             val activeRoles = user.activeRoles.map { it.name }.toSet()
-            val id = call.parameters["id"]!!.toIntOrNull() ?: return@get call.respondError("Invalid ID")
+            val id = call.parameters["id"]!!.toIntOrNull() ?: return@get call.respondError(ValidationConstants.INVALID_ID)
 
             call.respondData(petService.getAdoptionRequestsForPet(id, session.userId, activeRoles))
         }
@@ -245,7 +246,7 @@ fun Route.petsRoutes() {
             }
             val user = (userResult as ServiceResult.Success).data
             val activeRoles = user.activeRoles.map { it.name }.toSet()
-            val requestId = call.parameters["requestId"]!!.toIntOrNull() ?: return@put call.respondError("Invalid ID")
+            val requestId = call.parameters["requestId"]!!.toIntOrNull() ?: return@put call.respondError(ValidationConstants.INVALID_ID)
             val params = call.receiveParameters()
             val status = params["status"] ?: return@put call.respondError("status required")
 

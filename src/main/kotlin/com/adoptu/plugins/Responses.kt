@@ -30,7 +30,7 @@ class DataResponder : ServiceResultResponder {
     override suspend fun respond(call: ApplicationCall, result: ServiceResult<*>) {
         when (result) {
             is ServiceResult.Success -> call.respond(result.data as Any)
-            is ServiceResult.NotFound -> call.respondError("Not found", 404)
+            is ServiceResult.NotFound -> call.respondError(ValidationConstants.NOT_FOUND, 404)
             is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
             is ServiceResult.Error -> call.respondError(result.message)
         }
@@ -41,18 +41,19 @@ class SuccessResponder : ServiceResultResponder {
     override suspend fun respond(call: ApplicationCall, result: ServiceResult<*>) {
         when (result) {
             is ServiceResult.Success -> call.respond(SuccessResponse(success = true))
-            is ServiceResult.NotFound -> call.respondError("Not found", 404)
+            is ServiceResult.NotFound -> call.respondError(ValidationConstants.NOT_FOUND, 404)
             is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
             is ServiceResult.Error -> call.respondError(result.message)
         }
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 class CustomResponder<T>(private val transform: suspend (T) -> Unit) : ServiceResultResponder {
     override suspend fun respond(call: ApplicationCall, result: ServiceResult<*>) {
         when (result) {
             is ServiceResult.Success -> transform(result.data as T)
-            is ServiceResult.NotFound -> call.respondError("Not found", 404)
+            is ServiceResult.NotFound -> call.respondError(ValidationConstants.NOT_FOUND, 404)
             is ServiceResult.Forbidden -> call.respondError("Forbidden", 403)
             is ServiceResult.Error -> call.respondError(result.message)
         }
@@ -66,7 +67,7 @@ suspend fun ApplicationCall.respondServiceResult(result: ServiceResult<*>, respo
 suspend inline fun <T> ApplicationCall.respondData(result: ServiceResult<T>) {
     when (result) {
         is ServiceResult.Success -> respond(result.data as Any)
-        is ServiceResult.NotFound -> respondError("Not found", 404)
+        is ServiceResult.NotFound -> respondError(ValidationConstants.NOT_FOUND, 404)
         is ServiceResult.Forbidden -> respondError("Forbidden", 403)
         is ServiceResult.Error -> respondError(result.message)
     }
@@ -75,7 +76,7 @@ suspend inline fun <T> ApplicationCall.respondData(result: ServiceResult<T>) {
 suspend fun ApplicationCall.respondSuccess(result: ServiceResult<*>) {
     when (result) {
         is ServiceResult.Success -> respond(SuccessResponse(success = true))
-        is ServiceResult.NotFound -> respondError("Not found", 404)
+        is ServiceResult.NotFound -> respondError(ValidationConstants.NOT_FOUND, 404)
         is ServiceResult.Forbidden -> respondError("Forbidden", 403)
         is ServiceResult.Error -> respondError(result.message)
     }

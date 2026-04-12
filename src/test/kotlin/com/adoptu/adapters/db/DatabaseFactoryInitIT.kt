@@ -44,7 +44,7 @@ class DatabaseFactoryInitIT {
             setProperty("password", "testpassword")
         }
 
-        val conn = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
+        val conn: java.sql.Connection = driver.connect("jdbc:postgresql://$host:$port/postgres", props)!!
         conn.use { conn ->
             conn.createStatement().use { stmt ->
                 stmt.execute("CREATE DATABASE adoptu_test1")
@@ -86,7 +86,7 @@ class DatabaseFactoryInitIT {
         transaction {
             val admin = Users.selectAll().where { Users.username.eq("adopt-u@adopt-u.org") }.firstOrNull()
             assertNotNull(admin, "Default admin should be created")
-            assertEquals("Admin", admin!![Users.displayName])
+            assertEquals("Admin", admin[Users.displayName])
             assertTrue(admin[Users.createdAt] > 0)
 
             val roles = UserActiveRoles.selectAll().where { UserActiveRoles.userId.eq(admin[Users.id]) }.toList()
@@ -104,7 +104,7 @@ class DatabaseFactoryInitIT {
         transaction {
             val admin = Users.selectAll().where { Users.username.eq("custom-admin@test.com") }.firstOrNull()
             assertNotNull(admin, "Custom admin should be created")
-            assertEquals("Admin", admin!![Users.displayName])
+            assertEquals("Admin", admin[Users.displayName])
         }
     }
 
@@ -175,7 +175,7 @@ class DatabaseFactoryInitIT {
         transaction {
             val admin = Users.selectAll().where { Users.username.eq("adopt-u@adopt-u.org") }.firstOrNull()
             assertNotNull(admin)
-            val createdAt = admin!![Users.createdAt]
+            val createdAt = admin[Users.createdAt]
             assertTrue(createdAt >= beforeInit, "Admin createdAt should be >= beforeInit")
             assertTrue(createdAt <= afterInit, "Admin createdAt should be <= afterInit")
         }
@@ -192,7 +192,7 @@ class DatabaseFactoryInitIT {
             assertNotNull(admin)
 
             val roles = UserActiveRoles.selectAll()
-                .where { UserActiveRoles.userId.eq(admin!![Users.id]) }
+                .where { UserActiveRoles.userId.eq(admin[Users.id]) }
                 .toList()
 
             assertEquals(1, roles.size, "Admin should have exactly one role")

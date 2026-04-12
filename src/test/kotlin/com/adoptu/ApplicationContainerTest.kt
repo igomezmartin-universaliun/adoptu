@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
 
 @Testcontainers
 @Execution(ExecutionMode.SAME_THREAD)
-@DisabledOnOs(OS.LINUX, disabledReason = "Requires Docker which is not available in CI")
 class ApplicationContainerTest {
 
     companion object {

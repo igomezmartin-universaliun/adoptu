@@ -20,6 +20,10 @@ interface UserRepositoryPort {
     fun deactivateRescuerProfile(userId: Int): UserDto?
     fun activateTemporalHomeProfile(userId: Int): UserDto?
     fun deactivateTemporalHomeProfile(userId: Int): UserDto?
+    fun activateShelterProfile(userId: Int): UserDto?
+    fun deactivateShelterProfile(userId: Int): UserDto?
+    fun activateSterilizationProfile(userId: Int): UserDto?
+    fun deactivateSterilizationProfile(userId: Int): UserDto?
     fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto?
     fun updateLanguage(userId: Int, language: String): UserDto?
     fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto?

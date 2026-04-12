@@ -61,7 +61,7 @@ class S3ImageStorageAdapterTest {
 
     @Test
     fun `adapter implements ImageStoragePort`() {
-        assertTrue(adapter is ImageStoragePort)
+        assertNotNull(adapter)
     }
 
     @Test

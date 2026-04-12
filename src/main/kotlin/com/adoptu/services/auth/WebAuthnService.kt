@@ -40,7 +40,7 @@ class WebAuthnService(
     private val adminEmail: String,
     private val rpId: String,
     private val rpName: String,
-    private val origin: String
+    private val origins: List<String>
 ) {
     private val objectConverter = ObjectConverter()
     private val webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager(objectConverter)
@@ -135,7 +135,7 @@ class WebAuthnService(
         ChallengeStore.remove(email)
 
         val serverProperty = ServerProperty.builder()
-            .origin(Origin(origin))
+            .origins(origins.map { Origin(it) }.toSet())
             .rpId(rpId)
             .challenge(DefaultChallenge(storedChallenge))
             .build()
@@ -297,7 +297,7 @@ class WebAuthnService(
         ChallengeStore.removeForUser(userId)
 
         val serverProperty = ServerProperty.builder()
-            .origin(Origin(origin))
+            .origins(origins.map { Origin(it) }.toSet())
             .rpId(rpId)
             .challenge(DefaultChallenge(storedChallenge))
             .build()
@@ -361,7 +361,7 @@ class WebAuthnService(
         ChallengeStore.removeAssertion()
 
         val serverProperty = ServerProperty.builder()
-            .origin(Origin(origin))
+            .origins(origins.map { Origin(it) }.toSet())
             .rpId(rpId)
             .challenge(DefaultChallenge(storedChallenge))
             .build()
