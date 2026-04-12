@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform") version "2.3.20"
     kotlin("plugin.serialization") version "2.3.20"
-    application
     id("io.miret.etienne.sass") version "1.6.0"
     id("com.gradleup.shadow") version "8.3.10"
 }
@@ -24,10 +23,7 @@ val kotestVersion = "6.1.3"
 val playwrightVersion = "1.58.0"
 
 kotlin {
-    jvm {
-        withJava()
-        jvmToolchain(25)
-    }
+    jvm()
     js(IR) {
         browser {
             binaries.executable()
@@ -114,10 +110,6 @@ kotlin {
             }
         }
     }
-}
-
-application {
-    mainClass.set("com.adoptu.ApplicationKt")
 }
 
 tasks.run<JavaExec> {
