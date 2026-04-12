@@ -52,36 +52,7 @@ tasks.withType<JavaExec> {
 }
 
 
-tasks.named<Test>("jvmTest") {
-    useJUnitPlatform()
-    maxParallelForks = Runtime.getRuntime().availableProcessors()
-    forkEvery = 1
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-    }
-    jvmArgs(
-        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-        "--add-opens", "java.base/java.util=ALL-UNNAMED",
-        "--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED",
-        "--add-opens", "java.base/java.math=ALL-UNNAMED",
-        "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
-        "--add-opens", "java.base/java.io=ALL-UNNAMED",
-        "--add-opens", "jdk.unsupported/sun.misc=ALL-UNNAMED",
-        "--add-opens", "java.base/java.nio=ALL-UNNAMED",
-        "--add-opens", "java.base/sun.security.ssl=ALL-UNNAMED",
-        "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
-        "--enable-native-access=ALL-UNNAMED",
-        "-XX:+EnableDynamicAgentLoading",
-        "-Dkotest.framework.classpath.scanning.config.disable=true",
-        "-Dkotest.framework.classpath.scanning.autoscan.disable=true"
-    )
-    systemProperty("jdk.module.illegalAccess", "permit")
-    systemProperty("jdk.suppressUnsupportedWarningWarnings", "true")
-    systemProperty("jdk.module.illegalAccess", "permit")
 
-    dependsOn("dockerUp")
-}
 
 tasks.compileSass {
     sourceDir = file("src/main/scss")
