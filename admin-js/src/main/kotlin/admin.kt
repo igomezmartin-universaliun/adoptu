@@ -118,7 +118,7 @@ fun loadPets() {
 fun setupTabs() {
     js("document.getElementById('tab-users').onclick = function() { document.getElementById('tab-users').classList.add('active'); document.getElementById('tab-pets').classList.remove('active'); document.getElementById('users-tab').style.display = 'block'; document.getElementById('pets-tab').style.display = 'none'; }")
     js("document.getElementById('tab-pets').onclick = function() { document.getElementById('tab-pets').classList.add('active'); document.getElementById('tab-users').classList.remove('active'); document.getElementById('pets-tab').style.display = 'block'; document.getElementById('users-tab').style.display = 'none'; }")
-    js("window.del = async function(id) { if (!confirm('Delete this pet?')) return; await api.deletePet(id); loadPets(); }")
+    js("window.del = function(id) { if (!confirm('Delete this pet?')) return; api.deletePet(id).then(function(){ loadPets(); }); }")
 }
 
 fun main() {
