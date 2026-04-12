@@ -2,6 +2,10 @@ plugins {
     kotlin("js")
 }
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     js(IR) {
         browser {
