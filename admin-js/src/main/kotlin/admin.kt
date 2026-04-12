@@ -1,6 +1,7 @@
 @file:Suppress("UnsafeCastFromDynamic", "unused")
 
 import kotlin.js.Promise
+import kotlin.js.Date
 
 external fun t(key: String): String
 external val api: dynamic
@@ -101,8 +102,6 @@ fun unbanUser(userId: dynamic) {
     fetch("/api/admin/users/${userId}/unban", options)
     loadUsers()
 }
-
-import kotlin.js.Date
 
 fun loadPets() {
     api.getPets().then { pets ->
