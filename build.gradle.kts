@@ -165,6 +165,14 @@ tasks.test {
     systemProperty("jdk.module.illegalAccess", "permit")
     systemProperty("jdk.suppressUnsupportedWarningWarnings", "true")
     systemProperty("jdk.module.illegalAccess", "permit")
+
+    doFirst {
+        // Ensure test dependencies (postgres/localstack) are started each run; non-blocking
+        exec {
+            environment("DOCKER_HOST", "unix:///run/docker.sock")
+            commandLine("sh", "-c", "docker compose -f docker-compose.test.yml up -d")
+        }
+    }
 }
 
 tasks.compileSass {
@@ -210,9 +218,6 @@ tasks.register<Exec>("dockerUp") {
     commandLine("sh", "-c", 
         "docker compose -f docker-compose.test.yml up -d"
     )
-    doFirst {
-        Thread.sleep(15000)
-    }
 }
 
 tasks.register<Exec>("dockerDown") {
