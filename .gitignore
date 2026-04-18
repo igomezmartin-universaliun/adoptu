@@ -40,6 +40,9 @@ logs/
 *.log
 *.ktds
 
+# Kotlin/JS
+kotlin-js-store/
+
 # Distributions
 build/distributions/*.zip
 build/distributions/*.tar

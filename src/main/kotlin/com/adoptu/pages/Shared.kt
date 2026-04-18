@@ -14,16 +14,15 @@ fun HTML.commonHead(title: String, extraCss: String? = null) {
 
 fun A.commonLogo() {
     classes = setOf("logo")
-    img(src = "https://d1i54dtpue2yh6.cloudfront.net/logo.svg", alt = "Adopt-U Logo")
+    img(src = "https://static.adopt-u.org/logo.svg", alt = "Adopt-U Logo")
     span { +"Adopt-U" }
 }
 
 fun BODY.commonScripts(isLoggedIn: Boolean = false) {
-    script(src = "/static/js/api.js") {}
+    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn;") } }
     script(src = "/static/js/i18n/i18n.js") {}
     script(src = "/static/js/i18n/i18n-en.js") {}
-    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn;") } }
-    script(src = "/static/js/common.js") {}
+    script(src = "/static/js/frontend.js") {}
 }
 
 fun DIV.languageDropdown() {
