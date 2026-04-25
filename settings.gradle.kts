@@ -1,2 +1,3 @@
 rootProject.name = "adopt-u"
-include("server")
+include("frontend")
+include("backend")
