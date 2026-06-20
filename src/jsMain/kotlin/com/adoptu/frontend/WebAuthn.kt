@@ -39,7 +39,15 @@ external object PublicKeyCredentialCompanion {
 
 object WebAuthn {
     suspend fun register(email: String, displayName: String, roles: List<String>, temporalHomeProfile: dynamic? = null): dynamic {
-        val optsRes = fetch("/api/auth/registration-options", js("({method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: 'email=' + encodeURIComponent('$email') + '&displayName=' + encodeURIComponent('$displayName')})")).awaitFetch()
+        val optsRes = fetch("/api/auth/registration-options", {
+            method: "POST",
+            headers: js("{'Content-Type': 'application/x-www-form-urlencoded'}"),
+            body: "email=" + encodeURIComponent(email) + "&displayName=" + encodeURIComponent(displayName)
+        }).awaitFetch()
+        if (!optsRes.ok) {
+            val error = optsRes.json().awaitCrypto()
+            throw Error(error.error ?: "Registration failed")
+        }
         val options = optsRes.json().awaitCrypto()
         val credential = navigator.credentials.create(json("publicKey" to parseCreationOptions(options))).awaitCrypto()
 
@@ -66,6 +74,9 @@ object WebAuthn {
         val optsRes = fetch("/api/auth/assertion-options", js("({credentials: 'include'})")).awaitFetch()
         val options = optsRes.json().awaitCrypto()
         val credential = navigator.credentials.get(json("publicKey" to parseRequestOptions(options))).awaitCrypto()
+        if (credential == null) {
+            throw Error("Passkey authentication was cancelled")
+        }
         val authRes = fetch("/api/auth/authenticate", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(credential.toJSON?.invoke() ?: toJSON(credential)), credentials: 'include'})")).awaitFetch()
         return authRes.json().awaitCrypto()
     }
@@ -125,6 +136,11 @@ object WebAuthn {
                 "userHandle" to (response.userHandle?.let { arrayToBase64(js("new Uint8Array")(it)) } ?: undefined)
             )
         )
+    }
+
+    fun serializeCredential(credential: dynamic): String {
+        val json = credential.toJSON?.invoke() ?: toJSON(credential)
+        return JSON.stringify(json)
     }
 }
 

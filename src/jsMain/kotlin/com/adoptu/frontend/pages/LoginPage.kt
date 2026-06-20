@@ -21,6 +21,34 @@ object LoginPage {
             (document.getElementById("tab-password") as? HTMLElement)?.click()
         }
 
+        // Handle URL error parameters from magic link login
+        val params = URLSearchParams(window.location.search)
+        val error = params.get("error")
+        if (error != null) {
+            val msg = document.getElementById("passkey-message") as? HTMLElement ?: return
+            val email = params.get("email")
+            val resent = params.get("resent") == "true"
+            
+            msg.className = "message error"
+            msg.textContent = when (error) {
+                "not_verified" -> if (resent) {
+                    I18n.t("verificationEmailResent")
+                } else {
+                    I18n.t("emailNotVerifiedLogin")
+                }
+                "invalid_or_expired" -> I18n.t("invalidOrExpiredToken")
+                "invalid_token" -> I18n.t("invalidToken")
+                "banned" -> I18n.t("accountBanned")
+                else -> I18n.t("loginError")
+            }
+            
+            // Set pending email for resend functionality
+            if (email != null) {
+                pendingEmail = email
+                showResendButton()
+            }
+        }
+
         (document.getElementById("login-btn") as? HTMLElement)?.onclick = {
             loginWithPasskey()
             undefined
@@ -140,6 +168,35 @@ object LoginPage {
 
         RsaCrypto.getPublicKey().then { publicKey ->
             RsaCrypto.encrypt(email, publicKey.toString()).then { encrypted ->
+                if (encrypted == null) {
+                    msg.className = "message error"
+                    msg.textContent = I18n.t("magicLinkFailed")
+                    undefined
+                    return@then
+                }
+                fetch("/api/auth/request-magic-link", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({encryptedData: encrypted})})")).then { res ->
+                    if (!res.ok) {
+                        msg.className = "message error"
+                        msg.textContent = "Server error: ${res.status}"
+                        return@then
+                    }
+                    res.json().then { result ->
+                        if (result.success == true) {
+                            msg.className = "message success"
+                            msg.textContent = I18n.t("magicLinkSent")
+                            emailInput.value = ""
+                        } else {
+                            msg.className = "message error"
+                            msg.textContent = result.error ?: I18n.t("magicLinkFailed")
+                        }
+                        undefined
+                    }
+                }
+            }
+        }.catch {
+            msg.className = "message error"
+            msg.textContent = I18n.t("magicLinkFailed")
+        }
                 fetch("/api/auth/request-magic-link", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({encryptedData: encrypted})})")).then { res ->
                     res.json().then { result ->
                         if (result.success == true) {
@@ -178,6 +235,12 @@ object LoginPage {
 
         RsaCrypto.getPublicKey().then { publicKey ->
             RsaCrypto.encrypt(password, publicKey.toString()).then { encrypted ->
+                if (encrypted == null) {
+                    msg.className = "message error"
+                    msg.textContent = I18n.t("loginFailed")
+                    undefined
+                    return@then
+                }
                 fetch("/api/auth/login-with-password", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: email, encryptedPassword: encrypted})})")).then { res ->
                     res.json().then { result ->
                         if (result.success == true) {
@@ -204,6 +267,12 @@ object LoginPage {
                         } else {
                             msg.className = "message error"
                             msg.textContent = result.error ?: I18n.t("loginFailed")
+                            
+                            // If email not verified, show resend button
+                            if (result.error?.contains("verify your email") == true && result.email != null) {
+                                pendingEmail = result.email
+                                showResendButton()
+                            }
                         }
                         undefined
                     }
@@ -238,6 +307,22 @@ object LoginPage {
         if (roles.contains("TEMPORAL_HOME")) {
             try {
                 ApiClient.getTemporalHome()
+            } catch (e: Throwable) {
+                return true
+            }
+        }
+        if (roles.contains("SHELTER")) {
+            try {
+                val res = fetch("/api/users/shelter").awaitMain()
+                if (!res.ok) return true
+            } catch (e: Throwable) {
+                return true
+            }
+        }
+        if (roles.contains("STERILIZATION_SERVICE")) {
+            try {
+                val res = fetch("/api/users/sterilization-location").awaitMain()
+                if (!res.ok) return true
             } catch (e: Throwable) {
                 return true
             }

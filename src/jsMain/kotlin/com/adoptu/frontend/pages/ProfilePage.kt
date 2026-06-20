@@ -11,6 +11,7 @@ object ProfilePage {
     private var hasTemporalHomeProfile = false
     private var hasShelterProfile = false
     private var hasSterilizationProfile = false
+    private var isPhotographerComplete = false
 
     suspend fun init() {
         loadProfile()
@@ -23,6 +24,7 @@ object ProfilePage {
 
         (document.getElementById("logout-link") as? HTMLElement)?.onclick = { e ->
             e.preventDefault()
+            js("window.onbeforeunload = null")
             ApiClient.logout().then { window.location.href = "/" }
             undefined
         }
@@ -54,12 +56,54 @@ object ProfilePage {
             }
         }
 
+        isPhotographerComplete = currentRoles.contains("PHOTOGRAPHER") &&
+            user.photographerCountry != null && user.photographerState != null
         try { ApiClient.getTemporalHome(); hasTemporalHomeProfile = true } catch (e: Throwable) { hasTemporalHomeProfile = false }
-        try { val r = fetch("/api/users/shelter"); hasShelterProfile = r.ok } catch (e: Throwable) { hasShelterProfile = false }
-        try { val r = fetch("/api/users/sterilization-location"); hasSterilizationProfile = r.ok } catch (e: Throwable) { hasSterilizationProfile = false }
+        try { val r = fetch("/api/users/shelter").awaitMain(); hasShelterProfile = r.ok } catch (e: Throwable) { hasShelterProfile = false }
+        try { val r = fetch("/api/users/sterilization-location").awaitMain(); hasSterilizationProfile = r.ok } catch (e: Throwable) { hasSterilizationProfile = false }
 
         setupRoleToggles()
         loadRoleSections(user)
+        setupCompletionGuard()
+    }
+
+    private fun isProfileComplete(): Boolean {
+        if (currentRoles.contains("PHOTOGRAPHER") && !isPhotographerComplete) return false
+        if (currentRoles.contains("TEMPORAL_HOME") && !hasTemporalHomeProfile) return false
+        return true
+    }
+
+    private fun setupCompletionGuard() {
+        val rolesRequiringData = currentRoles.filter { it !in listOf("ADOPTER", "RESCUER") }
+        if (rolesRequiringData.isEmpty() || isProfileComplete()) return
+
+        val banner = document.createElement("div") as HTMLElement
+        banner.id = "profile-completion-banner"
+        banner.className = "message error"
+        banner.style.asDynamic().margin = "1rem"
+        banner.setAttribute("data-i18n", "completeProfileToNavigate")
+        banner.textContent = "Please fill in all required information for your active roles before leaving this page."
+        document.querySelector("main")?.let { main -> main.insertBefore(banner, main.firstChild) }
+
+        js("window.onbeforeunload = function(e) { var msg = 'Please complete your profile before leaving.'; e.returnValue = msg; return msg; }")
+
+        document.addEventListener("click", { e ->
+            val anchor = js("e.target && e.target.closest && e.target.closest('a')")
+            if (anchor != null) {
+                val pathname = anchor.pathname?.toString() ?: ""
+                if (!pathname.startsWith("/profile") && pathname != "/logout") {
+                    e.preventDefault()
+                    val msg = document.getElementById("message") as? HTMLElement
+                    if (msg != null) {
+                        msg.className = "message error"
+                        msg.setAttribute("data-i18n", "completeProfileToNavigate")
+                        msg.textContent = "Please fill in all required information for your active roles before leaving this page."
+                        js("msg.scrollIntoView({behavior: 'smooth', block: 'center'})")
+                    }
+                }
+            }
+            undefined
+        })
     }
 
     private fun setupRoleToggles() {
@@ -222,6 +266,17 @@ object ProfilePage {
             } else {
                 ApiClient.activatePhotographer(false)
             }
+        } else if (rolePhotographer && !isPhotographerComplete) {
+            val phCountry = (document.getElementById("photographerCountry") as? HTMLSelectElement)?.value ?: ""
+            val phState = (document.getElementById("photographerState") as? HTMLInputElement)?.value ?: ""
+            if (phCountry.isEmpty() || phState.isEmpty()) {
+                msg.className = "message error"
+                msg.textContent = "Please fill in country and state for photographer services"
+                return
+            }
+            val phFee = (document.getElementById("photographerFee") as? HTMLInputElement)?.value?.toDoubleOrNull() ?: 0.0
+            val phCurrency = (document.getElementById("photographerCurrency") as? HTMLSelectElement)?.value ?: "USD"
+            ApiClient.updatePhotographerSettings(phFee, phCurrency, phCountry, phState)
         }
         if (roleTemporalHome != currentRoles.contains("TEMPORAL_HOME")) {
             if (roleTemporalHome) {
@@ -249,10 +304,28 @@ object ProfilePage {
             } else {
                 ApiClient.activateTemporalHome(false)
             }
+        } else if (roleTemporalHome && !hasTemporalHomeProfile) {
+            val thAlias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
+            val thCountry = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
+            val thCity = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            if (thAlias.isEmpty() || thCountry.isEmpty() || thCity.isEmpty()) {
+                msg.className = "message error"
+                msg.textContent = "Please fill in alias, country and city for temporal home"
+                return
+            }
+            val thData = js("({})")
+            thData.alias = thAlias
+            thData.country = thCountry
+            thData.state = (document.getElementById("th-state") as? HTMLInputElement)?.value?.trim() ?: null
+            thData.city = thCity
+            thData.zip = (document.getElementById("th-zip") as? HTMLInputElement)?.value?.trim() ?: null
+            thData.neighborhood = (document.getElementById("th-neighborhood") as? HTMLInputElement)?.value?.trim() ?: null
+            ApiClient.createTemporalHome(thData).then { hasTemporalHomeProfile = true; undefined }
         }
 
         msg.className = "message success"
         msg.textContent = "Profile updated!"
+        js("window.onbeforeunload = null")
         window.location.reload()
     }
 
@@ -407,7 +480,7 @@ object ProfilePage {
         fetch("/api/auth/registration-options-for-user", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: user.email, displayName: user.displayName})})")).then { res ->
             res.json().then { options ->
                 val credential = navigator.credentials.create(json("publicKey" to WebAuthn.parseCreationOptions(options))).awaitCommon()
-                fetch("/api/auth/register-passkey", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({registrationResponse: JSON.stringify(credential), passkeyName: passkeyName})})")).then { regRes ->
+                fetch("/api/auth/register-passkey", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({registrationResponse: WebAuthn.serializeCredential(credential), passkeyName: passkeyName})})")).then { regRes ->
                     regRes.json().then { result ->
                         if (result.success == true) {
                             msg.className = "message success"

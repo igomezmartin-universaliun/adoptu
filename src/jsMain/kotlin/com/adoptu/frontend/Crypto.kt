@@ -20,7 +20,7 @@ external fun atob(data: String): String
 external fun btoa(data: String): String
 
 object RsaCrypto {
-    private var cachedPublicKey: String? = null
+    private var cachedPublicKeyPromise: Promise<String>? = null
 
     private fun pemToBase64(pem: String): String = pem
         .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -45,40 +45,48 @@ object RsaCrypto {
         return btoa(binary)
     }
 
-    suspend fun encrypt(plaintext: String, publicKeyPem: String): String? {
-        return try {
-            val keyData = base64ToArrayBuffer(pemToBase64(publicKeyPem))
-            val publicKey = crypto.subtle.importKey(
-                "spki",
-                keyData,
-                js("({name: 'RSA-OAEP', hash: 'SHA-256'})"),
-                false,
-                js("['encrypt']")
-            ).awaitCrypto()
-
-            val encoder = js("new TextEncoder()")
-            val data = encoder.encode(plaintext)
-
-            val encrypted = crypto.subtle.encrypt(
-                js("({name: 'RSA-OAEP', hash: 'SHA-256'})"),
-                publicKey,
-                data
-            ).awaitCrypto()
-
-            arrayBufferToBase64(encrypted)
-        } catch (e: Throwable) {
-            console.error("Encryption failed: $e")
-            null
+    fun encrypt(plaintext: String, publicKeyPem: String): Promise<String?> {
+        return Promise<dynamic> { resolve, reject ->
+            try {
+                val keyData = base64ToArrayBuffer(pemToBase64(publicKeyPem))
+                crypto.subtle.importKey(
+                    "spki",
+                    keyData,
+                    js("({name: 'RSA-OAEP', hash: 'SHA-256'})"),
+                    false,
+                    js("['encrypt']")
+                ).then { publicKey ->
+                    val encoder = js("new TextEncoder()")
+                    val data = encoder.encode(plaintext)
+                    crypto.subtle.encrypt(
+                        js("({name: 'RSA-OAEP', hash: 'SHA-256'})"),
+                        publicKey,
+                        data
+                    ).then { encrypted ->
+                        resolve(arrayBufferToBase64(encrypted))
+                    }.catch { e ->
+                        console.error("Encryption failed: $e")
+                        resolve(null)
+                    }
+                }.catch { e ->
+                    console.error("Key import failed: $e")
+                    resolve(null)
+                }
+            } catch (e: Throwable) {
+                console.error("Encryption failed: $e")
+                resolve(null)
+            }
         }
     }
 
-    suspend fun getPublicKey(): String {
-        cachedPublicKey?.let { return it }
-        val response = fetch("/api/auth/encryption-key").awaitFetch()
-        val data = response.json().awaitCrypto()
-        val key = data.publicKey as String
-        cachedPublicKey = key
-        return key
+    fun getPublicKey(): Promise<String> {
+        if (cachedPublicKeyPromise != null) {
+            return cachedPublicKeyPromise!!
+        }
+        cachedPublicKeyPromise = fetch("/api/auth/encryption-key")
+            .then { res -> res.json() }
+            .then { data -> data.publicKey as String }
+        return cachedPublicKeyPromise!!
     }
 }
 
