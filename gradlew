@@ -199,6 +199,11 @@ if "$cygwin" || "$msys" ; then
 fi
 
 
+# Suppress Node.js deprecation warnings produced by yarn 1.x running on Node.js 22+.
+# DEP0169 (url.parse) and DEP0040 (punycode) come from yarn internals; setting NODE_OPTIONS
+# here ensures every node subprocess spawned during the build inherits the flag.
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--no-deprecation"
+
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
