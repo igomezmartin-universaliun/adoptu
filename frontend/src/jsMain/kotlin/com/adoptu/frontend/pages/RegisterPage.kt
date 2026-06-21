@@ -2,6 +2,7 @@ package com.adoptu.frontend.pages
 
 import com.adoptu.frontend.*
 import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.dom.*
 import kotlin.js.json
 
@@ -86,7 +87,7 @@ object RegisterPage {
                             if (result.success == true) {
                                 msg.className = "message success"
                                 msg.textContent = "Account created! Check your email to verify your account."
-                                js("setTimeout")(suspend { window.location.href = "/login" }, 2000)
+                                js("setTimeout")({ window.location.href = "/login" }, 2000)
                             } else {
                                 msg.className = "message error"
                                 msg.textContent = result.error ?: "Registration failed."

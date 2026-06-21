@@ -1,27 +1,25 @@
 package com.adoptu.frontend
 
-import kotlinx.browser.window
-import org.w3c.dom.RequestCredentials
-import org.w3c.dom.fetch.RequestInit
-import kotlin.js.Promise
 import kotlin.js.json
 
-external fun fetch(resource: String, init: RequestInit? = definedExternally): Promise<Response>
-external interface Response {
-    val ok: Boolean
-    val statusText: String
-    fun text(): Promise<String>
-    fun json(): Promise<dynamic>
+external interface RequestInit {
+    var method: String
+    var headers: dynamic
+    var body: dynamic
+    var credentials: String
 }
+
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+fun RequestInit(): RequestInit = js("({})") as RequestInit
 
 object ApiClient {
     private val base = ""
 
     private suspend fun request(path: String, options: RequestInit? = null): dynamic {
         val init = options ?: RequestInit()
-        init.credentials = RequestCredentials.include
-        val response = fetch(base + path, init).awaitKt()
-        val text = response.text().awaitKt()
+        init.credentials = "include"
+        val response = fetch(base + path, init).awaitCommon()
+        val text = response.text().awaitCommon()
         val data = if (text.isNotEmpty()) {
             try {
                 JSON.parse<dynamic>(text)
@@ -210,19 +208,6 @@ object ApiClient {
         headers = json("Content-Type" to "application/json")
         body = JSON.stringify(json("encryptedData" to encryptedPassword))
     })
-}
-
-external object JSON {
-    fun parse(text: String): dynamic
-    fun <T> parse(text: String): T
-    fun stringify(value: dynamic): String
-}
-
-suspend fun <T> Promise<T>.awaitKt(): T = kotlin.coroutines.suspendCoroutine { cont ->
-    this.then(
-        onFulfilled = { cont.resume(it) },
-        onRejected = { cont.resumeWith(Result.failure(it as Throwable)) }
-    )
 }
 
 external class Error(message: String) : Throwable

@@ -14,18 +14,12 @@ kotlin {
     js(IR) {
         browser {
             binaries.executable()
-            commonWebpackConfig {
-                outputFileName = "common.js"
-            }
-        }
-        compilerOptions {
-            freeCompilerArgs.addAll(listOf("-opt-in=kotlin.js.ExperimentalJsExport"))
         }
     }
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-js"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             }
         }
     }

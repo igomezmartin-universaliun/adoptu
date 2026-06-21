@@ -5,6 +5,8 @@ import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
+import kotlin.coroutines.resume
+import kotlin.js.Promise
 import kotlin.js.json
 
 external fun fetch(resource: String, init: dynamic = definedExternally): Promise<FetchResponse>
