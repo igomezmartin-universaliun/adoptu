@@ -33,16 +33,16 @@ class WebAuthnServiceChallengeStoreTest {
         val result = webAuthnService.generateRegistrationOptions("test@example.com", "Test User")
 
         assertNotNull(result)
-        assertEquals("localhost", result.rp.id)
-        assertEquals("Adopt-U Pet Adoption", result.rp.name)
-        assertNotNull(result.user)
-        assertEquals("test@example.com", result.user.name)
-        assertEquals("Test User", result.user.displayName)
-        assertTrue(result.challenge.isNotEmpty())
-        assertNotNull(result.pubKeyCredParams)
-        assertEquals(2, result.pubKeyCredParams.size)
-        assertTrue(result.pubKeyCredParams.any { it.type == "public-key" && it.alg == -7 })
-        assertTrue(result.pubKeyCredParams.any { it.type == "public-key" && it.alg == -257 })
+        assertEquals("localhost", result.publicKey.rp.id)
+        assertEquals("Adopt-U Pet Adoption", result.publicKey.rp.name)
+        assertNotNull(result.publicKey.user)
+        assertEquals("test@example.com", result.publicKey.user.name)
+        assertEquals("Test User", result.publicKey.user.displayName)
+        assertTrue(result.publicKey.challenge.isNotEmpty())
+        assertNotNull(result.publicKey.pubKeyCredParams)
+        assertEquals(2, result.publicKey.pubKeyCredParams.size)
+        assertTrue(result.publicKey.pubKeyCredParams.any { it.type == "public-key" && it.alg == -7 })
+        assertTrue(result.publicKey.pubKeyCredParams.any { it.type == "public-key" && it.alg == -257 })
     }
 
     @Test
@@ -118,18 +118,20 @@ class WebAuthnServiceChallengeStoreTest {
         @Test
         fun `RegistrationOptionsResponse contains all fields`() {
             val response = WebAuthnService.RegistrationOptionsResponse(
-                rp = WebAuthnService.RelyingParty(id = "rp-id", name = "RP Name"),
-                user = WebAuthnService.PublicKeyUser(id = "user-id", name = "name", displayName = "Display"),
-                challenge = "challenge-value",
-                pubKeyCredParams = listOf(
-                    WebAuthnService.PubKeyCredParam(type = "public-key", alg = -7)
+                publicKey = WebAuthnService.PublicKeyOptions(
+                    rp = WebAuthnService.RelyingParty(id = "rp-id", name = "RP Name"),
+                    user = WebAuthnService.PublicKeyUser(id = "user-id", name = "name", displayName = "Display"),
+                    challenge = "challenge-value",
+                    pubKeyCredParams = listOf(
+                        WebAuthnService.PubKeyCredParam(type = "public-key", alg = -7)
+                    )
                 )
             )
 
-            assertEquals("rp-id", response.rp.id)
-            assertEquals("user-id", response.user.id)
-            assertEquals("challenge-value", response.challenge)
-            assertEquals(1, response.pubKeyCredParams.size)
+            assertEquals("rp-id", response.publicKey.rp.id)
+            assertEquals("user-id", response.publicKey.user.id)
+            assertEquals("challenge-value", response.publicKey.challenge)
+            assertEquals(1, response.publicKey.pubKeyCredParams.size)
         }
     }
 

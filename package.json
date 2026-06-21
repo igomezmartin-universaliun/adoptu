@@ -1,0 +1,22 @@
+{
+  "name": "adoptu",
+  "version": "1.0.0",
+  "description": "A Kotlin pet adoption web application with **FIDO2/WebAuthn** passwordless authentication. Multi-page application with HTML rendered from Kotlin (kotlinx.html).",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igomezmartin-universaliun/adoptu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/igomezmartin-universaliun/adoptu/issues"
+  },
+  "homepage": "https://github.com/igomezmartin-universaliun/adoptu#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0"
+  }
+}

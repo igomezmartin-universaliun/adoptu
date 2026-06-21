@@ -8,6 +8,8 @@ fun HTML.commonHead(title: String, extraCss: String? = null) {
         meta(name = "viewport", content = "width=device-width, initial-scale=1.0")
         this.title { +title }
         link(rel = "stylesheet", href = "/static/css/style.css")
+        link(rel = "icon", href = "https://static.adopt-u.org/favicon.ico", type = "image/x-icon")
+        link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200")
         extraCss?.let { link(rel = "stylesheet", href = "/static/css/$it") }
     }
 }
@@ -19,34 +21,32 @@ fun A.commonLogo() {
 }
 
 fun BODY.commonScripts(isLoggedIn: Boolean = false) {
-    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn;") } }
-    script(src = "/static/js/i18n/i18n.js") {}
-    script(src = "/static/js/i18n/i18n-en.js") {}
-    script(src = "/static/js/frontend.js") {}
+    script(src = "/static/js/common.js") {}
+    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn; com.adoptu.frontend.Common.initDropdowns(); com.adoptu.frontend.Common.initI18n(null);") } }
 }
 
 fun DIV.languageDropdown() {
     div(classes = "lang-dropdown") {
-        button(classes = "lang-dropbtn", type = ButtonType.button) { +"🌐" }
+        button(classes = "lang-dropbtn", type = ButtonType.button) { id = "lang-dropbtn"; +"🌐" }
         div(classes = "lang-dropdown-content") {
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('en')"; +"🇺🇸 English" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('es')"; +"🇪🇸 Español" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('fr')"; +"🇫🇷 Français" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('pt')"; +"🇧🇷 Português" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('zh')"; +"🇨🇳 中文" }
+            a(classes = "lang-option") { attributes["data-lang"] = "en"; +"🇺🇸 English" }
+            a(classes = "lang-option") { attributes["data-lang"] = "es"; +"🇪🇸 Español" }
+            a(classes = "lang-option") { attributes["data-lang"] = "fr"; +"🇫🇷 Français" }
+            a(classes = "lang-option") { attributes["data-lang"] = "pt"; +"🇧🇷 Português" }
+            a(classes = "lang-option") { attributes["data-lang"] = "zh"; +"🇨🇳 中文" }
         }
     }
 }
 
 fun NAV.languageDropdown() {
     div(classes = "lang-dropdown") {
-        button(classes = "lang-dropbtn", type = ButtonType.button) { +"🌐" }
+        button(classes = "lang-dropbtn", type = ButtonType.button) { id = "lang-dropbtn"; +"🌐" }
         div(classes = "lang-dropdown-content") {
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('en')"; +"🇺🇸 English" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('es')"; +"🇪🇸 Español" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('fr')"; +"🇫🇷 Français" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('pt')"; +"🇧🇷 Português" }
-            a(classes = "lang-option") { attributes["onclick"] = "setLang('zh')"; +"🇨🇳 中文" }
+            a(classes = "lang-option") { attributes["data-lang"] = "en"; +"🇺🇸 English" }
+            a(classes = "lang-option") { attributes["data-lang"] = "es"; +"🇪🇸 Español" }
+            a(classes = "lang-option") { attributes["data-lang"] = "fr"; +"🇫🇷 Français" }
+            a(classes = "lang-option") { attributes["data-lang"] = "pt"; +"🇧🇷 Português" }
+            a(classes = "lang-option") { attributes["data-lang"] = "zh"; +"🇨🇳 中文" }
         }
     }
 }
@@ -67,33 +67,33 @@ fun NAV.commonNav(isLoggedIn: Boolean = false, isAdmin: Boolean = false, isRescu
                 div(classes = "user-dropdown") {
                     a("/profile") { 
                         span { attributes["data-i18n"] = "profile"; +"Profile" }
-                        img(src = Icons.USER, alt = "User") { width = "20"; height = "20" }
+                        span(classes = "material-symbols-outlined") { +Icons.USER }
                     }
                     if (isRescuerOrAdmin || isAdmin) {
                         a("/my-pets") {
                             span { attributes["data-i18n"] = "myPets"; +"My Pets" }
-                            img(src = Icons.PAW, alt = "Pet") { width = "20"; height = "20" }
+                            span(classes = "material-symbols-outlined") { +Icons.PAW }
                         }
                     }
                     if (isTemporalHomeOrAdmin || isAdmin) {
                         a("/temporal-home") {
                             span { attributes["data-i18n"] = "myTemporalHome"; +"My Temporal Home" }
-                            img(src = Icons.HOME, alt = "Home") { width = "20"; height = "20" }
+                            span(classes = "material-symbols-outlined") { +Icons.HOME }
                         }
                     }
                     if (isAdmin) {
                         a("/admin") {
                             span { attributes["data-i18n"] = "admin"; +"Admin" }
-                            img(src = Icons.SETTINGS, alt = "Settings") { width = "20"; height = "20" }
+                            span(classes = "material-symbols-outlined") { +Icons.SETTINGS }
                         }
                         a("/admin/shelters") {
                             span { attributes["data-i18n"] = "manageShelters"; +"Manage Shelters" }
-                            img(src = Icons.HOME, alt = "Home") { width = "20"; height = "20" }
+                            span(classes = "material-symbols-outlined") { +Icons.HOME }
                         }
                     }
                     a("/logout") {
                         span { attributes["data-i18n"] = "logout"; +"Close session" }
-                        img(src = Icons.LOGOUT, alt = "Logout") { width = "20"; height = "20" }
+                        span(classes = "material-symbols-outlined") { +Icons.LOGOUT }
                     }
                 }
             }
@@ -120,19 +120,19 @@ fun DIV.commonResourcesDropdown() {
         div(classes = "resources-dropdown-content") {
             a("/shelters") { 
                 span { attributes["data-i18n"] = "shelters"; +"Shelters" }
-                img(src = Icons.BUILDING, alt = "Building") { width = "16"; height = "16" }
+                span(classes = "material-symbols-outlined") { +Icons.SHELTER }
             }
             a("/photographers") { 
                 span { attributes["data-i18n"] = "photographers"; +"Photographers" }
-                img(src = Icons.SHELTER, alt = "Shelter") { width = "16"; height = "16" }
+                span(classes = "material-symbols-outlined") { +Icons.CAMERA }
             }
             a("/sterilization-locations") { 
                 span { attributes["data-i18n"] = "sterilizationLocations"; +"Sterilization Locations" }
-                img(src = Icons.HEARTBEAT, alt = "Health") { width = "16"; height = "16" }
+                span(classes = "material-symbols-outlined") { +Icons.SYRINGE }
             }
             a("/temporal-homes") { 
                 span { attributes["data-i18n"] = "findTemporalHomes"; +"Temporal Homes" }
-                img(src = Icons.BUILDING, alt = "Building") { width = "16"; height = "16" }
+                span(classes = "material-symbols-outlined") { +Icons.HOME }
             }
         }
     }

@@ -1,0 +1,406 @@
+{
+  "version": 1,
+  "created_at": "2026-06-21T17:54:59.933Z",
+  "lifetime": {
+    "total_tokens_estimated": 42725,
+    "total_reads": 43,
+    "total_writes": 5,
+    "total_sessions": 9,
+    "anatomy_hits": 34,
+    "anatomy_misses": 9,
+    "repeated_reads_blocked": 4,
+    "estimated_savings_vs_bare_cli": 16028
+  },
+  "sessions": [
+    {
+      "id": "session-2026-06-21-1249",
+      "started": "2026-06-21T18:49:17.366Z",
+      "ended": "2026-06-21T18:53:17.214Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/buildspec.yml",
+          "tokens_estimated": 353,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/docker-compose.test.yml",
+          "tokens_estimated": 251,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/gradle/wrapper/gradle-wrapper.properties",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 134,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9848,
+        "output_tokens_estimated": 134,
+        "reads_count": 9,
+        "writes_count": 1,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 8
+      }
+    },
+    {
+      "id": "session-2026-06-21-1249",
+      "started": "2026-06-21T18:49:17.366Z",
+      "ended": "2026-06-21T18:58:03.949Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/buildspec.yml",
+          "tokens_estimated": 353,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/docker-compose.test.yml",
+          "tokens_estimated": 251,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/gradle/wrapper/gradle-wrapper.properties",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 134,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9848,
+        "output_tokens_estimated": 134,
+        "reads_count": 9,
+        "writes_count": 1,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 8
+      }
+    },
+    {
+      "id": "session-2026-06-21-1249",
+      "started": "2026-06-21T18:49:17.366Z",
+      "ended": "2026-06-21T18:59:45.848Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/buildspec.yml",
+          "tokens_estimated": 353,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/docker-compose.test.yml",
+          "tokens_estimated": 251,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/gradle/wrapper/gradle-wrapper.properties",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 134,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9848,
+        "output_tokens_estimated": 134,
+        "reads_count": 9,
+        "writes_count": 1,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 8
+      }
+    },
+    {
+      "id": "session-2026-06-21-1249",
+      "started": "2026-06-21T18:49:17.366Z",
+      "ended": "2026-06-21T19:07:05.244Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/buildspec.yml",
+          "tokens_estimated": 353,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/docker-compose.test.yml",
+          "tokens_estimated": 251,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/settings.gradle.kts",
+          "tokens_estimated": 8,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/gradle/wrapper/gradle-wrapper.properties",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/services/ServiceResult.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/ports/NotificationPort.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/services/EmailVerificationService.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 134,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9848,
+        "output_tokens_estimated": 134,
+        "reads_count": 12,
+        "writes_count": 1,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 8
+      }
+    },
+    {
+      "id": "session-2026-06-21-1322",
+      "started": "2026-06-21T19:22:48.783Z",
+      "ended": "2026-06-21T19:27:40.509Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 2307,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/fix-test-task/build.gradle.kts",
+          "tokens_estimated": 49,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 2307,
+        "output_tokens_estimated": 49,
+        "reads_count": 1,
+        "writes_count": 1,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-21-1330",
+      "started": "2026-06-21T19:30:28.743Z",
+      "ended": "2026-06-21T19:33:08.190Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/adapters/db/Models.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/adapters/db/DatabaseFactory.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/settings.json",
+          "tokens_estimated": 441,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 441,
+        "output_tokens_estimated": 0,
+        "reads_count": 3,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 1
+      }
+    }
+  ],
+  "daemon_usage": [],
+  "waste_flags": [],
+  "optimization_report": {
+    "last_generated": null,
+    "patterns": []
+  }
+}

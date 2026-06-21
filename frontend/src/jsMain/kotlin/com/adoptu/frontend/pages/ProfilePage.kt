@@ -1,48 +1,45 @@
 package com.adoptu.frontend.pages
 
-import com.adoptu.frontend.*
+import com.adoptu.frontend.ApiClientModule
+import com.adoptu.frontend.I18n
+import com.adoptu.frontend.RsaCryptoModule
+import com.adoptu.frontend.WebAuthnModule
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
-import kotlin.js.json
+import kotlin.js.Promise
 
-object ProfilePage {
+@JsExport
+@JsName("ProfilePage")
+object ProfilePageModule {
     private var currentRoles = emptyList<String>()
     private var hasTemporalHomeProfile = false
     private var hasShelterProfile = false
     private var hasSterilizationProfile = false
-    private var isPhotographerComplete = false
 
-    suspend fun init() {
+    fun init() {
         loadProfile()
-        setupSaveButton()
-        setupPasswordButton()
-        setupEmailChangeButton()
-        setupPasskeyButton()
-        loadPasswordStatus()
-        loadPasskeyStatus()
+    }
 
-        (document.getElementById("logout-link") as? HTMLElement)?.onclick = { e ->
-            e.preventDefault()
-            js("window.onbeforeunload = null")
-            ApiClient.logout().then { window.location.href = "/" }
+    private fun loadProfile() {
+        ApiClientModule.me().then<Unit> { user ->
+            if (user != null) {
+                updateProfileUI(user)
+            }
             undefined
         }
     }
 
-    private suspend fun loadProfile() {
-        var user: dynamic = js("window.cachedUserData")
-        if (user == null) {
-            user = js("window.userDataPromise").awaitCommon()
+    private fun updateProfileUI(user: dynamic) {
+        if (user.authenticated == false) {
+            window.location.href = "/login"
+            return
         }
-        if (user == null) {
-            try { user = ApiClient.me(); js("window.cachedUserData = user") } catch (e: Throwable) { return }
-        }
-        if (user.authenticated == false) { window.location.href = "/login"; return }
 
         (document.getElementById("email") as? HTMLInputElement)?.value = user.email ?: ""
         (document.getElementById("displayName") as? HTMLInputElement)?.value = user.displayName ?: ""
         (document.getElementById("language") as? HTMLSelectElement)?.value = user.language ?: "en"
+
         currentRoles = (user.activeRoles as? Array<*>)?.map { it.toString() } ?: emptyList()
 
         listOf("role-rescuer", "role-photographer", "role-temporal-home", "role-shelter", "role-sterilization").forEach { id ->
@@ -56,95 +53,73 @@ object ProfilePage {
             }
         }
 
-        isPhotographerComplete = currentRoles.contains("PHOTOGRAPHER") &&
-            user.photographerCountry != null && user.photographerState != null
-        try { ApiClient.getTemporalHome(); hasTemporalHomeProfile = true } catch (e: Throwable) { hasTemporalHomeProfile = false }
-        try { val r = fetch("/api/users/shelter").awaitMain(); hasShelterProfile = r.ok } catch (e: Throwable) { hasShelterProfile = false }
-        try { val r = fetch("/api/users/sterilization-location").awaitMain(); hasSterilizationProfile = r.ok } catch (e: Throwable) { hasSterilizationProfile = false }
+        hasTemporalHomeProfile = false
+        hasShelterProfile = false
+        hasSterilizationProfile = false
+
+        checkProfileExists()
 
         setupRoleToggles()
         loadRoleSections(user)
-        setupCompletionGuard()
+        setupSaveButton()
+        setupPasswordButton()
+        setupEmailChangeButton()
+        setupPasskeyButton()
+        loadPasswordStatus()
+        loadPasskeyStatus()
+        I18n.updatePage()
     }
 
-    private fun isProfileComplete(): Boolean {
-        if (currentRoles.contains("PHOTOGRAPHER") && !isPhotographerComplete) return false
-        if (currentRoles.contains("TEMPORAL_HOME") && !hasTemporalHomeProfile) return false
-        return true
-    }
-
-    private fun setupCompletionGuard() {
-        val rolesRequiringData = currentRoles.filter { it !in listOf("ADOPTER", "RESCUER") }
-        if (rolesRequiringData.isEmpty() || isProfileComplete()) return
-
-        val banner = document.createElement("div") as HTMLElement
-        banner.id = "profile-completion-banner"
-        banner.className = "message error"
-        banner.style.asDynamic().margin = "1rem"
-        banner.setAttribute("data-i18n", "completeProfileToNavigate")
-        banner.textContent = "Please fill in all required information for your active roles before leaving this page."
-        document.querySelector("main")?.let { main -> main.insertBefore(banner, main.firstChild) }
-
-        js("window.onbeforeunload = function(e) { var msg = 'Please complete your profile before leaving.'; e.returnValue = msg; return msg; }")
-
-        document.addEventListener("click", { e ->
-            val anchor = js("e.target && e.target.closest && e.target.closest('a')")
-            if (anchor != null) {
-                val pathname = anchor.pathname?.toString() ?: ""
-                if (!pathname.startsWith("/profile") && pathname != "/logout") {
-                    e.preventDefault()
-                    val msg = document.getElementById("message") as? HTMLElement
-                    if (msg != null) {
-                        msg.className = "message error"
-                        msg.setAttribute("data-i18n", "completeProfileToNavigate")
-                        msg.textContent = "Please fill in all required information for your active roles before leaving this page."
-                        js("msg.scrollIntoView({behavior: 'smooth', block: 'center'})")
-                    }
-                }
-            }
-            undefined
-        })
+    private fun checkProfileExists() {
+        window.asDynamic().fetch("/api/users/temporal-home").then { res ->
+            if (res.ok) hasTemporalHomeProfile = true
+        }
+        window.asDynamic().fetch("/api/users/shelter").then { res ->
+            if (res.ok) hasShelterProfile = true
+        }
+        window.asDynamic().fetch("/api/users/sterilization-location").then { res ->
+            if (res.ok) hasSterilizationProfile = true
+        }
     }
 
     private fun setupRoleToggles() {
-        (document.getElementById("role-photographer") as? HTMLInputElement)?.onchange = {
-            document.querySelector(".photographer-section")?.asDynamic()?.style?.display =
-                if ((it.asDynamic().target.checked)) "block" else "none"
-            undefined
-        }
-        (document.getElementById("role-temporal-home") as? HTMLInputElement)?.onchange = {
-            document.querySelector(".temporal-home-section")?.asDynamic()?.style?.display =
-                if ((it.asDynamic().target.checked)) "block" else "none"
-            undefined
-        }
-        (document.getElementById("role-shelter") as? HTMLInputElement)?.onchange = {
-            document.querySelector(".shelter-section")?.asDynamic()?.style?.display =
-                if ((it.asDynamic().target.checked)) "block" else "none"
-            undefined
-        }
-        (document.getElementById("role-sterilization") as? HTMLInputElement)?.onchange = {
-            document.querySelector(".sterilization-section")?.asDynamic()?.style?.display =
-                if ((it.asDynamic().target.checked)) "block" else "none"
-            undefined
-        }
+        (document.getElementById("role-photographer") as? HTMLInputElement)?.addEventListener("change", {
+            val checked = (it.asDynamic().target.checked as Boolean)
+            val section = document.querySelector(".photographer-section") as? HTMLElement
+            section?.style?.display = if (checked) "block" else "none"
+        })
+        (document.getElementById("role-temporal-home") as? HTMLInputElement)?.addEventListener("change", {
+            val checked = (it.asDynamic().target.checked as Boolean)
+            val section = document.querySelector(".temporal-home-section") as? HTMLElement
+            section?.style?.display = if (checked) "block" else "none"
+        })
+        (document.getElementById("role-shelter") as? HTMLInputElement)?.addEventListener("change", {
+            val checked = (it.asDynamic().target.checked as Boolean)
+            val section = document.querySelector(".shelter-section") as? HTMLElement
+            section?.style?.display = if (checked) "block" else "none"
+        })
+        (document.getElementById("role-sterilization") as? HTMLInputElement)?.addEventListener("change", {
+            val checked = (it.asDynamic().target.checked as Boolean)
+            val section = document.querySelector(".sterilization-section") as? HTMLElement
+            section?.style?.display = if (checked) "block" else "none"
+        })
     }
 
     private fun loadRoleSections(user: dynamic) {
-        val primaryRole = currentRoles.firstOrNull() ?: "ADOPTER"
-        if (primaryRole == "PHOTOGRAPHER" || currentRoles.contains("PHOTOGRAPHER")) {
-            document.querySelector(".photographer-section")?.asDynamic()?.style?.display = "block"
+        if (currentRoles.contains("PHOTOGRAPHER")) {
+            (document.querySelector(".photographer-section") as? HTMLElement)?.style?.display = "block"
             loadPhotographer(user)
         }
-        if (primaryRole == "TEMPORAL_HOME" || currentRoles.contains("TEMPORAL_HOME")) {
-            document.querySelector(".temporal-home-section")?.asDynamic()?.style?.display = "block"
+        if (currentRoles.contains("TEMPORAL_HOME")) {
+            (document.querySelector(".temporal-home-section") as? HTMLElement)?.style?.display = "block"
             loadTemporalHome()
         }
-        if (primaryRole == "SHELTER" || currentRoles.contains("SHELTER")) {
-            document.querySelector(".shelter-section")?.asDynamic()?.style?.display = "block"
+        if (currentRoles.contains("SHELTER")) {
+            (document.querySelector(".shelter-section") as? HTMLElement)?.style?.display = "block"
             loadShelter()
         }
-        if (primaryRole == "STERILIZATION_SERVICE" || currentRoles.contains("STERILIZATION_SERVICE")) {
-            document.querySelector(".sterilization-section")?.asDynamic()?.style?.display = "block"
+        if (currentRoles.contains("STERILIZATION_SERVICE")) {
+            (document.querySelector(".sterilization-section") as? HTMLElement)?.style?.display = "block"
             loadSterilization()
         }
     }
@@ -157,7 +132,7 @@ object ProfilePage {
     }
 
     private fun loadTemporalHome() {
-        ApiClient.getTemporalHome().then { th ->
+        ApiClientModule.getTemporalHome().then<Unit> { th ->
             if (th != null) {
                 (document.getElementById("th-alias") as? HTMLInputElement)?.value = th.alias ?: ""
                 (document.getElementById("th-country") as? HTMLSelectElement)?.value = th.country ?: ""
@@ -171,50 +146,47 @@ object ProfilePage {
     }
 
     private fun loadShelter() {
-        fetch("/api/users/shelter").then { res ->
-            if (res.ok) {
-                res.json().then { shelter ->
-                    (document.getElementById("shelter-name") as? HTMLInputElement)?.value = shelter.name ?: ""
-                    (document.getElementById("shelter-country") as? HTMLSelectElement)?.value = shelter.country ?: ""
-                    (document.getElementById("shelter-state") as? HTMLInputElement)?.value = shelter.state ?: ""
-                    (document.getElementById("shelter-city") as? HTMLInputElement)?.value = shelter.city ?: ""
-                    (document.getElementById("shelter-address") as? HTMLInputElement)?.value = shelter.address ?: ""
-                    (document.getElementById("shelter-zip") as? HTMLInputElement)?.value = shelter.zip ?: ""
-                    (document.getElementById("shelter-phone") as? HTMLInputElement)?.value = shelter.phone ?: ""
-                    (document.getElementById("shelter-email") as? HTMLInputElement)?.value = shelter.email ?: ""
-                    (document.getElementById("shelter-website") as? HTMLInputElement)?.value = shelter.website ?: ""
-                    (document.getElementById("shelter-description") as? HTMLTextAreaElement)?.value = shelter.description ?: ""
-                    undefined
-                }
-            } else undefined
+        ApiClientModule.getShelter().then<Unit> { shelter ->
+            if (shelter != null) {
+                (document.getElementById("shelter-name") as? HTMLInputElement)?.value = shelter.name ?: ""
+                (document.getElementById("shelter-country") as? HTMLSelectElement)?.value = shelter.country ?: ""
+                (document.getElementById("shelter-state") as? HTMLInputElement)?.value = shelter.state ?: ""
+                (document.getElementById("shelter-city") as? HTMLInputElement)?.value = shelter.city ?: ""
+                (document.getElementById("shelter-address") as? HTMLInputElement)?.value = shelter.address ?: ""
+                (document.getElementById("shelter-zip") as? HTMLInputElement)?.value = shelter.zip ?: ""
+                (document.getElementById("shelter-phone") as? HTMLInputElement)?.value = shelter.phone ?: ""
+                (document.getElementById("shelter-email") as? HTMLInputElement)?.value = shelter.email ?: ""
+                (document.getElementById("shelter-website") as? HTMLInputElement)?.value = shelter.website ?: ""
+                (document.getElementById("shelter-description") as? HTMLTextAreaElement)?.value = shelter.description ?: ""
+            }
+            undefined
         }
     }
 
     private fun loadSterilization() {
-        fetch("/api/users/sterilization-location").then { res ->
-            if (res.ok) {
-                res.json().then { loc ->
-                    (document.getElementById("sterilization-name") as? HTMLInputElement)?.value = loc.name ?: ""
-                    (document.getElementById("sterilization-country") as? HTMLSelectElement)?.value = loc.country ?: ""
-                    (document.getElementById("sterilization-state") as? HTMLInputElement)?.value = loc.state ?: ""
-                    (document.getElementById("sterilization-city") as? HTMLInputElement)?.value = loc.city ?: ""
-                    (document.getElementById("sterilization-address") as? HTMLInputElement)?.value = loc.address ?: ""
-                    (document.getElementById("sterilization-zip") as? HTMLInputElement)?.value = loc.zip ?: ""
-                    (document.getElementById("sterilization-phone") as? HTMLInputElement)?.value = loc.phone ?: ""
-                    (document.getElementById("sterilization-email") as? HTMLInputElement)?.value = loc.email ?: ""
-                    (document.getElementById("sterilization-website") as? HTMLInputElement)?.value = loc.website ?: ""
-                    (document.getElementById("sterilization-description") as? HTMLTextAreaElement)?.value = loc.description ?: ""
-                    undefined
-                }
-            } else undefined
+        ApiClientModule.getSterilizationLocation().then<Unit> { loc ->
+            if (loc != null) {
+                (document.getElementById("sterilization-name") as? HTMLInputElement)?.value = loc.name ?: ""
+                (document.getElementById("sterilization-country") as? HTMLSelectElement)?.value = loc.country ?: ""
+                (document.getElementById("sterilization-state") as? HTMLInputElement)?.value = loc.state ?: ""
+                (document.getElementById("sterilization-city") as? HTMLInputElement)?.value = loc.city ?: ""
+                (document.getElementById("sterilization-address") as? HTMLInputElement)?.value = loc.address ?: ""
+                (document.getElementById("sterilization-zip") as? HTMLInputElement)?.value = loc.zip ?: ""
+                (document.getElementById("sterilization-phone") as? HTMLInputElement)?.value = loc.phone ?: ""
+                (document.getElementById("sterilization-email") as? HTMLInputElement)?.value = loc.email ?: ""
+                (document.getElementById("sterilization-website") as? HTMLInputElement)?.value = loc.website ?: ""
+                (document.getElementById("sterilization-description") as? HTMLTextAreaElement)?.value = loc.description ?: ""
+            }
+            undefined
         }
     }
 
     private fun setupSaveButton() {
-        (document.getElementById("save-profile-btn") as? HTMLElement)?.onclick = {
+        val btn = document.getElementById("save-profile-btn") as? HTMLElement
+        if (btn == null) return
+        btn.addEventListener("click", {
             saveProfile()
-            undefined
-        }
+        })
     }
 
     private fun saveProfile() {
@@ -222,20 +194,149 @@ object ProfilePage {
         val displayName = (document.getElementById("displayName") as? HTMLInputElement)?.value ?: ""
         val language = (document.getElementById("language") as? HTMLSelectElement)?.value ?: "en"
 
+        clearFieldErrors()
+
         if (displayName.trim().isEmpty()) {
-            msg.className = "message error"
-            msg.textContent = "Display name cannot be empty"
+            showFieldError("displayName", I18n.t("displayNameRequired"))
+            showMessage(msg, "error", I18n.t("displayNameRequired"))
             return
         }
 
-        ApiClient.updateProfile(displayName).then {
-            ApiClient.updateLanguage(language)
-            I18n.setLang(language)
+        val validationError = validateActiveRoles()
+        if (validationError != null) {
+            showMessage(msg, "error", validationError)
+            return
+        }
+
+        showMessage(msg, "", I18n.t("saving"))
+
+        ApiClientModule.updateProfile(displayName).then<Unit> {
+            ApiClientModule.updateLanguage(language)
             undefined
-        }.then {
+        }.then<Unit> {
             saveRoles(msg)
             undefined
+        }.catch { error: dynamic ->
+            msg.className = "message error"
+            msg.textContent = error.message ?: "Failed to save profile"
+            msg.style.display = "block"
         }
+    }
+
+    private fun validateActiveRoles(): String? {
+        val rolePhotographer = (document.getElementById("role-photographer") as? HTMLInputElement)?.checked ?: false
+        val roleTemporalHome = (document.getElementById("role-temporal-home") as? HTMLInputElement)?.checked ?: false
+        val roleShelter = (document.getElementById("role-shelter") as? HTMLInputElement)?.checked ?: false
+        val roleSterilization = (document.getElementById("role-sterilization") as? HTMLInputElement)?.checked ?: false
+
+        var firstError: String? = null
+
+        if (rolePhotographer) {
+            val phCountry = (document.getElementById("photographerCountry") as? HTMLSelectElement)?.value ?: ""
+            val phState = (document.getElementById("photographerState") as? HTMLInputElement)?.value ?: ""
+            if (phCountry.isEmpty()) {
+                showFieldError("photographerCountry", I18n.t("countryLabel") + " is required")
+                if (firstError == null) firstError = I18n.t("photographerCountryStateRequired")
+            }
+            if (phState.isEmpty()) {
+                showFieldError("photographerState", I18n.t("state") + " is required")
+                if (firstError == null) firstError = I18n.t("photographerCountryStateRequired")
+            }
+        }
+        if (roleTemporalHome) {
+            val thAlias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
+            val thCountry = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
+            val thCity = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            if (thAlias.isEmpty()) {
+                showFieldError("th-alias", I18n.t("alias") + " is required")
+                if (firstError == null) firstError = I18n.t("temporalHomeAliasCountryCityRequired")
+            }
+            if (thCountry.isEmpty()) {
+                showFieldError("th-country", I18n.t("countryLabel") + " is required")
+                if (firstError == null) firstError = I18n.t("temporalHomeAliasCountryCityRequired")
+            }
+            if (thCity.isEmpty()) {
+                showFieldError("th-city", I18n.t("city") + " is required")
+                if (firstError == null) firstError = I18n.t("temporalHomeAliasCountryCityRequired")
+            }
+        }
+        if (roleShelter) {
+            val shelterName = (document.getElementById("shelter-name") as? HTMLInputElement)?.value?.trim() ?: ""
+            val shelterCountry = (document.getElementById("shelter-country") as? HTMLSelectElement)?.value ?: ""
+            val shelterCity = (document.getElementById("shelter-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            val shelterAddress = (document.getElementById("shelter-address") as? HTMLInputElement)?.value?.trim() ?: ""
+            if (shelterName.isEmpty()) {
+                showFieldError("shelter-name", I18n.t("name") + " is required")
+                if (firstError == null) firstError = I18n.t("shelterNameCountryCityAddressRequired")
+            }
+            if (shelterCountry.isEmpty()) {
+                showFieldError("shelter-country", I18n.t("countryLabel") + " is required")
+                if (firstError == null) firstError = I18n.t("shelterNameCountryCityAddressRequired")
+            }
+            if (shelterCity.isEmpty()) {
+                showFieldError("shelter-city", I18n.t("city") + " is required")
+                if (firstError == null) firstError = I18n.t("shelterNameCountryCityAddressRequired")
+            }
+            if (shelterAddress.isEmpty()) {
+                showFieldError("shelter-address", I18n.t("address") + " is required")
+                if (firstError == null) firstError = I18n.t("shelterNameCountryCityAddressRequired")
+            }
+        }
+        if (roleSterilization) {
+            val sterName = (document.getElementById("sterilization-name") as? HTMLInputElement)?.value?.trim() ?: ""
+            val sterCountry = (document.getElementById("sterilization-country") as? HTMLSelectElement)?.value ?: ""
+            val sterCity = (document.getElementById("sterilization-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            val sterAddress = (document.getElementById("sterilization-address") as? HTMLInputElement)?.value?.trim() ?: ""
+            if (sterName.isEmpty()) {
+                showFieldError("sterilization-name", I18n.t("name") + " is required")
+                if (firstError == null) firstError = I18n.t("sterilizationNameCountryCityAddressRequired")
+            }
+            if (sterCountry.isEmpty()) {
+                showFieldError("sterilization-country", I18n.t("countryLabel") + " is required")
+                if (firstError == null) firstError = I18n.t("sterilizationNameCountryCityAddressRequired")
+            }
+            if (sterCity.isEmpty()) {
+                showFieldError("sterilization-city", I18n.t("city") + " is required")
+                if (firstError == null) firstError = I18n.t("sterilizationNameCountryCityAddressRequired")
+            }
+            if (sterAddress.isEmpty()) {
+                showFieldError("sterilization-address", I18n.t("address") + " is required")
+                if (firstError == null) firstError = I18n.t("sterilizationNameCountryCityAddressRequired")
+            }
+        }
+        return firstError
+    }
+
+    private fun showMessage(msg: HTMLElement, type: String, text: String) {
+        msg.className = "message $type"
+        msg.textContent = text
+        msg.style.display = "block"
+    }
+
+    private fun clearFieldErrors() {
+        val errors = document.querySelectorAll(".field-error")
+        for (i in 0 until errors.length) {
+            (errors.item(i) as? HTMLElement)?.textContent = ""
+        }
+        val invalids = document.querySelectorAll(".field-invalid")
+        for (i in 0 until invalids.length) {
+            (invalids.item(i) as? HTMLElement)?.classList?.remove("field-invalid")
+        }
+    }
+
+    private fun showFieldError(fieldId: String, message: String) {
+        val errorEl = document.getElementById("$fieldId-error")
+        errorEl?.textContent = message
+        val inputEl = document.getElementById(fieldId)
+        inputEl?.classList?.add("field-invalid")
+    }
+
+    private fun savePhotographerData(): Promise<dynamic> {
+        val phFee = (document.getElementById("photographerFee") as? HTMLInputElement)?.value?.toDoubleOrNull() ?: 0.0
+        val phCurrency = (document.getElementById("photographerCurrency") as? HTMLSelectElement)?.value ?: "USD"
+        val phCountry = (document.getElementById("photographerCountry") as? HTMLSelectElement)?.value ?: ""
+        val phState = (document.getElementById("photographerState") as? HTMLInputElement)?.value ?: ""
+        return ApiClientModule.updatePhotographerSettings(phFee, phCurrency, phCountry, phState)
     }
 
     private fun saveRoles(msg: HTMLElement) {
@@ -245,95 +346,170 @@ object ProfilePage {
         val roleShelter = (document.getElementById("role-shelter") as? HTMLInputElement)?.checked ?: false
         val roleSterilization = (document.getElementById("role-sterilization") as? HTMLInputElement)?.checked ?: false
 
+        val promises = mutableListOf<Promise<dynamic>>()
+
         if (roleRescuer != currentRoles.contains("RESCUER")) {
-            ApiClient.activateRescuer(roleRescuer)
+            promises.add(ApiClientModule.activateRescuer(roleRescuer))
         }
         if (rolePhotographer != currentRoles.contains("PHOTOGRAPHER")) {
             if (rolePhotographer) {
-                val phCountry = (document.getElementById("photographerCountry") as? HTMLSelectElement)?.value ?: ""
-                val phState = (document.getElementById("photographerState") as? HTMLInputElement)?.value ?: ""
-                if (phCountry.isEmpty() || phState.isEmpty()) {
-                    msg.className = "message error"
-                    msg.textContent = "Please fill in country and state for photographer services"
-                    return
-                }
-                ApiClient.activatePhotographer(true).then {
-                    val phFee = (document.getElementById("photographerFee") as? HTMLInputElement)?.value?.toDoubleOrNull() ?: 0.0
-                    val phCurrency = (document.getElementById("photographerCurrency") as? HTMLSelectElement)?.value ?: "USD"
-                    ApiClient.updatePhotographerSettings(phFee, phCurrency, phCountry, phState)
+                promises.add(ApiClientModule.activatePhotographer(true).then<Unit> {
+                    savePhotographerData()
                     undefined
-                }
+                })
             } else {
-                ApiClient.activatePhotographer(false)
+                promises.add(ApiClientModule.activatePhotographer(false))
             }
-        } else if (rolePhotographer && !isPhotographerComplete) {
-            val phCountry = (document.getElementById("photographerCountry") as? HTMLSelectElement)?.value ?: ""
-            val phState = (document.getElementById("photographerState") as? HTMLInputElement)?.value ?: ""
-            if (phCountry.isEmpty() || phState.isEmpty()) {
-                msg.className = "message error"
-                msg.textContent = "Please fill in country and state for photographer services"
-                return
-            }
-            val phFee = (document.getElementById("photographerFee") as? HTMLInputElement)?.value?.toDoubleOrNull() ?: 0.0
-            val phCurrency = (document.getElementById("photographerCurrency") as? HTMLSelectElement)?.value ?: "USD"
-            ApiClient.updatePhotographerSettings(phFee, phCurrency, phCountry, phState)
+        } else if (rolePhotographer) {
+            promises.add(savePhotographerData())
         }
         if (roleTemporalHome != currentRoles.contains("TEMPORAL_HOME")) {
             if (roleTemporalHome) {
-                val thAlias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
-                val thCountry = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
-                val thCity = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
-                if (thAlias.isEmpty() || thCountry.isEmpty() || thCity.isEmpty()) {
-                    msg.className = "message error"
-                    msg.textContent = "Please fill in alias, country and city for temporal home"
-                    return
-                }
                 val thData = js("({})")
-                thData.alias = thAlias
-                thData.country = thCountry
-                thData.state = (document.getElementById("th-state") as? HTMLInputElement)?.value?.trim() ?: null
-                thData.city = thCity
-                thData.zip = (document.getElementById("th-zip") as? HTMLInputElement)?.value?.trim() ?: null
-                thData.neighborhood = (document.getElementById("th-neighborhood") as? HTMLInputElement)?.value?.trim() ?: null
+                thData.alias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
+                thData.country = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
+                thData.state = (document.getElementById("th-state") as? HTMLInputElement)?.value?.trim()
+                thData.city = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
+                thData.zip = (document.getElementById("th-zip") as? HTMLInputElement)?.value?.trim()
+                thData.neighborhood = (document.getElementById("th-neighborhood") as? HTMLInputElement)?.value?.trim()
 
                 if (hasTemporalHomeProfile) {
-                    ApiClient.updateTemporalHome(thData)
+                    promises.add(ApiClientModule.updateTemporalHome(thData))
                 } else {
-                    ApiClient.createTemporalHome(thData).then { hasTemporalHomeProfile = true; undefined }
+                    promises.add(ApiClientModule.createTemporalHome(thData).then<Unit> { hasTemporalHomeProfile = true; undefined })
                 }
+                promises.add(ApiClientModule.activateTemporalHome(true))
             } else {
-                ApiClient.activateTemporalHome(false)
+                promises.add(ApiClientModule.activateTemporalHome(false))
             }
-        } else if (roleTemporalHome && !hasTemporalHomeProfile) {
-            val thAlias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
-            val thCountry = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
-            val thCity = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
-            if (thAlias.isEmpty() || thCountry.isEmpty() || thCity.isEmpty()) {
-                msg.className = "message error"
-                msg.textContent = "Please fill in alias, country and city for temporal home"
-                return
-            }
+        } else if (roleTemporalHome) {
             val thData = js("({})")
-            thData.alias = thAlias
-            thData.country = thCountry
-            thData.state = (document.getElementById("th-state") as? HTMLInputElement)?.value?.trim() ?: null
-            thData.city = thCity
-            thData.zip = (document.getElementById("th-zip") as? HTMLInputElement)?.value?.trim() ?: null
-            thData.neighborhood = (document.getElementById("th-neighborhood") as? HTMLInputElement)?.value?.trim() ?: null
-            ApiClient.createTemporalHome(thData).then { hasTemporalHomeProfile = true; undefined }
+            thData.alias = (document.getElementById("th-alias") as? HTMLInputElement)?.value?.trim() ?: ""
+            thData.country = (document.getElementById("th-country") as? HTMLSelectElement)?.value ?: ""
+            thData.state = (document.getElementById("th-state") as? HTMLInputElement)?.value?.trim()
+            thData.city = (document.getElementById("th-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            thData.zip = (document.getElementById("th-zip") as? HTMLInputElement)?.value?.trim()
+            thData.neighborhood = (document.getElementById("th-neighborhood") as? HTMLInputElement)?.value?.trim()
+
+            if (hasTemporalHomeProfile) {
+                promises.add(ApiClientModule.updateTemporalHome(thData))
+            } else {
+                promises.add(ApiClientModule.createTemporalHome(thData).then<Unit> { hasTemporalHomeProfile = true; undefined })
+            }
+        }
+        if (roleShelter != currentRoles.contains("SHELTER")) {
+            if (roleShelter) {
+                val shelterData = js("({})")
+                shelterData.name = (document.getElementById("shelter-name") as? HTMLInputElement)?.value?.trim() ?: ""
+                shelterData.country = (document.getElementById("shelter-country") as? HTMLSelectElement)?.value ?: ""
+                shelterData.state = (document.getElementById("shelter-state") as? HTMLInputElement)?.value?.trim()
+                shelterData.city = (document.getElementById("shelter-city") as? HTMLInputElement)?.value?.trim() ?: ""
+                shelterData.address = (document.getElementById("shelter-address") as? HTMLInputElement)?.value?.trim() ?: ""
+                shelterData.zip = (document.getElementById("shelter-zip") as? HTMLInputElement)?.value?.trim()
+                shelterData.phone = (document.getElementById("shelter-phone") as? HTMLInputElement)?.value?.trim()
+                shelterData.email = (document.getElementById("shelter-email") as? HTMLInputElement)?.value?.trim()
+                shelterData.website = (document.getElementById("shelter-website") as? HTMLInputElement)?.value?.trim()
+                shelterData.description = (document.getElementById("shelter-description") as? HTMLTextAreaElement)?.value?.trim()
+
+                if (hasShelterProfile) {
+                    promises.add(ApiClientModule.updateShelter(shelterData))
+                } else {
+                    promises.add(ApiClientModule.createShelter(shelterData).then<Unit> { hasShelterProfile = true; undefined })
+                }
+                promises.add(ApiClientModule.activateShelter(true))
+            } else {
+                promises.add(ApiClientModule.activateShelter(false))
+            }
+        } else if (roleShelter) {
+            val shelterData = js("({})")
+            shelterData.name = (document.getElementById("shelter-name") as? HTMLInputElement)?.value?.trim() ?: ""
+            shelterData.country = (document.getElementById("shelter-country") as? HTMLSelectElement)?.value ?: ""
+            shelterData.state = (document.getElementById("shelter-state") as? HTMLInputElement)?.value?.trim()
+            shelterData.city = (document.getElementById("shelter-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            shelterData.address = (document.getElementById("shelter-address") as? HTMLInputElement)?.value?.trim() ?: ""
+            shelterData.zip = (document.getElementById("shelter-zip") as? HTMLInputElement)?.value?.trim()
+            shelterData.phone = (document.getElementById("shelter-phone") as? HTMLInputElement)?.value?.trim()
+            shelterData.email = (document.getElementById("shelter-email") as? HTMLInputElement)?.value?.trim()
+            shelterData.website = (document.getElementById("shelter-website") as? HTMLInputElement)?.value?.trim()
+            shelterData.description = (document.getElementById("shelter-description") as? HTMLTextAreaElement)?.value?.trim()
+
+            if (hasShelterProfile) {
+                promises.add(ApiClientModule.updateShelter(shelterData))
+            } else {
+                promises.add(ApiClientModule.createShelter(shelterData).then<Unit> { hasShelterProfile = true; undefined })
+            }
+        }
+        if (roleSterilization != currentRoles.contains("STERILIZATION_SERVICE")) {
+            if (roleSterilization) {
+                val sterData = js("({})")
+                sterData.name = (document.getElementById("sterilization-name") as? HTMLInputElement)?.value?.trim() ?: ""
+                sterData.country = (document.getElementById("sterilization-country") as? HTMLSelectElement)?.value ?: ""
+                sterData.state = (document.getElementById("sterilization-state") as? HTMLInputElement)?.value?.trim()
+                sterData.city = (document.getElementById("sterilization-city") as? HTMLInputElement)?.value?.trim() ?: ""
+                sterData.address = (document.getElementById("sterilization-address") as? HTMLInputElement)?.value?.trim() ?: ""
+                sterData.zip = (document.getElementById("sterilization-zip") as? HTMLInputElement)?.value?.trim()
+                sterData.phone = (document.getElementById("sterilization-phone") as? HTMLInputElement)?.value?.trim()
+                sterData.email = (document.getElementById("sterilization-email") as? HTMLInputElement)?.value?.trim()
+                sterData.website = (document.getElementById("sterilization-website") as? HTMLInputElement)?.value?.trim()
+                sterData.description = (document.getElementById("sterilization-description") as? HTMLTextAreaElement)?.value?.trim()
+
+                if (hasSterilizationProfile) {
+                    promises.add(ApiClientModule.updateSterilizationLocation(sterData))
+                } else {
+                    promises.add(ApiClientModule.createSterilizationLocation(sterData).then<Unit> { hasSterilizationProfile = true; undefined })
+                }
+                promises.add(ApiClientModule.activateSterilization(true))
+            } else {
+                promises.add(ApiClientModule.activateSterilization(false))
+            }
+        } else if (roleSterilization) {
+            val sterData = js("({})")
+            sterData.name = (document.getElementById("sterilization-name") as? HTMLInputElement)?.value?.trim() ?: ""
+            sterData.country = (document.getElementById("sterilization-country") as? HTMLSelectElement)?.value ?: ""
+            sterData.state = (document.getElementById("sterilization-state") as? HTMLInputElement)?.value?.trim()
+            sterData.city = (document.getElementById("sterilization-city") as? HTMLInputElement)?.value?.trim() ?: ""
+            sterData.address = (document.getElementById("sterilization-address") as? HTMLInputElement)?.value?.trim() ?: ""
+            sterData.zip = (document.getElementById("sterilization-zip") as? HTMLInputElement)?.value?.trim()
+            sterData.phone = (document.getElementById("sterilization-phone") as? HTMLInputElement)?.value?.trim()
+            sterData.email = (document.getElementById("sterilization-email") as? HTMLInputElement)?.value?.trim()
+            sterData.website = (document.getElementById("sterilization-website") as? HTMLInputElement)?.value?.trim()
+            sterData.description = (document.getElementById("sterilization-description") as? HTMLTextAreaElement)?.value?.trim()
+
+            if (hasSterilizationProfile) {
+                promises.add(ApiClientModule.updateSterilizationLocation(sterData))
+            } else {
+                promises.add(ApiClientModule.createSterilizationLocation(sterData).then<Unit> { hasSterilizationProfile = true; undefined })
+            }
         }
 
-        msg.className = "message success"
-        msg.textContent = "Profile updated!"
-        js("window.onbeforeunload = null")
-        window.location.reload()
+        if (promises.isEmpty()) {
+            showMessage(msg, "success", I18n.t("profileUpdated"))
+            window.location.reload()
+            return
+        }
+
+        Promise.all(promises.toTypedArray().unsafeCast<Array<Promise<dynamic>>>()).then<Unit> {
+            showMessage(msg, "success", I18n.t("profileUpdated"))
+            window.location.reload()
+            undefined
+        }.catch { error: dynamic ->
+            showMessage(msg, "error", error.message ?: "Failed to save profile")
+        }
+
+        Promise.all(promises.toTypedArray().unsafeCast<Array<Promise<dynamic>>>()).then<Unit> {
+            msg.className = "message success"
+            msg.textContent = I18n.t("profileUpdated")
+            window.location.reload()
+            undefined
+        }.catch { error: dynamic ->
+            showMessage(msg, "error", error.message ?: "Failed to save profile")
+        }
     }
 
     private fun setupPasswordButton() {
-        (document.getElementById("save-password-btn") as? HTMLElement)?.onclick = {
+        (document.getElementById("save-password-btn") as? HTMLElement)?.addEventListener("click", {
             savePassword()
-            undefined
-        }
+        })
     }
 
     private fun savePassword() {
@@ -344,163 +520,132 @@ object ProfilePage {
         val hasPassword = (document.getElementById("current-password") as? HTMLInputElement)?.disabled == false
 
         if (newPassword != confirmPassword) {
-            msg.className = "message error"
-            msg.textContent = I18n.t("passwordsDoNotMatch")
+            showMessage(msg, "error", I18n.t("passwordsDoNotMatch"))
             return
         }
 
         if (hasPassword && currentPassword.isEmpty()) {
-            msg.className = "message error"
-            msg.textContent = I18n.t("currentPasswordRequired")
+            showMessage(msg, "error", I18n.t("currentPasswordRequired"))
             return
         }
 
-        msg.textContent = I18n.t("saving")
-        msg.className = ""
+        showMessage(msg, "", I18n.t("saving"))
 
-        RsaCrypto.getPublicKey().then { key ->
+        RsaCryptoModule.getPublicKey().then<Unit> { publicKey ->
             if (hasPassword) {
-                RsaCrypto.encrypt(currentPassword, key.toString()).then { encCurrent ->
-                    RsaCrypto.encrypt(newPassword, key.toString()).then { encNew ->
-                        ApiClient.changePassword(encCurrent!!, encNew!!).then { result ->
+                RsaCryptoModule.encrypt(currentPassword, publicKey).then<Unit> { encCurrent ->
+                    RsaCryptoModule.encrypt(newPassword, publicKey).then<Unit> { encNew ->
+                        ApiClientModule.changePassword(encCurrent, encNew).then<Unit> { result ->
                             if (result.success == true) {
-                                msg.className = "message success"
-                                msg.textContent = I18n.t("passwordChangeSuccess")
+                                showMessage(msg, "success", I18n.t("passwordChangeSuccess"))
                                 (document.getElementById("current-password") as? HTMLInputElement)?.value = ""
                                 (document.getElementById("new-password") as? HTMLInputElement)?.value = ""
                                 (document.getElementById("confirm-password") as? HTMLInputElement)?.value = ""
                             } else {
-                                msg.className = "message error"
-                                msg.textContent = result.error ?: I18n.t("passwordChangeFailed")
+                                showMessage(msg, "error", result.error ?: I18n.t("passwordChangeFailed"))
                             }
                             undefined
                         }
                     }
                 }
             } else {
-                RsaCrypto.encrypt(newPassword, key.toString()).then { encNew ->
-                    ApiClient.setPassword(encNew!!).then { result ->
+                RsaCryptoModule.encrypt(newPassword, publicKey).then<Unit> { encNew ->
+                    ApiClientModule.setPassword(encNew).then<Unit> { result ->
                         if (result.success == true) {
-                            msg.className = "message success"
-                            msg.textContent = I18n.t("passwordSetSuccess")
+                            showMessage(msg, "success", I18n.t("passwordSetSuccess"))
                             (document.getElementById("new-password") as? HTMLInputElement)?.value = ""
                             (document.getElementById("confirm-password") as? HTMLInputElement)?.value = ""
                             loadPasswordStatus()
                         } else {
-                            msg.className = "message error"
-                            msg.textContent = result.error ?: I18n.t("passwordSetFailed")
+                            showMessage(msg, "error", result.error ?: I18n.t("passwordSetFailed"))
                         }
                         undefined
                     }
                 }
             }
+            undefined
+        }.catch { error: dynamic ->
+            showMessage(msg, "error", error.message ?: "Failed to save password")
         }
     }
 
     private fun loadPasswordStatus() {
-        fetch("/api/users/has-password").then { res ->
-            res.json().then { data ->
-                val passwordStatus = document.getElementById("password-status") as? HTMLElement
-                val currentPasswordRow = document.getElementById("current-password-row") as? HTMLElement
-                if (data.hasPassword == true) {
-                    passwordStatus?.textContent = I18n.t("passwordSet")
-                    currentPasswordRow?.classList?.remove("password-hidden")
-                    (document.getElementById("current-password") as? HTMLInputElement)?.disabled = false
-                } else {
-                    passwordStatus?.textContent = I18n.t("noPassword")
-                    currentPasswordRow?.classList?.add("password-hidden")
-                    (document.getElementById("current-password") as? HTMLInputElement)?.disabled = true
-                }
-                undefined
+        ApiClientModule.hasPassword().then<Unit> { data ->
+            val passwordStatus = document.getElementById("password-status") as? HTMLElement
+            val currentPasswordRow = document.getElementById("current-password-row") as? HTMLElement
+            if (data.hasPassword == true) {
+                passwordStatus?.textContent = I18n.t("passwordSet")
+                currentPasswordRow?.classList?.remove("password-hidden")
+                (document.getElementById("current-password") as? HTMLInputElement)?.disabled = false
+            } else {
+                passwordStatus?.textContent = I18n.t("noPassword")
+                currentPasswordRow?.classList?.add("password-hidden")
+                (document.getElementById("current-password") as? HTMLInputElement)?.disabled = true
             }
+            undefined
         }
     }
 
     private fun setupEmailChangeButton() {
-        (document.getElementById("change-email-btn") as? HTMLElement)?.onclick = {
+        (document.getElementById("change-email-btn") as? HTMLElement)?.addEventListener("click", {
             requestEmailChange()
-            undefined
-        }
+        })
     }
 
     private fun requestEmailChange() {
         val newEmail = (document.getElementById("new-email") as? HTMLInputElement)?.value ?: ""
         val msg = document.getElementById("email-change-message") as? HTMLElement ?: return
         if (newEmail.isEmpty()) {
-            msg.className = "message error"
-            msg.textContent = I18n.t("emailRequired")
+            showMessage(msg, "error", I18n.t("emailRequired"))
             return
         }
-        msg.textContent = I18n.t("sending")
-        msg.className = ""
-        ApiClient.requestEmailChange(newEmail).then { result ->
+        showMessage(msg, "", I18n.t("saving"))
+        ApiClientModule.requestEmailChange(newEmail).then<Unit> { result ->
             if (result.success == true) {
-                msg.className = "message success"
-                msg.textContent = I18n.t("emailChangeSent")
+                showMessage(msg, "success", I18n.t("emailChangeSent"))
                 (document.getElementById("new-email") as? HTMLInputElement)?.value = ""
             } else {
-                msg.className = "message error"
-                msg.textContent = result.error ?: I18n.t("emailChangeFailed")
+                showMessage(msg, "error", result.error ?: I18n.t("emailChangeFailed"))
             }
             undefined
+        }.catch { error: dynamic ->
+            showMessage(msg, "error", error.message ?: I18n.t("emailChangeFailed"))
         }
     }
 
     private fun setupPasskeyButton() {
-        (document.getElementById("register-passkey-btn") as? HTMLElement)?.onclick = {
+        (document.getElementById("register-passkey-btn") as? HTMLElement)?.addEventListener("click", {
             registerPasskey()
-            undefined
-        }
+        })
     }
 
     private fun registerPasskey() {
         val msg = document.getElementById("passkey-message") as? HTMLElement ?: return
         val passkeyName = (document.getElementById("passkey-name") as? HTMLInputElement)?.value?.trim() ?: ""
         if (passkeyName.isEmpty()) {
-            msg.className = "message error"
-            msg.textContent = I18n.t("passkeyNameRequired")
+            showMessage(msg, "error", I18n.t("passkeyNameRequired"))
             return
         }
-        msg.textContent = I18n.t("registeringPasskey")
-        msg.className = ""
+        showMessage(msg, "", I18n.t("registeringPasskey"))
 
-        js("window.cachedUserData").let { user ->
-            if (user == null) {
-                ApiClient.me().then { u ->
-                    doRegisterPasskey(u, passkeyName, msg)
+        ApiClientModule.me().then<Unit> { user ->
+            if (user != null && user.email != null) {
+                WebAuthnModule.register(user.email.toString(), passkeyName).then<Unit> {
+                    showMessage(msg, "success", I18n.t("passkeyRegisteredSuccess"))
+                    (document.getElementById("passkey-name") as? HTMLInputElement)?.value = ""
+                    loadPasskeyStatus()
                     undefined
-                }
-            } else {
-                doRegisterPasskey(user, passkeyName, msg)
-            }
-        }
-    }
-
-    private fun doRegisterPasskey(user: dynamic, passkeyName: String, msg: HTMLElement) {
-        fetch("/api/auth/registration-options-for-user", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: user.email, displayName: user.displayName})})")).then { res ->
-            res.json().then { options ->
-                val credential = navigator.credentials.create(json("publicKey" to WebAuthn.parseCreationOptions(options))).awaitCommon()
-                fetch("/api/auth/register-passkey", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({registrationResponse: WebAuthn.serializeCredential(credential), passkeyName: passkeyName})})")).then { regRes ->
-                    regRes.json().then { result ->
-                        if (result.success == true) {
-                            msg.className = "message success"
-                            msg.textContent = I18n.t("passkeyRegisteredSuccess")
-                            (document.getElementById("passkey-name") as? HTMLInputElement)?.value = ""
-                            loadPasskeyStatus()
-                        } else {
-                            msg.className = "message error"
-                            msg.textContent = result.error ?: I18n.t("passkeyRegistrationFailed")
-                        }
-                        undefined
-                    }
+                }.catch { error: dynamic ->
+                    showMessage(msg, "error", error.message ?: I18n.t("passkeyRegistrationFailed"))
                 }
             }
+            undefined
         }
     }
 
     private fun loadPasskeyStatus() {
-        fetch("/api/auth/has-passkey").then { res ->
-            res.json().then { data ->
+        window.asDynamic().fetch("/api/auth/has-passkey").then { res ->
+            res.unsafeCast<dynamic>().json().then { data ->
                 val passkeyStatus = document.getElementById("passkey-status") as? HTMLElement
                 if (data.success == true) {
                     passkeyStatus?.textContent = I18n.t("passkeyRegistered")
@@ -512,3 +657,5 @@ object ProfilePage {
         }
     }
 }
+
+external val undefined: dynamic

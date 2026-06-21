@@ -52,12 +52,7 @@ object CryptoService {
 
     fun encrypt(plaintext: String, publicKeyBase64: String): String? {
         return try {
-            val keyBytes = try {
-                Base64.getDecoder().decode(publicKeyBase64)
-            } catch (e: IllegalArgumentException) {
-                // fallback to URL-safe base64
-                Base64.getUrlDecoder().decode(publicKeyBase64)
-            }
+            val keyBytes = Base64.getDecoder().decode(publicKeyBase64)
             val keySpec = X509EncodedKeySpec(keyBytes)
             val keyFactory = KeyFactory.getInstance("RSA")
             val publicKey = keyFactory.generatePublic(keySpec) as PublicKey
@@ -66,7 +61,7 @@ object CryptoService {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey, getOaepParameterSpec())
 
             val ciphertext = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
-            Base64.getEncoder().encodeToString(ciphertext)
+            Base64.getUrlEncoder().encodeToString(ciphertext)
         } catch (e: Exception) {
             System.err.println("Encryption error: ${e::class.java.name}: ${e.message}")
             e.printStackTrace()
@@ -82,11 +77,7 @@ object CryptoService {
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.DECRYPT_MODE, privateKey, getOaepParameterSpec())
 
-            val ciphertextBytes = try {
-                Base64.getDecoder().decode(ciphertext)
-            } catch (e: IllegalArgumentException) {
-                Base64.getUrlDecoder().decode(ciphertext)
-            }
+            val ciphertextBytes = Base64.getUrlDecoder().decode(ciphertext)
             val plaintext = cipher.doFinal(ciphertextBytes)
             String(plaintext, Charsets.UTF_8)
         } catch (e: Exception) {
@@ -98,11 +89,7 @@ object CryptoService {
 
     fun decryptWithKey(ciphertext: String, privateKeyBase64: String): String? {
         return try {
-            val keyBytes = try {
-                Base64.getDecoder().decode(privateKeyBase64)
-            } catch (e: IllegalArgumentException) {
-                Base64.getUrlDecoder().decode(privateKeyBase64)
-            }
+            val keyBytes = Base64.getDecoder().decode(privateKeyBase64)
             val keySpec = PKCS8EncodedKeySpec(keyBytes)
             val keyFactory = KeyFactory.getInstance("RSA")
             val privateKey = keyFactory.generatePrivate(keySpec) as PrivateKey
@@ -110,11 +97,7 @@ object CryptoService {
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.DECRYPT_MODE, privateKey, getOaepParameterSpec())
 
-            val ciphertextBytes = try {
-                Base64.getDecoder().decode(ciphertext)
-            } catch (e: IllegalArgumentException) {
-                Base64.getUrlDecoder().decode(ciphertext)
-            }
+            val ciphertextBytes = Base64.getDecoder().decode(ciphertext)
             val plaintext = cipher.doFinal(ciphertextBytes)
             String(plaintext, Charsets.UTF_8)
         } catch (e: Exception) {

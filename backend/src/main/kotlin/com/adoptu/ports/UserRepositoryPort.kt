@@ -32,7 +32,9 @@ interface UserRepositoryPort {
     fun setEmailVerified(userId: Int, verified: Boolean): Boolean
     fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean
     fun verifyToken(token: String): Int?
+    fun getUserIdByToken(token: String): Int?
     fun deleteVerificationTokens(userId: Int)
     fun getVerificationAttemptsToday(userId: Int): Int
     fun recordVerificationAttempt(userId: Int)
+    fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo?
 }

@@ -5,6 +5,7 @@ import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
 import com.adoptu.ports.NotificationPort
 import com.adoptu.ports.UserRepositoryPort
+import com.adoptu.services.EmailVerificationService
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -26,8 +27,8 @@ class MagicLinkService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: NotificationPort,
     private val clock: Clock,
-    private val baseUrl: String = "http://localhost:8080",
-    private val emailVerificationService: EmailVerificationService? = null
+    private val baseUrl: String,
+    private val emailVerificationService: EmailVerificationService
 ) {
     private val secureRandom = SecureRandom()
     private val magicLinkExpirationMs = 5 * 60 * 1000L
@@ -35,6 +36,30 @@ class MagicLinkService(
 
     fun requestMagicLink(email: String, language: String): Result<Boolean> {
         val user = userRepository.getByEmail(email) ?: return Result.success(true)
+
+        // Check if user's email is verified
+        if (!userRepository.isEmailVerified(user.id)) {
+            // Email not verified - send verification email instead
+            if (!emailVerificationService.canSendVerificationEmail(user.id)) {
+                return Result.failure(Exception("Maximum verification emails (3) reached for today. Please try again tomorrow."))
+            }
+            
+            // Check if there's a recent verification token (within 24h)
+            val latestToken = userRepository.getLatestVerificationToken(user.id)
+            val now = System.currentTimeMillis()
+            
+            if (latestToken != null && latestToken.expiresAt > now) {
+                // Verification email was already sent and is still valid
+                return Result.failure(Exception("Verification email already sent. Please check your inbox or wait for the link to expire."))
+            }
+            
+            val result = runBlocking { emailVerificationService.resendVerificationEmail(user.id, email, user.displayName, language) }
+            return if (result.isSuccess && result.getOrDefault(false)) {
+                Result.failure(Exception("Email not verified. A new verification email has been sent to your inbox."))
+            } else {
+                Result.failure(Exception("Failed to send verification email. Please try again."))
+            }
+        }
 
         val requestsToday = transaction {
             val startOfDay = getStartOfDayMillis()
@@ -51,7 +76,7 @@ class MagicLinkService(
         val token = generateToken()
         val expiresAt = clock.now().toEpochMilliseconds() + magicLinkExpirationMs
 
-        transaction {
+        val tokenSaved = transaction {
             try {
                 MagicLinkTokens.insert {
                     it[MagicLinkTokens.userId] = user.id
@@ -60,19 +85,24 @@ class MagicLinkService(
                     it[MagicLinkTokens.createdAt] = clock.now().toEpochMilliseconds()
                     it[MagicLinkTokens.usedAt] = null
                 }
+                true
             } catch (e: Exception) {
-                return@transaction
+                false
             }
         }
 
-        val loginUrl = "$baseUrl/magic-link-login?token=$token"
+        if (!tokenSaved) {
+            return Result.failure(Exception("Failed to create magic link. Please try again."))
+        }
+
+        val loginUrl = "$baseUrl/api/auth/magic-link-login?token=$token"
         val (subject, body) = getLocalizedMagicLinkContent(language, user.displayName, loginUrl)
 
         val sent = runBlocking { notificationPort.sendEmail(email, subject, body) }
         return Result.success(sent)
     }
 
-    fun verifyAndConsumeMagicLink(token: String): MagicLinkResult? {
+    fun verifyMagicLink(token: String): MagicLinkResult? {
         return transaction {
             val now = clock.now().toEpochMilliseconds()
             val tokenRow = MagicLinkTokens
@@ -98,10 +128,6 @@ class MagicLinkService(
                 .map { it[UserActiveRoles.role] }
             val primaryRole = if (roles.contains("ADMIN")) "ADMIN" else roles.firstOrNull() ?: "ADOPTER"
 
-            MagicLinkTokens.update({ MagicLinkTokens.id eq tokenRow[MagicLinkTokens.id] }) {
-                it[MagicLinkTokens.usedAt] = clock.now().toEpochMilliseconds()
-            }
-
             MagicLinkResult(
                 userId = userId,
                 username = userRow[Users.username],
@@ -109,6 +135,26 @@ class MagicLinkService(
                 primaryRole = primaryRole
             )
         }
+    }
+
+    fun consumeMagicLink(token: String) {
+        transaction {
+            MagicLinkTokens.update({ MagicLinkTokens.token eq token }) {
+                it[MagicLinkTokens.usedAt] = clock.now().toEpochMilliseconds()
+            }
+        }
+    }
+
+    fun releaseMagicLinkToken(token: String) {
+        // Token is not consumed - no action needed, it remains valid
+    }
+
+    fun verifyAndConsumeMagicLink(token: String): MagicLinkResult? {
+        val result = verifyMagicLink(token)
+        if (result != null) {
+            consumeMagicLink(token)
+        }
+        return result
     }
 
     private fun generateToken(): String {

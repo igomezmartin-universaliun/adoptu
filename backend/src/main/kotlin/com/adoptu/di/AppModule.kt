@@ -36,10 +36,10 @@ fun appModule(config: ApplicationConfig) = module {
     single { UserSterilizationLocationService(get()) }
     single { ShelterService(get()) }
     single { SterilizationLocationService(get()) }
-    single { EmailVerificationService(get(), get(), get()) }
-    single { PasswordService(get(), get(), get()) }
-    single { MagicLinkService(get(), get(), get()) }
-    single { EmailChangeService(get(), get(), get()) }
+    single { EmailVerificationService(get(), get(), get(), config.propertyOrNull("baseUrl")?.getString() ?: "http://localhost:80") }
+    single { PasswordService(get(), get(), get(), config.propertyOrNull("baseUrl")?.getString() ?: "http://localhost:80") }
+    single { MagicLinkService(get(), get(), get(), config.propertyOrNull("baseUrl")?.getString() ?: "http://localhost:80", get()) }
+    single { EmailChangeService(get(), get(), get(), config.propertyOrNull("baseUrl")?.getString() ?: "http://localhost:80") }
     single { UsersValidationService() }
     single { PetsValidationService() }
     single { PhotographersValidationService() }
@@ -54,7 +54,7 @@ private fun getOrigins(config: ApplicationConfig): List<String> {
     if (!originsList.isNullOrEmpty()) {
         return originsList
     }
-    return listOf("http://localhost:8080")
+    return listOf("http://localhost:80")
 }
 
 internal fun createImageStorageAdapter(config: ApplicationConfig): ImageStoragePort {

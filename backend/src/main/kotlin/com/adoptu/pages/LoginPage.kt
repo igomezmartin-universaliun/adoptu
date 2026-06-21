@@ -57,8 +57,5 @@ fun HTML.loginPage(navParams: NavParams = NavParams()) {
         }
         footer()
         commonScripts(navParams.isLoggedIn)
-        script(src = "/static/js/webauthn.js") {}
-        script(src = "/static/js/crypto.js") {}
-        script(src = "/static/js/login.js") {}
     }
 }

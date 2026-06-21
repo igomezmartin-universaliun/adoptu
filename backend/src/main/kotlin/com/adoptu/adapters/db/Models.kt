@@ -212,6 +212,7 @@ object TemporalHomeRequests : Table("temporal_home_requests") {
 
 object AnimalShelters : Table("animal_shelters") {
     val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id).nullable()
     val name = varchar("name", 255)
     val country = varchar("country", 100)
     val state = varchar("state", 100).nullable()
@@ -238,6 +239,7 @@ object AnimalShelters : Table("animal_shelters") {
 
 object SterilizationLocations : Table("sterilization_locations") {
     val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id).nullable()
     val name = varchar("name", 255)
     val country = varchar("country", 100)
     val state = varchar("state", 100).nullable()

@@ -10,7 +10,7 @@ Kotlin Multiplatform pet adoption platform. Ktor backend + Kotlin/JS admin front
 - **Kotlin-first**: Prefer Kotlin for everything — backend logic, frontend JS (via Kotlin/JS), and HTML generation (kotlinx.html). Avoid introducing Node.js, npm packages, or JS frameworks.
 - **Clean Architecture**: Follow the ports/adapters pattern. Business logic lives in `services/`, interfaces in `ports/`, implementations in `adapters/`. Routes call services, services call ports.
 - **Docs stay current**: When making important changes, update both `README.md` and `AGENTS.md` to reflect the new state.
-- **Tests required**: New code must include tests. When removing code, review and remove its associated tests if no longer needed.
+- **Tests required**: New code must include tests. When removing code, review and remove its associated tests if no longer needed. Preferred ITs with business value. At least 90% coverage and 85 mutation test score. 
 
 ## Commands
 

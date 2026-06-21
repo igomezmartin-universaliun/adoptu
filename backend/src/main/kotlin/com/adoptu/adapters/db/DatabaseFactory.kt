@@ -37,7 +37,9 @@ object DatabaseFactory {
         AnimalShelters,
         SterilizationLocations,
         UserShelters,
-        UserSterilizationLocations)
+        UserSterilizationLocations,
+        PasswordResetTokens,
+        EmailChangeTokens)
     fun init(config: ApplicationConfig) {
         val env = config.propertyOrNull("env")?.getString() ?: "prod"
         val prefix = "db.$env"

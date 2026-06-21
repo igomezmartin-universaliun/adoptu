@@ -1,127 +1,255 @@
 package com.adoptu.frontend.pages
 
-import com.adoptu.frontend.*
+import com.adoptu.frontend.I18n
+import com.adoptu.frontend.RsaCryptoModule
+import com.adoptu.frontend.WebAuthnModule
+import com.adoptu.frontend.apiFetch
 import kotlinx.browser.document
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import org.w3c.dom.*
+import kotlin.js.Promise
 import kotlin.js.json
 
-object RegisterPage {
-    suspend fun init() {
-        (document.getElementById("password") as? HTMLInputElement)?.addEventListener("input", { e ->
-            validatePassword((e as InputEvent).target.asDynamic().value.toString())
-            undefined
+@JsExport
+@JsName("RegisterPage")
+object RegisterPageModule {
+    private var selectedMethod = "passkey"
+
+    fun init() {
+        console.log("RegisterPage.init() called")
+        I18n.loadLang(window.localStorage.getItem("preferredLanguage") ?: "en").then({ _: dynamic ->
+            console.log("RegisterPage.init() after i18n load")
+            I18n.updatePage()
+            val messageEl = document.getElementById("message") as? HTMLElement
+            messageEl?.setAttribute("style", "display: none")
+            setupMethodToggle()
+            setupForm()
+        })
+    }
+
+    private fun setupMethodToggle() {
+        val passkeyCheckbox = document.getElementById("method-passkey") as? HTMLInputElement
+        val passwordCheckbox = document.getElementById("method-password") as? HTMLInputElement
+
+        val passwordFields = document.getElementById("password-fields")
+
+        fun updateVisibility() {
+            if (passwordFields != null) {
+                val showPassword = passwordCheckbox?.checked == true
+                passwordFields.setAttribute("style", "display: ${if (showPassword) "block" else "none"}")
+            }
+        }
+
+        fun ensureAtLeastOne() {
+            if (passkeyCheckbox != null && passwordCheckbox != null) {
+                if (!passkeyCheckbox.checked && !passwordCheckbox.checked) {
+                    passkeyCheckbox.checked = true
+                }
+            }
+        }
+
+        passkeyCheckbox?.addEventListener("click", { _ ->
+            ensureAtLeastOne()
+            updateVisibility()
         })
 
-        (document.getElementById("register-form") as? HTMLFormElement)?.onsubmit = { e ->
+        passwordCheckbox?.addEventListener("click", { _ ->
+            ensureAtLeastOne()
+            updateVisibility()
+        })
+
+        updateVisibility()
+    }
+
+    private fun setupForm() {
+        console.log("RegisterPage.setupForm() called")
+        val form = document.getElementById("register-form") as? HTMLFormElement
+        val messageEl = document.getElementById("message") as? HTMLElement
+
+        form?.addEventListener("submit", { e ->
+            console.log("RegisterPage form submitted")
             e.preventDefault()
-            handleRegister()
-            undefined
-        }
+            messageEl?.setAttribute("style", "display: none")
+
+            val emailInput = document.getElementById("email") as? HTMLInputElement
+            val displayNameInput = document.getElementById("displayName") as? HTMLInputElement
+            val passkeyCheckbox = document.getElementById("method-passkey") as? HTMLInputElement
+            val passwordCheckbox = document.getElementById("method-password") as? HTMLInputElement
+
+            val email = emailInput?.value ?: ""
+            val displayName = displayNameInput?.value ?: ""
+            val usePasskey = passkeyCheckbox?.checked == true
+            val usePassword = passwordCheckbox?.checked == true
+
+            if (email.isEmpty() || displayName.isEmpty()) {
+                messageEl?.textContent = "Please enter email and display name"
+                messageEl?.setAttribute("style", "display: block")
+                return@addEventListener
+            }
+
+            if (!usePasskey && !usePassword) {
+                messageEl?.textContent = "Please select at least one login method"
+                messageEl?.setAttribute("style", "display: block")
+                return@addEventListener
+            }
+
+            if (usePassword) {
+                val passwordInput = document.getElementById("password") as? HTMLInputElement
+                val confirmPasswordInput = document.getElementById("confirmPassword") as? HTMLInputElement
+
+                val password = passwordInput?.value ?: ""
+                val confirmPassword = confirmPasswordInput?.value ?: ""
+
+                if (password.isEmpty()) {
+                    messageEl?.textContent = "Please enter a password"
+                    messageEl?.setAttribute("style", "display: block")
+                    return@addEventListener
+                }
+
+                if (password != confirmPassword) {
+                    messageEl?.textContent = "Passwords do not match"
+                    messageEl?.setAttribute("style", "display: block")
+                    return@addEventListener
+                }
+
+                if (password.length < 8) {
+                    messageEl?.textContent = "Password must be at least 8 characters"
+                    messageEl?.setAttribute("style", "display: block")
+                    return@addEventListener
+                }
+            }
+
+            when {
+                usePasskey && usePassword -> registerBoth(email, displayName, messageEl)
+                usePasskey -> registerPasskey(email, displayName, messageEl)
+                usePassword -> registerPassword(email, displayName, messageEl)
+            }
+        })
     }
 
-    private fun validatePassword(password: String): Boolean {
-        val checks = listOf(
-            password.length >= 8 to "At least 8 characters",
-            Regex("[A-Z]").containsMatchIn(password) to "Contains uppercase letter",
-            Regex("[a-z]").containsMatchIn(password) to "Contains lowercase letter",
-            Regex("[0-9]").containsMatchIn(password) to "Contains number",
-            Regex("[!@#\$%^&*(),.?\":{}|<>\\-_+=()\\[\\]\\\\|°º«»¿]").containsMatchIn(password) to "Contains symbol"
-        )
-
-        var html = ""
-        checks.forEach { (valid, label) ->
-            val color = if (valid) "#28a745" else "#dc3545"
-            val icon = if (valid) "&#10003;" else "&#10007;"
-            html += "<div style=\"color:$color; font-size: 0.85rem; margin: 0.2rem 0;\">$icon $label</div>"
-        }
-        (document.getElementById("password-checks") as? HTMLElement)?.innerHTML = html
-        return checks.all { it.first }
+    private fun registerPasskey(email: String, displayName: String, messageEl: Element?) {
+        messageEl?.textContent = "Creating passkey..."
+        messageEl?.setAttribute("style", "display: block")
+        WebAuthnModule.register(email, displayName)
+            .then { _: dynamic ->
+                console.log("Registration successful")
+                window.location.href = "/login"
+            }
+            .catch { error: dynamic ->
+                console.log("Registration error: $error")
+                val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
+                messageEl?.textContent = "Error: $errMsg"
+                messageEl?.setAttribute("style", "display: block")
+            }
     }
 
-    private fun handleRegister() {
-        val email = (document.getElementById("email") as? HTMLInputElement)?.value?.trim() ?: ""
-        val displayName = (document.getElementById("displayName") as? HTMLInputElement)?.value?.trim() ?: ""
-        val password = (document.getElementById("password") as? HTMLInputElement)?.value ?: ""
-        val confirmPassword = (document.getElementById("confirmPassword") as? HTMLInputElement)?.value ?: ""
-        val msg = document.getElementById("message") as? HTMLElement ?: return
+    private fun registerPassword(email: String, displayName: String, messageEl: Element?) {
+        val passwordInput = document.getElementById("password") as? HTMLInputElement
+        val confirmPasswordInput = document.getElementById("confirmPassword") as? HTMLInputElement
 
+        val password = passwordInput?.value ?: ""
+        val confirmPassword = confirmPasswordInput?.value ?: ""
+
+        if (password.isEmpty()) {
+            messageEl?.textContent = "Please enter a password"
+            return
+        }
+
+        if (password != confirmPassword) {
+            messageEl?.textContent = "Passwords do not match"
+            return
+        }
+
+        if (password.length < 8) {
+            messageEl?.textContent = "Password must be at least 8 characters"
+            return
+        }
+
+        messageEl?.textContent = "Registering..."
+        
+        RsaCryptoModule.getPublicKey()
+            .then { publicKey ->
+                RsaCryptoModule.encrypt("$email:$password", publicKey)
+            }
+            .then { encryptedPassword ->
+                val body = json(
+                    "email" to email,
+                    "displayName" to displayName,
+                    "roles" to getRoles(),
+                    "encryptedPassword" to encryptedPassword.unsafeCast<String>()
+                )
+                apiFetch("/api/auth/register-password", js("({method: 'POST', body: JSON.stringify(body)})"))
+            }
+            .then { _: dynamic ->
+                window.location.href = "/login"
+            }
+            .catch { error: dynamic ->
+                val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
+                messageEl?.textContent = "Error: $errMsg"
+            }
+    }
+
+    private fun registerBoth(email: String, displayName: String, messageEl: Element?) {
+        val passwordInput = document.getElementById("password") as? HTMLInputElement
+        val confirmPasswordInput = document.getElementById("confirmPassword") as? HTMLInputElement
+
+        val password = passwordInput?.value ?: ""
+        val confirmPassword = confirmPasswordInput?.value ?: ""
+
+        if (password.isEmpty()) {
+            messageEl?.textContent = "Please enter a password"
+            return
+        }
+
+        if (password != confirmPassword) {
+            messageEl?.textContent = "Passwords do not match"
+            return
+        }
+
+        if (password.length < 8) {
+            messageEl?.textContent = "Password must be at least 8 characters"
+            return
+        }
+
+        messageEl?.textContent = "Creating passkey and password..."
+        
+        WebAuthnModule.register(email, displayName)
+            .then<Unit> {
+                RsaCryptoModule.getPublicKey()
+                    .then { publicKey ->
+                        RsaCryptoModule.encrypt("$email:$password", publicKey)
+                    }
+                    .then { encryptedPassword ->
+                        val body = json(
+                            "email" to email,
+                            "displayName" to displayName,
+                            "roles" to getRoles(),
+                            "encryptedPassword" to encryptedPassword.unsafeCast<String>()
+                        )
+                        apiFetch("/api/auth/register-password", js("({method: 'POST', body: JSON.stringify(body)})"))
+                    }
+                    .then { _: dynamic ->
+                        window.location.href = "/login"
+                    }
+                    .catch { error: dynamic ->
+                        val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
+                        messageEl?.textContent = "Error: $errMsg"
+                    }
+            }
+            .catch { error: dynamic ->
+                val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
+                messageEl?.textContent = "Error: $errMsg"
+            }
+    }
+
+    private fun getRoles(): String {
         val roles = mutableListOf("ADOPTER")
         if ((document.getElementById("role-rescuer") as? HTMLInputElement)?.checked == true) roles.add("RESCUER")
         if ((document.getElementById("role-photographer") as? HTMLInputElement)?.checked == true) roles.add("PHOTOGRAPHER")
         if ((document.getElementById("role-temporal-home") as? HTMLInputElement)?.checked == true) roles.add("TEMPORAL_HOME")
-
-        if (email.isEmpty() || displayName.isEmpty()) {
-            msg.className = "message error"
-            msg.textContent = "Please fill in all required fields."
-            return
-        }
-
-        if (!Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$").matches(email)) {
-            msg.className = "message error"
-            msg.textContent = "Please enter a valid email address."
-            return
-        }
-
-        if (password.isNotEmpty() && password != confirmPassword) {
-            msg.className = "message error"
-            msg.textContent = "Passwords do not match."
-            return
-        }
-
-        if (password.isNotEmpty()) {
-            val isValid = validatePassword(password)
-            if (!isValid) {
-                msg.className = "message error"
-                msg.textContent = "Password does not meet requirements."
-                return
-            }
-        }
-
-        if (password.isNotEmpty()) {
-            msg.textContent = "Creating account with password..."
-            RsaCrypto.getPublicKey().then { key ->
-                RsaCrypto.encrypt(password, key.toString()).then { encrypted ->
-                    fetch("/api/auth/register-password", js("({method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: email, displayName: displayName, roles: roles.join(','), encryptedPassword: encrypted})})")).then { res ->
-                        res.json().then { result ->
-                            if (result.success == true) {
-                                msg.className = "message success"
-                                msg.textContent = "Account created! Check your email to verify your account."
-                                js("setTimeout")({ window.location.href = "/login" }, 2000)
-                            } else {
-                                msg.className = "message error"
-                                msg.textContent = result.error ?: "Registration failed."
-                            }
-                            undefined
-                        }
-                    }
-                }
-            }.catch { err ->
-                msg.className = "message error"
-                msg.textContent = err.asDynamic().message ?: "Registration error."
-                undefined
-            }
-        } else {
-            msg.textContent = "Creating passkey..."
-            WebAuthn.register(email, displayName, roles).then { result ->
-                if (result != null) {
-                    msg.className = "message success"
-                    msg.textContent = "Success! Redirecting..."
-                    if (result.needsProfileCompletion == true) {
-                        window.location.href = "/profile"
-                    } else {
-                        window.location.href = "/"
-                    }
-                } else {
-                    msg.className = "message error"
-                    msg.textContent = "Registration failed."
-                }
-                undefined
-            }.catch { err ->
-                msg.className = "message error"
-                msg.textContent = err.asDynamic().message ?: "Registration error."
-                undefined
-            }
-        }
+        if ((document.getElementById("role-shelter") as? HTMLInputElement)?.checked == true) roles.add("SHELTER")
+        if ((document.getElementById("role-sterilization") as? HTMLInputElement)?.checked == true) roles.add("STERILIZATION_SERVICE")
+        return roles.joinToString(",")
     }
 }

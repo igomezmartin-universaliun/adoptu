@@ -47,9 +47,9 @@ class WebAuthnServiceTest {
         
         userRepository = UserRepository(clock)
         mockNotificationAdapter = MockNotificationAdapter()
-        passwordService = PasswordService(userRepository, mockNotificationAdapter, clock)
-        emailVerificationService = EmailVerificationService(userRepository, mockNotificationAdapter, clock)
-        magicLinkService = MagicLinkService(userRepository, mockNotificationAdapter, clock)
+        passwordService = PasswordService(userRepository, mockNotificationAdapter, clock, "http://localhost:80")
+        emailVerificationService = EmailVerificationService(userRepository, mockNotificationAdapter, clock, "http://localhost:80")
+        magicLinkService = MagicLinkService(userRepository, mockNotificationAdapter, clock, "http://localhost:80", emailVerificationService)
         webAuthnService = WebAuthnService(
             clock,
             emailVerificationService,
@@ -203,12 +203,12 @@ class WebAuthnServiceTest {
         val options = webAuthnService.generateRegistrationOptionsForUser(userId, "user@example.com", "Test User")
 
         assertNotNull(options)
-        assertEquals(rpId, options.rp.id)
-        assertEquals(rpName, options.rp.name)
-        assertEquals("user@example.com", options.user.name)
-        assertEquals("Test User", options.user.displayName)
-        assertNotNull(options.challenge)
-        assertTrue(options.pubKeyCredParams.isNotEmpty())
+        assertEquals(rpId, options.publicKey.rp.id)
+        assertEquals(rpName, options.publicKey.rp.name)
+        assertEquals("user@example.com", options.publicKey.user.name)
+        assertEquals("Test User", options.publicKey.user.displayName)
+        assertNotNull(options.publicKey.challenge)
+        assertTrue(options.publicKey.pubKeyCredParams.isNotEmpty())
     }
 
     @Test

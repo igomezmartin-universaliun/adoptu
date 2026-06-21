@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 private val logger = LoggerFactory.getLogger("AdoptU")
 
 fun main(args: Array<String>) {
-    val env = System.getenv("ADOPTU_ENV") ?: "prod"
+    val env = System.getenv("ADOPTU_ENV") ?: "dev"
     logger.info("Starting Adopt-U application in $env environment")
     EngineMain.main(args)
 }

@@ -15,8 +15,8 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 h1 { attributes["data-i18n"] = "profile"; +"Profile" }
                 button(classes = "btn", type = ButtonType.button) { id = "save-profile-btn"; attributes["data-i18n"] = "save"; +"Save" }
             }
-            div { id = "message"; +"" }
-            
+            div(classes = "message") { id = "message"; +"" }
+
             div(classes = "card-bg profile-section") {
                 h2 { attributes["data-i18n"] = "accountSettings"; +"Account Settings" }
                 div(classes = "form-row") {
@@ -26,6 +26,7 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 div(classes = "form-row") {
                     label { htmlFor = "displayName"; attributes["data-i18n"] = "displayName"; +"Display Name" }
                     input(InputType.text) { id = "displayName"; required = true }
+                    span(classes = "field-error") { id = "displayName-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "language"; attributes["data-i18n"] = "language"; +"Language" }
@@ -81,10 +82,12 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 div(classes = "form-row") {
                     label { htmlFor = "shelter-name"; attributes["data-i18n"] = "name"; +"Shelter Name" }
                     input(InputType.text) { id = "shelter-name" }
+                    span(classes = "field-error") { id = "shelter-name-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "shelter-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
                     select { id = "shelter-country"; countrySelect("shelter-country", false) }
+                    span(classes = "field-error") { id = "shelter-country-error" }
                 }
                 div(classes = "form-row-two-col") {
                     div {
@@ -94,11 +97,13 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                     div {
                         label { htmlFor = "shelter-city"; attributes["data-i18n"] = "city"; +"City" }
                         input(InputType.text) { id = "shelter-city" }
+                        span(classes = "field-error") { id = "shelter-city-error" }
                     }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "shelter-address"; attributes["data-i18n"] = "address"; +"Address" }
                     input(InputType.text) { id = "shelter-address" }
+                    span(classes = "field-error") { id = "shelter-address-error" }
                 }
                 div(classes = "form-row-two-col") {
                     div {
@@ -129,10 +134,12 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 div(classes = "form-row") {
                     label { htmlFor = "sterilization-name"; attributes["data-i18n"] = "name"; +"Name" }
                     input(InputType.text) { id = "sterilization-name" }
+                    span(classes = "field-error") { id = "sterilization-name-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "sterilization-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
                     select { id = "sterilization-country"; countrySelect("sterilization-country", false) }
+                    span(classes = "field-error") { id = "sterilization-country-error" }
                 }
                 div(classes = "form-row-two-col") {
                     div {
@@ -142,11 +149,13 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                     div {
                         label { htmlFor = "sterilization-city"; attributes["data-i18n"] = "city"; +"City" }
                         input(InputType.text) { id = "sterilization-city" }
+                        span(classes = "field-error") { id = "sterilization-city-error" }
                     }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "sterilization-address"; attributes["data-i18n"] = "address"; +"Address" }
                     input(InputType.text) { id = "sterilization-address" }
+                    span(classes = "field-error") { id = "sterilization-address-error" }
                 }
                 div(classes = "form-row-two-col") {
                     div {
@@ -177,10 +186,12 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 div(classes = "form-row") {
                     label { htmlFor = "photographerCountry"; attributes["data-i18n"] = "countryLabel"; +"Country" }
                     select { id = "photographerCountry"; countrySelect("photographerCountry", false) }
+                    span(classes = "field-error") { id = "photographerCountry-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "photographerState"; attributes["data-i18n"] = "state"; +"State" }
                     input(InputType.text) { id = "photographerState" }
+                    span(classes = "field-error") { id = "photographerState-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "photographerFee"; attributes["data-i18n"] = "sessionFee"; +"Session Fee" }
@@ -202,10 +213,12 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                 div(classes = "form-row") {
                     label { htmlFor = "th-alias"; attributes["data-i18n"] = "alias"; +"Alias" }
                     input(InputType.text) { id = "th-alias" }
+                    span(classes = "field-error") { id = "th-alias-error" }
                 }
                 div(classes = "form-row") {
                     label { htmlFor = "th-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
                     select { id = "th-country"; countrySelect("th-country", false) }
+                    span(classes = "field-error") { id = "th-country-error" }
                 }
                 div(classes = "form-row-two-col") {
                     div {
@@ -215,6 +228,7 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                     div {
                         label { htmlFor = "th-city"; attributes["data-i18n"] = "city"; +"City" }
                         input(InputType.text) { id = "th-city" }
+                        span(classes = "field-error") { id = "th-city-error" }
                     }
                 }
                 div(classes = "form-row-two-col") {
@@ -262,7 +276,7 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                     input(InputType.text) { id = "passkey-name"; placeholder = "e.g., MacBook, iPhone, YubiKey" }
                 }
                 p { id = "passkey-message"; +"" }
-                button(classes = "btn", type = ButtonType.button) { id = "register-passkey-btn"; attributes["data-i18n"] = "registerNewPasskey"; +"Register New Passkey" }
+                button(classes = "btn", type = ButtonType.button) { id = "register-passkey-btn"; attributes["data-i18n"] = "registerWithPasskey"; +"Register with Passkey" }
             }
 
             div(classes = "card-bg profile-section") {
@@ -278,7 +292,6 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
         }
         footer()
         commonScripts(navParams.isLoggedIn)
-        script(src = "/static/js/crypto.js") {}
-        script(src = "/static/js/profile.js") {}
+        script(src = "/static/js/common.js") {}
     }
 }

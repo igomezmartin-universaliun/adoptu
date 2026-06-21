@@ -61,4 +61,8 @@ class AuthValidationService : KoinComponent {
         }
         return ServiceResult.Success(Unit)
     }
+
+    fun getUserByEmail(email: String): UserDto? {
+        return userService.getByEmail(email)
+    }
 }

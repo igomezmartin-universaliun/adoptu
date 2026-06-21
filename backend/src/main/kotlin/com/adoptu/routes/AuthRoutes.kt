@@ -13,6 +13,7 @@ import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.auth.WebAuthnService
 import com.adoptu.services.validation.AuthValidationService
 import com.adoptu.services.crypto.CryptoService
+import com.adoptu.adapters.db.repositories.UserRepository
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -38,14 +39,27 @@ fun Route.authRoutes() {
     val validationService by inject<AuthValidationService>()
     val config by inject<ApplicationConfig>()
     val adminEmail = config.propertyOrNull("admin.email")?.getString() ?: "admin@adopt-u.com"
+    val userRepository = UserRepository(clock = kotlin.time.Clock.System)
 
     route("/api/auth") {
         post("/registration-options") {
             val params = call.receiveParameters()
             val email = params["email"] ?: return@post call.respondError("email required")
             val displayName = params["displayName"] ?: return@post call.respondError("displayName required")
+            val language = params["language"] ?: "en"
             val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
-            if (!emailRegex.matches(email)) return@post call.respondError("invalid email format")
+            if (!emailRegex.matches(email)) return@post call.respondError(getLocalizedError("invalid email format", language))
+            
+            val existingUser = validationService.getUserByEmail(email)
+            if (existingUser != null) {
+                val isVerified = webAuthnService.isUserVerified(existingUser.id)
+                if (isVerified) {
+                    return@post call.respondError(getLocalizedError("email already registered", language))
+                }
+                webAuthnService.resendVerificationEmail(existingUser.id)
+                return@post call.respondError(getLocalizedError("verification email sent", language))
+            }
+            
             val options = webAuthnService.generateRegistrationOptions(email, displayName)
             call.respond(options)
         }
@@ -201,10 +215,11 @@ fun Route.authRoutes() {
         }
 
         post("/authenticate") {
-            val body = call.receiveText()
-            if (body.isBlank()) return@post call.respond(SuccessWithErrorResponse(success = false, error = "No credential"))
+            val params = call.receiveParameters()
+            val credential = params["credential"]
+            if (credential.isNullOrBlank()) return@post call.respond(SuccessWithErrorResponse(success = false, error = "No credential"))
 
-            val result = webAuthnService.verifyAndAuthenticate(body)
+            val result = webAuthnService.verifyAndAuthenticate(credential)
             if (result != null) {
                 val verifiedResult = validationService.validateVerified(result.userId, result.user.username)
                 if (verifiedResult is ServiceResult.Error) {
@@ -263,53 +278,84 @@ fun Route.authRoutes() {
         }
 
         post("/request-magic-link") {
+            application.log.info("Received magic link request")
+
             val body = try {
                 call.receive<EncryptedLoginRequest>()
             } catch (e: Exception) {
+                application.log.error("Failed to parse request body: ${e.message}")
                 return@post call.respondError("Invalid request body", 400)
             }
             
+            application.log.info("Processing magic link request")
             val emailResult = validationService.validateAndDecryptEmail(body.encryptedData)
             if (emailResult is ServiceResult.Error) {
+                application.log.warn("Email validation/decryption failed: ${emailResult.message}")
                 return@post call.respondError(emailResult.message, 400)
             }
             val email = (emailResult as ServiceResult.Success).data
+            application.log.info("Processing magic link request for: $email")
             
             val result = webAuthnService.requestMagicLink(email)
             if (result.isFailure) {
-                call.respond(SuccessWithErrorResponse(success = false, error = result.exceptionOrNull()?.message ?: "Failed to send magic link"))
+                application.log.error("Magic link request failed: ${result.exceptionOrNull()?.message}")
+                // Return the specific error message (e.g., "Email not verified. A new verification email has been sent.")
+                val errorMessage = result.exceptionOrNull()?.message ?: "Failed to send magic link"
+                call.respond(SuccessWithErrorResponse(success = false, error = errorMessage, email = email))
             } else {
-                call.respond(SuccessResponse(success = true))
+                val sent = result.getOrNull() ?: false
+                if (sent) {
+                    application.log.info("Magic link sent successfully to: $email")
+                } else {
+                    application.log.warn("Magic link email NOT sent to: $email (SMTP not configured or failed)")
+                }
+                call.respond(SuccessResponse(success = sent))
             }
         }
 
         get("/magic-link-login") {
             val token = call.request.queryParameters["token"]
             if (token.isNullOrBlank()) {
-                return@get call.respond(VerificationResponse(success = false, message = "Token is required"))
-            }
-            
-            val result = webAuthnService.verifyAndConsumeMagicLink(token)
-            if (result == null) {
-                call.respond(VerificationResponse(success = false, message = "Invalid or expired magic link"))
+                call.respondRedirect("/login?error=invalid_token")
                 return@get
             }
             
-            val verifiedResult = validationService.validateVerified(result.userId, result.username)
+            val magicLinkResult = webAuthnService.verifyMagicLink(token)
+            if (magicLinkResult == null) {
+                call.respondRedirect("/login?error=invalid_or_expired")
+                return@get
+            }
+            
+            val verifiedResult = validationService.validateVerified(magicLinkResult.userId, magicLinkResult.username)
             if (verifiedResult is ServiceResult.Error) {
-                call.respond(SuccessWithErrorResponse(success = false, error = "Please verify your email before logging in", email = result.username))
+                // Check if verification email needs resend (token expired after 24h)
+                val latestToken = userRepository.getLatestVerificationToken(magicLinkResult.userId)
+                val now = System.currentTimeMillis()
+                
+                if (latestToken == null || latestToken.expiresAt <= now) {
+                    // Token expired or doesn't exist - resend verification email
+                    webAuthnService.resendVerificationEmail(magicLinkResult.userId)
+                    call.respondRedirect("/login?error=not_verified&email=${magicLinkResult.username}&resent=true")
+                } else {
+                    call.respondRedirect("/login?error=not_verified&email=${magicLinkResult.username}")
+                }
                 return@get
             }
             
-            val bannedResult = validationService.validateNotBanned(result.userId)
+            val bannedResult = validationService.validateNotBanned(magicLinkResult.userId)
             if (bannedResult is ServiceResult.Error) {
-                call.respond(SuccessWithErrorResponse(success = false, error = bannedResult.message, email = result.username))
+                call.respondRedirect("/login?error=banned")
                 return@get
             }
             
-            application.log.debug("Magic link login: success for userId=${result.userId}, username=${result.username}")
-            call.sessions.set(SessionUser(result.userId, result.username, result.displayName))
-            call.respond(SuccessResponse(success = true))
+            // Now consume the token and set the session
+            webAuthnService.consumeMagicLink(token)
+            
+            application.log.debug("Magic link login: success for userId=${magicLinkResult.userId}, username=${magicLinkResult.username}")
+            call.sessions.set(SessionUser(magicLinkResult.userId, magicLinkResult.username, magicLinkResult.displayName))
+            
+            // Redirect to profile or home page
+            call.respondRedirect("/profile")
         }
 
         post("/login-with-password") {
@@ -333,7 +379,33 @@ fun Route.authRoutes() {
             
             val verifiedResult = validationService.validateVerified(user.id, body.email)
             if (verifiedResult is ServiceResult.Error) {
-                call.respond(SuccessWithErrorResponse(success = false, error = "Please verify your email before logging in", email = body.email))
+                // Check if verification email needs resend
+                val latestToken = userRepository.getLatestVerificationToken(user.id)
+                val now = System.currentTimeMillis()
+                
+                val email = body.email
+                if (latestToken == null || latestToken.expiresAt <= now) {
+                    val resent = webAuthnService.resendVerificationEmail(user.id)
+                    if (resent) {
+                        call.respond(SuccessWithErrorResponse(
+                            success = false,
+                            error = "Verification email was expired. A new verification email has been sent.",
+                            email = email
+                        ))
+                    } else {
+                        call.respond(SuccessWithErrorResponse(
+                            success = false,
+                            error = "Unable to send verification email. You may have reached the daily limit (3 emails). Please try again tomorrow.",
+                            email = email
+                        ))
+                    }
+                } else {
+                    call.respond(SuccessWithErrorResponse(
+                        success = false,
+                        error = "Please verify your email before logging in",
+                        email = email
+                    ))
+                }
                 return@post
             }
             
@@ -447,5 +519,40 @@ private suspend fun RoutingContext.processResult(result: WebAuthnService.Registr
         }
     } else {
         call.respond(RegistrationResponse(success = false, message = "Registration failed"))
+    }
+}
+
+private fun getLocalizedError(key: String, language: String): String {
+    return when (language.lowercase()) {
+        "es" -> when (key) {
+            "invalid email format" -> "formato de correo electrónico inválido"
+            "email already registered" -> "correo electrónico ya registrado"
+            "verification email sent" -> "correo de verificación enviado. Revisa tu bandeja de entrada."
+            else -> key
+        }
+        "fr" -> when (key) {
+            "invalid email format" -> "format d'email invalide"
+            "email already registered" -> "email déjà enregistré"
+            "verification email sent" -> "email de vérification envoyé. Vérifiez votre boîte de réception."
+            else -> key
+        }
+        "pt" -> when (key) {
+            "invalid email format" -> "formato de email inválido"
+            "email already registered" -> "email já registrado"
+            "verification email sent" -> "e-mail de verificação enviado. Verifique sua caixa de entrada."
+            else -> key
+        }
+        "zh" -> when (key) {
+            "invalid email format" -> "邮箱格式无效"
+            "email already registered" -> "邮箱已被注册"
+            "verification email sent" -> "验证邮件已发送。请检查您的收件箱。"
+            else -> key
+        }
+        else -> when (key) {
+            "invalid email format" -> "invalid email format"
+            "email already registered" -> "email already registered"
+            "verification email sent" -> "verification email sent. Check your inbox."
+            else -> key
+        }
     }
 }

@@ -1,213 +1,133 @@
 package com.adoptu.frontend
 
+import kotlinx.browser.window
+import kotlin.js.Promise
 import kotlin.js.json
 
-external interface RequestInit {
-    var method: String
-    var headers: dynamic
-    var body: dynamic
-    var credentials: String
-}
-
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-fun RequestInit(): RequestInit = js("({})") as RequestInit
-
-object ApiClient {
-    private val base = ""
-
-    private suspend fun request(path: String, options: RequestInit? = null): dynamic {
-        val init = options ?: RequestInit()
-        init.credentials = "include"
-        val response = fetch(base + path, init).awaitCommon()
-        val text = response.text().awaitCommon()
-        val data = if (text.isNotEmpty()) {
-            try {
-                JSON.parse<dynamic>(text)
-            } catch (e: Exception) {
-                js("({})")
+fun apiFetch(path: String, init: dynamic = null): Promise<dynamic> {
+    val opts = init ?: js("({})")
+    val method = opts.method?.unsafeCast<String>()
+    if (method == null) {
+    } else if (method != "GET" && method != "HEAD") {
+        if (opts.headers == null) {
+            opts.headers = js("({})")
+        }
+        if (opts.headers["Content-Type"] == null && opts.headers["content-type"] == null) {
+            opts.headers["Content-Type"] = "application/json"
+        }
+    }
+    return window.asDynamic().fetch(path, opts).then { res ->
+        try {
+            val r = res.unsafeCast<dynamic>()
+            if (!r.ok) {
+                r.text().then { text ->
+                    throw js("new Error('Request failed: ' + text)")
+                }
+            } else {
+                r.json().then<dynamic> { json -> json }
             }
-        } else {
-            js("({})")
+        } catch (e: dynamic) {
+            throw js("new Error('Request failed: ' + e)")
         }
-        if (!response.ok) {
-            throw Error((data as dynamic)?.error?.toString() ?: response.statusText)
-        }
-        return data
     }
-
-    suspend fun me(): dynamic = request("/api/auth/me")
-    suspend fun logout(): dynamic = request("/api/auth/logout", RequestInit().apply { method = "POST" })
-
-    suspend fun getPets(type: String? = null): dynamic = request("/api/pets" + (type?.let { "?type=${js("encodeURIComponent")(it)}" } ?: ""))
-    suspend fun getPet(id: String): dynamic = request("/api/pets/$id")
-
-    suspend fun createPet(pet: dynamic): dynamic = request("/api/pets", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(pet)
-    })
-
-    suspend fun updatePet(id: String, pet: dynamic): dynamic = request("/api/pets/$id", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(pet)
-    })
-
-    suspend fun deletePet(id: String): dynamic = request("/api/pets/$id", RequestInit().apply { method = "DELETE" })
-
-    suspend fun adoptPet(id: String, message: String): dynamic = request("/api/pets/$id/adopt", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("message" to (message ?: "")))
-    })
-
-    suspend fun addImage(petId: String, file: dynamic, isPrimary: Boolean = false): dynamic {
-        val formData = js("new FormData()")
-        formData.append("file", file)
-        formData.append("isPrimary", isPrimary.toString())
-        return request("/api/pets/$petId/images", RequestInit().apply {
-            method = "POST"
-            body = formData
-        })
-    }
-
-    suspend fun removeImage(petId: String, imageId: String): dynamic = request("/api/pets/$petId/images/$imageId", RequestInit().apply { method = "DELETE" })
-    suspend fun setPrimaryImage(petId: String, imageId: String): dynamic = request("/api/pets/$petId/images/$imageId/primary", RequestInit().apply { method = "PUT" })
-
-    suspend fun getAdoptionRequests(petId: String): dynamic = request("/api/pets/$petId/adoption-requests")
-    suspend fun updateAdoptionRequest(requestId: String, status: String): dynamic = request("/api/pets/adoption-requests/$requestId", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/x-www-form-urlencoded")
-        body = "status=${js("encodeURIComponent")(status)}"
-    })
-
-    suspend fun getMyAdoptionRequests(): dynamic = request("/api/pets/my-adoption-requests")
-    suspend fun getPhotographers(): dynamic = request("/api/photographers")
-
-    suspend fun updateProfile(displayName: String): dynamic = request("/api/users/profile", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("displayName" to displayName))
-    })
-
-    suspend fun updatePhotographerSettings(fee: Double, currency: String, country: String, state: String): dynamic = request("/api/photographers/settings", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("photographerFee" to fee, "photographerCurrency" to currency, "country" to country, "state" to state))
-    })
-
-    suspend fun createPhotographyRequest(photographerId: Int, petId: String?, message: String): dynamic = request("/api/photographers/requests", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("photographerId" to photographerId, "petId" to (petId ?: null), "message" to message))
-    })
-
-    suspend fun createMultiplePhotographyRequests(photographerIds: Array<Int>, petId: String?, message: String): dynamic = request("/api/photographers/requests/multiple", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("photographerIds" to photographerIds, "petId" to (petId ?: null), "message" to message))
-    })
-
-    suspend fun getPhotographyRequests(): dynamic = request("/api/photographers/requests")
-    suspend fun updatePhotographyRequest(requestId: String, status: String? = null, scheduledDate: String? = null): dynamic {
-        val bodyObj = js("({})")
-        status?.let { bodyObj.status = it }
-        scheduledDate?.let { bodyObj.scheduledDate = it }
-        return request("/api/photographers/requests/$requestId", RequestInit().apply {
-            method = "PUT"
-            headers = json("Content-Type" to "application/json")
-            body = JSON.stringify(bodyObj)
-        })
-    }
-
-    suspend fun activateRescuer(activate: Boolean): dynamic = request("/api/users/rescuer-profile", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("activate" to activate))
-    })
-
-    suspend fun activatePhotographer(activate: Boolean): dynamic = request("/api/photographers/profile", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("activate" to activate))
-    })
-
-    suspend fun activateTemporalHome(activate: Boolean): dynamic = request("/api/users/temporal-home-profile", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("activate" to activate))
-    })
-
-    suspend fun createTemporalHome(data: dynamic): dynamic = request("/api/users/temporal-home", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(data)
-    })
-
-    suspend fun updateTemporalHome(data: dynamic): dynamic = request("/api/users/temporal-home", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(data)
-    })
-
-    suspend fun getTemporalHome(): dynamic = request("/api/users/temporal-home")
-    suspend fun getTemporalHomeRequests(): dynamic = request("/api/users/temporal-home/requests")
-
-    suspend fun blockRescuer(rescuerId: String): dynamic = request("/api/temporal-homes/block", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("rescuerId" to rescuerId))
-    })
-
-    suspend fun updateLanguage(language: String): dynamic = request("/api/users/language", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("language" to language))
-    })
-
-    suspend fun hasPassword(): dynamic = request("/api/users/has-password")
-
-    suspend fun setPassword(encryptedPassword: String): dynamic = request("/api/users/password", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("encryptedPassword" to encryptedPassword))
-    })
-
-    suspend fun changePassword(encryptedCurrent: String, encryptedNew: String): dynamic = request("/api/users/password", RequestInit().apply {
-        method = "PUT"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("encryptedCurrentPassword" to encryptedCurrent, "encryptedNewPassword" to encryptedNew))
-    })
-
-    suspend fun requestEmailChange(newEmail: String): dynamic = request("/api/users/request-email-change", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("newEmail" to newEmail))
-    })
-
-    suspend fun requestMagicLink(encryptedData: String): dynamic = request("/api/auth/request-magic-link", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("encryptedData" to encryptedData))
-    })
-
-    suspend fun loginWithPassword(email: String, encryptedPassword: String): dynamic = request("/api/auth/login-with-password", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("email" to email, "encryptedPassword" to encryptedPassword))
-    })
-
-    suspend fun forgotPassword(encryptedData: String): dynamic = request("/api/auth/forgot-password", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("encryptedData" to encryptedData))
-    })
-
-    suspend fun resetPassword(token: String, encryptedPassword: String): dynamic = request("/api/auth/reset-password?token=${js("encodeURIComponent")(token)}", RequestInit().apply {
-        method = "POST"
-        headers = json("Content-Type" to "application/json")
-        body = JSON.stringify(json("encryptedData" to encryptedPassword))
-    })
 }
 
-external class Error(message: String) : Throwable
+@JsExport
+@JsName("ApiClient")
+object ApiClientModule {
+    fun me(): Promise<dynamic> = apiFetch("/api/auth/me")
+
+    fun logout(): Promise<dynamic> = apiFetch("/api/auth/logout", js("({method: 'POST'})"))
+
+    fun getPets(type: String? = null): Promise<dynamic> =
+        apiFetch("/api/pets" + (type?.let { "?type=${window.asDynamic().encodeURIComponent(it)}" } ?: ""))
+
+    fun getPet(id: String): Promise<dynamic> = apiFetch("/api/pets/$id")
+
+    fun createPet(pet: dynamic): Promise<dynamic> = apiFetch("/api/pets", js("({method: 'POST', body: JSON.stringify(pet)})"))
+
+    fun updatePet(id: String, pet: dynamic): Promise<dynamic> = apiFetch("/api/pets/$id", js("({method: 'PUT', body: JSON.stringify(pet)})"))
+
+    fun deletePet(id: String): Promise<dynamic> = apiFetch("/api/pets/$id", js("({method: 'DELETE'})"))
+
+    fun updateProfile(displayName: String): Promise<dynamic> {
+        val body = js("({displayName: displayName})")
+        return apiFetch("/api/users/profile", js("({method: 'PUT', body: JSON.stringify(body)})"))
+    }
+
+    fun updateLanguage(language: String): Promise<dynamic> {
+        val body = js("({language: language})")
+        return apiFetch("/api/users/language", js("({method: 'PUT', body: JSON.stringify(body)})"))
+    }
+
+    fun getTemporalHome(): Promise<dynamic> = apiFetch("/api/users/temporal-home")
+
+    fun updateTemporalHome(data: dynamic): Promise<dynamic> = apiFetch("/api/users/temporal-home", js("({method: 'PUT', body: JSON.stringify(data)})"))
+
+    fun createTemporalHome(data: dynamic): Promise<dynamic> = apiFetch("/api/users/temporal-home", js("({method: 'POST', body: JSON.stringify(data)})"))
+
+    fun activateTemporalHome(active: Boolean): Promise<dynamic> {
+        val body = js("({activate: active})")
+        return apiFetch("/api/users/temporal-home-profile", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun activateRescuer(active: Boolean): Promise<dynamic> {
+        val body = js("({activate: active})")
+        return apiFetch("/api/users/rescuer-profile", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun activatePhotographer(active: Boolean): Promise<dynamic> {
+        val body = js("({activate: active})")
+        return apiFetch("/api/photographers/profile", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun activateShelter(active: Boolean): Promise<dynamic> {
+        val body = js("({activate: active})")
+        return apiFetch("/api/users/shelter-profile", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun activateSterilization(active: Boolean): Promise<dynamic> {
+        val body = js("({activate: active})")
+        return apiFetch("/api/users/sterilization-profile", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun updatePhotographerSettings(fee: Double, currency: String, country: String, state: String?): Promise<dynamic> {
+        val body = js("({photographerFee: fee, photographerCurrency: currency, country: country, state: state})")
+        return apiFetch("/api/photographers/settings", js("({method: 'PUT', body: JSON.stringify(body)})"))
+    }
+
+    fun getShelter(): Promise<dynamic> = apiFetch("/api/users/shelter")
+
+    fun updateShelter(data: dynamic): Promise<dynamic> = apiFetch("/api/users/shelter", js("({method: 'PUT', body: JSON.stringify(data)})"))
+
+    fun createShelter(data: dynamic): Promise<dynamic> = apiFetch("/api/users/shelter", js("({method: 'POST', body: JSON.stringify(data)})"))
+
+    fun getSterilizationLocation(): Promise<dynamic> = apiFetch("/api/users/sterilization-location")
+
+    fun updateSterilizationLocation(data: dynamic): Promise<dynamic> = apiFetch("/api/users/sterilization-location", js("({method: 'PUT', body: JSON.stringify(data)})"))
+
+    fun createSterilizationLocation(data: dynamic): Promise<dynamic> = apiFetch("/api/users/sterilization-location", js("({method: 'POST', body: JSON.stringify(data)})"))
+
+    fun hasPassword(): Promise<dynamic> = apiFetch("/api/users/has-password")
+
+    fun setPassword(encryptedPassword: String): Promise<dynamic> {
+        val body = js("({encryptedPassword: encryptedPassword})")
+        return apiFetch("/api/users/password", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun changePassword(encryptedCurrentPassword: String, encryptedNewPassword: String): Promise<dynamic> {
+        val body = js("({encryptedCurrentPassword: encryptedCurrentPassword, encryptedNewPassword: encryptedNewPassword})")
+        return apiFetch("/api/users/password", js("({method: 'PUT', body: JSON.stringify(body)})"))
+    }
+
+    fun requestEmailChange(newEmail: String): Promise<dynamic> {
+        val body = js("({newEmail: newEmail})")
+        return apiFetch("/api/users/request-email-change", js("({method: 'POST', body: JSON.stringify(body)})"))
+    }
+
+    fun getPhotographers(): Promise<dynamic> = apiFetch("/api/photographers")
+
+    fun getShelters(): Promise<dynamic> = apiFetch("/api/shelters")
+
+    fun searchTemporalHomes(query: dynamic): Promise<dynamic> = apiFetch("/api/temporal-homes/search", js("({method: 'POST', body: JSON.stringify(query)})"))
+}

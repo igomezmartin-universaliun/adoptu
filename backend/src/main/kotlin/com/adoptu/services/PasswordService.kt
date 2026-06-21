@@ -4,7 +4,9 @@ import com.adoptu.adapters.db.PasswordResetTokens
 import com.adoptu.adapters.db.UserPasswords
 import com.adoptu.ports.UserRepositoryPort
 import com.adoptu.services.crypto.CryptoService
+import com.password4j.Argon2Function
 import com.password4j.Password
+import com.password4j.types.Argon2
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -24,7 +26,7 @@ class PasswordService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: com.adoptu.ports.NotificationPort,
     private val clock: Clock,
-    private val baseUrl: String = "http://localhost:8080"
+    private val baseUrl: String
 ) {
     private val secureRandom = SecureRandom()
     private val passwordResetExpirationMs = 15 * 60 * 1000L
@@ -70,14 +72,15 @@ class PasswordService(
         return verifyPasswordString(password, storedHash)
     }
 
+    private val argon2 = Argon2Function.getInstance(65536, 3, 4, 64, Argon2.ID, 19)
+
     private fun hashPassword(password: String): String {
-        return Password.hash(password)
-            .withArgon2()
-            .getResult()
+        return Password.hash(password).with(argon2).getResult()
     }
 
     private fun verifyPasswordString(password: String, hash: String): Boolean {
-        return Password.check(password, hash).withArgon2()
+        val argon2 = Argon2Function.getInstanceFromHash(hash)
+        return Password.check(password, hash).with(argon2)
     }
 
     private fun setPasswordHash(userId: Int, hash: String): Boolean {

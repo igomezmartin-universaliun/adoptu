@@ -19,7 +19,7 @@ fun HTML.emailVerificationPage(success: Boolean, language: String = "en", navPar
                             +"Email Verified Successfully!"
                         }
                         div(classes = "success-icon") {
-                            img(src = Icons.CHECK_CIRCLE, alt = "Success") { width = "80"; height = "80" }
+                            unsafe { raw("""<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="green" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>""") }
                         }
                         p(classes = "success-message") {
                             attributes["data-i18n"] = "emailVerifiedMessage"
@@ -42,6 +42,22 @@ fun HTML.emailVerificationPage(success: Boolean, language: String = "en", navPar
                             }
                         }
                     }
+                    script {
+                        unsafe { raw("""
+                            (function() {
+                                var countdown = 10;
+                                var countdownEl = document.getElementById('countdown');
+                                var interval = setInterval(function() {
+                                    countdown--;
+                                    if (countdownEl) countdownEl.textContent = countdown;
+                                    if (countdown <= 0) {
+                                        clearInterval(interval);
+                                        window.location.href = '/';
+                                    }
+                                }, 1000);
+                            })();
+                        """.trimIndent()) }
+                    }
                 } else {
                     div(classes = "verification-error") {
                         h1(classes = "error-title") {
@@ -49,7 +65,7 @@ fun HTML.emailVerificationPage(success: Boolean, language: String = "en", navPar
                             +"Verification Failed"
                         }
                         div(classes = "error-icon") {
-                            img(src = Icons.ERROR_CIRCLE, alt = "Error") { width = "80"; height = "80" }
+                            unsafe { raw("""<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>""") }
                         }
                         p(classes = "error-message") {
                             attributes["data-i18n"] = "invalidOrExpiredToken"
@@ -66,7 +82,7 @@ fun HTML.emailVerificationPage(success: Boolean, language: String = "en", navPar
             }
         }
         footer()
-        script(src = "/static/js/email-verification.js") {}
-        commonScripts(navParams.isLoggedIn)
+        script(src = "/static/js/common.js") {}
+        script { unsafe { raw("window.isLoggedInGlobal = false; com.adoptu.frontend.Common.initI18n(null);") } }
     }
 }

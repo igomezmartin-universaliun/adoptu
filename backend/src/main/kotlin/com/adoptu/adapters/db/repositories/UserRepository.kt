@@ -6,6 +6,7 @@ import com.adoptu.dto.input.PhotographerDto
 import com.adoptu.dto.input.PhotographerSettingsRequest
 import com.adoptu.dto.input.UserDto
 import com.adoptu.dto.input.UserRole
+import com.adoptu.ports.EmailVerificationTokenInfo
 import com.adoptu.ports.UserRepositoryPort
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -431,6 +432,16 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
+    override fun getUserIdByToken(token: String): Int? {
+        return transaction {
+            EmailVerificationTokens
+                .selectAll()
+                .where { EmailVerificationTokens.token eq token }
+                .firstOrNull()
+                ?.get(EmailVerificationTokens.userId)
+        }
+    }
+
     override fun deleteVerificationTokens(userId: Int) {
         transaction {
             EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
@@ -453,6 +464,23 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
                 it[EmailVerificationAttempts.userId] = userId
                 it[EmailVerificationAttempts.createdAt] = clock.now().toEpochMilliseconds()
             }
+        }
+    }
+
+    override fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo? {
+        val result = transaction {
+            EmailVerificationTokens
+                .selectAll()
+                .where { EmailVerificationTokens.userId eq userId }
+                .orderBy(EmailVerificationTokens.createdAt, org.jetbrains.exposed.v1.core.SortOrder.DESC)
+                .firstOrNull()
+        }
+        return result?.let {
+            EmailVerificationTokenInfo(
+                token = it[EmailVerificationTokens.token],
+                expiresAt = it[EmailVerificationTokens.expiresAt],
+                createdAt = it[EmailVerificationTokens.createdAt]
+            )
         }
     }
 

@@ -140,6 +140,28 @@ fun Route.uiRoutes() {
         val session: SessionUser? = call.sessions.get()
         val navParams = getNavParams(session)
         val token = call.request.queryParameters["token"]
+        if (token.isNullOrBlank()) {
+            call.respondHtml(HttpStatusCode.OK) { emailVerificationPage(false, "en", navParams) }
+            return@get
+        }
+        
+        // Get userId from token before verification (which deletes the token)
+        val userId = userRepository.getUserIdByToken(token)
+        val result = webAuthnService.verifyTokenAndGetLanguage(token)
+        
+        if (result.first && userId != null) {
+            // Log the user in after successful verification
+            val user = userRepository.getById(userId)
+            if (user != null) {
+                call.sessions.set(SessionUser(user.id, user.username, user.displayName))
+            }
+        }
+        call.respondHtml(HttpStatusCode.OK) { emailVerificationPage(result.first, result.second, getNavParams(call.sessions.get())) }
+    }
+    get("/verify-email") {
+        val session: SessionUser? = call.sessions.get()
+        val navParams = getNavParams(session)
+        val token = call.request.queryParameters["token"]
         val success: Boolean
         val language: String
         if (token.isNullOrBlank()) {
@@ -163,9 +185,12 @@ fun Route.uiRoutes() {
         call.respondHtml(HttpStatusCode.OK) { resetPasswordPage(navParams) } 
     }
     get("/magic-link-login") { 
-        val session: SessionUser? = call.sessions.get()
-        val navParams = getNavParams(session)
-        call.respondHtml(HttpStatusCode.OK) { magicLinkLoginPage(navParams) } 
+        val token = call.request.queryParameters["token"]
+        if (token.isNullOrBlank()) {
+            call.respondRedirect("/login?error=invalid_token")
+        } else {
+            call.respondRedirect("/api/auth/magic-link-login?token=$token")
+        }
     }
     get("/verify-email-change") { 
         val session: SessionUser? = call.sessions.get()
@@ -185,7 +210,7 @@ fun Route.uiRoutes() {
                         +"Block Rescuer"
                         onClick = "blockRescuerAndRedirect($temporalHomeId, $rescuerId)"
                     }
-                    script(src = "/static/js/temporal-home.js") {}
+                    script(src = "/static/js/common.js") {}
                 }
             }
         } else {
