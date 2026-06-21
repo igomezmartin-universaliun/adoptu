@@ -1,0 +1,39 @@
+@use 'variables' as *;
+@use 'base';
+@use 'layout';
+@use 'location-search-form';
+
+.location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.location-card {
+    padding: 1.5rem;
+    
+    h3 {
+        margin: 0 0 0.5rem;
+        color: var(--accent);
+    }
+    
+    .location-address {
+        color: #9ca3af;
+        margin: 0.5rem 0;
+    }
+    
+    .location-phone,
+    .location-email,
+    .location-description {
+        margin: 0.5rem 0;
+    }
+    
+    .location-website a {
+        color: var(--primary-light);
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
