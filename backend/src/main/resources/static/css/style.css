@@ -530,7 +530,7 @@ footer span {
     display: none;
     position: absolute;
     background: var(--secondary);
-    min-width: 320px;
+    width: max-content;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     z-index: 1000;
@@ -545,14 +545,13 @@ footer span {
   text-decoration: none;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
-  text-align: right;
+  white-space: nowrap;
   transition: background 0.2s;
 }
 .resources-dropdown .resources-dropdown-content a span:first-child {
   flex: 1;
-  text-align: right;
 }
 .resources-dropdown .resources-dropdown-content a .material-symbols-outlined {
   font-size: 20px;
