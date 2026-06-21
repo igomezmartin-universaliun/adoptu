@@ -1,12 +1,43 @@
 {
-  "session_id": "session-2026-06-21-1454",
-  "started": "2026-06-21T20:54:42.892Z",
-  "files_read": {},
+  "session_id": "session-2026-06-21-1542",
+  "started": "2026-06-21T21:42:20.363Z",
+  "files_read": {
+    "/home/laf/Proyektes/adoptu/backend/src/test/kotlin/com/adoptu/adapters/db/DatabaseFactoryTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-21T21:42:55.310Z"
+    },
+    "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/adapters/db/DatabaseFactory.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-21T21:43:14.322Z"
+    },
+    "/home/laf/Proyektes/adoptu/backend/src/test/kotlin/com/adoptu/ApplicationIntegrationTest.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-21T21:43:53.222Z"
+    },
+    "/home/laf/Proyektes/adoptu/backend/src/test/kotlin/com/adoptu/routes/ApplicationTestcontainersIT.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-21T21:43:53.818Z"
+    },
+    "/home/laf/Proyektes/adoptu/backend/src/test/kotlin/com/adoptu/routes/SheltersRoutesE2ETest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-21T21:44:00.855Z"
+    },
+    "/home/laf/Proyektes/adoptu/backend/build.gradle.kts": {
+      "count": 2,
+      "tokens": 2307,
+      "first_read": "2026-06-21T21:44:16.494Z"
+    }
+  },
   "files_written": [],
   "edit_counts": {},
-  "anatomy_hits": 0,
-  "anatomy_misses": 0,
-  "repeated_reads_warned": 0,
+  "anatomy_hits": 1,
+  "anatomy_misses": 5,
+  "repeated_reads_warned": 2,
   "cerebrum_warnings": 0,
-  "stop_count": 0
+  "stop_count": 2
 }
