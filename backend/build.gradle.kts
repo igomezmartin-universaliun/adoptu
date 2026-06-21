@@ -107,6 +107,11 @@ tasks.withType<Test> {
         showStandardStreams = true
     }
     exclude("com/adoptu/e2e/**")
+    // Testcontainers tests need a running Docker daemon; they run via integrationTest task instead.
+    exclude("**/*IT.class")
+    exclude("**/ApplicationIntegrationTest.class")
+    exclude("**/ApplicationContainerTest.class")
+    exclude("**/SheltersRoutesE2ETest.class")
 }
 
 tasks.register<Exec>("dockerUp") {
