@@ -5,22 +5,27 @@ A Kotlin pet adoption web application with **FIDO2/WebAuthn** passwordless authe
 ## Features
 
 - **FIDO2 Authentication**: Register and sign in with passkeys (biometrics, security keys)
+- **Password + Magic Link login**: Alternative auth methods
 - **Pet Types**: Dogs, cats, birds, fish
 - **User Roles**:
-  - **Admin**: Add or remove pet pages
-  - **Rescuers**: Publish multiple pet pages
-  - **Adopters**: Request pet adoptions
+  - **Admin**: Full system access
+  - **Rescuers**: Publish and manage pet pages
+  - **Adopters**: Browse pets and request adoptions
+  - **Photographers**, **Shelters**, **Temporal Homes**, **Sterilization Services**
 
 ## Tech Stack
 
-- **Backend**: Kotlin, Ktor
-- **Database**: H2 (file-based)
+- **Backend**: Kotlin, Ktor, Exposed ORM
+- **Database**: PostgreSQL
 - **Auth**: WebAuthn4J (FIDO2/Passkeys)
-- **Frontend**: Kotlin HTML (kotlinx.html DSL), JavaScript, SCSS
+- **Frontend**: Kotlin HTML (kotlinx.html DSL), Kotlin/JS
+- **Storage**: AWS S3 (LocalStack for dev)
+- **Email**: AWS SES (Mailpit for dev)
 
 ## Requirements
 
 - Java 17+
+- Docker (for dev services)
 - Modern browser with WebAuthn support (Chrome, Firefox, Edge, Safari)
 
 ## Run
@@ -33,38 +38,47 @@ Then open http://localhost:8080
 
 **Note**: WebAuthn requires HTTPS or localhost. For production, use HTTPS.
 
+## Development Services
+
+Start Postgres, LocalStack (S3), and Mailpit (email):
+
+```bash
+./gradlew dockerUp
+```
+
+- **Database**: PostgreSQL on `localhost:5432`
+- **S3**: LocalStack on `localhost:4566`
+- **Email**: Mailpit web UI at http://localhost:8025
+
+Stop services:
+
+```bash
+./gradlew dockerDown
+```
+
 ## Project Structure
 
 ```
-src/main/
-├── kotlin/com/adoptu/
-│   ├── Application.kt
-│   ├── auth/WebAuthnService.kt, SessionUser.kt
-│   ├── db/DatabaseFactory.kt
-│   ├── di/AppModule.kt
-│   ├── models/Models.kt
-│   ├── pages/HtmlPages.kt
-│   ├── plugins/Serialization, Sessions, Routing, WebAuthn
-│   └── repositories/PetRepository.kt
-└── resources/
-    └── static/           # JS, CSS (HTML from Kotlin)
-        ├── scss/style.scss
-        └── js/api.js, webauthn.js
+backend/src/main/kotlin/com/adoptu/
+├── Application.kt
+├── adapters/          # DB repositories, S3 storage, SES email
+├── di/                # Koin dependency injection
+├── dto/               # Request/response DTOs
+├── pages/             # kotlinx.html page renderers
+├── plugins/           # Ktor plugins (Routing, Sessions, etc.)
+├── ports/             # Repository/storage/notification interfaces
+├── routes/            # Route handlers
+└── services/          # Business logic
 ```
 
-## Pet Page Fields
+## Testing
 
-Each pet has: name, type, description, weight, age (years/months), and pictures placeholder.
-
-# Application Start Test
-
-A test has been added at `src/test/kotlin/com/adoptu/ApplicationStartTest.kt` to confirm the application starts properly. To run the test, use:
-
+```bash
+./gradlew :backend:test                   # Unit tests
+./gradlew dockerUp && ./gradlew integrationTest  # Integration tests
+./gradlew e2eTest                         # E2E tests with Playwright in Docker
+./gradlew dockerDown                      # Stop test containers
 ```
-./gradlew test --tests com.adoptu.ApplicationStartTest
-```
-
-If the test fails, check the error output for details and ensure all dependencies and environment variables are correctly configured.
 
 
 # Deploy:

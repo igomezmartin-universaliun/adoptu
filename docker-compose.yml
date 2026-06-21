@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: adoptu
+      POSTGRES_PASSWORD: Ad0ptU
+      POSTGRES_DB: adoptu
+    network_mode: "host"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adoptu"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailpit:
+    image: axllent/mailpit
+    network_mode: "host"
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+
+  adoptu:
+    image: adoptu:test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    network_mode: "host"
+    environment:
+      ADOPTU_ENV: "dev"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

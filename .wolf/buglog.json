@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-06-21T19:24:37.073Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5\u21925 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "kts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21T19:24:37.073Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-06-21T13:25:00Z",
+      "error_message": "Root test task only ran :backend:test; ./gradlew test skipped all frontend jsTest targets",
+      "file": "build.gradle.kts",
+      "root_cause": "Root test task only delegated to :backend:test; :frontend:jsTest was omitted in the initial multi-module fix",
+      "fix": "Added \":frontend:jsTest\" to dependsOn in root tasks.register(\"test\") call",
+      "tags": [
+        "gradle",
+        "kotlin-multiplatform",
+        "test-task",
+        "frontend",
+        "jsTest"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-06-21T13:25:00Z",
+      "error_message": "(node) [DEP0169] DeprecationWarning: url.parse() ... [DEP0040] DeprecationWarning: punycode module deprecated",
+      "file": "gradlew",
+      "root_cause": "Kotlin/JS uses yarn 1.22.17 internally which calls url.parse() and punycode APIs deprecated in Node.js 22. kotlin.js.yarn=false is NOT supported in Kotlin 2.3.20 (yarn tasks still run). KotlinNpmInstallTask extends DefaultTask not Exec so environment() is unavailable. YarnEnvironment has no env-var map. Only fix is injecting NODE_OPTIONS before the Gradle JVM starts.",
+      "fix": "Exported NODE_OPTIONS=\"--no-deprecation\" in gradlew before JVM launch; all node subprocesses (including yarn invoked via ExecOperations.exec) inherit it",
+      "tags": [
+        "nodejs",
+        "yarn",
+        "deprecation",
+        "DEP0169",
+        "DEP0040",
+        "kotlin-js",
+        "gradlew",
+        "node22"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-06-21T19:32:45Z",
+      "error_message": "org.postgresql.util.PSQLException: ERROR: relation \"user_sterilization_locations\" does not exist",
+      "file": "backend/src/main/kotlin/com/adoptu/adapters/db/DatabaseFactory.kt",
+      "root_cause": "UserSterilizationLocations (and also UserShelters, PasswordResetTokens, EmailChangeTokens) were defined in Models.kt but missing from the listOfTables list in DatabaseFactory.kt, so SchemaUtils.create() never created those tables",
+      "fix": "Added UserShelters, UserSterilizationLocations, PasswordResetTokens, EmailChangeTokens to the listOfTables list in DatabaseFactory.kt",
+      "tags": [
+        "postgresql",
+        "exposed",
+        "schema",
+        "missing-table",
+        "listOfTables"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21"
+    }
+  ]
+}
