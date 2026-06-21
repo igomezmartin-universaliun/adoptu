@@ -25,7 +25,9 @@ import kotlin.time.ExperimentalTime
 class MagicLinkService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: NotificationPort,
-    private val clock: Clock
+    private val clock: Clock,
+    private val baseUrl: String = "http://localhost:8080",
+    private val emailVerificationService: EmailVerificationService? = null
 ) {
     private val secureRandom = SecureRandom()
     private val magicLinkExpirationMs = 5 * 60 * 1000L
@@ -63,7 +65,7 @@ class MagicLinkService(
             }
         }
 
-        val loginUrl = "http://localhost:8080/magic-link-login?token=$token"
+        val loginUrl = "$baseUrl/magic-link-login?token=$token"
         val (subject, body) = getLocalizedMagicLinkContent(language, user.displayName, loginUrl)
 
         val sent = runBlocking { notificationPort.sendEmail(email, subject, body) }

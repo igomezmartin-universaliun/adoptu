@@ -20,7 +20,8 @@ import kotlin.time.ExperimentalTime
 class EmailChangeService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: NotificationPort,
-    private val clock: Clock
+    private val clock: Clock,
+    private val baseUrl: String = "http://localhost:8080"
 ) {
     private val secureRandom = SecureRandom()
     private val emailChangeExpirationMs = 60 * 60 * 1000L
@@ -58,7 +59,7 @@ class EmailChangeService(
             }
         }
 
-        val changeUrl = "http://localhost:8080/verify-email-change?token=$token"
+        val changeUrl = "$baseUrl/verify-email-change?token=$token"
         val (subject, body) = getLocalizedEmailChangeContent(language, user.displayName, changeUrl, newEmail)
 
         val sent = runBlocking { notificationPort.sendEmail(newEmail, subject, body) }

@@ -23,7 +23,8 @@ import kotlin.time.ExperimentalTime
 class PasswordService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: com.adoptu.ports.NotificationPort,
-    private val clock: Clock
+    private val clock: Clock,
+    private val baseUrl: String = "http://localhost:8080"
 ) {
     private val secureRandom = SecureRandom()
     private val passwordResetExpirationMs = 15 * 60 * 1000L
@@ -154,7 +155,7 @@ class PasswordService(
             }
         }
 
-        val resetUrl = "http://localhost:8080/reset-password?token=$token"
+        val resetUrl = "$baseUrl/reset-password?token=$token"
         val (subject, body) = getLocalizedResetContent(language, user.displayName, resetUrl)
 
         val sent = runBlocking { notificationPort.sendEmail(email, subject, body) }

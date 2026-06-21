@@ -11,7 +11,8 @@ import kotlin.time.ExperimentalTime
 class EmailVerificationService(
     private val userRepository: UserRepositoryPort,
     private val notificationPort: NotificationPort,
-    private val clock: Clock
+    private val clock: Clock,
+    private val baseUrl: String = "http://localhost:8080"
 ) {
     private val secureRandom = SecureRandom()
     private val tokenExpirationMs = 24 * 60 * 60 * 1000L
@@ -119,7 +120,7 @@ class EmailVerificationService(
         val tokenCreated = userRepository.createEmailVerificationToken(userId, token, expiresAt)
         if (!tokenCreated) return Result.failure(Exception("Failed to create verification token"))
         
-        val verificationUrl = "http://localhost:8080/verify?token=$token"
+        val verificationUrl = "$baseUrl/verify?token=$token"
         
         val (subject, body) = getLocalizedContent(language, displayName, verificationUrl)
         

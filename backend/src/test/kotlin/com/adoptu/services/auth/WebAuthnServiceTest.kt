@@ -34,20 +34,20 @@ class WebAuthnServiceTest {
         fun `generates valid registration options with correct structure`() {
             val result = webAuthnService.generateRegistrationOptions("test@example.com", "Test User")
 
-            assertEquals("localhost", result.publicKey.rp.id)
-            assertEquals("Adopt-U Pet Adoption", result.publicKey.rp.name)
-            assertEquals("test@example.com", result.publicKey.user.name)
-            assertEquals("Test User", result.publicKey.user.displayName)
-            assertTrue(result.publicKey.challenge.isNotEmpty())
-            assertEquals(2, result.publicKey.pubKeyCredParams.size)
+            assertEquals("localhost", result.rp.id)
+            assertEquals("Adopt-U Pet Adoption", result.rp.name)
+            assertEquals("test@example.com", result.user.name)
+            assertEquals("Test User", result.user.displayName)
+            assertTrue(result.challenge.isNotEmpty())
+            assertEquals(2, result.pubKeyCredParams.size)
         }
 
         @Test
         fun `includes ES256 and RS256 algorithms`() {
             val result = webAuthnService.generateRegistrationOptions("test@example.com", "Test User")
 
-            val es256 = result.publicKey.pubKeyCredParams.find { it.alg == -7 }
-            val rs256 = result.publicKey.pubKeyCredParams.find { it.alg == -257 }
+            val es256 = result.pubKeyCredParams.find { it.alg == -7 }
+            val rs256 = result.pubKeyCredParams.find { it.alg == -257 }
 
             assertTrue(es256?.type == "public-key")
             assertTrue(rs256?.type == "public-key")
