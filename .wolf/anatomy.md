@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-21T19:24:37.055Z
-> Files: 520 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-21T22:48:50.688Z
+> Files: 522 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -727,6 +727,14 @@
 - `MyPetsPage.kt` (~0 tok)
 - `ProfilePage.kt` (~0 tok)
 - `RegisterPage.kt` (~0 tok)
+
+## .claude/worktrees/layout-fix/backend/src/main/resources/static/css/
+
+- `style.css` — Styles: 91 rules, 8 vars (~5932 tok)
+
+## .claude/worktrees/layout-fix/backend/src/main/scss/
+
+- `_layout.scss` — Styles: 11 rules (~1915 tok)
 
 ## .claude/worktrees/profile-completion-guard/
 

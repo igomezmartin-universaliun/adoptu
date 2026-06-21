@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5\u21925 lines (2 removed)",
+      "fix": "Rewrote 5→5 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -73,6 +73,38 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-21"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-06-21T22:48:39.166Z",
+      "error_message": "CSS fix: justify-content",
+      "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "scss"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21T22:48:39.166Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-06-21T22:48:50.716Z",
+      "error_message": "CSS fix: justify-content",
+      "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-21T22:48:50.716Z"
     }
   ]
 }
