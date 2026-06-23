@@ -81,3 +81,56 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+
+## Session: 2026-06-21 17:14
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-22 19:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:12
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:12
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:13
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:13
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:15 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css | CSS: white-space, span, font-size | ~198 |
+| 19:16 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css | CSS: white-space, span, font-size | ~198 |
+| 19:16 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css | CSS: white-space, span, font-size | ~198 |
+| 19:16 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css | CSS: white-space, span, font-size | ~198 |
+| 19:16 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css | CSS: white-space, span, font-size | ~198 |
+| 19:16 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css | CSS: white-space, span, font-size | ~198 |
+
+## Session: 2026-06-23 19:16
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:17 | Fix resource dropdown icon alignment on all pages | 6 CSS files | Changed justify-content to space-between, span:first-child flex:1, added .material-symbols-outlined rule | ~200 |
+| 19:18 | Created .claude/worktrees/quiet-booping-hare/scripts/load_test_data.sh | — | ~122 |
+| 19:20 | Edited .claude/worktrees/clever-forging-teacup/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | "window.isLoggedInGlobal =" → "window.isLoggedInGlobal =" | ~47 |
+| 19:21 | Edited .claude/worktrees/clever-forging-teacup/backend/src/main/kotlin/com/adoptu/pages/EmailVerificationPage.kt | "window.isLoggedInGlobal =" → "window.isLoggedInGlobal =" | ~33 |
+| 19:22 | Fixed ReferenceError: com is not defined — changed com.adoptu.frontend.Common.* to frontend.com.adoptu.frontend.Common.* in Shared.kt + EmailVerificationPage.kt | Shared.kt, EmailVerificationPage.kt | fixed | ~100 |
+| 19:23 | Edited .claude/worktrees/clever-forging-teacup/.wolf/cerebrum.md | 5→6 lines | ~161 |
+| 19:23 | Session end: 4 writes across 4 files (load_test_data.sh, Shared.kt, EmailVerificationPage.kt, cerebrum.md) | 14 reads | ~2936 tok |
+| 19:23 | Created .claude/worktrees/quiet-booping-hare/scripts/test_data.sql | — | ~18508 |
+| 19:24 | Edited .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/_layout.scss | expanded (+7 lines) | ~75 |
+| 19:25 | Edited .claude/worktrees/zippy-rolling-cocke/.wolf/cerebrum.md | 3→5 lines | ~156 |
+| 19:25 | Fix: edit _layout.scss (not CSS) + recompile all SCSS | _layout.scss + 9 CSS files | icons flush right on all pages; cerebrum updated with SCSS-only rule | ~300 |
+| 19:26 | Edited .claude/worktrees/quiet-booping-hare/scripts/test_data.sql | expanded (+48 lines) | ~3854 |

@@ -72,7 +72,7 @@ main {
   font-weight: 500;
   color: var(--text);
 }
-.form-row input, .form-row select, .form-row textarea {
+.form-row input, .form-row select {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border);
@@ -139,8 +139,6 @@ main {
 }
 
 .message {
-  display: block;
-  min-height: 1.5rem;
   padding: 1rem;
   border-radius: 6px;
   margin: 1rem 0;
@@ -494,7 +492,7 @@ footer span {
   display: none;
   position: absolute;
   background: var(--secondary);
-  min-width: 286px;
+  width: max-content;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
   z-index: 1000;
@@ -509,14 +507,19 @@ footer span {
   text-decoration: none;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
-  text-align: right;
+  white-space: nowrap;
   transition: background 0.2s;
 }
-.resources-dropdown .resources-dropdown-content a span {
+.resources-dropdown .resources-dropdown-content a span:first-child {
   flex: 1;
-  text-align: right;
+}
+.resources-dropdown .resources-dropdown-content a .material-symbols-outlined {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
 }
 .resources-dropdown .resources-dropdown-content a svg, .resources-dropdown .resources-dropdown-content a img {
   flex-shrink: 0;
@@ -583,7 +586,7 @@ footer span {
     align-items: stretch;
   }
   .location-search-form .location-search-country select,
-.location-search-form .location-search-filters {
+  .location-search-form .location-search-filters {
     width: 100%;
   }
   .location-search-form .location-search-filters {
@@ -627,5 +630,3 @@ footer span {
 .location-card .location-website a:hover {
   text-decoration: underline;
 }
-
-/*# sourceMappingURL=sterilization.css.map */
