@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5→5 lines (2 removed)",
+      "fix": "Rewrote 5\u21925 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -105,6 +105,153 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-21T22:48:50.716Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-06-23T01:15:26.012Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:15:26.012Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-06-23T01:16:02.809Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:16:02.809Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-06-23T01:16:07.064Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:16:07.064Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-06-23T01:16:09.579Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:16:09.579Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-06-23T01:16:12.781Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:16:12.781Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-06-23T01:16:15.816Z",
+      "error_message": "CSS fix: justify-content, text-align",
+      "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:16:15.816Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-06-23T01:20:56.182Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/clever-forging-teacup/backend/src/main/kotlin/com/adoptu/pages/Shared.kt",
+      "root_cause": "Had \"window.isLoggedInGlobal = $isLoggedIn; com.adoptu",
+      "fix": "Changed to \"window.isLoggedInGlobal = $isLoggedIn; frontend.c",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:20:56.182Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-06-23T01:21:11.000Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/clever-forging-teacup/backend/src/main/kotlin/com/adoptu/pages/EmailVerificationPage.kt",
+      "root_cause": "Had \"window.isLoggedInGlobal = false; com.adoptu.front",
+      "fix": "Changed to \"window.isLoggedInGlobal = false; frontend.com.ado",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:21:11.000Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-06-22T19:20:00.000Z",
+      "error_message": "Uncaught ReferenceError: com is not defined at shelters:49:45",
+      "file": "backend/src/main/kotlin/com/adoptu/pages/Shared.kt, backend/src/main/kotlin/com/adoptu/pages/EmailVerificationPage.kt",
+      "root_cause": "Kotlin/JS IR bundle exports module as globalThis.frontend (UMD), not globalThis.com. Inline script called com.adoptu.frontend.Common.initDropdowns() but the correct path is frontend.com.adoptu.frontend.Common.initDropdowns()",
+      "fix": "Changed inline JS calls from com.adoptu.frontend.Common.* to frontend.com.adoptu.frontend.Common.* in both Shared.kt (commonScripts) and EmailVerificationPage.kt",
+      "tags": [
+        "kotlin-js",
+        "umd",
+        "module-export",
+        "inline-script",
+        "i18n",
+        "dropdowns"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T19:20:00.000Z"
     }
   ]
 }

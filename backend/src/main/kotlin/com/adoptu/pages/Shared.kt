@@ -22,7 +22,7 @@ fun A.commonLogo() {
 
 fun BODY.commonScripts(isLoggedIn: Boolean = false) {
     script(src = "/static/js/common.js") {}
-    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn; com.adoptu.frontend.Common.initDropdowns(); com.adoptu.frontend.Common.initI18n(null);") } }
+    script { unsafe { raw("window.isLoggedInGlobal = $isLoggedIn; frontend.com.adoptu.frontend.Common.initDropdowns(); frontend.com.adoptu.frontend.Common.initI18n(null);") } }
 }
 
 fun DIV.languageDropdown() {

@@ -83,6 +83,6 @@ fun HTML.emailVerificationPage(success: Boolean, language: String = "en", navPar
         }
         footer()
         script(src = "/static/js/common.js") {}
-        script { unsafe { raw("window.isLoggedInGlobal = false; com.adoptu.frontend.Common.initI18n(null);") } }
+        script { unsafe { raw("window.isLoggedInGlobal = false; frontend.com.adoptu.frontend.Common.initI18n(null);") } }
     }
 }
