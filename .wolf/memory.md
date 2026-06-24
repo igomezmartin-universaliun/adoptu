@@ -138,3 +138,95 @@
 | 19:26 | Edited .claude/worktrees/quiet-booping-hare/scripts/test_data.sql | 1→2 lines | ~178 |
 | 19:27 | Created test_data.sql (50 users, 200 pets) + load_test_data.sh | scripts/test_data.sql, scripts/load_test_data.sh | committed worktree-quiet-booping-hare | ~2k |
 | 19:28 | Session end: 9 writes across 6 files (load_test_data.sh, Shared.kt, EmailVerificationPage.kt, cerebrum.md, test_data.sql) | 18 reads | ~48149 tok |
+| 19:32 | Session end: 9 writes across 6 files (load_test_data.sh, Shared.kt, EmailVerificationPage.kt, cerebrum.md, test_data.sql) | 18 reads | ~48149 tok |
+| 19:32 | Session end: 9 writes across 6 files (load_test_data.sh, Shared.kt, EmailVerificationPage.kt, cerebrum.md, test_data.sql) | 18 reads | ~48149 tok |
+
+## Session: 2026-06-23 19:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:46
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-23 19:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 60→65 lines | ~1924 |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 3→4 lines | ~88 |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 4→5 lines | ~67 |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 1→2 lines | ~22 |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 1→2 lines | ~42 |
+| 19:48 | Created .claude/worktrees/woolly-mixing-catmull/local-start.sh | — | ~163 |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 1→2 lines | ~98 |
+| 19:48 | Session end: 7 writes across 2 files (test_data.sql, local-start.sh) | 4 reads | ~2783 tok |
+| 19:48 | Edited .claude/worktrees/mutable-enchanting-moler/scripts/test_data.sql | 1→2 lines | ~93 |
+| 19:49 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js | added error handling | ~241 |
+| 19:49 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js | added error handling | ~204 |
+| 19:49 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/login.js | modified catch() | ~55 |
+| 19:49 | Fix test_data.sql FK/duplicate-key errors: explicit user IDs + ON CONFLICT guards | scripts/test_data.sql | fixed | ~800 |
+| 19:49 | Session end: 11 writes across 4 files (test_data.sql, local-start.sh, webauthn.js, login.js) | 7 reads | ~3382 tok |
+| 19:49 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/register.js | modified catch() | ~48 |
+| 19:49 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/profile.js | modified catch() | ~106 |
+| 19:50 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/i18n-en.js | 1→3 lines | ~72 |
+| 19:50 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/i18n-es.js | 1→3 lines | ~78 |
+| 19:50 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/i18n-zh.js | 1→3 lines | ~44 |
+| 19:50 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/i18n-fr.js | 1→3 lines | ~80 |
+| 19:50 | Edited .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/i18n-pt.js | 1→3 lines | ~76 |
+| 19:51 | Edited .claude/worktrees/swift-wiggling-conway/.wolf/buglog.json | expanded (+12 lines) | ~272 |
+| 19:51 | Session end: 19 writes across 12 files (test_data.sql, local-start.sh, webauthn.js, login.js, register.js) | 14 reads | ~4158 tok |
+
+## Session: 2026-06-24 21:46
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-24 21:48
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-24 21:55
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:57 | Edited .claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt | added 1 condition(s) | ~117 |
+
+## Session: 2026-06-24 21:57
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:55 | Fix NotAllowedError on FIDO cancel showing raw browser error | LoginPage.kt | Check error.name == NotAllowedError in catch, show friendly message | ~100 |
+| 21:58 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | "ls-xEbE8734-fUqu-kOme-zOp" → "http://localhost:8080" | ~44 |
+
+## Session: 2026-06-24 21:58
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:59 | Edited .claude/worktrees/elegant-coalescing-kurzweil/.wolf/buglog.json | expanded (+18 lines) | ~416 |
+| 21:59 | Edited .claude/worktrees/elegant-coalescing-kurzweil/.wolf/memory.md | expanded (+6 lines) | ~107 |
+| 21:59 | Session end: 2 writes across 2 files (buglog.json, memory.md) | 5 reads | ~530 tok |
+| 22:00 | Session end: 2 writes across 2 files (buglog.json, memory.md) | 6 reads | ~530 tok |
+| 22:02 | Session end: 2 writes across 2 files (buglog.json, memory.md) | 8 reads | ~530 tok |
+| 22:04 | Session end: 2 writes across 2 files (buglog.json, memory.md) | 8 reads | ~530 tok |
+| 22:06 | Session end: 2 writes across 2 files (buglog.json, memory.md) | 8 reads | ~530 tok |
+| 22:08 | Created .claude/worktrees/elegant-coalescing-kurzweil/docker-compose.yml | — | ~303 |
+| 22:09 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~18 |
+| 22:09 | Session end: 4 writes across 4 files (buglog.json, memory.md, docker-compose.yml, local-start.sh) | 13 reads | ~1437 tok |
+| 22:10 | Session end: 4 writes across 4 files (buglog.json, memory.md, docker-compose.yml, local-start.sh) | 14 reads | ~1688 tok |
+| 22:13 | Created .claude/worktrees/elegant-coalescing-kurzweil/docker-compose.yml | — | ~329 |
+| 22:13 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~17 |
+| 22:14 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~18 |
+| 22:14 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~19 |
+
+## Session: 2026-06-24 22:16
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 22:18 | Created .claude/worktrees/elegant-coalescing-kurzweil/docker-compose.yml | — | ~118 |
+| 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
+| 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |

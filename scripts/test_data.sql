@@ -7,73 +7,79 @@
 -- -------------------------
 -- USERS
 -- -------------------------
-INSERT INTO users (username, display_name, language, created_at, last_accepted_privacy_policy, last_accepted_terms_and_conditions, is_email_verified, is_banned)
+INSERT INTO users (id, username, display_name, language, created_at, last_accepted_privacy_policy, last_accepted_terms_and_conditions, is_email_verified, is_banned)
+OVERRIDING SYSTEM VALUE
 VALUES
   -- Admin
-  ('admin@adoptu.com',               'Admin Adoptu',          'es', 1704067200000, 1704067200000, 1704067200000, true,  false),
+  (1,  'admin@adoptu.com',               'Admin Adoptu',          'es', 1704067200000, 1704067200000, 1704067200000, true,  false),
   -- Rescuers (2-16)
-  ('maria.garcia@email.com',         'María García',          'es', 1704153600000, 1704153600000, 1704153600000, true,  false),
-  ('carlos.rodriguez@email.com',     'Carlos Rodríguez',      'es', 1706745600000, 1706745600000, 1706745600000, true,  false),
-  ('ana.martinez@email.com',         'Ana Martínez',          'es', 1709424000000, 1709424000000, 1709424000000, true,  false),
-  ('luis.hernandez@email.com',       'Luis Hernández',        'es', 1712102400000, 1712102400000, 1712102400000, true,  false),
-  ('sofia.lopez@email.com',          'Sofía López',           'es', 1714694400000, 1714694400000, 1714694400000, true,  false),
-  ('pedro.gonzalez@email.com',       'Pedro González',        'es', 1717372800000, 1717372800000, 1717372800000, true,  false),
-  ('valentina.perez@email.com',      'Valentina Pérez',       'es', 1719964800000, 1719964800000, 1719964800000, true,  false),
-  ('diego.sanchez@email.com',        'Diego Sánchez',         'es', 1722643200000, 1722643200000, 1722643200000, true,  false),
-  ('isabela.ramirez@email.com',      'Isabela Ramírez',       'es', 1725321600000, 1725321600000, 1725321600000, true,  false),
-  ('mateo.flores@email.com',         'Mateo Flores',          'es', 1727913600000, 1727913600000, 1727913600000, true,  false),
-  ('camila.torres@email.com',        'Camila Torres',         'es', 1730592000000, 1730592000000, 1730592000000, true,  false),
-  ('alejandro.jimenez@email.com',    'Alejandro Jiménez',     'es', 1733184000000, 1733184000000, 1733184000000, true,  false),
-  ('luciana.morales@email.com',      'Luciana Morales',       'es', 1735862400000, 1735862400000, 1735862400000, true,  false),
-  ('sebastian.vargas@email.com',     'Sebastián Vargas',      'es', 1738540800000, 1738540800000, 1738540800000, true,  false),
-  ('valeria.castillo@email.com',     'Valeria Castillo',      'es', 1741132800000, 1741132800000, 1741132800000, true,  false),
+  (2,  'maria.garcia@email.com',         'María García',          'es', 1704153600000, 1704153600000, 1704153600000, true,  false),
+  (3,  'carlos.rodriguez@email.com',     'Carlos Rodríguez',      'es', 1706745600000, 1706745600000, 1706745600000, true,  false),
+  (4,  'ana.martinez@email.com',         'Ana Martínez',          'es', 1709424000000, 1709424000000, 1709424000000, true,  false),
+  (5,  'luis.hernandez@email.com',       'Luis Hernández',        'es', 1712102400000, 1712102400000, 1712102400000, true,  false),
+  (6,  'sofia.lopez@email.com',          'Sofía López',           'es', 1714694400000, 1714694400000, 1714694400000, true,  false),
+  (7,  'pedro.gonzalez@email.com',       'Pedro González',        'es', 1717372800000, 1717372800000, 1717372800000, true,  false),
+  (8,  'valentina.perez@email.com',      'Valentina Pérez',       'es', 1719964800000, 1719964800000, 1719964800000, true,  false),
+  (9,  'diego.sanchez@email.com',        'Diego Sánchez',         'es', 1722643200000, 1722643200000, 1722643200000, true,  false),
+  (10, 'isabela.ramirez@email.com',      'Isabela Ramírez',       'es', 1725321600000, 1725321600000, 1725321600000, true,  false),
+  (11, 'mateo.flores@email.com',         'Mateo Flores',          'es', 1727913600000, 1727913600000, 1727913600000, true,  false),
+  (12, 'camila.torres@email.com',        'Camila Torres',         'es', 1730592000000, 1730592000000, 1730592000000, true,  false),
+  (13, 'alejandro.jimenez@email.com',    'Alejandro Jiménez',     'es', 1733184000000, 1733184000000, 1733184000000, true,  false),
+  (14, 'luciana.morales@email.com',      'Luciana Morales',       'es', 1735862400000, 1735862400000, 1735862400000, true,  false),
+  (15, 'sebastian.vargas@email.com',     'Sebastián Vargas',      'es', 1738540800000, 1738540800000, 1738540800000, true,  false),
+  (16, 'valeria.castillo@email.com',     'Valeria Castillo',      'es', 1741132800000, 1741132800000, 1741132800000, true,  false),
   -- Adopters (17-26)
-  ('juan.medina@email.com',          'Juan Medina',           'es', 1704240000000, 1704240000000, 1704240000000, true,  false),
-  ('daniela.nunez@email.com',        'Daniela Núñez',         'es', 1707004800000, 1707004800000, 1707004800000, true,  false),
-  ('roberto.delgado@email.com',      'Roberto Delgado',       'es', 1709596800000, 1709596800000, 1709596800000, true,  false),
-  ('mariana.silva@email.com',        'Mariana Silva',         'es', 1712275200000, 1712275200000, 1712275200000, true,  false),
-  ('pablo.ramos@email.com',          'Pablo Ramos',           'es', 1714867200000, 1714867200000, 1714867200000, true,  false),
-  ('andrea.romero@email.com',        'Andrea Romero',         'es', 1717545600000, 1717545600000, 1717545600000, true,  false),
-  ('miguel.garcia@email.com',        'Miguel García',         'es', 1720224000000, 1720224000000, 1720224000000, true,  false),
-  ('natalia.rodriguez@email.com',    'Natalia Rodríguez',     'es', 1722816000000, 1722816000000, 1722816000000, true,  false),
-  ('francisco.martinez@email.com',   'Francisco Martínez',    'es', 1725494400000, 1725494400000, 1725494400000, true,  false),
-  ('carolina.hernandez@email.com',   'Carolina Hernández',    'es', 1728086400000, 1728086400000, 1728086400000, true,  false),
+  (17, 'juan.medina@email.com',          'Juan Medina',           'es', 1704240000000, 1704240000000, 1704240000000, true,  false),
+  (18, 'daniela.nunez@email.com',        'Daniela Núñez',         'es', 1707004800000, 1707004800000, 1707004800000, true,  false),
+  (19, 'roberto.delgado@email.com',      'Roberto Delgado',       'es', 1709596800000, 1709596800000, 1709596800000, true,  false),
+  (20, 'mariana.silva@email.com',        'Mariana Silva',         'es', 1712275200000, 1712275200000, 1712275200000, true,  false),
+  (21, 'pablo.ramos@email.com',          'Pablo Ramos',           'es', 1714867200000, 1714867200000, 1714867200000, true,  false),
+  (22, 'andrea.romero@email.com',        'Andrea Romero',         'es', 1717545600000, 1717545600000, 1717545600000, true,  false),
+  (23, 'miguel.garcia@email.com',        'Miguel García',         'es', 1720224000000, 1720224000000, 1720224000000, true,  false),
+  (24, 'natalia.rodriguez@email.com',    'Natalia Rodríguez',     'es', 1722816000000, 1722816000000, 1722816000000, true,  false),
+  (25, 'francisco.martinez@email.com',   'Francisco Martínez',    'es', 1725494400000, 1725494400000, 1725494400000, true,  false),
+  (26, 'carolina.hernandez@email.com',   'Carolina Hernández',    'es', 1728086400000, 1728086400000, 1728086400000, true,  false),
   -- Photographers (27-31)
-  ('jorge.photo@email.com',          'Jorge Fotógrafo',       'es', 1704326400000, 1704326400000, 1704326400000, true,  false),
-  ('laura.photo@email.com',          'Laura Fotografía',      'es', 1707091200000, 1707091200000, 1707091200000, true,  false),
-  ('andres.photo@email.com',         'Andrés Foto',           'es', 1709769600000, 1709769600000, 1709769600000, true,  false),
-  ('monica.photo@email.com',         'Mónica Photo',          'es', 1712448000000, 1712448000000, 1712448000000, true,  false),
-  ('raul.photo@email.com',           'Raúl Fotógrafo',        'es', 1715040000000, 1715040000000, 1715040000000, true,  false),
+  (27, 'jorge.photo@email.com',          'Jorge Fotógrafo',       'es', 1704326400000, 1704326400000, 1704326400000, true,  false),
+  (28, 'laura.photo@email.com',          'Laura Fotografía',      'es', 1707091200000, 1707091200000, 1707091200000, true,  false),
+  (29, 'andres.photo@email.com',         'Andrés Foto',           'es', 1709769600000, 1709769600000, 1709769600000, true,  false),
+  (30, 'monica.photo@email.com',         'Mónica Photo',          'es', 1712448000000, 1712448000000, 1712448000000, true,  false),
+  (31, 'raul.photo@email.com',           'Raúl Fotógrafo',        'es', 1715040000000, 1715040000000, 1715040000000, true,  false),
   -- Temporal homes (32-39)
-  ('elena.foster@email.com',         'Elena Foster',          'es', 1704412800000, 1704412800000, 1704412800000, true,  false),
-  ('thomas.foster@email.com',        'Tomás Foster',          'es', 1707177600000, 1707177600000, 1707177600000, true,  false),
-  ('lucia.casa@email.com',           'Lucía Temporal',        'es', 1709856000000, 1709856000000, 1709856000000, true,  false),
-  ('martin.temporal@email.com',      'Martín Temporal',       'es', 1712534400000, 1712534400000, 1712534400000, true,  false),
-  ('rosa.home@email.com',            'Rosa Hogar',            'es', 1715126400000, 1715126400000, 1715126400000, true,  false),
-  ('felix.hogar@email.com',          'Félix Hogar',           'es', 1717804800000, 1717804800000, 1717804800000, true,  false),
-  ('catalina.casa@email.com',        'Catalina Casa',         'es', 1720396800000, 1720396800000, 1720396800000, true,  false),
-  ('hugo.temporal@email.com',        'Hugo Temporal',         'es', 1723075200000, 1723075200000, 1723075200000, true,  false),
+  (32, 'elena.foster@email.com',         'Elena Foster',          'es', 1704412800000, 1704412800000, 1704412800000, true,  false),
+  (33, 'thomas.foster@email.com',        'Tomás Foster',          'es', 1707177600000, 1707177600000, 1707177600000, true,  false),
+  (34, 'lucia.casa@email.com',           'Lucía Temporal',        'es', 1709856000000, 1709856000000, 1709856000000, true,  false),
+  (35, 'martin.temporal@email.com',      'Martín Temporal',       'es', 1712534400000, 1712534400000, 1712534400000, true,  false),
+  (36, 'rosa.home@email.com',            'Rosa Hogar',            'es', 1715126400000, 1715126400000, 1715126400000, true,  false),
+  (37, 'felix.hogar@email.com',          'Félix Hogar',           'es', 1717804800000, 1717804800000, 1717804800000, true,  false),
+  (38, 'catalina.casa@email.com',        'Catalina Casa',         'es', 1720396800000, 1720396800000, 1720396800000, true,  false),
+  (39, 'hugo.temporal@email.com',        'Hugo Temporal',         'es', 1723075200000, 1723075200000, 1723075200000, true,  false),
   -- Shelter managers (40-44)
-  ('shelter.amigos@email.com',       'Refugio Amigos Peludos','es', 1704499200000, 1704499200000, 1704499200000, true,  false),
-  ('shelter.esperanza@email.com',    'Refugio Esperanza',     'es', 1707264000000, 1707264000000, 1707264000000, true,  false),
-  ('shelter.patitas@email.com',      'Refugio Patitas',       'es', 1709942400000, 1709942400000, 1709942400000, true,  false),
-  ('shelter.huellitas@email.com',    'Refugio Huellitas',     'es', 1712620800000, 1712620800000, 1712620800000, true,  false),
-  ('shelter.vida@email.com',         'Refugio Nueva Vida',    'es', 1715212800000, 1715212800000, 1715212800000, true,  false),
+  (40, 'shelter.amigos@email.com',       'Refugio Amigos Peludos','es', 1704499200000, 1704499200000, 1704499200000, true,  false),
+  (41, 'shelter.esperanza@email.com',    'Refugio Esperanza',     'es', 1707264000000, 1707264000000, 1707264000000, true,  false),
+  (42, 'shelter.patitas@email.com',      'Refugio Patitas',       'es', 1709942400000, 1709942400000, 1709942400000, true,  false),
+  (43, 'shelter.huellitas@email.com',    'Refugio Huellitas',     'es', 1712620800000, 1712620800000, 1712620800000, true,  false),
+  (44, 'shelter.vida@email.com',         'Refugio Nueva Vida',    'es', 1715212800000, 1715212800000, 1715212800000, true,  false),
   -- Sterilization service (45-47)
-  ('steril.clinic1@email.com',       'Clínica Esteriliza Ya', 'es', 1704585600000, 1704585600000, 1704585600000, true,  false),
-  ('steril.clinic2@email.com',       'Clínica Bienestar',     'es', 1707350400000, 1707350400000, 1707350400000, true,  false),
-  ('steril.clinic3@email.com',       'Clínica Sana Mascota',  'es', 1710028800000, 1710028800000, 1710028800000, true,  false),
+  (45, 'steril.clinic1@email.com',       'Clínica Esteriliza Ya', 'es', 1704585600000, 1704585600000, 1704585600000, true,  false),
+  (46, 'steril.clinic2@email.com',       'Clínica Bienestar',     'es', 1707350400000, 1707350400000, 1707350400000, true,  false),
+  (47, 'steril.clinic3@email.com',       'Clínica Sana Mascota',  'es', 1710028800000, 1710028800000, 1710028800000, true,  false),
   -- Mixed roles (48-50)
-  ('rescuer.photo1@email.com',       'Carmen Rescatadora',    'es', 1712707200000, 1712707200000, 1712707200000, true,  false),
-  ('rescuer.home1@email.com',        'Ernesto Multirol',      'es', 1715299200000, 1715299200000, 1715299200000, true,  false),
-  ('rescuer.adopter1@email.com',     'Patricia Corazón',      'es', 1717977600000, 1717977600000, 1717977600000, true,  false);
+  (48, 'rescuer.photo1@email.com',       'Carmen Rescatadora',    'es', 1712707200000, 1712707200000, 1712707200000, true,  false),
+  (49, 'rescuer.home1@email.com',        'Ernesto Multirol',      'es', 1715299200000, 1715299200000, 1715299200000, true,  false),
+  (50, 'rescuer.adopter1@email.com',     'Patricia Corazón',      'es', 1717977600000, 1717977600000, 1717977600000, true,  false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Advance the sequence past the manually inserted IDs so future inserts don't collide
+SELECT setval(pg_get_serial_sequence('users', 'id'), GREATEST((SELECT MAX(id) FROM users), 50), true);
 
 -- -------------------------
 -- PASSWORDS (all: Test1234!)
 -- -------------------------
 INSERT INTO user_passwords (user_id, password_hash, created_at, updated_at)
 SELECT id, '$argon2id$v=19$m=65536,t=3,p=4$FrWyc5rTivlqFuys+G+Q6Q$uToUdFF9IBhSYRV+OCHW6IFgnVdmxCR98BBEIa6/NNhNLgg5E5d61vIne7XtHIlzCFl7dnRwsnmNQmKb+eKyFQ', 1704067200000, 1704067200000
-FROM users;
+FROM users WHERE id BETWEEN 1 AND 50
+ON CONFLICT (user_id) DO NOTHING;
 
 -- -------------------------
 -- ROLES
@@ -104,7 +110,8 @@ INSERT INTO user_active_roles (user_id, role) VALUES
   -- Mixed: RESCUER + PHOTOGRAPHER (48), RESCUER + TEMPORAL_HOME (49), RESCUER + ADOPTER (50)
   (48, 'RESCUER'), (48, 'PHOTOGRAPHER'),
   (49, 'RESCUER'), (49, 'TEMPORAL_HOME'),
-  (50, 'RESCUER'), (50, 'ADOPTER');
+  (50, 'RESCUER'), (50, 'ADOPTER')
+ON CONFLICT (user_id, role) DO NOTHING;
 
 -- -------------------------
 -- PHOTOGRAPHERS
@@ -115,7 +122,8 @@ INSERT INTO photographers (user_id, photographer_fee, photographer_currency, cou
   (29, 180.00, 'ARS', 'Argentina', 'Buenos Aires'),
   (30, 200.00, 'CLP', 'Chile',     'Región Metropolitana'),
   (31, 150.00, 'COP', 'Colombia',  'Antioquia'),
-  (48, 220.00, 'MXN', 'México',    'Nuevo León');
+  (48, 220.00, 'MXN', 'México',    'Nuevo León')
+ON CONFLICT (user_id) DO NOTHING;
 
 -- -------------------------
 -- TEMPORAL HOMES
@@ -129,7 +137,8 @@ INSERT INTO temporal_homes (user_id, alias, country, state, city, zip, neighborh
   (37, 'Hogar Félix',    'Colombia',  'Antioquia',          'Medellín',         '050001','El Poblado',      1717804800000),
   (38, 'Casa Catalina',  'México',    'Nuevo León',         'Monterrey',        '64000', 'San Pedro',       1720396800000),
   (39, 'Hogar Hugo',     'México',    'Puebla',             'Puebla',           '72000', 'Centro Histórico',1723075200000),
-  (49, 'Casa Ernesto',   'México',    'CDMX',              'Ciudad de México', '11800', 'Polanco',          1715299200000);
+  (49, 'Casa Ernesto',   'México',    'CDMX',              'Ciudad de México', '11800', 'Polanco',          1715299200000)
+ON CONFLICT (user_id) DO NOTHING;
 
 -- -------------------------
 -- USER SHELTERS
@@ -139,7 +148,8 @@ INSERT INTO user_shelters (user_id, name, country, state, city, neighborhood, ad
   (41, 'Refugio Esperanza','México',   'Jalisco',            'Guadalajara',      'Zapopan',     'Av. Vallarta 567',                  '45010', '+52 33 9876 5432', 'info@esperanzarefugio.mx',    'https://esperanzarefugio.mx', 'Refugio con más de 10 años de experiencia en Jalisco.',                'MXN', 1707264000000, 1707264000000),
   (42, 'Patitas Felices',  'Argentina','Buenos Aires',       'Buenos Aires',     'Villa Urquiza','Av. Triunvirato 1890',             '1431',  '+54 11 4444 3333', 'patitas@patitasfelices.ar',   NULL,                          'Centro de adopción responsable en Buenos Aires.',                      'ARS', 1709942400000, 1709942400000),
   (43, 'Huellitas del Sur','Chile',    'Región Metropolitana','Santiago',         'La Florida',  'Calle La Serena 234',              '8240000','+56 2 2345 6789', 'huellas@huellitasdelsur.cl',  NULL,                          'Refugio en el sur de Santiago con 200+ animales rescatados.',          'CLP', 1712620800000, 1712620800000),
-  (44, 'Nueva Vida Animal','Colombia', 'Antioquia',          'Medellín',         'Laureles',    'Cra. 70 # 44-50',                  '050001','+57 4 567 8901',   'info@nuevavida.co',           'https://nuevavida.co',        'Fundación comprometida con el bienestar animal en Colombia.',          'COP', 1715212800000, 1715212800000);
+  (44, 'Nueva Vida Animal','Colombia', 'Antioquia',          'Medellín',         'Laureles',    'Cra. 70 # 44-50',                  '050001','+57 4 567 8901',   'info@nuevavida.co',           'https://nuevavida.co',        'Fundación comprometida con el bienestar animal en Colombia.',          'COP', 1715212800000, 1715212800000)
+ON CONFLICT (user_id) DO NOTHING;
 
 -- -------------------------
 -- USER STERILIZATION LOCATIONS
@@ -147,7 +157,8 @@ INSERT INTO user_shelters (user_id, name, country, state, city, neighborhood, ad
 INSERT INTO user_sterilization_locations (user_id, name, country, state, city, neighborhood, address, zip, phone, email, website, description, created_at, updated_at) VALUES
   (45, 'Clínica Esteriliza Ya', 'México',    'CDMX',              'Ciudad de México', 'Tlalpan',    'Insurgentes Sur 4512',    '14000', '+52 55 5555 1111', 'esteriliza@ya.mx',         NULL,                        'Esterilizaciones a bajo costo todos los sábados.',           1704585600000, 1704585600000),
   (46, 'Clínica Bienestar',     'México',    'Jalisco',            'Guadalajara',      'Tetlán',     'Av. 8 de Julio 1500',     '44820', '+52 33 3333 2222', 'clinica@bienestarjal.mx',  'https://bienestarjal.mx',   'Servicio veterinario con programa de esterilización masiva.', 1707350400000, 1707350400000),
-  (47, 'Clínica Sana Mascota',  'Argentina', 'Buenos Aires',       'Buenos Aires',     'Belgrano',   'Av. Cabildo 980',         '1426',  '+54 11 5555 6666', 'sanamascota@gmail.com',    NULL,                        'Clínica veterinaria con esterilizaciones gratuitas un día al mes.', 1710028800000, 1710028800000);
+  (47, 'Clínica Sana Mascota',  'Argentina', 'Buenos Aires',       'Buenos Aires',     'Belgrano',   'Av. Cabildo 980',         '1426',  '+54 11 5555 6666', 'sanamascota@gmail.com',    NULL,                        'Clínica veterinaria con esterilizaciones gratuitas un día al mes.', 1710028800000, 1710028800000)
+ON CONFLICT (user_id) DO NOTHING;
 
 -- -------------------------
 -- PETS (200 rows)

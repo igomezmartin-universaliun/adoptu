@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5\u21925 lines (2 removed)",
+      "fix": "Rewrote 5→5 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -111,8 +111,8 @@
       "timestamp": "2026-06-23T01:15:26.012Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -127,8 +127,8 @@
       "timestamp": "2026-06-23T01:16:02.809Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -143,8 +143,8 @@
       "timestamp": "2026-06-23T01:16:07.064Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -159,8 +159,8 @@
       "timestamp": "2026-06-23T01:16:09.579Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -175,8 +175,8 @@
       "timestamp": "2026-06-23T01:16:12.781Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -191,8 +191,8 @@
       "timestamp": "2026-06-23T01:16:15.816Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -252,6 +252,141 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-22T19:20:00.000Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-06-23T01:49:17.562Z",
+      "error_message": "Missing error handling in register",
+      "file": ".claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block | Also: let credential;; try {",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-23T01:49:23.133Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-06-22T19:40:00.000Z",
+      "error_message": "duplicate key value violates unique constraint user_passwords_pkey (user_id=238913); FK violations on user_active_roles, photographers, temporal_homes, user_shelters, user_sterilization_locations, pets",
+      "file": "scripts/test_data.sql",
+      "root_cause": "INSERT INTO users used auto-generated IDs, but all subsequent inserts used hardcoded sequential IDs 1-50. Password INSERT selected ALL users including pre-existing ones.",
+      "fix": "Added explicit IDs (1-50) with OVERRIDING SYSTEM VALUE to users INSERT + ON CONFLICT (id) DO NOTHING. Scoped password SELECT to WHERE id BETWEEN 1 AND 50 + ON CONFLICT DO NOTHING. Added ON CONFLICT DO NOTHING to roles, photographers, temporal_homes, user_shelters, user_sterilization_locations. Added setval() to advance sequence.",
+      "tags": [
+        "sql",
+        "test-data",
+        "foreign-key",
+        "sequence",
+        "idempotent"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-06-23T01:51:27.949Z",
+      "error_message": "Missing error handling in unknown",
+      "file": ".claude/worktrees/swift-wiggling-conway/.wolf/buglog.json",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-23T01:51:27.949Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-06-24T03:57:14.723Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→8 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T03:57:14.723Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-06-23T21:55:00Z",
+      "error_message": "The operation either timed out or was not allowed. See: https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.",
+      "file": "frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
+      "root_cause": "navigator.credentials.get() rejects with NotAllowedError on user cancel; the WebAuthn.kt null-credential check only runs on resolve, never on rejection. LoginPage.kt catch block used error.message directly, which includes the full raw browser string.",
+      "fix": "Check error.name == \"NotAllowedError\" in LoginPage.kt setupPasskeyButton catch block; show \"Passkey sign-in was cancelled.\" instead of the raw message.",
+      "tags": [
+        "webauthn",
+        "fido",
+        "NotAllowedError",
+        "cancel",
+        "passkey",
+        "LoginPage"
+      ],
+      "related_bugs": [
+        "bug-webauthn-prev"
+      ],
+      "occurrences": 2,
+      "last_seen": "2026-06-23"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-06-24T03:58:16.216Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/elegant-coalescing-kurzweil/local-start.sh",
+      "root_cause": "Had \"ls-xEbE8734-fUqu-kOme-zOpA-1482XITi3c2e\"",
+      "fix": "Changed to \"http://localhost:8080\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24T03:58:16.216Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-06-24T04:14:05.460Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts",
+      "root_cause": "Had \"docker compose -f docker-compose.test.yml up -d\"",
+      "fix": "Changed to \"docker compose --profile test up -d\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "kts"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-24T04:14:09.440Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-06-24T04:19:48.444Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts",
+      "root_cause": "Had \"docker compose --profile test up -d\"",
+      "fix": "Changed to \"docker compose up -d\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "kts"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-24T04:19:53.185Z"
     }
   ]
 }

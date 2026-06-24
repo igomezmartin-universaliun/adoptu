@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-21T22:48:50.688Z
-> Files: 522 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-24T04:19:53.167Z
+> Files: 553 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -259,6 +259,33 @@
 
 - `application.conf` (~0 tok)
 - `logback-test.xml` (~0 tok)
+
+## .claude/worktrees/clever-forging-teacup/.wolf/
+
+- `cerebrum.md` — Cerebrum (~768 tok)
+
+## .claude/worktrees/clever-forging-teacup/backend/src/main/kotlin/com/adoptu/pages/
+
+- `EmailVerificationPage.kt` — HTML (~1236 tok)
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~3173 tok)
+
+## .claude/worktrees/elegant-coalescing-kurzweil/
+
+- `docker-compose.yml` — Docker Compose services (~118 tok)
+- `local-start.sh` (~49 tok)
+
+## .claude/worktrees/elegant-coalescing-kurzweil/.wolf/
+
+- `buglog.json` (~1465 tok)
+- `memory.md` — Memory (~913 tok)
+
+## .claude/worktrees/elegant-coalescing-kurzweil/backend/
+
+- `build.gradle.kts` (~1930 tok)
+
+## .claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
+
+- `LoginPage.kt` — init, getPublicKey, setupPasskeyButton, setupMagicLinkButton, setupPasswordLoginButton (~1477 tok)
 
 ## .claude/worktrees/fix-multimodule-migration/
 
@@ -736,6 +763,10 @@
 
 - `_layout.scss` — Styles: 11 rules (~1915 tok)
 
+## .claude/worktrees/mutable-enchanting-moler/scripts/
+
+- `test_data.sql` — ============================================================================= (~22562 tok)
+
 ## .claude/worktrees/profile-completion-guard/
 
 - `.dockerignore` — Docker ignore rules (~0 tok)
@@ -778,6 +809,11 @@
 - `MyPetsPage.kt` (~0 tok)
 - `ProfilePage.kt` — init, loadProfile, isProfileComplete, setupCompletionGuard, setupRoleToggles (~7078 tok)
 - `RegisterPage.kt` (~0 tok)
+
+## .claude/worktrees/quiet-booping-hare/scripts/
+
+- `load_test_data.sh` (~122 tok)
+- `test_data.sql` — ============================================================================= (~22381 tok)
 
 ## .claude/worktrees/swift-orbiting-crab/
 
@@ -860,3 +896,43 @@
 - `ProfilePage.kt` (~0 tok)
 - `RegisterPage.kt` (~0 tok)
 - `Shared.kt` (~0 tok)
+
+## .claude/worktrees/swift-wiggling-conway/.wolf/
+
+- `buglog.json` (~1446 tok)
+
+## .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/
+
+- `login.js` — updateLangButton: checkProfileCompletion, showResendButton (~2440 tok)
+- `profile.js` — load: loadPhotographer, loadTemporalHome, loadShelter, loadSterilization (~9709 tok)
+- `register.js` — Declares validatePassword (~1255 tok)
+- `webauthn.js` — Declares webauthn (~1323 tok)
+
+## .claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/i18n/
+
+- `i18n-en.js` (~6774 tok)
+- `i18n-es.js` (~7289 tok)
+- `i18n-fr.js` (~7386 tok)
+- `i18n-pt.js` (~7082 tok)
+- `i18n-zh.js` (~4810 tok)
+
+## .claude/worktrees/woolly-mixing-catmull/
+
+- `local-start.sh` (~163 tok)
+
+## .claude/worktrees/zippy-rolling-cocke/.wolf/
+
+- `cerebrum.md` — Cerebrum (~763 tok)
+
+## .claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/
+
+- `pet-food.css` — Styles: 97 rules, 8 vars (~3726 tok)
+- `photographers.css` — Styles: 91 rules, 8 vars (~3528 tok)
+- `policy.css` — Styles: 89 rules, 8 vars (~3442 tok)
+- `shelters.css` — Styles: 92 rules, 8 vars (~3521 tok)
+- `sterilization.css` — Styles: 94 rules, 8 vars (~3505 tok)
+- `temporal-home.css` — Styles: 91 rules, 8 vars (~3581 tok)
+
+## .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/
+
+- `_layout.scss` — Styles: 11 rules (~1961 tok)
