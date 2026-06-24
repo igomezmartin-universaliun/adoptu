@@ -119,14 +119,14 @@ tasks.register<Exec>("dockerUp") {
     description = "Start Docker containers for integration tests"
     workingDir = rootProject.rootDir
     environment["DOCKER_HOST"] = "unix:///run/docker.sock"
-    commandLine("sh", "-c", "docker compose --profile test up -d")
+    commandLine("sh", "-c", "docker compose up -d")
 }
 
 tasks.register<Exec>("dockerDown") {
     group = "docker"
     description = "Stop Docker containers for integration tests"
     workingDir = rootProject.rootDir
-    commandLine("docker", "compose", "--profile", "test", "down", "-v")
+    commandLine("docker", "compose", "down", "-v")
 }
 
 tasks.register<Test>("integrationTest") {
