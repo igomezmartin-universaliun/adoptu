@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   mailpit:
-    profiles: [dev, test]
     image: axllent/mailpit
     network_mode: "host"
     environment:
@@ -11,40 +10,9 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: "1"
 
   localstack:
-    profiles: [dev, test]
     image: localstack/localstack:4.0.0
     network_mode: "host"
     environment:
       SERVICES: s3
       DEFAULT_REGION: us-east-1
       EXTRA_CORS_ALLOWED_ORIGINS: "http://localhost:8080"
-
-  postgres:
-    profiles: [test]
-    image: postgres:15-alpine
-    network_mode: "host"
-    environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpassword
-      POSTGRES_DB: testdb
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U testuser"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  adoptu:
-    profiles: [test]
-    image: adoptu:test
-    network_mode: "host"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      ADOPTU_ENV: "dev"
-      JAVA_OPTS: "-Xms256m -Xmx512m"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
