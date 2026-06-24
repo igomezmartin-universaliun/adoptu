@@ -37,8 +37,12 @@ object LoginPageModule {
                         window.location.href = "/profile"
                     }
                     .catch { error: dynamic ->
-                        val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
-                        messageEl?.textContent = "Error: $errMsg"
+                        val errName = error?.name?.toString() ?: ""
+                        messageEl?.textContent = if (errName == "NotAllowedError") {
+                            "Passkey sign-in was cancelled."
+                        } else {
+                            "Error: ${error?.message ?: error?.toString() ?: "Unknown error"}"
+                        }
                     }
             })
         }
