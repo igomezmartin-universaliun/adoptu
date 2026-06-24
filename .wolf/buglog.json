@@ -105,6 +105,24 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-21T22:48:50.716Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-06-24T04:00:00Z",
+      "error_message": "License activation failed! Expected license to be ACTIVE, was EXPIRED — LocalStack exits with code 55",
+      "file": "local-start.sh",
+      "root_cause": "local-start.sh passed LOCALSTACK_AUTH_TOKEN with an expired pro license key to the community image (localstack/localstack). When LOCALSTACK_AUTH_TOKEN is set, the community image tries to activate pro mode; with an expired token it quits with exit code 55. Image also had no version pin.",
+      "fix": "Removed -e LOCALSTACK_AUTH_TOKEN from docker run; pinned image to localstack/localstack:4.0.0 (matching docker-compose.test.yml)",
+      "tags": [
+        "localstack",
+        "license",
+        "docker",
+        "expired-token",
+        "exit-code-55"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-24"
     }
   ]
 }
