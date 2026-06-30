@@ -5,7 +5,7 @@ let currentPet;
 async function load() {
     if (!id) { location.href = '/'; return; }
     try { user = await api.me(); } catch { user = { authenticated: false }; }
-    currentPet = await api.getPet(id);
+    try { currentPet = await api.getPet(id); } catch { location.href = '/pets'; return; }
     const container = document.getElementById('pet-detail');
     let isOwner = (user.activeRoles?.includes('RESCUER') || user.activeRoles?.includes('ADMIN')) && currentPet.rescuerId === user.id;
     let adoptForm = currentPet.status === 'AVAILABLE' && user.activeRoles?.includes('ADOPTER') ? '<form id="adopt-form"><label for="msg">Message (optional)</label><textarea id="msg" name="message"></textarea><button type="submit" class="btn">Request Adoption</button></form>' : '';

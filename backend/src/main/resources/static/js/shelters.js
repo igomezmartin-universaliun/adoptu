@@ -1,30 +1,18 @@
 window.searchShelters = async function() {
-    const country = document.getElementById('search-country').value;
-    const state = document.getElementById('search-state').value;
-    const city = document.getElementById('search-city').value;
-    const zip = document.getElementById('search-zip').value;
-    const neighborhood = document.getElementById('search-neighborhood').value;
-    
     const errorDiv = document.getElementById('shelters-error');
     const container = document.getElementById('shelters');
-    
+
     errorDiv.style.display = 'none';
     errorDiv.textContent = '';
     container.innerHTML = '<p>' + t('loading') + '</p>';
-    
-    if (!country) {
+
+    const params = window.buildLocationSearchParams();
+    if (!params) {
         errorDiv.style.display = 'block';
         errorDiv.textContent = t('countryRequired');
         container.innerHTML = '';
         return;
     }
-    
-    const params = new URLSearchParams();
-    params.append('country', country);
-    if (state) params.append('state', state);
-    if (city) params.append('city', city);
-    if (zip) params.append('zip', zip);
-    if (neighborhood) params.append('neighborhood', neighborhood);
     
     try {
         const output = await fetch('/api/shelters?' + params.toString());

@@ -1,22 +1,9 @@
 window.searchPhotographers = async function() {
-    const country = document.getElementById('search-country').value;
-    const state = document.getElementById('search-state').value;
-    const city = document.getElementById('search-city').value;
-    const zip = document.getElementById('search-zip').value;
-    const neighborhood = document.getElementById('search-neighborhood').value;
-    
-    if (!country) {
+    const params = window.buildLocationSearchParams();
+    if (!params) {
         document.getElementById('photographers').innerHTML = '<p>'+t('pleaseSelectCountry')+'</p>';
         return;
     }
-    
-    const params = new URLSearchParams();
-    params.append('country', country);
-    if (state) params.append('state', state);
-    if (city) params.append('city', city);
-    if (zip) params.append('zip', zip);
-    if (neighborhood) params.append('neighborhood', neighborhood);
-    
     loadPhotographers('/api/photographers?' + params.toString());
 }
 

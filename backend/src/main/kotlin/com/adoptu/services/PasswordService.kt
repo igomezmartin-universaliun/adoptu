@@ -40,18 +40,26 @@ class PasswordService(
         }
     }
 
+    // The frontend encrypts "email:password" — extract just the password part
+    private fun extractPassword(decrypted: String): String {
+        val colonIdx = decrypted.indexOf(':')
+        return if (colonIdx >= 0) decrypted.substring(colonIdx + 1) else decrypted
+    }
+
     fun setPassword(userId: Int, encryptedPassword: String): Boolean {
-        val decryptedPassword = CryptoService.decrypt(encryptedPassword)
-        if (decryptedPassword == null || !isPasswordValid(decryptedPassword)) {
-            return false
-        }
-        return setPasswordHash(userId, hashPassword(decryptedPassword))
+        val decrypted = CryptoService.decrypt(encryptedPassword)
+        if (decrypted == null) return false
+        val password = extractPassword(decrypted)
+        if (!isPasswordValid(password)) return false
+        return setPasswordHash(userId, hashPassword(password))
     }
 
     fun changePassword(userId: Int, currentEncryptedPassword: String, newEncryptedPassword: String): Boolean {
-        val currentPassword = CryptoService.decrypt(currentEncryptedPassword) ?: return false
-        val newPassword = CryptoService.decrypt(newEncryptedPassword) ?: return false
-        
+        val currentDecrypted = CryptoService.decrypt(currentEncryptedPassword) ?: return false
+        val newDecrypted = CryptoService.decrypt(newEncryptedPassword) ?: return false
+        val currentPassword = extractPassword(currentDecrypted)
+        val newPassword = extractPassword(newDecrypted)
+
         if (!isPasswordValid(newPassword)) {
             return false
         }
@@ -67,7 +75,8 @@ class PasswordService(
     }
 
     fun verifyPassword(userId: Int, encryptedPassword: String): Boolean {
-        val password = CryptoService.decrypt(encryptedPassword) ?: return false
+        val decrypted = CryptoService.decrypt(encryptedPassword) ?: return false
+        val password = extractPassword(decrypted)
         val storedHash = getPasswordHash(userId) ?: return false
         return verifyPasswordString(password, storedHash)
     }
