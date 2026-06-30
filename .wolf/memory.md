@@ -327,3 +327,62 @@
 |------|--------|---------|---------|--------|
 | 21:57 | Added CallLogging plugin, colorized logback.xml, promoted auth log levels to INFO | plugins/Logging.kt, logback.xml, AuthRoutes.kt, MagicLinkService.kt | success | ~300 |
 | 21:58 | Fixed temporal-home redirect-to-login: rebuilt backend after api.js fix | Shared.kt | Fixed | ~150 |
+
+## Session: 2026-06-30 22:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 22:46 | Edited .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~81 |
+| 22:46 | Edited .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~66 |
+
+## Session: 2026-06-30 22:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:11
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 08:24 | Edited .claude/worktrees/memoized-herding-badger/.wolf/cerebrum.md | 1→2 lines | ~178 |
+
+## Session: 2026-06-30 03:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 03:47 | Fixed 15 failing tests: CryptoService decrypt/decryptWithKey used standard Base64 decoder but encrypt uses URL-safe encoder | CryptoService.kt | All 426 backend tests pass | ~2k |

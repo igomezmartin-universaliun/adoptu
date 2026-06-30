@@ -458,6 +458,24 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-29T21:58:00Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-06-30T03:47:00Z",
+      "error_message": "15 tests failed: AssertionFailedError in PasswordServiceTest, WebAuthnServiceTest, PasswordRegistrationRoutesE2ETest \u2014 Decryption error: Illegal base64 character 5f / 2d",
+      "file": "backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
+      "root_cause": "encrypt() uses Base64.getUrlEncoder() (produces URL-safe chars _ and -) but decrypt() and decryptWithKey() used Base64.getDecoder() (standard, which rejects _ and -). Encoder/decoder mismatch caused all password-based operations to fail silently.",
+      "fix": "Changed both Base64.getDecoder().decode(ciphertext) calls in decrypt() (line 80) and decryptWithKey() (line 100) to Base64.getUrlDecoder().decode(ciphertext).",
+      "tags": [
+        "crypto",
+        "base64",
+        "password",
+        "tests",
+        "decrypt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T03:47:00Z"
     }
   ]
 }
