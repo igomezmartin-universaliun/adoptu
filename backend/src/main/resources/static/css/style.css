@@ -549,6 +549,8 @@ form textarea {
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
   box-sizing: border-box;
 }
 form textarea {
@@ -559,8 +561,16 @@ form input[type=checkbox] {
   height: auto;
 }
 form input:disabled {
-  background-color: #e9ecef;
+  background-color: var(--card-bg);
+  color: #9ca3af;
   cursor: not-allowed;
+}
+form input:-webkit-autofill,
+form input:-webkit-autofill:hover,
+form input:-webkit-autofill:focus,
+form input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
 }
 
 .auth-form {
@@ -583,7 +593,16 @@ form input:disabled {
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
   box-sizing: border-box;
+}
+.auth-form input:-webkit-autofill,
+.auth-form input:-webkit-autofill:hover,
+.auth-form input:-webkit-autofill:focus,
+.auth-form input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--bg) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
 }
 
 .security-info {

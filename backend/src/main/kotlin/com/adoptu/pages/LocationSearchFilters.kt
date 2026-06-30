@@ -7,6 +7,10 @@ fun DIV.locationSearchFilters(
     includeNeighborhood: Boolean = true
 ) {
     div(classes = formClass) {
+        p(classes = "location-search-hint") {
+            attributes["data-i18n"] = "selectCountryFirst"
+            +"Select a country to enable filters"
+        }
         div(classes = "location-search-country") {
             label { htmlFor = "search-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
             select {
@@ -17,10 +21,6 @@ fun DIV.locationSearchFilters(
             }
         }
         div(classes = "location-search-filters") {
-            p(classes = "location-search-hint") {
-                attributes["data-i18n"] = "selectCountryFirst"
-                +"Select a country to enable filters"
-            }
             div(classes = "location-search-filter") {
                 label { htmlFor = "search-state"; attributes["data-i18n"] = "state"; +"State" }
                 input(InputType.text) { name = "state"; id = "search-state"; disabled = true }
@@ -55,6 +55,23 @@ window.onCountryChange = function() {
     });
     var hint = document.querySelector('.location-search-hint');
     if (hint) hint.style.display = hasCountry ? 'none' : '';
+};
+// Shared helper: build URLSearchParams from the filter fields.
+// Returns null if country is not selected.
+window.buildLocationSearchParams = function() {
+    var country = (document.getElementById('search-country') || {}).value || '';
+    if (!country) return null;
+    var params = new URLSearchParams();
+    params.append('country', country);
+    var state = (document.getElementById('search-state') || {}).value;
+    var city = (document.getElementById('search-city') || {}).value;
+    var zip = (document.getElementById('search-zip') || {}).value;
+    var neighborhood = (document.getElementById('search-neighborhood') || {}).value;
+    if (state) params.append('state', state);
+    if (city) params.append('city', city);
+    if (zip) params.append('zip', zip);
+    if (neighborhood) params.append('neighborhood', neighborhood);
+    return params;
 };
 """)
             }

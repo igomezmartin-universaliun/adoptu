@@ -14,6 +14,15 @@ class UserSterilizationLocationService(private val repository: UserSterilization
         require(request.country.isNotBlank()) { "Country is required" }
         require(request.city.isNotBlank()) { "City is required" }
         require(request.address.isNotBlank()) { "Address is required" }
+        if (repository.getByUserId(userId) != null) {
+            val updateRequest = UpdateUserSterilizationLocationRequest(
+                name = request.name, country = request.country, state = request.state,
+                city = request.city, neighborhood = request.neighborhood, address = request.address,
+                zip = request.zip, phone = request.phone, email = request.email,
+                website = request.website, description = request.description
+            )
+            return repository.update(userId, updateRequest) ?: throw Exception("Failed to update sterilization location")
+        }
         return repository.create(userId, request)
     }
 

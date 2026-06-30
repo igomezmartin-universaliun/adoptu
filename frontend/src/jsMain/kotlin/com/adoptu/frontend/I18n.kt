@@ -312,6 +312,17 @@ private val englishTranslations = json(
         "country.venezuela" to "Venezuela",
         "country.vietnam" to "Vietnam",
         "country.yemen" to "Yemen",
+        "loading" to "Loading...",
+        "countryRequired" to "Please select a country to search",
+        "noSheltersFound" to "No shelters found yet. Check back later!",
+        "visitWebsite" to "Visit Website",
+        "fiscalId" to "Fiscal ID",
+        "donationInformation" to "Donation Information",
+        "bankName" to "Bank",
+        "accountHolder" to "Account Holder",
+        "accountNumber" to "Account Number",
+        "currency" to "Currency",
+        "errorLoadingShelters" to "Error loading shelters",
     )
 
     private val spanishTranslations = json(
@@ -619,6 +630,17 @@ private val englishTranslations = json(
         "country.venezuela" to "Venezuela",
         "country.vietnam" to "Vietnam",
         "country.yemen" to "Yemen",
+        "loading" to "Cargando...",
+        "countryRequired" to "Por favor selecciona un país para buscar",
+        "noSheltersFound" to "Aún no se encontraron refugios. ¡Vuelve más tarde!",
+        "visitWebsite" to "Visitar sitio web",
+        "fiscalId" to "ID fiscal",
+        "donationInformation" to "Información de donación",
+        "bankName" to "Banco",
+        "accountHolder" to "Titular de la cuenta",
+        "accountNumber" to "Número de cuenta",
+        "currency" to "Moneda",
+        "errorLoadingShelters" to "Error al cargar los refugios",
     )
 
     private val frenchTranslations = json(
@@ -926,6 +948,17 @@ private val englishTranslations = json(
         "country.venezuela" to "Venezuela",
         "country.vietnam" to "Vietnam",
         "country.yemen" to "Yémen",
+        "loading" to "Chargement...",
+        "countryRequired" to "Veuillez sélectionner un pays pour rechercher",
+        "noSheltersFound" to "Aucun refuge trouvé. Revenez plus tard!",
+        "visitWebsite" to "Visiter le site web",
+        "fiscalId" to "Numéro fiscal",
+        "donationInformation" to "Informations de don",
+        "bankName" to "Banque",
+        "accountHolder" to "Titulaire du compte",
+        "accountNumber" to "Numéro de compte",
+        "currency" to "Devise",
+        "errorLoadingShelters" to "Erreur lors du chargement des refuges",
 )
 
 private val portugueseTranslations = json(
@@ -1121,6 +1154,17 @@ private val portugueseTranslations = json(
     "temporalHomeAliasCountryCityRequired" to "Preencha apelido, país e cidade para lar temporário",
     "shelterNameCountryCityAddressRequired" to "Preencha nome, país, cidade e endereço para abrigo",
     "sterilizationNameCountryCityAddressRequired" to "Preencha nome, país, cidade e endereço para esterilização",
+    "loading" to "Carregando...",
+    "countryRequired" to "Por favor, selecione um país para pesquisar",
+    "noSheltersFound" to "Nenhum abrigo encontrado ainda. Volte mais tarde!",
+    "visitWebsite" to "Visitar site",
+    "fiscalId" to "CNPJ/CPF",
+    "donationInformation" to "Informações de doação",
+    "bankName" to "Banco",
+    "accountHolder" to "Titular da conta",
+    "accountNumber" to "Número da conta",
+    "currency" to "Moeda",
+    "errorLoadingShelters" to "Erro ao carregar os abrigos",
 )
 
 private val chineseTranslations = json(
@@ -1428,6 +1472,17 @@ private val chineseTranslations = json(
     "country.venezuela" to "委内瑞拉",
     "country.vietnam" to "越南",
     "country.yemen" to "也门",
+    "loading" to "加载中...",
+    "countryRequired" to "请选择一个国家进行搜索",
+    "noSheltersFound" to "暂未找到收容所。稍后再来查看！",
+    "visitWebsite" to "访问网站",
+    "fiscalId" to "税号",
+    "donationInformation" to "捐赠信息",
+    "bankName" to "银行",
+    "accountHolder" to "账户持有人",
+    "accountNumber" to "账号",
+    "currency" to "货币",
+    "errorLoadingShelters" to "加载收容所时出错",
 )
 
 @JsExport

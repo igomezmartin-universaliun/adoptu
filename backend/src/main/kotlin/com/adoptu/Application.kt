@@ -2,6 +2,7 @@ package com.adoptu
 
 import com.adoptu.adapters.db.DatabaseFactory
 import com.adoptu.di.appModule
+import com.adoptu.plugins.configureLogging
 import com.adoptu.plugins.configureRouting
 import com.adoptu.plugins.configureSerialization
 import com.adoptu.plugins.configureSessions
@@ -29,6 +30,7 @@ fun Application.module() {
     }
     DatabaseFactory.init(config)
     CryptoService.initialize()
+    configureLogging()
     configureSerialization()
     configureSessions()
     configureWebAuthn()
