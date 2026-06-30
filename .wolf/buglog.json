@@ -387,6 +387,42 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-06-24T04:19:53.185Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-06-30T01:50:00.000Z",
+      "error_message": "Uncaught ReferenceError: t is not defined at createRequestModal (photographers.js:88)",
+      "file": "backend/src/main/resources/static/js/photographers.js",
+      "root_cause": "photographers.js called bare t() which is not a global. The i18n function lives on window.AdoptuI18n.t() set by the Kotlin/JS main() in common.js.",
+      "fix": "Added local t() shim at top of photographers.js that delegates to window.AdoptuI18n.t(key) with a fallback to the key itself.",
+      "tags": ["javascript", "i18n", "UMD", "photographers"],
+      "related_bugs": ["bug-022"],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T01:50:00.000Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-06-30T01:50:00.000Z",
+      "error_message": "Uncaught TypeError: window.onCountryChange is not a function at HTMLSelectElement.onchange (photographers:35)",
+      "file": "backend/src/main/resources/static/js/photographers.js",
+      "root_cause": "LocationSearchFilters.kt inlines window.onCountryChange via a <script> block, but the backend may serve an old compiled JAR that lacks it; photographers.js had no fallback.",
+      "fix": "Added window.onCountryChange fallback definition at the top of photographers.js using the same enable/disable logic as LocationSearchFilters.kt.",
+      "tags": ["javascript", "onCountryChange", "photographers", "location-filters"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T01:50:00.000Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-06-30T01:50:00.000Z",
+      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 — api.createPhotographyRequest)",
+      "file": "backend/src/main/resources/static/js/photographers.js",
+      "root_cause": "photographers.js called api.createPhotographyRequest() but no window.api global exists. The Kotlin/JS bundle does not expose an 'api' object.",
+      "fix": "Replaced api.createPhotographyRequest() with a direct fetch('/api/photographers/requests', {method:'POST', ...}) call matching the CreatePhotographyRequestRequest DTO.",
+      "tags": ["javascript", "api", "photographers", "fetch"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T01:50:00.000Z"
     }
   ]
 }

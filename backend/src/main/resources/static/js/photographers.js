@@ -1,22 +1,40 @@
+function t(key) {
+    return window.AdoptuI18n ? window.AdoptuI18n.t(key) : key;
+}
+
+window.onCountryChange = window.onCountryChange || function() {
+    var sel = document.getElementById('search-country');
+    var hasCountry = sel && sel.value.length > 0;
+    var ids = ['search-state', 'search-city', 'search-zip', 'search-neighborhood'];
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.disabled = !hasCountry;
+        if (!hasCountry) el.value = '';
+    });
+    var hint = document.querySelector('.location-search-hint');
+    if (hint) hint.style.display = hasCountry ? 'none' : '';
+};
+
 window.searchPhotographers = async function() {
     const country = document.getElementById('search-country').value;
     const state = document.getElementById('search-state').value;
     const city = document.getElementById('search-city').value;
     const zip = document.getElementById('search-zip').value;
     const neighborhood = document.getElementById('search-neighborhood').value;
-    
+
     if (!country) {
         document.getElementById('photographers').innerHTML = '<p>'+t('pleaseSelectCountry')+'</p>';
         return;
     }
-    
+
     const params = new URLSearchParams();
     params.append('country', country);
     if (state) params.append('state', state);
     if (city) params.append('city', city);
     if (zip) params.append('zip', zip);
     if (neighborhood) params.append('neighborhood', neighborhood);
-    
+
     loadPhotographers('/api/photographers?' + params.toString());
 }
 
@@ -42,7 +60,7 @@ async function loadPhotographers(url) {
                 '<button class="btn request-btn" data-id="'+p.userId+'" data-name="'+p.displayName+'" data-fee="'+fee+'">'+t('requestPhotoSession')+'</button>' +
                 '</div>';
         }).join('');
-        
+
         document.querySelectorAll('.request-btn').forEach(btn => {
             btn.onclick = () => {
                 const photographerId = parseInt(btn.dataset.id);
@@ -118,7 +136,12 @@ function createRequestModal() {
         const message = document.getElementById('request-message').value;
         const photographerId = parseInt(modal.dataset.photographerId);
         try {
-            await api.createPhotographyRequest(photographerId, null, message || '');
+            const response = await fetch('/api/photographers/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photographerId, petId: null, message: message || '' })
+            });
+            if (!response.ok) throw new Error(await response.text());
             modal.style.display = 'none';
             alert(t('requestSentSuccessfully'));
         } catch (err) {
