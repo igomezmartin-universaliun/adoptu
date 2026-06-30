@@ -475,3 +475,99 @@
 | 19:08 | Fixed input/select/textarea fields rendering white instead of dark theme | style.scss, _location-search-form.scss + 6 compiled .css | fixed (bug-024) | ~3500 |
 | 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | added 1 import(s) | ~22 |
 | 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | removed 118 lines | ~44 |
+| 15:02 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/Models.kt | added 1 import(s) | ~36 |
+| 15:02 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | added 1 import(s) | ~34 |
+| 15:02 | Session end: 23 writes across 9 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 18 reads | ~26615 tok |
+| 15:02 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | 2→2 lines | ~29 |
+| 15:02 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | modified getAll() | ~84 |
+| 15:02 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | 2→3 lines | ~55 |
+| 15:03 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | 2→4 lines | ~62 |
+| 15:03 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | modified getCountries() | ~168 |
+| 15:03 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | added 1 import(s) | ~40 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | 2→2 lines | ~33 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | 4→5 lines | ~73 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | 14→15 lines | ~194 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | 2→4 lines | ~62 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | modified getCountries() | ~389 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | added 1 import(s) | ~35 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | 2→2 lines | ~28 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | modified create() | ~138 |
+
+## Session: 2026-06-30 15:04
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 15:04
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | 4→4 lines | ~40 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | 2→4 lines | ~69 |
+| 15:04 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | modified search() | ~93 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | added 1 import(s) | ~42 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | 2→2 lines | ~35 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | modified create() | ~161 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | 4→4 lines | ~44 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | 2→5 lines | ~83 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | modified search() | ~100 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | added 1 import(s) | ~61 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | 4→4 lines | ~55 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | modified createTemporalHome() | ~267 |
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | added optional chaining | ~92 |
+
+## Session: 2026-06-30 15:05
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:05 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | 4→4 lines | ~37 |
+| 15:06 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | 3→4 lines | ~74 |
+| 15:06 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | 3→3 lines | ~45 |
+| 15:06 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt | added 1 import(s) | ~68 |
+| 15:06 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt | added 1 condition(s) | ~591 |
+| 15:06 | Edited .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~20 |
+| 15:06 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt | added optional chaining | ~290 |
+| 15:06 | Edited .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~23 |
+| 15:06 | Edited .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~26 |
+| 15:06 | Edited .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~23 |
+| 15:06 | Edited .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~16 |
+| 15:07 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt | added 1 import(s) | ~30 |
+| 15:07 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt | inline fix | ~28 |
+| 15:07 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt | added 1 condition(s) | ~482 |
+| 15:07 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt | modified if() | ~512 |
+| 15:08 | Session end: 15 writes across 4 files (TemporalHomeRepository.kt, PhotographerRepository.kt, I18n.kt, UserRepository.kt) | 8 reads | ~2428 tok |
+| 15:09 | Edited .claude/worktrees/replicated-yawning-lantern/backend/src/main/scss/style.scss | CSS: text-transform | ~342 |
+| 15:09 | Edited .claude/worktrees/replicated-yawning-lantern/backend/src/main/resources/static/js/my-pets.js | expanded (+6 lines) | ~335 |
+| 15:10 | Session end: 17 writes across 6 files (TemporalHomeRepository.kt, PhotographerRepository.kt, I18n.kt, UserRepository.kt, style.scss) | 10 reads | ~3129 tok |
+| 15:10 | Created ../../.claude/jobs/95b8a41d/tmp/migrate_country.sql | — | ~554 |
+| 15:11 | Edited .claude/worktrees/replicated-yawning-lantern/backend/src/main/resources/static/js/my-pets.js | inline fix | ~333 |
+| 15:11 | Edited .claude/worktrees/replicated-yawning-lantern/backend/src/main/scss/style.scss | 17→16 lines | ~63 |
+| 15:11 | Edited .claude/worktrees/replicated-yawning-lantern/backend/src/main/scss/style.scss | expanded (+7 lines) | ~63 |
+| 15:13 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/routes/SheltersRoutesE2ETest.kt | added 1 import(s) | ~32 |
+| 15:13 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/routes/SheltersRoutesE2ETest.kt | 5→6 lines | ~92 |
+| 15:13 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/routes/SheltersRoutesE2ETest.kt | 2→2 lines | ~34 |
+| 15:14 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/services/ShelterServiceTest.kt | added 1 import(s) | ~37 |
+| 15:14 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/services/ShelterServiceTest.kt | 10→11 lines | ~157 |
+| 15:14 | Edited .claude/worktrees/fix-nopets-i18n/.wolf/cerebrum.md | 1→6 lines | ~602 |
+| 15:15 | Session end: 27 writes across 10 files (TemporalHomeRepository.kt, PhotographerRepository.kt, I18n.kt, UserRepository.kt, style.scss) | 15 reads | ~5214 tok |
+
+## Session: 2026-06-30 15:15
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:15 | Edited .claude/worktrees/replicated-yawning-lantern/.wolf/buglog.json | expanded (+12 lines) | ~402 |
+| 15:16 | Edited .claude/worktrees/replicated-yawning-lantern/.wolf/cerebrum.md | 3→5 lines | ~268 |
+| 15:16 | Edited .claude/worktrees/replicated-yawning-lantern/.wolf/cerebrum.md | 3→5 lines | ~289 |
+| 15:16 | Session end: 3 writes across 2 files (buglog.json, cerebrum.md) | 1 reads | ~999 tok |
+| 15:17 | Edited .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/routes/SheltersRoutesE2ETest.kt | inline fix | ~23 |
+| 15:17 | Edited .claude/worktrees/test-coverage-95/build.gradle.kts | 5→6 lines | ~65 |
+| 15:17 | Session end: 5 writes across 4 files (buglog.json, cerebrum.md, SheltersRoutesE2ETest.kt, build.gradle.kts) | 4 reads | ~11973 tok |
+| 15:17 | Edited .claude/worktrees/test-coverage-95/backend/build.gradle.kts | 5→6 lines | ~32 |
+| 15:18 | Edited .claude/worktrees/test-coverage-95/backend/build.gradle.kts | expanded (+18 lines) | ~139 |
+
+## Session: 2026-06-30 15:19
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 15:19 | Edited .claude/worktrees/test-coverage-95/build.gradle.kts | inline fix | ~18 |
+| 15:19 | Edited .claude/worktrees/country-enum-fix/.wolf/cerebrum.md | 3→6 lines | ~426 |

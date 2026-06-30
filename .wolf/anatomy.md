@@ -1,7 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T19:35:02.676Z
-> Files: 605 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:19:47.336Z
+> Files: 626 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../.claude/jobs/95b8a41d/tmp/
+
+- `migrate_country.sql` (~554 tok)
 
 ## ../../.claude/plans/
 
@@ -272,6 +276,36 @@
 
 - `EmailVerificationPage.kt` — HTML (~1236 tok)
 - `Shared.kt` — HTML, A, BODY, DIV, NAV (~3173 tok)
+
+## .claude/worktrees/country-enum-fix/.wolf/
+
+- `cerebrum.md` — Cerebrum (~1059 tok)
+
+## .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/
+
+- `Models.kt` (~3276 tok)
+
+## .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/
+
+- `PhotographerRepository.kt` — PhotographerRepositoryImpl: canSendMessage, createPhotographyRequest, getMyRequests, getRequestsForP (~3336 tok)
+- `ShelterRepository.kt` — ShelterRepository: rowToDto, getById, getAll, create (~1877 tok)
+- `SterilizationLocationRepository.kt` — SterilizationLocationRepository: rowToDto, getById, getAll, create (~2347 tok)
+- `TemporalHomeRepository.kt` — TemporalHomeRepositoryImpl: getTemporalHome, createTemporalHome, updateTemporalHome, searchTemporalH (~2482 tok)
+- `UserRepository.kt` — UserRepository: getActiveRolesForUser, getById, getByEmail, getAllUsers (~5228 tok)
+- `UserShelterRepository.kt` — UserShelterRepository: rowToDto, getByUserId, create, update (~2093 tok)
+- `UserSterilizationLocationRepository.kt` — UserSterilizationLocationRepository: rowToDto, getByUserId, create, update (~1908 tok)
+
+## .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/
+
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~1955 tok)
+
+## .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/routes/
+
+- `SheltersRoutesE2ETest.kt` — SheltersRoutesE2ETest: findAvailablePort, createTestConfig, initDatabase, setUp (~6267 tok)
+
+## .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/services/
+
+- `ShelterServiceTest.kt` — ShelterServiceTest: setup, createTestShelter (~3232 tok)
 
 ## .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/
 
@@ -728,6 +762,14 @@
 - `ProfilePage.kt` — init, loadProfile, isProfileComplete, setupCompletionGuard, setupRoleToggles (~7082 tok)
 - `RegisterPage.kt` — init, validatePassword, handleRegister (~1525 tok)
 
+## .claude/worktrees/fix-nopets-i18n/.wolf/
+
+- `cerebrum.md` — Cerebrum (~2051 tok)
+
+## .claude/worktrees/fix-nopets-i18n/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~17715 tok)
+
 ## .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/
 
 - `sterilization-locations.js` — escapeHtml: loadCountries, loadLocations, showForm + 3 more (~1318 tok)
@@ -889,6 +931,19 @@
 
 - `ProfilePage.kt` — init, loadProfile, updateProfileUI, checkProfileExists, setupRoleToggles (~9591 tok)
 
+## .claude/worktrees/replicated-yawning-lantern/.wolf/
+
+- `buglog.json` (~4796 tok)
+- `cerebrum.md` — Cerebrum (~1097 tok)
+
+## .claude/worktrees/replicated-yawning-lantern/backend/src/main/resources/static/js/
+
+- `my-pets.js` — API routes: GET (2 endpoints) (~4164 tok)
+
+## .claude/worktrees/replicated-yawning-lantern/backend/src/main/scss/
+
+- `style.scss` — Styles: 44 rules (~2338 tok)
+
 ## .claude/worktrees/rosy-tumbling-plum/.wolf/
 
 - `buglog.json` (~4791 tok)
@@ -1023,6 +1078,14 @@
 - `i18n-fr.js` (~7386 tok)
 - `i18n-pt.js` (~7082 tok)
 - `i18n-zh.js` (~4810 tok)
+
+## .claude/worktrees/test-coverage-95/
+
+- `build.gradle.kts` (~154 tok)
+
+## .claude/worktrees/test-coverage-95/backend/
+
+- `build.gradle.kts` (~2088 tok)
 
 ## .claude/worktrees/update-libs-latest/
 
