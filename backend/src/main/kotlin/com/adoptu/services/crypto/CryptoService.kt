@@ -77,7 +77,7 @@ object CryptoService {
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.DECRYPT_MODE, privateKey, getOaepParameterSpec())
 
-            val ciphertextBytes = Base64.getUrlDecoder().decode(ciphertext)
+            val ciphertextBytes = Base64.getDecoder().decode(ciphertext)
             val plaintext = cipher.doFinal(ciphertextBytes)
             String(plaintext, Charsets.UTF_8)
         } catch (e: Exception) {
