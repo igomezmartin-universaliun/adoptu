@@ -635,3 +635,19 @@
 | 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 15:05 | Fixed missing noPets i18n key (My Pets empty state untranslated) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/.../static/js/common.js | fixed, bundle rebuilt, verified via curl on live dev server | ~12000 |
+| 15:37 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/AuthRoutesE2ETest.kt | — | ~12878 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/versions.tf | — | ~155 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/providers.tf | — | ~129 |
+| 15:38 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | — | ~7910 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/variables.tf | — | ~900 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/terraform.tfvars.example | — | ~119 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/data.tf | — | ~274 |
+| 15:39 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/TemporalHomeRoutesE2ETest.kt | — | ~6899 |
+| 15:39 | Created .claude/worktrees/opentofu-aws-infra/infra/network.tf | — | ~358 |
+| 15:39 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | modified put() | ~268 |
+| 15:39 | Created .claude/worktrees/opentofu-aws-infra/infra/security_groups.tf | — | ~570 |
+| 15:40 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | 5→5 lines | ~49 |
+| 15:40 | Session end: 44 writes across 33 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 87 reads | ~141235 tok |
+| 15:40 | Edited .claude/worktrees/opentofu-aws-infra/infra/variables.tf | expanded (+20 lines) | ~284 |
+| 15:41 | Edited .claude/worktrees/opentofu-aws-infra/infra/data.tf | expanded (+10 lines) | ~116 |
