@@ -635,3 +635,5 @@
 | 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 15:42 | Diagnosed playwright CI email failures: e2e-verify.spec.ts needs live backend/mailpit/test-data, but playwright.yml never starts them | .github/workflows/playwright.yml | logged bug-070, no fix applied yet (pending user) | ~6000 |
+| 15:46 | Removed .github/workflows/playwright.yml (user request — never worked, was emailing failure notifications on every push) | .github/workflows/playwright.yml | deleted, bug-067 updated | ~2500 |
