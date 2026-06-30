@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:31:45.712Z
-> Files: 642 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:35:50.174Z
+> Files: 651 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/95b8a41d/tmp/
 
@@ -1083,6 +1083,12 @@
 
 - `build.gradle.kts` (~154 tok)
 
+## .claude/worktrees/test-coverage-95/.wolf/
+
+- `anatomy.md` — anatomy.md (~11957 tok)
+- `cerebrum.md` — Cerebrum (~2155 tok)
+- `memory.md` — Memory (~8610 tok)
+
 ## .claude/worktrees/test-coverage-95/backend/
 
 - `build.gradle.kts` (~2088 tok)
@@ -1100,6 +1106,14 @@
 
 - `TestDatabase.kt` — initH2, clearAllData (~931 tok)
 
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/
+
+- `ShelterRoutesE2ETest.kt` — Ktor routing (~3585 tok)
+- `SterilizationLocationRoutesE2ETest.kt` — Ktor routing (~4224 tok)
+- `UIRoutesE2ETest.kt` — End-to-end tests for [uiRoutes]: mounts the real route tree in a Ktor (~5835 tok)
+- `UserShelterRoutesE2ETest.kt` — Ktor routing (~4048 tok)
+- `UserSterilizationLocationRoutesE2ETest.kt` — Ktor routing (~4341 tok)
+
 ## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/
 
 - `UserShelterServiceTest.kt` — UserShelterServiceTest: setup (~4418 tok)
@@ -1116,6 +1130,7 @@
 - `PhotographersValidationServiceTest.kt` — PhotographersValidationServiceTest: setup, tearDown, createTestUser, userDto (~1735 tok)
 - `SheltersValidationServiceTest.kt` — SheltersValidationServiceTest: setup (~626 tok)
 - `SterilizationLocationsValidationServiceTest.kt` — SterilizationLocationsValidationServiceTest: setup (~638 tok)
+- `TemporalHomesValidationServiceTest.kt` — TemporalHomesValidationServiceTest: setup, tearDown, createTestUser, createTemporalHomeRequest (~3805 tok)
 - `UsersValidationServiceTest.kt` — UsersValidationServiceTest: setup, tearDown, createTestUser, userDto (~1975 tok)
 
 ## .claude/worktrees/update-libs-latest/

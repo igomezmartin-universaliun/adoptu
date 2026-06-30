@@ -617,3 +617,19 @@
 | 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserSterilizationLocationServiceTest.kt | — | ~4323 |
 | 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt | — | ~1975 |
 | 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt | — | ~2100 |
+| 15:32 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/TemporalHomesValidationServiceTest.kt | — | ~3805 |
+| 15:32 | Edited .claude/worktrees/test-coverage-95/.wolf/anatomy.md | expanded (+9 lines) | ~280 |
+| 15:32 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt | — | ~5895 |
+| 15:32 | Edited .claude/worktrees/test-coverage-95/.wolf/memory.md | modified entities() | ~265 |
+| 15:33 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UserShelterRoutesE2ETest.kt | — | ~4048 |
+| 15:33 | Session end: 25 writes across 20 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 82 reads | ~68879 tok |
+| 15:33 | Session end: 25 writes across 20 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 82 reads | ~80620 tok |
+| 15:33 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UserSterilizationLocationRoutesE2ETest.kt | — | ~4341 |
+| 15:34 | Session end: 26 writes across 21 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 84 reads | ~85271 tok |
+| 15:34 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/SterilizationLocationRoutesE2ETest.kt | — | ~4224 |
+| 15:34 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt | 7→5 lines | ~62 |
+| 15:34 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt | 6→4 lines | ~70 |
+| 15:34 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/ShelterRoutesE2ETest.kt | — | ~3585 |
+| 15:35 | Session end: 30 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 85 reads | ~99614 tok |
+| 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/anatomy.md | 3→7 lines | ~321 |
+| 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
