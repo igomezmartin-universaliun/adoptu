@@ -651,3 +651,4 @@
 | 15:40 | Session end: 44 writes across 33 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 87 reads | ~141235 tok |
 | 15:40 | Edited .claude/worktrees/opentofu-aws-infra/infra/variables.tf | expanded (+20 lines) | ~284 |
 | 15:41 | Edited .claude/worktrees/opentofu-aws-infra/infra/data.tf | expanded (+10 lines) | ~116 |
+| 13:08 | Fixed wrong sheltersDescription i18n text (said "make donations" instead of finding/leaving pets) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | fixed, all 5 locales + backend fallback corrected | ~1.2k |
