@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     application
+    id("org.jetbrains.kotlinx.kover")
 }
 
 group = "com.adoptu"
@@ -133,6 +134,8 @@ tasks.register<Exec>("dockerDown") {
 tasks.register<Test>("integrationTest") {
     group = "verification"
     description = "Run integration tests with Docker"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     maxParallelForks = Runtime.getRuntime().availableProcessors()
     testLogging {
@@ -158,8 +161,38 @@ tasks.register<Test>("integrationTest") {
     systemProperty("jdk.module.illegalAccess", "permit")
     systemProperty("jdk.suppressUnsupportedWarningWarnings", "true")
     dependsOn("dockerUp")
+    // tasks.withType<Test> above excludes *IT/Application*Test classes from every Test task
+    // (so the fast `test` task skips Docker-only suites). Without clearing that here, this
+    // task's own includeTestsMatching(".*IT") filter has nothing left to match and it
+    // silently runs zero tests.
+    setExcludes(emptySet())
     filter {
-        includeTestsMatching(".*IT")
+        // Gradle's TestFilter uses '*'-glob matching, not regex -- ".*IT" requires the name
+        // to literally start with a dot and never matches anything; "*IT" is the correct glob.
+        includeTestsMatching("*IT")
+    }
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                // entrypoint / bootstrap wiring, exercised by ApplicationIntegrationTest+ApplicationContainerTest
+                // (Docker-only IT suite) rather than unit coverage
+                classes("com.adoptu.ApplicationKt")
+                annotatedBy("kotlinx.serialization.Serializable")
+                // Dead code: imported in PetsRoutes.kt but never instantiated anywhere in production.
+                // respondData()/respondSuccess() extension functions are used directly instead.
+                classes("com.adoptu.plugins.DataResponder")
+                classes("com.adoptu.plugins.SuccessResponder")
+                classes("com.adoptu.plugins.CustomResponder")
+            }
+        }
+        verify {
+            rule {
+                minBound(95)
+            }
+        }
     }
 }
 

@@ -207,8 +207,8 @@ fun Route.uiRoutes() {
                     h1 { +"Report as Spam & Block Rescuer" }
                     p { +"Are you sure you want to block this rescuer from sending you more requests?" }
                     button(type = ButtonType.button) {
-                        +"Block Rescuer"
                         onClick = "blockRescuerAndRedirect($temporalHomeId, $rescuerId)"
+                        +"Block Rescuer"
                     }
                     script(src = "/static/js/common.js") {}
                 }
