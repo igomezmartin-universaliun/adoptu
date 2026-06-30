@@ -69,6 +69,38 @@ form {
     border: 1px solid var(--border);
 }
 
+.login-forms-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: flex-start;
+    justify-content: center;
+
+    .auth-form-container {
+        flex: 1 1 300px;
+        min-width: 0;
+    }
+
+    .auth-form {
+        margin: 2rem 1rem;
+        max-width: none;
+    }
+
+    @media (max-width: 860px) {
+        flex-direction: column;
+
+        .auth-form-container {
+            flex: none;
+            width: 100%;
+        }
+
+        .auth-form {
+            margin: 1rem auto;
+            max-width: 400px;
+        }
+    }
+}
+
 .auth-form-container {
     margin-bottom: 2rem;
 }

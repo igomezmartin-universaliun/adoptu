@@ -515,12 +515,6 @@ footer span {
 .resources-dropdown .resources-dropdown-content a span:first-child {
   flex: 1;
 }
-.resources-dropdown .resources-dropdown-content a .material-symbols-outlined {
-  font-size: 20px;
-  flex-shrink: 0;
-  width: 24px;
-  text-align: center;
-}
 .resources-dropdown .resources-dropdown-content a svg, .resources-dropdown .resources-dropdown-content a img {
   flex-shrink: 0;
   width: 16px;
@@ -592,6 +586,35 @@ form input:disabled {
   background: var(--bg);
   border-radius: 8px;
   border: 1px solid var(--border);
+}
+
+.login-forms-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  align-items: flex-start;
+  justify-content: center;
+}
+.login-forms-grid .auth-form-container {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+.login-forms-grid .auth-form {
+  margin: 2rem 1rem;
+  max-width: none;
+}
+@media (max-width: 860px) {
+  .login-forms-grid {
+    flex-direction: column;
+  }
+  .login-forms-grid .auth-form-container {
+    flex: none;
+    width: 100%;
+  }
+  .login-forms-grid .auth-form {
+    margin: 1rem auto;
+    max-width: 400px;
+  }
 }
 
 .auth-form-container {
