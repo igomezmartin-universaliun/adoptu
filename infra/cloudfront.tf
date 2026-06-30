@@ -95,11 +95,10 @@ resource "aws_cloudfront_distribution" "dynamic_images" {
 
 # --- adopt-u.org / www / api: the app itself, fronting the ECS task directly -
 # No load balancer, by design - same as the live deployment. Origin is the
-# "ecs.<domain>" DNS record (route53.tf), which resolves straight to the
-# running Fargate task's public IPv6 address. That record is NOT
-# auto-updated by this stack (see route53.tf / README "Releasing new
-# versions") - re-point it after every deploy that replaces the task,
-# exactly like today.
+# internal-only "backend.<domain>" DNS record (route53.tf), which resolves
+# straight to the running Fargate task's public IPv6 address and is kept
+# current automatically by the dns_updater Lambda (dns_updater.tf) - not
+# manually, and not the same name as the public api.<domain> alias below.
 
 resource "aws_cloudfront_distribution" "app" {
   enabled         = true
@@ -110,7 +109,7 @@ resource "aws_cloudfront_distribution" "app" {
   comment         = "adopt-u app (ECS Fargate, direct origin, no load balancer)"
 
   origin {
-    domain_name = "ecs.${var.domain_name}"
+    domain_name = "backend.${var.domain_name}"
     origin_id   = "ecs-task"
 
     custom_origin_config {

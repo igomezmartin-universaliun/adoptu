@@ -31,6 +31,8 @@
 - **RDS in a VPC with IPv6-only ECS subnets needs `network_type = "DUAL"`**, not just IPv4 — an IPv6-only Fargate task has no IPv4 address on its ENI at all, so it cannot open an IPv4 TCP connection to an IPv4-only RDS endpoint even though they're in the same VPC. The DB subnet group must support `DUAL` (check `aws rds describe-db-subnet-groups`) before this is possible; intra-VPC routing then handles it with no NAT/IGW involved either way.
 - **For "no NAT" + IPv6-only ECS Fargate**: a VPC with an Amazon-provided IPv6 `/56` (the default for newer default VPCs) is "public" IPv6 — the VPC's main route table already has `::/0 -> igw`, so IPv6-only subnets get direct internet egress through the regular Internet Gateway with zero extra routing config (no NAT Gateway, no Egress-Only IGW needed). ALBs, however, still require a subnet with an IPv4 CIDR present (even when using `ip_address_type = "dualstack-without-public-ipv4"` to avoid consuming a public IPv4 address) — pure IPv6-only subnets work for ECS tasks but not for ALB nodes; put the ALB in the existing dual-stack subnets and only the ECS tasks in the IPv6-only ones.
 
+- [2026-06-30] When introducing a new internal-only DNS hostname (e.g. for a CDN origin), it CANNOT reuse a name that's already a public alias to something else (e.g. `api.adopt-u.org` already aliases to the CloudFront distribution itself) - a single DNS name can only be one record type. Give the internal-only hostname its own distinct name (adopt-u uses `backend.adopt-u.org`); don't assume a semantically-fitting public name is free to reuse for internal plumbing without checking what it already points to.
+
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->

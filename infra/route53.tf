@@ -7,18 +7,24 @@ locals {
   app_hostnames = [var.domain_name, "www.${var.domain_name}", "api.${var.domain_name}"]
 }
 
-# Points at whichever Fargate task is currently running - the CloudFront
-# "app" origin (cloudfront.tf) targets this name rather than a load
-# balancer. Brought under management via `tofu import` (it already exists
-# live); `ignore_changes` because its value is updated operationally after
-# each deploy that replaces the task (see README "Releasing new
-# versions"), not by Terraform.
-resource "aws_route53_record" "ecs_task" {
+# Internal-only hostname (never seen by a browser) - points at whichever
+# Fargate task is currently running. The CloudFront "app" origin
+# (cloudfront.tf) targets this name directly rather than a load balancer.
+# api.${var.domain_name} stays a public, CloudFront-fronted alias below
+# (app_a/app_aaaa) - it is NOT this record, those are two different DNS
+# names by necessity (one aliases to CloudFront, this one resolves
+# directly to the task).
+#
+# This is a brand new name (nothing to import). `ignore_changes` because
+# its value is kept current automatically by the Lambda in
+# dns_updater.tf - reacting to ECS "task RUNNING" events - not by
+# Terraform.
+resource "aws_route53_record" "backend" {
   zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "ecs.${var.domain_name}"
+  name    = "backend.${var.domain_name}"
   type    = "AAAA"
   ttl     = 60
-  records = ["2600:1f18:4f77:4e01:386a:77e7:3b9e:7605"] # seeded from the current live task; updated operationally after that
+  records = ["2600:1f18:4f77:4e01:386a:77e7:3b9e:7605"] # seeded from the current live task; the dns_updater Lambda takes over from here
 
   lifecycle {
     ignore_changes = [records]

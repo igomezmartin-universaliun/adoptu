@@ -12,10 +12,22 @@ ACM cert already issued, both reused via data sources — not recreated).
 **No load balancer.** CloudFront's app origin points directly at the
 running ECS Fargate task over IPv6, matching the live deployment exactly
 (verified against the live distribution's actual `CustomOriginConfig`:
-`http-only`, port `8080`) — not an ALB/NLB. The tradeoff this carries
-(`ecs.adopt-u.org` has to be re-pointed manually after a deploy that
-replaces the task) is the same tradeoff the live deployment already has;
-see "Releasing new versions" below.
+`http-only`, port `8080`) — not an ALB/NLB. The address this needs to track
+the task's current IPv6 address is `backend.adopt-u.org` (`route53.tf`) —
+an **internal-only** hostname, never exposed to a browser, distinct from
+`api.adopt-u.org` (which stays public and CloudFront-fronted, exactly as
+today). `backend.adopt-u.org` is kept current **fully automatically** by
+`dns_updater.tf`: an EventBridge rule fires on every "ECS task reached
+RUNNING" event for the cluster, triggering a small Lambda that looks up
+the new task's IPv6 address and UPSERTs the Route 53 record. No manual
+step, ever — see "Releasing new versions" below.
+
+**FIDO/WebAuthn**: `ADOPTU_WEB_AUTHN_ORIGIN` (`https://www.adopt-u.org`)
+and `ADOPTU_WEB_AUTHN_RP_ID` (`adopt-u.org`) in `ecs.tf`'s container
+environment are unchanged from the live task definition. `backend.adopt-u.org`
+is pure server-side CDN-to-origin plumbing — it's never sent to or seen by
+a browser, so it cannot affect WebAuthn relying-party/origin validation or
+invalidate existing users' passkeys.
 
 ## What this is NOT
 
@@ -26,11 +38,11 @@ unique per account) — `apply`-ing this against an empty state will fail
 with `BucketAlreadyExists` / `DBInstanceAlreadyExists` / `CNAMEAlreadyExists`
 errors. Those resources must be **imported** first (commands below).
 
-Compute (ECS cluster/service/task definition/security groups) is instead
-stood up **fresh, in parallel**, under a new `adoptu` ECS cluster, so the
-existing live service (`Adopt-u-ipv6` in cluster `default`) keeps serving
-traffic unmodified until you've verified the new stack and are ready to
-cut over.
+Compute (ECS cluster/service/task definition/security groups/the DNS
+updater Lambda) is instead stood up **fresh, in parallel**, under a new
+`adoptu` ECS cluster, so the existing live service (`Adopt-u-ipv6` in
+cluster `default`) keeps serving traffic unmodified until you've verified
+the new stack and are ready to cut over.
 
 ## Findings from the live account (fixed here, not silently)
 
@@ -59,6 +71,10 @@ cut over.
    from an earlier, abandoned attempt at exactly the load-balanced design
    this stack deliberately does *not* use. Not imported/managed; delete it
    manually whenever convenient (it isn't referenced by anything).
+8. The live deployment had a hand-maintained `ecs.adopt-u.org` record that
+   required a manual update after every deploy. Replaced with
+   `backend.adopt-u.org` + the `dns_updater` Lambda (still no load
+   balancer, just no manual step either).
 
 ## Prerequisites
 
@@ -101,7 +117,8 @@ tofu import aws_iam_role_policy_attachment.ecs_task_app \
 
 # Existing DNS records (most names already exist in the zone; importing
 # avoids "RRSet already exists" on apply). <ZONE_ID> = Z02544353GT8GHBAPPWSE
-tofu import aws_route53_record.ecs_task Z02544353GT8GHBAPPWSE_ecs.adopt-u.org_AAAA
+# Note: backend.adopt-u.org is NOT imported here - it's a brand new name,
+# nothing to import.
 tofu import 'aws_route53_record.app_a["adopt-u.org"]' Z02544353GT8GHBAPPWSE_adopt-u.org_A
 tofu import 'aws_route53_record.app_aaaa["adopt-u.org"]' Z02544353GT8GHBAPPWSE_adopt-u.org_AAAA
 tofu import 'aws_route53_record.app_a["www.adopt-u.org"]' Z02544353GT8GHBAPPWSE_www.adopt-u.org_A
@@ -126,7 +143,21 @@ an import ID mismatch).
 
 ## Step 2 — stand up the new compute (no impact on the live service)
 
+The DNS updater (Lambda + EventBridge rule) must exist **before** the new
+ECS service starts its first task, or that first task's `RUNNING` event
+fires into the void and `backend.adopt-u.org` is stuck on its seed value
+until the next deploy:
+
 ```bash
+tofu apply -target=aws_iam_role.dns_updater \
+           -target=aws_iam_role_policy.dns_updater \
+           -target=aws_cloudwatch_log_group.dns_updater \
+           -target=aws_lambda_function.dns_updater \
+           -target=aws_cloudwatch_event_rule.ecs_task_running \
+           -target=aws_cloudwatch_event_target.dns_updater \
+           -target=aws_lambda_permission.events_invoke_dns_updater \
+           -target=aws_route53_record.backend
+
 tofu apply -target=aws_subnet.ecs_ipv6_only \
            -target=aws_security_group.ecs_task \
            -target=aws_security_group.rds \
@@ -136,40 +167,27 @@ tofu apply -target=aws_subnet.ecs_ipv6_only \
            -target=aws_ecs_service.app
 ```
 
-Find the new task's public IPv6 address and verify it directly (bypassing
-DNS/CloudFront):
+Confirm the Lambda actually updated the record (CloudWatch Logs
+`/aws/lambda/adoptu-dns-updater` should show an `"updated"` result), then
+verify the task directly (bypassing DNS/CloudFront, in case the record
+hasn't propagated to your resolver yet):
 
 ```bash
-TASK_ARN=$(aws ecs list-tasks --cluster adoptu --service-name adoptu --profile adoptu --query 'taskArns[0]' --output text)
-ENI_ID=$(aws ecs describe-tasks --cluster adoptu --tasks "$TASK_ARN" --profile adoptu \
-  --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text)
-TASK_IPV6=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --profile adoptu \
-  --query 'NetworkInterfaces[0].Ipv6Addresses[0].Ipv6Address' --output text)
-
-curl -g -v "http://[$TASK_IPV6]:8080/"
+dig +short AAAA backend.adopt-u.org
+curl -g -v "http://[$(dig +short AAAA backend.adopt-u.org)]:8080/"
 ```
 
 ## Step 3 — cut over
-
-Once the new task is verified healthy, point the `ecs.adopt-u.org` record
-at it (Terraform won't touch this value on its own — see
-`lifecycle.ignore_changes` in `route53.tf`):
-
-```bash
-aws route53 change-resource-record-sets --hosted-zone-id Z02544353GT8GHBAPPWSE \
-  --profile adoptu --change-batch "{\"Changes\":[{\"Action\":\"UPSERT\",\"ResourceRecordSet\":{\"Name\":\"ecs.adopt-u.org.\",\"Type\":\"AAAA\",\"TTL\":60,\"ResourceRecords\":[{\"Value\":\"$TASK_IPV6\"}]}}]}"
-```
-
-Then apply the rest (RDS `network_type`/SG, the imported Route53 records,
-etc.):
 
 ```bash
 tofu apply
 ```
 
-CloudFront resolves `ecs.adopt-u.org` per-request at the DNS TTL (60s
-here), so this is the moment apex/www/api traffic moves to the new task.
-Watch error rates for a few minutes before proceeding.
+This applies everything else (RDS `network_type`/SG, the imported Route53
+records, the CloudFront app origin pointing at `backend.adopt-u.org`).
+CloudFront resolves `backend.adopt-u.org` per-request at its DNS TTL (60s),
+so this is the moment apex/www/api traffic moves to the new task. Watch
+error rates for a few minutes before proceeding.
 
 ## Step 4 — decommission the old manual resources
 
@@ -178,6 +196,11 @@ After confirming the new stack is serving correctly for a while:
 ```bash
 aws ecs update-service --cluster default --service Adopt-u-ipv6 --desired-count 0 --profile adoptu
 aws ecs delete-service --cluster default --service Adopt-u-ipv6 --profile adoptu
+
+# Old hand-maintained record, no longer referenced by anything:
+# aws route53 change-resource-record-sets --hosted-zone-id Z02544353GT8GHBAPPWSE --profile adoptu \
+#   --change-batch '{"Changes":[{"Action":"DELETE","ResourceRecordSet":{"Name":"ecs.adopt-u.org.","Type":"AAAA", ...}}]}'
+# (check its current value with list-resource-record-sets first)
 
 # Stale orphaned alias from an abandoned ALB attempt - not referenced by
 # anything; check its current value with list-resource-record-sets first.
@@ -191,16 +214,15 @@ aws ecs delete-service --cluster default --service Adopt-u-ipv6 --profile adoptu
 CodeBuild/CodePipeline project (both are empty in the account) — releases
 have been manual `docker build` + `push` + Console redeploys.
 
-To ship a new image with this stack, **every** deploy replaces the task
-(new IP), so the `ecs.adopt-u.org` record needs re-pointing afterward —
-same operational step as Step 3 above, every time, since there's no load
-balancer to hold a stable address:
+To ship a new image with this stack:
 
 ```bash
 tofu apply -var="container_image_tag=sha256:<new digest>"
-# then re-run the describe-tasks/describe-network-interfaces/UPSERT
-# sequence from Step 3 against the new task
 ```
+
+That's it — every deploy replaces the task (new IP), and the
+`dns_updater` Lambda picks up the new task's `RUNNING` event automatically
+and re-points `backend.adopt-u.org`. No manual DNS step.
 
 ## Things intentionally left unmanaged
 

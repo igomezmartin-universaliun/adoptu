@@ -1,6 +1,6 @@
-output "ecs_task_origin_record" {
-  description = "DNS name CloudFront's app origin points to - update its value after every deploy that replaces the task (no load balancer)."
-  value       = aws_route53_record.ecs_task.fqdn
+output "backend_origin_record" {
+  description = "Internal DNS name CloudFront's app origin points to - kept current automatically by the dns_updater Lambda, never manually."
+  value       = aws_route53_record.backend.fqdn
 }
 
 output "ecs_cluster_name" {
