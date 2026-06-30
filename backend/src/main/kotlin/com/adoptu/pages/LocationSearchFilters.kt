@@ -17,6 +17,10 @@ fun DIV.locationSearchFilters(
             }
         }
         div(classes = "location-search-filters") {
+            p(classes = "location-search-hint") {
+                attributes["data-i18n"] = "selectCountryFirst"
+                +"Select a country to enable filters"
+            }
             div(classes = "location-search-filter") {
                 label { htmlFor = "search-state"; attributes["data-i18n"] = "state"; +"State" }
                 input(InputType.text) { name = "state"; id = "search-state"; disabled = true }
@@ -34,6 +38,25 @@ fun DIV.locationSearchFilters(
                     label { htmlFor = "search-neighborhood"; attributes["data-i18n"] = "neighborhood"; +"Neighborhood" }
                     input(InputType.text) { name = "neighborhood"; id = "search-neighborhood"; disabled = true }
                 }
+            }
+        }
+        script {
+            unsafe {
+                raw("""
+window.onCountryChange = function() {
+    var sel = document.getElementById('search-country');
+    var hasCountry = sel && sel.value.length > 0;
+    var ids = ['search-state', 'search-city', 'search-zip', 'search-neighborhood'];
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.disabled = !hasCountry;
+        if (!hasCountry) el.value = '';
+    });
+    var hint = document.querySelector('.location-search-hint');
+    if (hint) hint.style.display = hasCountry ? 'none' : '';
+};
+""")
             }
         }
     }
