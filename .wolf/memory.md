@@ -472,3 +472,6 @@
 | 13:33 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
 | 13:35 | Created ../../.claude/plans/enumerated-yawning-cloud.md | — | ~1813 |
 | 13:13 | Fixed shelters.js i18n: added 11 missing keys to I18n.kt for all 5 languages, rebuilt common.js, merged worktree-scalable-nibbling-hopper | I18n.kt, common.js, common.js.map | success | ~25000 |
+| 19:08 | Fixed input/select/textarea fields rendering white instead of dark theme | style.scss, _location-search-form.scss + 6 compiled .css | fixed (bug-024) | ~3500 |
+| 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | added 1 import(s) | ~22 |
+| 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | removed 118 lines | ~44 |

@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5\u21925 lines (2 removed)",
+      "fix": "Rewrote 5→5 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -111,8 +111,8 @@
       "timestamp": "2026-06-23T01:15:26.012Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -127,8 +127,8 @@
       "timestamp": "2026-06-23T01:16:02.809Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -143,8 +143,8 @@
       "timestamp": "2026-06-23T01:16:07.064Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -159,8 +159,8 @@
       "timestamp": "2026-06-23T01:16:09.579Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -175,8 +175,8 @@
       "timestamp": "2026-06-23T01:16:12.781Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -191,8 +191,8 @@
       "timestamp": "2026-06-23T01:16:15.816Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -258,7 +258,7 @@
       "timestamp": "2026-06-23T01:49:17.562Z",
       "error_message": "Missing error handling in register",
       "file": ".claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block | Also: let credential;; try {",
       "tags": [
         "auto-detected",
@@ -292,7 +292,7 @@
       "timestamp": "2026-06-23T01:51:27.949Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/swift-wiggling-conway/.wolf/buglog.json",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -309,7 +309,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4\u21928 lines (2 removed)",
+      "fix": "Rewrote 4→8 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -427,7 +427,7 @@
     {
       "id": "bug-026",
       "timestamp": "2026-06-30T01:50:00.000Z",
-      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 \u2014 api.createPhotographyRequest)",
+      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 — api.createPhotographyRequest)",
       "file": "backend/src/main/resources/static/js/photographers.js",
       "root_cause": "photographers.js called api.createPhotographyRequest() but no window.api global exists. The Kotlin/JS bundle does not expose an 'api' object.",
       "fix": "Replaced api.createPhotographyRequest() with a direct fetch('/api/photographers/requests', {method:'POST', ...}) call matching the CreatePhotographyRequestRequest DTO.",
@@ -462,7 +462,7 @@
     {
       "id": "bug-028",
       "timestamp": "2026-06-30T03:47:00Z",
-      "error_message": "15 tests failed: AssertionFailedError in PasswordServiceTest, WebAuthnServiceTest, PasswordRegistrationRoutesE2ETest \u2014 Decryption error: Illegal base64 character 5f / 2d",
+      "error_message": "15 tests failed: AssertionFailedError in PasswordServiceTest, WebAuthnServiceTest, PasswordRegistrationRoutesE2ETest — Decryption error: Illegal base64 character 5f / 2d",
       "file": "backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
       "root_cause": "encrypt() uses Base64.getUrlEncoder() (produces URL-safe chars _ and -) but decrypt() and decryptWithKey() used Base64.getDecoder() (standard, which rejects _ and -). Encoder/decoder mismatch caused all password-based operations to fail silently.",
       "fix": "Changed both Base64.getDecoder().decode(ciphertext) calls in decrypt() (line 80) and decryptWithKey() (line 100) to Base64.getUrlDecoder().decode(ciphertext).",
@@ -483,7 +483,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/playwright.config.ts",
       "root_cause": "37 lines replaced/restructured",
-      "fix": "Rewrote 58\u219224 lines (37 removed)",
+      "fix": "Rewrote 58→24 lines (37 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -514,7 +514,7 @@
       "timestamp": "2026-06-30T15:45:22.638Z",
       "error_message": "Incorrect value in code",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
-      "root_cause": "Had 'M\u00e9xico'",
+      "root_cause": "Had 'México'",
       "fix": "Changed to 'Mexico'",
       "tags": [
         "auto-detected",
@@ -547,7 +547,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
       "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 5\u21924 lines (5 removed)",
+      "fix": "Rewrote 5→4 lines (5 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -578,7 +578,7 @@
       "timestamp": "2026-06-30T16:21:31.873Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -594,7 +594,7 @@
       "timestamp": "2026-06-30T16:23:01.022Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/pet-detail.js",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -611,7 +611,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 11\u219219 lines (2 removed)",
+      "fix": "Rewrote 11→19 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -626,7 +626,7 @@
       "timestamp": "2026-06-30T16:38:06.712Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -642,7 +642,7 @@
       "timestamp": "2026-06-30T16:48:57.983Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -675,7 +675,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
       "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 9\u21927 lines (4 removed)",
+      "fix": "Rewrote 9→7 lines (4 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -691,7 +691,7 @@
       "error_message": "Wrong operator: || should be &&",
       "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
       "root_cause": "Used \"||\" instead of \"&&\"",
-      "fix": "Changed operator || \u2192 &&",
+      "fix": "Changed operator || → &&",
       "tags": [
         "auto-detected",
         "operator-fix",
@@ -707,7 +707,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/shelters.js",
       "root_cause": "12 lines replaced/restructured",
-      "fix": "Rewrote 27\u219215 lines (12 removed)",
+      "fix": "Rewrote 27→15 lines (12 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -723,7 +723,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/photographers.js",
       "root_cause": "12 lines replaced/restructured",
-      "fix": "Rewrote 21\u21928 lines (12 removed)",
+      "fix": "Rewrote 21→8 lines (12 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -739,7 +739,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/sterilization.js",
       "root_cause": "12 lines replaced/restructured",
-      "fix": "Rewrote 18\u21926 lines (12 removed)",
+      "fix": "Rewrote 18→6 lines (12 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -754,7 +754,7 @@
       "timestamp": "2026-06-30T18:28:17.423Z",
       "error_message": "Missing error handling in function",
       "file": ".claude/worktrees/webauthn-e2e-test/frontend/src/tests/e2e-verify.spec.ts",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -802,8 +802,8 @@
       "timestamp": "2026-06-30T19:04:50.579Z",
       "error_message": "CSS fix: background-color",
       "file": ".claude/worktrees/rosy-tumbling-plum/backend/src/main/scss/style.scss",
-      "root_cause": "background-color: #e9ecef \u2192 var(--card-bg)",
-      "fix": "Changed background-color: #e9ecef \u2192 var(--card-bg)",
+      "root_cause": "background-color: #e9ecef → var(--card-bg)",
+      "fix": "Changed background-color: #e9ecef → var(--card-bg)",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -850,8 +850,8 @@
       "timestamp": "2026-06-30T19:08:00.000Z",
       "error_message": "Searching shelters by Mexico returns no results despite shelters existing",
       "file": "backend/src/main/kotlin/com/adoptu/pages/Shared.kt; backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt",
-      "root_cause": "Country search dropdown (Shared.kt countrySelect) sends canonical value \"Mexico\" (no accent), but ShelterRepository.getAll() does exact-match filtering (AnimalShelters.country eq country). Two shelter rows in the DB (ids 403, 404) are stored with country=\"M\u00e9xico\" (accented), so \"Mexico\" != \"M\u00e9xico\" and the query returns zero rows even though matching shelters exist.",
-      "fix": "Not yet applied \u2014 pending user decision. Options: (1) normalize the two DB rows to country=\"Mexico\" to match the canonical dropdown value used by all exact-match filters app-wide, or (2) make shelter/photographer/sterilization/temporal-home country filtering accent-insensitive/case-insensitive at the query level so stray data variants still match.",
+      "root_cause": "Country search dropdown (Shared.kt countrySelect) sends canonical value \"Mexico\" (no accent), but ShelterRepository.getAll() does exact-match filtering (AnimalShelters.country eq country). Two shelter rows in the DB (ids 403, 404) are stored with country=\"México\" (accented), so \"Mexico\" != \"México\" and the query returns zero rows even though matching shelters exist.",
+      "fix": "Not yet applied — pending user decision. Options: (1) normalize the two DB rows to country=\"Mexico\" to match the canonical dropdown value used by all exact-match filters app-wide, or (2) make shelter/photographer/sterilization/temporal-home country filtering accent-insensitive/case-insensitive at the query level so stray data variants still match.",
       "tags": [
         "data-inconsistency",
         "search",
@@ -882,6 +882,40 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-30T19:09:00.000Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-06-30T19:05:00Z",
+      "error_message": "User reported input fields render white instead of matching the dark theme",
+      "file": "backend/src/main/scss/style.scss, backend/src/main/scss/_location-search-form.scss",
+      "root_cause": "The `form input/select/textarea`, `.auth-form input/select/textarea`, and `.location-search-form` input/select rules never set `background`/`color`, so they fell back to the browser default white background instead of inheriting `var(--bg)`/`var(--text)`. The `.form-row`/`.form-row-two-col` rules in _base.scss already set these correctly, masking the gap for some pages.",
+      "fix": "Added `background: var(--bg); color: var(--text);` to the affected input/select/textarea rules, changed the disabled-input background from a hardcoded light grey (#e9ecef) to var(--card-bg), and added -webkit-autofill overrides (matching the existing pattern in _base.scss) so browser autofill doesn't force a white background. Recompiled affected .scss files to .css with the vendored dart-sass binary at .gradle/sass/1.54.0/dart-sass/sass.",
+      "tags": [
+        "css",
+        "scss",
+        "dark-mode",
+        "input",
+        "theme"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T19:05:00Z"
+    },
+    {
+      "id": "bug-055",
+      "timestamp": "2026-06-30T21:01:53.667Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt",
+      "root_cause": "116 lines replaced/restructured",
+      "fix": "Rewrote 118→4 lines (116 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T21:01:53.667Z"
     }
   ]
 }

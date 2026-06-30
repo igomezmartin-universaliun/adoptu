@@ -19,6 +19,8 @@
 
 - **DatabaseFactory.listOfTables must be kept in sync with Models.kt:** Every `Table` object defined in `Models.kt` must be added to `listOfTables` in `DatabaseFactory.kt` — omitting one means `SchemaUtils.create()` never creates that table, causing a PSQLException at runtime. Tables previously missing: `UserSterilizationLocations`, `UserShelters`, `PasswordResetTokens`, `EmailChangeTokens`.
 
+- **`npx sass` fails in this sandbox** (`npm ERR! Cannot read properties of undefined (reading 'stdin')`). Use the vendored dart-sass binary directly instead: `.gradle/sass/1.54.0/dart-sass/sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`. Only top-level `.scss` files (not `_partial.scss` files) compile to their own `.css` — check which top-level files `@use`/import a changed partial (e.g. `grep -l "<partial-name>" backend/src/main/scss/*.scss`) and recompile each of those too.
+
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
@@ -33,6 +35,8 @@
 - [2026-06-30] New git worktrees in this repo are missing `gradle/wrapper/gradle-wrapper.jar` (it's untracked by git, only `gradle-wrapper.properties` is). Before running `./gradlew` in a fresh worktree, `cp` the jar from the main checkout's `gradle/wrapper/gradle-wrapper.jar` into the worktree first, or `./gradlew` fails with "Unable to access jarfile".
 - [2026-06-30] Merging a worktree branch that touches `frontend/src/jsMain/kotlin/**` into a `main` that has since regenerated its own `common.js`/`common.js.map` WILL conflict on those two generated bundle files even when the Kotlin source merges cleanly — they're build output, not source. Resolve with `git checkout --ours` on the bundle files (keep main's pre-merge bundle) and then rebuild via `./gradlew :frontend:jsBrowserProductionWebpack` post-merge to regenerate them from the merged source, rather than trying to hand-resolve the minified diff.
 - [2026-06-30] Do NOT mix Base64 encoder/decoder variants in CryptoService. `encrypt()` uses `Base64.getUrlEncoder()` (produces URL-safe `_` and `-`). Both `decrypt()` and `decryptWithKey()` MUST use `Base64.getUrlDecoder()`. Using the standard `Base64.getDecoder()` silently returns null and causes all password operations to fail (15 tests).
+
+- [2026-06-30] Do NOT assume `input`/`select`/`textarea` rules automatically pick up dark theme colors — the project sets `--bg`/`--text` as CSS vars but several rules (`form input/select/textarea`, `.auth-form input/select/textarea`, `.location-search-form` inputs) never set `background`/`color` explicitly, so they fell back to browser-default white. When adding/touching any input rule, always set `background: var(--bg); color: var(--text);` explicitly, and add the `-webkit-autofill` override (see `_base.scss`) since Chrome/Edge force a white autofill background unless overridden.
 
 ## Decision Log
 
