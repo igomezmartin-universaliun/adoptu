@@ -17,10 +17,13 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
+import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 import java.util.Base64
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+
+private val logger = LoggerFactory.getLogger(MagicLinkService::class.java)
 
 @OptIn(ExperimentalTime::class)
 class MagicLinkService(
@@ -35,24 +38,25 @@ class MagicLinkService(
     private val maxMagicLinksPerDay = 5
 
     fun requestMagicLink(email: String, language: String): Result<Boolean> {
-        val user = userRepository.getByEmail(email) ?: return Result.success(true)
+        val user = userRepository.getByEmail(email) ?: run {
+            logger.info("Magic link requested for unknown email (returning success to avoid enumeration)")
+            return Result.success(true)
+        }
 
         // Check if user's email is verified
         if (!userRepository.isEmailVerified(user.id)) {
-            // Email not verified - send verification email instead
+            logger.warn("Magic link requested for unverified email userId=${user.id}")
             if (!emailVerificationService.canSendVerificationEmail(user.id)) {
                 return Result.failure(Exception("Maximum verification emails (3) reached for today. Please try again tomorrow."))
             }
-            
-            // Check if there's a recent verification token (within 24h)
+
             val latestToken = userRepository.getLatestVerificationToken(user.id)
             val now = System.currentTimeMillis()
-            
+
             if (latestToken != null && latestToken.expiresAt > now) {
-                // Verification email was already sent and is still valid
                 return Result.failure(Exception("Verification email already sent. Please check your inbox or wait for the link to expire."))
             }
-            
+
             val result = runBlocking { emailVerificationService.resendVerificationEmail(user.id, email, user.displayName, language) }
             return if (result.isSuccess && result.getOrDefault(false)) {
                 Result.failure(Exception("Email not verified. A new verification email has been sent to your inbox."))
@@ -70,6 +74,7 @@ class MagicLinkService(
         }
 
         if (requestsToday >= maxMagicLinksPerDay) {
+            logger.warn("Magic link rate limit reached for userId=${user.id} (${requestsToday}/$maxMagicLinksPerDay today)")
             return Result.failure(Exception("Maximum magic link requests (5) reached for today. Please try again tomorrow."))
         }
 
@@ -87,6 +92,7 @@ class MagicLinkService(
                 }
                 true
             } catch (e: Exception) {
+                logger.error("Failed to insert magic link token for userId=${user.id}: ${e.message}")
                 false
             }
         }
@@ -99,6 +105,11 @@ class MagicLinkService(
         val (subject, body) = getLocalizedMagicLinkContent(language, user.displayName, loginUrl)
 
         val sent = runBlocking { notificationPort.sendEmail(email, subject, body) }
+        if (sent) {
+            logger.info("Magic link sent to userId=${user.id}")
+        } else {
+            logger.warn("Magic link email delivery failed for userId=${user.id}")
+        }
         return Result.success(sent)
     }
 
@@ -111,10 +122,12 @@ class MagicLinkService(
                 .firstOrNull()
 
             if (tokenRow == null) {
+                logger.warn("Magic link verification failed: token not found or already used")
                 return@transaction null
             }
 
             if (tokenRow[MagicLinkTokens.expiresAt] <= now) {
+                logger.warn("Magic link verification failed: token expired for userId=${tokenRow[MagicLinkTokens.userId]}")
                 MagicLinkTokens.deleteWhere { MagicLinkTokens.id eq tokenRow[MagicLinkTokens.id] }
                 return@transaction null
             }

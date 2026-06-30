@@ -230,3 +230,248 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 19:50 | Fixed ReferenceError: api is not defined by adding api.js to commonScripts() | Shared.kt | Fixed | ~200 |
+| 07:50 | Fixed 3 JS errors in photographers.js: t() shim, onCountryChange fallback, api→fetch | backend/src/main/resources/static/js/photographers.js | fixed | ~400 |
+## Session: 2026-06-30 19:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:35 | Edited .claude/worktrees/filter-country-hint/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | added 3 condition(s) | ~541 |
+| 19:35 | Session end: 1 writes across 1 files (LocationSearchFilters.kt) | 1 reads | ~580 tok |
+| 19:35 | Edited .claude/worktrees/filter-country-hint/backend/src/main/scss/_location-search-form.scss | expanded (+8 lines) | ~96 |
+| 19:35 | Session end: 2 writes across 2 files (LocationSearchFilters.kt, _location-search-form.scss) | 3 reads | ~683 tok |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~39 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~42 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~42 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~41 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~29 |
+
+## Session: 2026-06-30 19:37
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:38
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/ProfilePage.kt | added 3 condition(s) | ~184 |
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/UserShelterService.kt | added 1 condition(s) | ~340 |
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/UserSterilizationLocationService.kt | added 1 condition(s) | ~283 |
+
+## Session: 2026-06-30 19:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:50 | Fixed 404 console errors in ProfilePage: guarded checkProfileExists() with role checks; made UserShelterService/UserSterilizationLocationService.create() upsert when profile exists | ProfilePage.kt, UserShelterService.kt, UserSterilizationLocationService.kt | success | ~500 |
+
+## Session: 2026-06-30 19:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:49 | Created .claude/worktrees/sparkling-snuggling-pixel/backend/src/main/resources/static/js/photographers.js | — | ~2098 |
+| 19:49 | Session end: 1 writes across 1 files (photographers.js) | 3 reads | ~2098 tok |
+
+## Session: 2026-06-30 19:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:50 | Edited .claude/worktrees/foamy-discovering-papert/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | modified commonScripts() | ~85 |
+| 19:50 | Edited .claude/worktrees/sparkling-snuggling-pixel/.wolf/buglog.json | modified lives() | ~698 |
+| 19:51 | Edited .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/sterilization.js | 10→10 lines | ~231 |
+| 19:51 | Edited .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/sterilization-locations.js | modified escapeHtml() | ~325 |
+| 19:51 | Session end: 4 writes across 4 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js) | 7 reads | ~1345 tok |
+| 19:51 | Session end: 4 writes across 4 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js) | 9 reads | ~1345 tok |
+| 19:52 | Edited .claude/worktrees/imperative-roaming-starfish/backend/build.gradle.kts | 1→2 lines | ~36 |
+| 19:50 | Fixed JS SyntaxError: multiline strings with single quotes → template literals | sterilization.js, sterilization-locations.js | merged to main | ~200 |
+| 19:52 | Created .claude/worktrees/imperative-roaming-starfish/backend/src/main/resources/logback.xml | — | ~230 |
+| 19:52 | Created .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/plugins/Logging.kt | — | ~217 |
+| 19:52 | Session end: 7 writes across 7 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 11 reads | ~4169 tok |
+| 19:52 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/Application.kt | added 1 import(s) | ~60 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/Application.kt | 6→7 lines | ~50 |
+| 19:53 | Session end: 9 writes across 8 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 13 reads | ~4287 tok |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | 7→10 lines | ~76 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | modified requestMagicLink() | ~409 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | added 1 condition(s) | ~451 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | modified verifyMagicLink() | ~232 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Authenticate: success for" → "Passkey auth success: use" | ~30 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Authenticate: failed - in" → "Passkey auth failed: inva" | ~22 |
+| 19:54 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Magic link login: success" → "Magic link login success:" | ~35 |
+| 19:54 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Password login: success f" → "Password login success: u" | ~27 |
+| 19:54 | Session end: 17 writes across 10 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 17 reads | ~5661 tok |
+| 19:59 | Session end: 17 writes across 10 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 18 reads | ~5661 tok |
+
+## Session: 2026-06-30 21:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:57 | Added CallLogging plugin, colorized logback.xml, promoted auth log levels to INFO | plugins/Logging.kt, logback.xml, AuthRoutes.kt, MagicLinkService.kt | success | ~300 |
+| 21:58 | Fixed temporal-home redirect-to-login: rebuilt backend after api.js fix | Shared.kt | Fixed | ~150 |
+
+## Session: 2026-06-30 22:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 22:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 22:46 | Edited .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~81 |
+| 22:46 | Edited .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~66 |
+
+## Session: 2026-06-30 22:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:11
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 08:23
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 08:24 | Edited .claude/worktrees/memoized-herding-badger/.wolf/cerebrum.md | 1→2 lines | ~178 |
+
+## Session: 2026-06-30 03:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 03:47 | Fixed 15 failing tests: CryptoService decrypt/decryptWithKey used standard Base64 decoder but encrypt uses URL-safe encoder | CryptoService.kt | All 426 backend tests pass | ~2k |
+| 08:25 | Created .claude/worktrees/warm-crafting-canyon/.claude/skills/e2e-verify.md | — | ~212 |
+| 08:26 | Session end: 2 writes across 2 files (cerebrum.md, e2e-verify.md) | 1 reads | ~417 tok |
+| 08:27 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | — | ~7635 |
+| 08:29 | Edited .claude/worktrees/warm-crafting-canyon/playwright.config.ts | reduced (-34 lines) | ~142 |
+| 08:34 | Edited .claude/worktrees/warm-crafting-canyon/playwright.config.ts | 12→12 lines | ~69 |
+| 08:45 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/dto/input/PetDto.kt | 3→4 lines | ~36 |
+| 08:48 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | — | ~8708 |
+
+## Session: 2026-06-30 09:03
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | modified catch() | ~145 |
+| 09:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~97 |
+| 09:16 | Session end: 2 writes across 1 files (CryptoService.kt) | 4 reads | ~1289 tok |
+| 09:21 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt | added 2 condition(s) | ~464 |
+
+## Session: 2026-06-30 09:31
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:40 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified loginWithPassword() | ~191 |
+| 09:45 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | modified commonScripts() | ~85 |
+| 09:45 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | "México" → "Mexico" | ~6 |
+| 09:54 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 4→5 lines | ~100 |
+
+## Session: 2026-06-30 10:06
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | "window.isLoggedInGlobal =" → "window.isLoggedInGlobal =" | ~70 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/SterilizationLocationsPage.kt | modified button() | ~56 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified logout() | ~61 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 8→8 lines | ~126 |
+| 10:11 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 5→4 lines | ~56 |
+| 10:11 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | first() → link() | ~38 |
+| 10:21 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | expanded (+10 lines) | ~166 |
+| 10:21 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified logout() | ~69 |
+| 10:23 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/pet-detail.js | added error handling | ~43 |
+| 10:24 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 11→12 lines | ~162 |
+| 10:31 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/SterilizationLocationsPage.kt | modified button() | ~88 |
+| 10:33 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~156 |
+| 10:36 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~307 |
+| 10:38 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 3→4 lines | ~66 |
+
+## Session: 2026-06-30 10:39
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:40 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | passkey() → ensureAtLeastOne() | ~66 |
+| 10:41 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 1→2 lines | ~40 |
+| 10:48 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added optional chaining | ~219 |
+| 10:57 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/debug-pet-edit.spec.ts | — | ~598 |
+| 10:59 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/debug-pet-edit.spec.ts | 3→4 lines | ~79 |
+| 11:01 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 9→7 lines | ~114 |
+| 11:18 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~201 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | added 5 condition(s) | ~398 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/shelters.js | modified function() | ~148 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/photographers.js | modified function() | ~89 |
+| 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/sterilization.js | modified function() | ~70 |
+| 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/temporal-home-search.js | removed 13 lines | ~37 |
+| 13:07 | Edited .claude/worktrees/rosy-tumbling-plum/.wolf/cerebrum.md | 3→5 lines | ~254 |
+| 13:07 | Edited .claude/worktrees/rosy-tumbling-plum/.wolf/cerebrum.md | 3→5 lines | ~248 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~36 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~40 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~36 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~35 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~16 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | inline fix | ~47 |
+| 13:08 | Session end: 9 writes across 4 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt) | 9 reads | ~1162 tok |
+| 13:09 | Edited .claude/worktrees/serialized-wandering-phoenix/.wolf/cerebrum.md | 1→3 lines | ~134 |
+| 13:10 | Session end: 10 writes across 4 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt) | 11 reads | ~1305 tok |
+| 19:08 | Diagnosed: Mexico shelter search returns empty (dropdown sends 'Mexico', DB rows store 'México', exact-match filter fails) | ShelterRepository.kt, Shared.kt | diagnosed, awaiting fix decision | ~3k |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~163 |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~173 |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~174 |
+| 13:11 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~177 |
+| 13:11 | Edited .claude/worktrees/update-libs-latest/.wolf/cerebrum.md | 3→5 lines | ~474 |
+| 13:11 | Edited .claude/worktrees/update-libs-latest/.wolf/cerebrum.md | 1→2 lines | ~225 |
+| 13:11 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~106 |
+| 13:12 | Edited .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | modified div() | ~188 |
+| 13:12 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:14 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:33 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:35 | Created ../../.claude/plans/enumerated-yawning-cloud.md | — | ~1813 |
+| 13:13 | Fixed shelters.js i18n: added 11 missing keys to I18n.kt for all 5 languages, rebuilt common.js, merged worktree-scalable-nibbling-hopper | I18n.kt, common.js, common.js.map | success | ~25000 |
+| 19:08 | Fixed input/select/textarea fields rendering white instead of dark theme | style.scss, _location-search-form.scss + 6 compiled .css | fixed (bug-024) | ~3500 |
+| 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | added 1 import(s) | ~22 |
+| 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | removed 118 lines | ~44 |

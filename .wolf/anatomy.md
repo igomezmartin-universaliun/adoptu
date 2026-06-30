@@ -1,7 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-24T04:19:53.167Z
-> Files: 553 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T19:35:02.676Z
+> Files: 605 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../.claude/plans/
+
+- `enumerated-yawning-cloud.md` — Country enum as single source of truth (~1699 tok)
 
 ## ./
 
@@ -269,6 +273,10 @@
 - `EmailVerificationPage.kt` — HTML (~1236 tok)
 - `Shared.kt` — HTML, A, BODY, DIV, NAV (~3173 tok)
 
+## .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~927 tok)
+
 ## .claude/worktrees/elegant-coalescing-kurzweil/
 
 - `docker-compose.yml` — Docker Compose services (~118 tok)
@@ -282,6 +290,18 @@
 ## .claude/worktrees/elegant-coalescing-kurzweil/backend/
 
 - `build.gradle.kts` (~1930 tok)
+
+## .claude/worktrees/filter-country-hint/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~703 tok)
+
+## .claude/worktrees/filter-country-hint/backend/src/main/scss/
+
+- `_location-search-form.scss` — Styles: 2 rules (~502 tok)
+
+## .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~17510 tok)
 
 ## .claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
 
@@ -708,6 +728,11 @@
 - `ProfilePage.kt` — init, loadProfile, isProfileComplete, setupCompletionGuard, setupRoleToggles (~7082 tok)
 - `RegisterPage.kt` — init, validatePassword, handleRegister (~1525 tok)
 
+## .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/
+
+- `sterilization-locations.js` — escapeHtml: loadCountries, loadLocations, showForm + 3 more (~1318 tok)
+- `sterilization.js` — country: executedFunction (~957 tok)
+
 ## .claude/worktrees/fix-test-task/
 
 - `build.gradle.kts` (~137 tok)
@@ -755,6 +780,38 @@
 - `ProfilePage.kt` (~0 tok)
 - `RegisterPage.kt` (~0 tok)
 
+## .claude/worktrees/foamy-discovering-papert/backend/src/main/kotlin/com/adoptu/pages/
+
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~3184 tok)
+
+## .claude/worktrees/idempotent-juggling-orbit/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~699 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/
+
+- `build.gradle.kts` (~1948 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/
+
+- `Application.kt` — main, Application (~295 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/plugins/
+
+- `Logging.kt` — Application (~217 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/
+
+- `AuthRoutes.kt` — Data class: EncryptedLoginRequest (~6912 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/
+
+- `MagicLinkService.kt` — Data class: MagicLinkService (~2660 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/resources/
+
+- `logback.xml` (~230 tok)
+
 ## .claude/worktrees/layout-fix/backend/src/main/resources/static/css/
 
 - `style.css` — Styles: 91 rules, 8 vars (~5932 tok)
@@ -762,6 +819,14 @@
 ## .claude/worktrees/layout-fix/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1915 tok)
+
+## .claude/worktrees/memoized-herding-badger/.wolf/
+
+- `cerebrum.md` — Cerebrum (~849 tok)
+
+## .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/
+
+- `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
 
 ## .claude/worktrees/mutable-enchanting-moler/scripts/
 
@@ -814,6 +879,49 @@
 
 - `load_test_data.sh` (~122 tok)
 - `test_data.sql` — ============================================================================= (~22381 tok)
+
+## .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/
+
+- `UserShelterService.kt` — UserShelterService: getByUserId, create, update, delete (~689 tok)
+- `UserSterilizationLocationService.kt` — UserSterilizationLocationService: getByUserId, create, update, delete (~669 tok)
+
+## .claude/worktrees/quizzical-swimming-clarke/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
+
+- `ProfilePage.kt` — init, loadProfile, updateProfileUI, checkProfileExists, setupRoleToggles (~9591 tok)
+
+## .claude/worktrees/rosy-tumbling-plum/.wolf/
+
+- `buglog.json` (~4791 tok)
+- `cerebrum.md` — Cerebrum (~1045 tok)
+
+## .claude/worktrees/rosy-tumbling-plum/backend/src/main/scss/
+
+- `_location-search-form.scss` — Styles: 2 rules (~540 tok)
+- `style.scss` — Styles: 43 rules (~2496 tok)
+
+## .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~18336 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/.wolf/
+
+- `cerebrum.md` — Cerebrum (~870 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/backend/src/main/kotlin/com/adoptu/pages/
+
+- `SheltersPage.kt` — HTML (~381 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~17728 tok)
+
+## .claude/worktrees/sparkling-snuggling-pixel/.wolf/
+
+- `buglog.json` (~5098 tok)
+
+## .claude/worktrees/sparkling-snuggling-pixel/backend/src/main/resources/static/js/
+
+- `photographers.js` — t: loadPhotographers, createRequestModal, showRequestModal, executedFunction (~2098 tok)
 
 ## .claude/worktrees/swift-orbiting-crab/
 
@@ -915,6 +1023,70 @@
 - `i18n-fr.js` (~7386 tok)
 - `i18n-pt.js` (~7082 tok)
 - `i18n-zh.js` (~4810 tok)
+
+## .claude/worktrees/update-libs-latest/
+
+- `build.gradle.kts` (~136 tok)
+- `package.json` — Node.js package manifest (~198 tok)
+
+## .claude/worktrees/update-libs-latest/.wolf/
+
+- `cerebrum.md` — Cerebrum (~1315 tok)
+
+## .claude/worktrees/update-libs-latest/backend/
+
+- `build.gradle.kts` (~1948 tok)
+
+## .claude/worktrees/update-libs-latest/frontend/
+
+- `build.gradle.kts` (~284 tok)
+
+## .claude/worktrees/update-libs-latest/gradle/wrapper/
+
+- `gradle-wrapper.properties` (~68 tok)
+
+## .claude/worktrees/warm-crafting-canyon/
+
+- `playwright.config.ts` — Read environment variables from file. (~289 tok)
+
+## .claude/worktrees/warm-crafting-canyon/.claude/skills/
+
+- `e2e-verify.md` — E2E Verification Skill (~199 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/dto/input/
+
+- `PetDto.kt` — Data class: Gender (~948 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~931 tok)
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~3206 tok)
+- `SterilizationLocationsPage.kt` — HTML, HTML (~1591 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/
+
+- `PasswordService.kt` — PasswordService: hasPassword, extractPassword, setPassword, changePassword (~2986 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/
+
+- `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/
+
+- `pet-detail.js` — API routes: GET (1 endpoints) (~1879 tok)
+- `photographers.js` — params: loadPhotographers, createRequestModal, showRequestModal, executedFunction (~1676 tok)
+- `shelters.js` — errorDiv: executedFunction (~1287 tok)
+- `sterilization.js` — params: executedFunction (~801 tok)
+- `temporal-home-search.js` — params: executedFunction (~502 tok)
+
+## .claude/worktrees/warm-crafting-canyon/frontend/src/tests/
+
+- `debug-pet-edit.spec.ts` — Declares BASE (~628 tok)
+- `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9016 tok)
+
+## .claude/worktrees/webauthn-e2e-test/frontend/src/tests/
+
+- `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9827 tok)
 
 ## .claude/worktrees/woolly-mixing-catmull/
 

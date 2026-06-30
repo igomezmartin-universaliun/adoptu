@@ -1,16 +1,5 @@
 window.searchTemporalHomes = async function() {
-    const country = document.getElementById('search-country').value;
-    const state = document.getElementById('search-state').value;
-    const city = document.getElementById('search-city').value;
-    const zip = document.getElementById('search-zip').value;
-    const neighborhood = document.getElementById('search-neighborhood').value;
-    
-    const params = new URLSearchParams();
-    if (country) params.append('country', country);
-    if (state) params.append('state', state);
-    if (city) params.append('city', city);
-    if (zip) params.append('zip', zip);
-    if (neighborhood) params.append('neighborhood', neighborhood);
+    const params = window.buildLocationSearchParams() || new URLSearchParams();
     
     try {
         const response = await fetch('/api/temporal-homes?' + params.toString());

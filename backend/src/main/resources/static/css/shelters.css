@@ -552,6 +552,8 @@ footer span {
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
   width: 100%;
 }
 .location-search-form .location-search-filters {
@@ -559,6 +561,13 @@ footer span {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1rem;
+}
+.location-search-form .location-search-filters .location-search-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #888);
+  font-style: italic;
 }
 .location-search-form .location-search-filters .location-search-filter {
   display: flex;
@@ -575,6 +584,8 @@ footer span {
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
   width: 100%;
 }
 .location-search-form .location-search-filters .location-search-filter:has(input[id=search-zip]) {
@@ -586,7 +597,7 @@ footer span {
     align-items: stretch;
   }
   .location-search-form .location-search-country select,
-  .location-search-form .location-search-filters {
+.location-search-form .location-search-filters {
     width: 100%;
   }
   .location-search-form .location-search-filters {
