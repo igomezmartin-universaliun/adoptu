@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-06-21T17:54:59.933Z",
   "lifetime": {
-    "total_tokens_estimated": 309047,
-    "total_reads": 361,
-    "total_writes": 165,
-    "total_sessions": 40,
+    "total_tokens_estimated": 310753,
+    "total_reads": 366,
+    "total_writes": 169,
+    "total_sessions": 54,
     "anatomy_hits": 74,
-    "anatomy_misses": 284,
-    "repeated_reads_blocked": 49,
-    "estimated_savings_vs_bare_cli": 123766
+    "anatomy_misses": 289,
+    "repeated_reads_blocked": 51,
+    "estimated_savings_vs_bare_cli": 124796
   },
   "sessions": [
     {
@@ -3688,6 +3688,90 @@
         "writes_count": 17,
         "repeated_reads_blocked": 0,
         "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-30-0823",
+      "started": "2026-06-30T14:23:54.921Z",
+      "ended": "2026-06-30T14:26:38.728Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/memoized-herding-badger/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/memoized-herding-badger/.wolf/cerebrum.md",
+          "tokens_estimated": 190,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/.claude/skills/e2e-verify.md",
+          "tokens_estimated": 227,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 417,
+        "reads_count": 1,
+        "writes_count": 2,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-06-30-0903",
+      "started": "2026-06-30T15:03:34.086Z",
+      "ended": "2026-06-30T15:16:07.093Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/LoginPage.kt",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
+          "tokens_estimated": 1030,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/validation/AuthValidationService.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
+          "tokens_estimated": 155,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
+          "tokens_estimated": 104,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1030,
+        "output_tokens_estimated": 259,
+        "reads_count": 4,
+        "writes_count": 2,
+        "repeated_reads_blocked": 2,
+        "anatomy_lookups": 0
       }
     }
   ],

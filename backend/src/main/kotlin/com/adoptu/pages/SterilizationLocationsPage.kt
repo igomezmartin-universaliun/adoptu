@@ -51,8 +51,8 @@ fun HTML.adminSterilizationLocationsPage(navParams: NavParams = NavParams()) {
             button(classes = "btn") {
                 id = "add-btn"
                 attributes["data-i18n"] = "addLocation"
-                +"Add Location"
                 onClick = "showForm()"
+                +"Add Location"
             }
             
             div(classes = "form-modal") {
@@ -111,8 +111,8 @@ fun HTML.adminSterilizationLocationsPage(navParams: NavParams = NavParams()) {
                             button(type = ButtonType.button) {
                                 classes = setOf("btn", "btn-secondary")
                                 attributes["data-i18n"] = "cancel"
-                                +"Cancel"
                                 onClick = "hideForm()"
+                                +"Cancel"
                             }
                         }
                     }

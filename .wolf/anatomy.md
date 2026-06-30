@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T01:54:05.888Z
-> Files: 570 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T17:26:43.828Z
+> Files: 587 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -808,6 +808,14 @@
 
 - `_layout.scss` — Styles: 11 rules (~1915 tok)
 
+## .claude/worktrees/memoized-herding-badger/.wolf/
+
+- `cerebrum.md` — Cerebrum (~849 tok)
+
+## .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/
+
+- `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
+
 ## .claude/worktrees/mutable-enchanting-moler/scripts/
 
 - `test_data.sql` — ============================================================================= (~22562 tok)
@@ -977,6 +985,45 @@
 - `i18n-fr.js` (~7386 tok)
 - `i18n-pt.js` (~7082 tok)
 - `i18n-zh.js` (~4810 tok)
+
+## .claude/worktrees/warm-crafting-canyon/
+
+- `playwright.config.ts` — Read environment variables from file. (~289 tok)
+
+## .claude/worktrees/warm-crafting-canyon/.claude/skills/
+
+- `e2e-verify.md` — E2E Verification Skill (~199 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/dto/input/
+
+- `PetDto.kt` — Data class: Gender (~948 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~931 tok)
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~3206 tok)
+- `SterilizationLocationsPage.kt` — HTML, HTML (~1591 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/
+
+- `PasswordService.kt` — PasswordService: hasPassword, extractPassword, setPassword, changePassword (~2986 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/
+
+- `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
+
+## .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/
+
+- `pet-detail.js` — API routes: GET (1 endpoints) (~1879 tok)
+- `photographers.js` — params: loadPhotographers, createRequestModal, showRequestModal, executedFunction (~1676 tok)
+- `shelters.js` — errorDiv: executedFunction (~1287 tok)
+- `sterilization.js` — params: executedFunction (~801 tok)
+- `temporal-home-search.js` — params: executedFunction (~502 tok)
+
+## .claude/worktrees/warm-crafting-canyon/frontend/src/tests/
+
+- `debug-pet-edit.spec.ts` — Declares BASE (~628 tok)
+- `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9016 tok)
 
 ## .claude/worktrees/woolly-mixing-catmull/
 

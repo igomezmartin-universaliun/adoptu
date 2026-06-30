@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5\u21925 lines (2 removed)",
+      "fix": "Rewrote 5→5 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between",
-      "fix": "Changed justify-content: flex-end \u2192 space-between",
+      "root_cause": "justify-content: flex-end → space-between",
+      "fix": "Changed justify-content: flex-end → space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -111,8 +111,8 @@
       "timestamp": "2026-06-23T01:15:26.012Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -127,8 +127,8 @@
       "timestamp": "2026-06-23T01:16:02.809Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -143,8 +143,8 @@
       "timestamp": "2026-06-23T01:16:07.064Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -159,8 +159,8 @@
       "timestamp": "2026-06-23T01:16:09.579Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -175,8 +175,8 @@
       "timestamp": "2026-06-23T01:16:12.781Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -191,8 +191,8 @@
       "timestamp": "2026-06-23T01:16:15.816Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
-      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
-      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
+      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -258,7 +258,7 @@
       "timestamp": "2026-06-23T01:49:17.562Z",
       "error_message": "Missing error handling in register",
       "file": ".claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block | Also: let credential;; try {",
       "tags": [
         "auto-detected",
@@ -292,7 +292,7 @@
       "timestamp": "2026-06-23T01:51:27.949Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/swift-wiggling-conway/.wolf/buglog.json",
-      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -309,7 +309,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4\u21928 lines (2 removed)",
+      "fix": "Rewrote 4→8 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -427,7 +427,7 @@
     {
       "id": "bug-026",
       "timestamp": "2026-06-30T01:50:00.000Z",
-      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 \u2014 api.createPhotographyRequest)",
+      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 — api.createPhotographyRequest)",
       "file": "backend/src/main/resources/static/js/photographers.js",
       "root_cause": "photographers.js called api.createPhotographyRequest() but no window.api global exists. The Kotlin/JS bundle does not expose an 'api' object.",
       "fix": "Replaced api.createPhotographyRequest() with a direct fetch('/api/photographers/requests', {method:'POST', ...}) call matching the CreatePhotographyRequestRequest DTO.",
@@ -462,7 +462,7 @@
     {
       "id": "bug-028",
       "timestamp": "2026-06-30T03:47:00Z",
-      "error_message": "15 tests failed: AssertionFailedError in PasswordServiceTest, WebAuthnServiceTest, PasswordRegistrationRoutesE2ETest \u2014 Decryption error: Illegal base64 character 5f / 2d",
+      "error_message": "15 tests failed: AssertionFailedError in PasswordServiceTest, WebAuthnServiceTest, PasswordRegistrationRoutesE2ETest — Decryption error: Illegal base64 character 5f / 2d",
       "file": "backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt",
       "root_cause": "encrypt() uses Base64.getUrlEncoder() (produces URL-safe chars _ and -) but decrypt() and decryptWithKey() used Base64.getDecoder() (standard, which rejects _ and -). Encoder/decoder mismatch caused all password-based operations to fail silently.",
       "fix": "Changed both Base64.getDecoder().decode(ciphertext) calls in decrypt() (line 80) and decryptWithKey() (line 100) to Base64.getUrlDecoder().decode(ciphertext).",
@@ -476,6 +476,278 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T03:47:00Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-06-30T14:29:50.547Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/playwright.config.ts",
+      "root_cause": "37 lines replaced/restructured",
+      "fix": "Rewrote 58→24 lines (37 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T14:29:50.547Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-06-30T15:21:12.283Z",
+      "error_message": "Missing guard clause",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt",
+      "root_cause": "No early return/throw for edge case: colonIdx >= 0",
+      "fix": "Added guard clause: if (colonIdx >= 0)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T15:21:12.283Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-06-30T15:45:22.638Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Had 'México'",
+      "fix": "Changed to 'Mexico'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T15:45:22.638Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-06-30T16:08:25.486Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/Shared.kt",
+      "root_cause": "Had \"window.isLoggedInGlobal = $isLoggedIn; frontend.c",
+      "fix": "Changed to \"window.isLoggedInGlobal = $isLoggedIn; frontend.c",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:08:25.486Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-06-30T16:11:05.375Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 5→4 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:11:05.375Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-06-30T16:11:10.864Z",
+      "error_message": "Incorrect value in code",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Had '#login-link, a[href=\"",
+      "fix": "Changed to '#nav-login'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:11:10.864Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-06-30T16:21:31.873Z",
+      "error_message": "Missing error handling in unknown",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:21:31.873Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-06-30T16:23:01.022Z",
+      "error_message": "Missing error handling in unknown",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/pet-detail.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:23:01.022Z"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-06-30T16:36:52.603Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 11→19 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:36:52.603Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-06-30T16:38:06.712Z",
+      "error_message": "Missing error handling in unknown",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:38:06.712Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-06-30T16:48:57.983Z",
+      "error_message": "Missing error handling in unknown",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:48:57.983Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-06-30T16:59:42.690Z",
+      "error_message": "Missing import: fs",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/debug-pet-edit.spec.ts",
+      "root_cause": "Module(s) not imported: fs",
+      "fix": "Added import(s) for fs",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T16:59:42.690Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-06-30T17:01:41.231Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 9→7 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T17:01:41.231Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-06-30T17:18:05.218Z",
+      "error_message": "Wrong operator: || should be &&",
+      "file": ".claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts",
+      "root_cause": "Used \"||\" instead of \"&&\"",
+      "fix": "Changed operator || → &&",
+      "tags": [
+        "auto-detected",
+        "operator-fix",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T17:18:05.218Z"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-06-30T17:25:44.764Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/shelters.js",
+      "root_cause": "12 lines replaced/restructured",
+      "fix": "Rewrote 27→15 lines (12 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T17:25:44.764Z"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-06-30T17:25:59.123Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/photographers.js",
+      "root_cause": "12 lines replaced/restructured",
+      "fix": "Rewrote 21→8 lines (12 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T17:25:59.123Z"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-06-30T17:26:15.654Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/sterilization.js",
+      "root_cause": "12 lines replaced/restructured",
+      "fix": "Rewrote 18→6 lines (12 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T17:26:15.654Z"
     }
   ]
 }

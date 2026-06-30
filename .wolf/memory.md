@@ -386,3 +386,64 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 03:47 | Fixed 15 failing tests: CryptoService decrypt/decryptWithKey used standard Base64 decoder but encrypt uses URL-safe encoder | CryptoService.kt | All 426 backend tests pass | ~2k |
+| 08:25 | Created .claude/worktrees/warm-crafting-canyon/.claude/skills/e2e-verify.md | — | ~212 |
+| 08:26 | Session end: 2 writes across 2 files (cerebrum.md, e2e-verify.md) | 1 reads | ~417 tok |
+| 08:27 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | — | ~7635 |
+| 08:29 | Edited .claude/worktrees/warm-crafting-canyon/playwright.config.ts | reduced (-34 lines) | ~142 |
+| 08:34 | Edited .claude/worktrees/warm-crafting-canyon/playwright.config.ts | 12→12 lines | ~69 |
+| 08:45 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/dto/input/PetDto.kt | 3→4 lines | ~36 |
+| 08:48 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | — | ~8708 |
+
+## Session: 2026-06-30 09:03
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | modified catch() | ~145 |
+| 09:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt | getDecoder() → getUrlDecoder() | ~97 |
+| 09:16 | Session end: 2 writes across 1 files (CryptoService.kt) | 4 reads | ~1289 tok |
+| 09:21 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt | added 2 condition(s) | ~464 |
+
+## Session: 2026-06-30 09:31
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:40 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified loginWithPassword() | ~191 |
+| 09:45 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | modified commonScripts() | ~85 |
+| 09:45 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | "México" → "Mexico" | ~6 |
+| 09:54 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 4→5 lines | ~100 |
+
+## Session: 2026-06-30 10:06
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:08 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | "window.isLoggedInGlobal =" → "window.isLoggedInGlobal =" | ~70 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/SterilizationLocationsPage.kt | modified button() | ~56 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified logout() | ~61 |
+| 10:10 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 8→8 lines | ~126 |
+| 10:11 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 5→4 lines | ~56 |
+| 10:11 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | first() → link() | ~38 |
+| 10:21 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | expanded (+10 lines) | ~166 |
+| 10:21 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | modified logout() | ~69 |
+| 10:23 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/pet-detail.js | added error handling | ~43 |
+| 10:24 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 11→12 lines | ~162 |
+| 10:31 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/SterilizationLocationsPage.kt | modified button() | ~88 |
+| 10:33 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~156 |
+| 10:36 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~307 |
+| 10:38 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 3→4 lines | ~66 |
+
+## Session: 2026-06-30 10:39
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:40 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | passkey() → ensureAtLeastOne() | ~66 |
+| 10:41 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 1→2 lines | ~40 |
+| 10:48 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added optional chaining | ~219 |
+| 10:57 | Created .claude/worktrees/warm-crafting-canyon/frontend/src/tests/debug-pet-edit.spec.ts | — | ~598 |
+| 10:59 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/debug-pet-edit.spec.ts | 3→4 lines | ~79 |
+| 11:01 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | 9→7 lines | ~114 |
+| 11:18 | Edited .claude/worktrees/warm-crafting-canyon/frontend/src/tests/e2e-verify.spec.ts | added 1 condition(s) | ~201 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | added 5 condition(s) | ~398 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/shelters.js | modified function() | ~148 |
+| 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/photographers.js | modified function() | ~89 |
+| 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/sterilization.js | modified function() | ~70 |
+| 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/temporal-home-search.js | removed 13 lines | ~37 |

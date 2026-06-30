@@ -7,7 +7,8 @@ enum class Gender {
 }
 
 enum class Currency {
-    USD, EUR, GBP, CAD, AUD
+    USD, EUR, GBP, CAD, AUD,
+    MXN, ARS, CLP, COP, BRL, PEN, UYU, PYG, BOB, VES, CRC, GTQ, HNL, NIO, DOP, PAB
 }
 
 enum class Status {
