@@ -475,3 +475,4 @@
 | 19:08 | Fixed input/select/textarea fields rendering white instead of dark theme | style.scss, _location-search-form.scss + 6 compiled .css | fixed (bug-024) | ~3500 |
 | 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | added 1 import(s) | ~22 |
 | 15:01 | Edited .claude/worktrees/country-enum-fix/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | removed 118 lines | ~44 |
+| 15:05 | Fixed missing noPets i18n key (My Pets empty state untranslated) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/.../static/js/common.js | fixed, bundle rebuilt, verified via curl on live dev server | ~12000 |
