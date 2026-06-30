@@ -134,7 +134,7 @@ object RegisterPageModule {
         WebAuthnModule.register(email, displayName)
             .then { _: dynamic ->
                 console.log("Registration successful")
-                window.location.href = "/login"
+                window.location.href = "/login?registered=true"
             }
             .catch { error: dynamic ->
                 console.log("Registration error: $error")
@@ -182,7 +182,7 @@ object RegisterPageModule {
                 apiFetch("/api/auth/register-password", js("({method: 'POST', body: JSON.stringify(body)})"))
             }
             .then { _: dynamic ->
-                window.location.href = "/login"
+                window.location.href = "/login?registered=true"
             }
             .catch { error: dynamic ->
                 val errMsg = error?.message ?: error?.toString() ?: "Unknown error"
@@ -230,7 +230,7 @@ object RegisterPageModule {
                         apiFetch("/api/auth/register-password", js("({method: 'POST', body: JSON.stringify(body)})"))
                     }
                     .then { _: dynamic ->
-                        window.location.href = "/login"
+                        window.location.href = "/login?registered=true"
                     }
                     .catch { error: dynamic ->
                         val errMsg = error?.message ?: error?.toString() ?: "Unknown error"

@@ -11,6 +11,11 @@ fun HTML.loginPage(navParams: NavParams = NavParams()) {
             nav { commonNav(navParams.isLoggedIn, navParams.isAdmin, navParams.isRescuerOrAdmin, navParams.isTemporalHomeOrAdmin) }
         }
         main {
+            div(classes = "register-notification") {
+                id = "register-notification"
+                style = "display: none"
+            }
+
             div(classes = "login-forms-grid") {
                 div(classes = "auth-form-container") {
                     id = "passkey-form"
