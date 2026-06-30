@@ -5,6 +5,107 @@
 -- =============================================================================
 
 -- -------------------------
+-- CLEANUP: remove existing test data so re-runs work cleanly.
+-- Test users are identified by their well-known email addresses OR by
+-- explicit IDs 1-50 left from a previous run of this script.
+-- Deletion order follows FK dependency (deepest dependents first).
+-- -------------------------
+DO $$
+DECLARE
+  v_user_ids  INTEGER[];
+  v_pet_ids   INTEGER[];
+BEGIN
+  SELECT ARRAY(
+    SELECT DISTINCT id FROM users
+    WHERE username = ANY(ARRAY[
+      'admin@adoptu.com',
+      'maria.garcia@email.com',       'carlos.rodriguez@email.com',
+      'ana.martinez@email.com',        'luis.hernandez@email.com',
+      'sofia.lopez@email.com',         'pedro.gonzalez@email.com',
+      'valentina.perez@email.com',     'diego.sanchez@email.com',
+      'isabela.ramirez@email.com',     'mateo.flores@email.com',
+      'camila.torres@email.com',       'alejandro.jimenez@email.com',
+      'luciana.morales@email.com',     'sebastian.vargas@email.com',
+      'valeria.castillo@email.com',
+      'juan.medina@email.com',         'daniela.nunez@email.com',
+      'roberto.delgado@email.com',     'mariana.silva@email.com',
+      'pablo.ramos@email.com',         'andrea.romero@email.com',
+      'miguel.garcia@email.com',       'natalia.rodriguez@email.com',
+      'francisco.martinez@email.com',  'carolina.hernandez@email.com',
+      'jorge.photo@email.com',         'laura.photo@email.com',
+      'andres.photo@email.com',        'monica.photo@email.com',
+      'raul.photo@email.com',
+      'elena.foster@email.com',        'thomas.foster@email.com',
+      'lucia.casa@email.com',          'martin.temporal@email.com',
+      'rosa.home@email.com',           'felix.hogar@email.com',
+      'catalina.casa@email.com',       'hugo.temporal@email.com',
+      'shelter.amigos@email.com',      'shelter.esperanza@email.com',
+      'shelter.patitas@email.com',     'shelter.huellitas@email.com',
+      'shelter.vida@email.com',
+      'steril.clinic1@email.com',      'steril.clinic2@email.com',
+      'steril.clinic3@email.com',
+      'rescuer.photo1@email.com',      'rescuer.home1@email.com',
+      'rescuer.adopter1@email.com'
+    ])
+    OR id BETWEEN 1 AND 50
+  ) INTO v_user_ids;
+
+  IF array_length(v_user_ids, 1) IS NULL THEN
+    RETURN;
+  END IF;
+
+  SELECT ARRAY(SELECT id FROM pets WHERE rescuer_id = ANY(v_user_ids))
+  INTO v_pet_ids;
+
+  -- Leaf tables first (reference both pets and users)
+  IF array_length(v_pet_ids, 1) IS NOT NULL THEN
+    DELETE FROM adoption_requests
+      WHERE pet_id = ANY(v_pet_ids)
+         OR adopter_id = ANY(v_user_ids);
+    DELETE FROM photography_requests
+      WHERE pet_id = ANY(v_pet_ids)
+         OR photographer_id = ANY(v_user_ids)
+         OR requester_id    = ANY(v_user_ids);
+    DELETE FROM temporal_home_requests
+      WHERE pet_id         = ANY(v_pet_ids)
+         OR temporal_home_id = ANY(v_user_ids)
+         OR rescuer_id       = ANY(v_user_ids);
+  ELSE
+    DELETE FROM adoption_requests
+      WHERE adopter_id = ANY(v_user_ids);
+    DELETE FROM photography_requests
+      WHERE photographer_id = ANY(v_user_ids)
+         OR requester_id    = ANY(v_user_ids);
+    DELETE FROM temporal_home_requests
+      WHERE temporal_home_id = ANY(v_user_ids)
+         OR rescuer_id       = ANY(v_user_ids);
+  END IF;
+
+  DELETE FROM blocked_rescuers
+    WHERE temporal_home_id = ANY(v_user_ids)
+       OR rescuer_id       = ANY(v_user_ids);
+
+  -- Role-specific profile tables
+  DELETE FROM pets                         WHERE rescuer_id = ANY(v_user_ids);
+  DELETE FROM photographers                WHERE user_id    = ANY(v_user_ids);
+  DELETE FROM temporal_homes               WHERE user_id    = ANY(v_user_ids);
+  DELETE FROM user_shelters                WHERE user_id    = ANY(v_user_ids);
+  DELETE FROM user_sterilization_locations WHERE user_id    = ANY(v_user_ids);
+
+  -- Auth / session tables
+  DELETE FROM user_active_roles            WHERE user_id = ANY(v_user_ids);
+  DELETE FROM user_passwords               WHERE user_id = ANY(v_user_ids);
+  DELETE FROM email_verification_tokens    WHERE user_id = ANY(v_user_ids);
+  DELETE FROM magic_link_tokens            WHERE user_id = ANY(v_user_ids);
+  DELETE FROM password_reset_tokens        WHERE user_id = ANY(v_user_ids);
+  DELETE FROM email_change_tokens          WHERE user_id = ANY(v_user_ids);
+  DELETE FROM email_verification_attempts  WHERE user_id = ANY(v_user_ids);
+  DELETE FROM webauthn_credentials         WHERE user_id = ANY(v_user_ids);
+
+  DELETE FROM users WHERE id = ANY(v_user_ids);
+END $$;
+
+-- -------------------------
 -- USERS
 -- -------------------------
 INSERT INTO users (id, username, display_name, language, created_at, last_accepted_privacy_policy, last_accepted_terms_and_conditions, is_email_verified, is_banned)
