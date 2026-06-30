@@ -571,3 +571,8 @@
 |------|--------|---------|---------|--------|
 | 15:19 | Edited .claude/worktrees/test-coverage-95/build.gradle.kts | inline fix | ~18 |
 | 15:19 | Edited .claude/worktrees/country-enum-fix/.wolf/cerebrum.md | 3→6 lines | ~426 |
+| 15:18 | Fixed misaligned pet-card fields on My Pets page (pet-name/pet-info markup + status paragraph) | backend/src/main/resources/static/js/my-pets.js, index.js; backend/src/main/scss/style.scss | fixed, recompiled to style.css | ~3200 |
+| 15:21 | Session end: 2 writes across 2 files (build.gradle.kts, cerebrum.md) | 1 reads | ~475 tok |
+| 15:21 | Session end: 2 writes across 2 files (build.gradle.kts, cerebrum.md) | 1 reads | ~475 tok |
+| 15:22 | Session end: 2 writes across 2 files (build.gradle.kts, cerebrum.md) | 1 reads | ~475 tok |
+| 15:22 | Edited .claude/worktrees/country-enum-fix/.wolf/cerebrum.md | 6→3 lines | ~459 |

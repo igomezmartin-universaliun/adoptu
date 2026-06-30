@@ -1028,6 +1028,18 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T21:19:24.352Z"
+    },
+    {
+      "id": "bug-063",
+      "timestamp": "2026-06-30T21:00:00.000Z",
+      "error_message": "User reported: pet card fields are mis-aligned on My Pets page",
+      "file": "backend/src/main/resources/static/js/my-pets.js, backend/src/main/resources/static/js/index.js, backend/src/main/scss/style.scss",
+      "root_cause": "my-pets.js diverged from the home page's pet-card markup: it dumped raw text into .pet-age/.pet-rescue-date instead of the .label/.value spans the shared CSS expects, and the status <p> had no class so it picked up the browser default paragraph margin, breaking vertical rhythm in the card. Shared .pet-name rule also used justify-content:space-between, which pushed the breed badge to the far edge of the card on short names.",
+      "fix": "Added .label/.value markup to my-pets.js pet-age/pet-rescue-date (matching index.js), gave the status paragraph a .pet-status class on both pages, changed .pet-name to align-items:baseline (drop space-between) so breed sits next to the name, and added a .pet-status CSS rule resetting the default <p> margin. Recompiled style.scss to style.css via sass.",
+      "tags": ["css", "alignment", "my-pets", "pet-card", "frontend"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T21:00:00.000Z"
     }
   ]
 }

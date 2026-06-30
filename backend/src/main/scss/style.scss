@@ -204,15 +204,14 @@ form {
 
 .pet-name {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     flex-wrap: wrap;
     gap: 0.5rem;
-    
+
     h3 {
         margin: 0;
     }
-    
+
     .pet-breed {
         font-size: 0.9rem;
         color: #9ca3af;
@@ -273,6 +272,13 @@ form {
     .value {
         color: white;
     }
+}
+
+.pet-status {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    text-transform: capitalize;
 }
 
 .pet-card-actions {
