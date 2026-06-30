@@ -3,6 +3,10 @@ env:
   variables:
     ADOPTU_ENV: prod
     ADOPTU_ADMIN_USERNAME: admin
+    # Must match infra/variables.tf's ecr_repository_name default; override
+    # via a CodeBuild project environment variable if that ever diverges.
+    ECR_REPOSITORY_NAME: production/adoptu
+    DOCKER_BUILDKIT: "1"
   secrets-manager:
     ADOPTU_DB_URL: arn:aws:secretsmanager:region:account:secret:adoptu/db-url
     ADOPTU_DB_USER: arn:aws:secretsmanager:region:account:secret:adoptu/db-user
@@ -20,13 +24,20 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
   build:
     commands:
-      - docker build -t adoptu-app .
+      - docker build -t ${REPOSITORY_URI}:${IMAGE_TAG} -t ${REPOSITORY_URI}:latest .
   post_build:
     commands:
+      - docker push ${REPOSITORY_URI}:${IMAGE_TAG}
+      - docker push ${REPOSITORY_URI}:latest
+      - printf '[{"name":"Main","imageUri":"%s"}]' ${REPOSITORY_URI}:${IMAGE_TAG} > imagedefinitions.json
       - echo Build completed
 
 artifacts:
   files:
-    - '*/**'
+    - imagedefinitions.json

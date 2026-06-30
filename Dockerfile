@@ -1,42 +1,65 @@
-# Build stage - using Amazon Corretto 25 with Dart Sass
-FROM docker.io/amazoncorretto:25 AS builder
+# syntax=docker/dockerfile:1
+
+# Build stage - musl/Alpine-based JDK so the jlinked runtime below is ABI
+# compatible with the musl Alpine base used in the runtime stage (a glibc
+# JDK jlinked onto musl Alpine fails to exec at all).
+FROM docker.io/amazoncorretto:25-alpine-jdk AS builder
 
 WORKDIR /app
 
-# Install required tools and Dart Sass
-RUN dnf install -y tar gzip findutils \
-    && curl -fsSL https://github.com/sass/dart-sass/releases/download/1.77.8/dart-sass-1.77.8-linux-x64.tar.gz -o /tmp/sass.tar.gz \
-    && mkdir -p /opt/dart-sass \
-    && tar -xzf /tmp/sass.tar.gz -C /opt/dart-sass \
-    && ln -sf /opt/dart-sass/dart-sass/sass /usr/local/bin/sass \
-    && rm /tmp/sass.tar.gz \
-    && dnf clean all
+# findutils provides xargs (used by the Gradle wrapper script);
+# binutils provides objcopy (used by jlink --strip-debug below).
+RUN apk add --no-cache findutils binutils
 
+# Files that change rarely go first so the Gradle dependency layer survives
+# source-only edits when Docker layer caching is available.
 COPY gradle gradle
 COPY gradlew .
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY backend/src backend/src
+COPY build.gradle.kts settings.gradle.kts ./
 COPY backend/build.gradle.kts backend/build.gradle.kts
-COPY frontend/src frontend/src
 COPY frontend/build.gradle.kts frontend/build.gradle.kts
-
 RUN chmod +x gradlew
-RUN ./gradlew :backend:compileKotlin :backend:compileSass :backend:processResources --no-daemon
-RUN ./gradlew :backend:shadowJar --no-daemon
 
-# Runtime stage - using Alpine for small image
-FROM docker.io/amazoncorretto:25-alpine-jdk
+COPY backend/src backend/src
+COPY frontend/src frontend/src
+
+# CSS is precompiled from SCSS by hand and committed under
+# backend/src/main/resources/static/css/ - there is no Gradle Sass task,
+# and shadowJar already pulls in compileKotlin/processResources transitively.
+RUN --mount=type=cache,target=/root/.gradle \
+    ./gradlew :backend:shadowJar --no-daemon
+
+# jdeps-derive the JDK modules the fat jar actually needs, plus a small
+# safety-net set that static bytecode analysis misses: TLS ECDSA cipher
+# suites and DNS-based JNDI used by the AWS SDK, and jdk.unsupported for
+# Netty's reflective sun.misc.Unsafe access.
+RUN --mount=type=cache,target=/root/.gradle \
+    MODULES=$(jdeps --multi-release 25 --print-module-deps --ignore-missing-deps \
+      backend/build/libs/*-all.jar) \
+    && jlink \
+      --module-path "$JAVA_HOME/jmods" \
+      --add-modules "${MODULES},jdk.crypto.ec,jdk.naming.dns,jdk.unsupported,java.naming" \
+      --strip-debug --no-header-files --no-man-pages --compress=zip-9 \
+      --output /jre
+
+# Runtime stage - custom jlink JRE on Alpine, no full JDK needed.
+# Must match the builder's Alpine version for musl ABI compatibility.
+FROM docker.io/alpine:3.24
+
+RUN apk add --no-cache libstdc++ \
+    && addgroup -S app && adduser -S app -G app
 
 WORKDIR /app
 
+COPY --from=builder /jre /opt/jre
 COPY --from=builder /app/backend/build/libs/*-all.jar app.jar
-RUN mkdir -p /app/static/css && cp /app/backend/build/sass/* /app/static/css/ 2>/dev/null || true
 COPY backend/src/main/resources/application.conf .
 
-ENV JAVA_OPTS="-Xms256m -Xmx512m"
+ENV PATH="/opt/jre/bin:${PATH}"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 --enable-native-access=ALL-UNNAMED"
 ENV ADOPTU_ENV="prod"
 
+USER app
 EXPOSE 8080
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

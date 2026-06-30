@@ -664,3 +664,12 @@
 | 16:34 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/plugins/RoutingTest.kt | modified directly() | ~184 |
 | 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 8→10 lines | ~118 |
 | 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 2→3 lines | ~44 |
+| 16:42 | Rewrote Dockerfile: removed dead :backend:compileSass + dart-sass install, reordered COPY for cache locality, BuildKit cache mount, jdeps-derived jlink minimal JRE on musl-matched Alpine, container-aware JVM flags | Dockerfile | fixed (image never built before); 124MB final image | ~3200 |
+| 16:42 | Added com.gradleup.shadow plugin (shadowJar task never existed) and fixed jvmToolchain 17→25 mismatch vs JDK 25 builder | backend/build.gradle.kts | fixed build-blocking bug | ~400 |
+| 16:42 | Fixed .gitignore gradle-wrapper.jar negation order bug (later *.jar rule shadowed it) and git-tracked the jar | .gitignore, gradle/wrapper/gradle-wrapper.jar | fixed (CI checkouts were also affected, not just worktrees) | ~300 |
+| 16:42 | Fixed buildspec.yml: added real ECR login/tag/push (previously docker build only, never pushed), DOCKER_BUILDKIT=1, imagedefinitions.json artifact | buildspec.yml | fixed CI/CD gap | ~600 |
+| 16:42 | Verified end-to-end: docker build succeeded, booted image against real local Postgres container, app started in ~2s and served HTTP 200 | Dockerfile (test only) | confirmed working, not just builds | ~1500 |
+| 16:42 | Logged bug-067..bug-071 (dead compileSass task, missing shadow plugin, jvmToolchain mismatch, gitignore rule-order bug, glibc/musl jlink mismatch) and updated cerebrum.md Key Learnings/Do-Not-Repeat/Decision Log | .wolf/buglog.json, .wolf/cerebrum.md | logged | ~2800 |
+| 16:52 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 16:55 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | added optional chaining | ~1142 |
+| 16:56 | Session end: 33 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~104017 tok |
