@@ -19,6 +19,9 @@
 
 - **DatabaseFactory.listOfTables must be kept in sync with Models.kt:** Every `Table` object defined in `Models.kt` must be added to `listOfTables` in `DatabaseFactory.kt` — omitting one means `SchemaUtils.create()` never creates that table, causing a PSQLException at runtime. Tables previously missing: `UserSterilizationLocations`, `UserShelters`, `PasswordResetTokens`, `EmailChangeTokens`.
 
+- **`Country` (backend/src/main/kotlin/com/adoptu/common/Country.kt) is the single source of truth for country values.** The dropdown (`Shared.kt: countrySelect()`), DB storage (`Models.kt` columns use `enumerationByName("country", 100, Country::class)`), and validation (every repository touching a `country` column calls `Country.fromDisplayName()` before reading/writing) all derive from this enum. DTOs stay `String` on the wire (`country: String`) — repositories parse at the boundary, throwing `IllegalArgumentException` on insert/update with an unrecognized value, and returning `emptyList()` on a search filter with an unrecognized value. `Country.fromDisplayName()` does accent/case-insensitive fallback matching, so stray input (e.g. `"México"` vs `"Mexico"`) still resolves instead of silently returning zero results.
+- **Test fixtures must use real canonical country names from `Country.kt`, not placeholders.** Several test files used `"USA"` as a stand-in country value — it was never a real dropdown option (the canonical value is `"United States"`) and broke once country columns became enum-backed. Always use an exact `Country.entries` `displayName` in test data.
+
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
@@ -30,6 +33,9 @@
 
 - [2026-06-22] Do NOT edit CSS files directly. All styles live in `backend/src/main/scss/`. Shared/nav styles go in `_layout.scss`; page-specific styles in their own `.scss` file. After editing SCSS, recompile: `npx sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`
 
+- [2026-06-30] Do NOT add a free-text/hardcoded country list anywhere in this codebase again. Use `Country.entries` (backend/src/main/kotlin/com/adoptu/common/Country.kt) for any dropdown, and `Country.fromDisplayName()` to validate/normalize any incoming country string before it touches a DB column or a search filter. The original bug (Mexican shelter search returning zero results) was caused by exactly this: a hardcoded dropdown list drifting out of sync with free-text DB values (`"Mexico"` vs `"México"`).
+
 ## Decision Log
 
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
+- [2026-06-30] Country values switched from free-text `varchar` columns to an Exposed `enumerationByName` column backed by a new `Country` enum, after a Mexico search returned zero results due to an accent mismatch (`"Mexico"` dropdown value vs `"México"` stored in 2 shelter rows). Considered: (1) normalize the bad DB rows only, (2) make the filter comparison accent-insensitive, (3) make `Country` an enum and the single source of truth end-to-end. Chose (3), per explicit user direction, to eliminate the whole class of dropdown/DB drift rather than patch one symptom — affects 6 tables (shelters, sterilization locations, user shelters, user sterilization locations, temporal homes, photographers) that all shared the same free-text-country + exact-match-filter pattern.

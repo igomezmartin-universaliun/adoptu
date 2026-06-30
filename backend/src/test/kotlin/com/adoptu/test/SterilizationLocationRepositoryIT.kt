@@ -41,7 +41,7 @@ class SterilizationLocationRepositoryIT {
     fun `create and get sterilization location`() {
         val request = CreateSterilizationLocationRequest(
             name = "Test Vet Clinic",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "Los Angeles",
             address = "123 Main St",
@@ -55,7 +55,7 @@ class SterilizationLocationRepositoryIT {
         val created = repository.create(request)
         assertNotNull(created.id)
         assertEquals("Test Vet Clinic", created.name)
-        assertEquals("USA", created.country)
+        assertEquals("United States", created.country)
         assertEquals("California", created.state)
         assertEquals("Los Angeles", created.city)
         assertEquals("123 Main St", created.address)
@@ -69,14 +69,14 @@ class SterilizationLocationRepositoryIT {
     fun `get all sterilization locations`() {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "Los Angeles",
             address = "123 Main St"
         ))
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 2",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "San Francisco",
             address = "456 Oak Ave"
@@ -92,13 +92,13 @@ class SterilizationLocationRepositoryIT {
         val allLocations = repository.getAll()
         assertEquals(3, allLocations.size)
 
-        val usLocations = repository.getAll(country = "USA")
+        val usLocations = repository.getAll(country = "United States")
         assertEquals(2, usLocations.size)
 
-        val caLocations = repository.getAll(country = "USA", state = "California")
+        val caLocations = repository.getAll(country = "United States", state = "California")
         assertEquals(2, caLocations.size)
 
-        val laLocations = repository.getAll(country = "USA", state = "California", city = "Los Angeles")
+        val laLocations = repository.getAll(country = "United States", state = "California", city = "Los Angeles")
         assertEquals(1, laLocations.size)
         assertEquals("Vet 1", laLocations.first().name)
     }
@@ -107,7 +107,7 @@ class SterilizationLocationRepositoryIT {
     fun `update sterilization location`() {
         val created = repository.create(CreateSterilizationLocationRequest(
             name = "Original Name",
-            country = "USA",
+            country = "United States",
             city = "Los Angeles",
             address = "123 Main St"
         ))
@@ -121,14 +121,14 @@ class SterilizationLocationRepositoryIT {
         assertNotNull(updated)
         assertEquals("Updated Name", updated.name)
         assertEquals("California", updated.state)
-        assertEquals("USA", updated.country)
+        assertEquals("United States", updated.country)
     }
 
     @Test
     fun `delete sterilization location`() {
         val created = repository.create(CreateSterilizationLocationRequest(
             name = "To Delete",
-            country = "USA",
+            country = "United States",
             city = "Los Angeles",
             address = "123 Main St"
         ))
@@ -144,13 +144,13 @@ class SterilizationLocationRepositoryIT {
     fun `get countries`() {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
-            country = "USA",
+            country = "United States",
             city = "Los Angeles",
             address = "123 Main St"
         ))
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 2",
-            country = "USA",
+            country = "United States",
             city = "New York",
             address = "456 Broadway"
         ))
@@ -163,7 +163,7 @@ class SterilizationLocationRepositoryIT {
 
         val countries = repository.getCountries()
         assertEquals(2, countries.size)
-        assertTrue(countries.contains("USA"))
+        assertTrue(countries.contains("United States"))
         assertTrue(countries.contains("Mexico"))
     }
 
@@ -171,27 +171,27 @@ class SterilizationLocationRepositoryIT {
     fun `get states by country`() {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "Los Angeles",
             address = "123 Main St"
         ))
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 2",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "San Francisco",
             address = "456 Oak Ave"
         ))
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 3",
-            country = "USA",
+            country = "United States",
             state = "New York",
             city = "New York City",
             address = "789 Broadway"
         ))
 
-        val states = repository.getStatesByCountry("USA")
+        val states = repository.getStatesByCountry("United States")
         assertEquals(2, states.size)
         assertTrue(states.contains("California"))
         assertTrue(states.contains("New York"))
@@ -201,14 +201,14 @@ class SterilizationLocationRepositoryIT {
     fun `get grouped by location`() {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "Los Angeles",
             address = "123 Main St"
         ))
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 2",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "San Francisco",
             address = "456 Oak Ave"
@@ -224,7 +224,7 @@ class SterilizationLocationRepositoryIT {
         val grouped = repository.getGroupedByLocation()
         assertEquals(2, grouped.size)
         
-        val usaGroup = grouped.find { it.country == "USA" }
+        val usaGroup = grouped.find { it.country == "United States" }
         assertNotNull(usaGroup)
         assertEquals(1, usaGroup.states.size)
         assertEquals("California", usaGroup.states.first().state)

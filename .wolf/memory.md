@@ -230,3 +230,18 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+
+## Session: 2026-06-30 (Mexico shelter search fix)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:08 | Diagnosed Mexico shelter search returning empty results (dropdown sends "Mexico", DB had "México") | ShelterRepository.kt, Shared.kt | diagnosed, bug-050 logged | ~3k |
+| 13:35 | Planned and approved Country enum refactor (user chose enum approach over data-only fix) | plan: enumerated-yawning-cloud.md | approved | ~2k |
+| 15:09 | Created Country.kt enum (112 countries, fromDisplayName() with accent/case-insensitive fallback) | common/Country.kt | created | ~2k |
+| 15:09 | Switched countrySelect() dropdown to render from Country.entries | Shared.kt | edited | ~1k |
+| 15:09 | Switched 6 tables' country columns to enumerationByName(Country::class) | Models.kt | edited | ~1k |
+| 15:09 | Updated 7 repositories to parse/normalize country via Country.fromDisplayName() | ShelterRepository.kt, SterilizationLocationRepository.kt, UserShelterRepository.kt, UserSterilizationLocationRepository.kt, TemporalHomeRepository.kt, PhotographerRepository.kt, UserRepository.kt | edited | ~6k |
+| 15:11 | Migrated 27 existing DB rows (8 distinct stray country strings) to canonical enum names | live dev DB (animal_shelters, sterilization_locations, user_shelters, user_sterilization_locations, temporal_homes, photographers) | migrated, verified | ~1k |
+| 15:11 | Restarted backend, verified GET /api/shelters?country=Mexico now returns 2 shelters (was empty); México (accented) input still resolves via fallback | live :8080 | verified | ~1k |
+| 15:25 | Fixed test fixtures using non-canonical "USA" placeholder (broke once country became enum-backed); ran full backend test suite | SheltersRoutesE2ETest.kt, ShelterServiceTest.kt, SterilizationLocationServiceTest.kt, TemporalHomeServiceTest.kt, SterilizationLocationRepositoryIT.kt | 426 tests, 15 pre-existing unrelated failures confirmed (Password/WebAuthn), 0 new failures | ~4k |
+| 15:35 | Marked bug-050 fixed; logged bug-051 (AdminSheltersPage create/edit form references missing DOM elements, discovered but not fixed) | buglog.json | logged | ~1k |

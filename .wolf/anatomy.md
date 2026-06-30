@@ -936,3 +936,19 @@
 ## .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1961 tok)
+
+## backend/src/main/kotlin/com/adoptu/common/
+
+- `Country.kt` — Country enum: canonical list of 112 countries (displayName + i18nKey), `fromDisplayName()` resolves exact/accent-insensitive/case-insensitive input to an enum value. Single source of truth for the country dropdown (Shared.kt), validation, and DB storage (~1700 tok)
+
+## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
+
+- `Models.kt` — Exposed table defs; `country` columns on AnimalShelters, SterilizationLocations, UserShelters, UserSterilizationLocations, TemporalHomes, Photographers now use `enumerationByName("country", 100, Country::class)` instead of free-text varchar (~3300 tok)
+
+## backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ (canonical)
+
+- `ShelterRepository.kt`, `SterilizationLocationRepository.kt`, `UserShelterRepository.kt`, `UserSterilizationLocationRepository.kt`, `TemporalHomeRepository.kt`, `PhotographerRepository.kt`, `UserRepository.kt` — all parse incoming country filter/insert/update strings via `Country.fromDisplayName()` before touching the typed column, and map `Country` back to `.displayName` for DTOs (~unchanged sizes, logic only)
+
+## backend/src/main/kotlin/com/adoptu/pages/ (canonical)
+
+- `Shared.kt` — `countrySelect()` now renders `<option>`s from `Country.entries` instead of a hardcoded 112-line list (~3000 tok)

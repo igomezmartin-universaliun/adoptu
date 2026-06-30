@@ -1,6 +1,7 @@
 package com.adoptu.adapters.db.repositories
 
 import com.adoptu.adapters.db.UserShelters
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateUserShelterRequest
 import com.adoptu.dto.input.UpdateUserShelterRequest
 import com.adoptu.dto.input.UserShelterDto
@@ -23,7 +24,7 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
         return UserShelterDto(
             userId = row[UserShelters.userId],
             name = row[UserShelters.name],
-            country = row[UserShelters.country],
+            country = row[UserShelters.country].displayName,
             state = row[UserShelters.state],
             city = row[UserShelters.city],
             neighborhood = row[UserShelters.neighborhood],
@@ -53,11 +54,13 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
 
     override fun create(userId: Int, request: CreateUserShelterRequest): UserShelterDto {
         val now = clock.now().toEpochMilliseconds()
+        val parsedCountry = Country.fromDisplayName(request.country)
+            ?: throw IllegalArgumentException("Invalid country: ${request.country}")
         return transaction {
             UserShelters.insert {
                 it[UserShelters.userId] = userId
                 it[UserShelters.name] = request.name
-                it[UserShelters.country] = request.country
+                it[UserShelters.country] = parsedCountry
                 it[UserShelters.state] = request.state
                 it[UserShelters.city] = request.city
                 it[UserShelters.neighborhood] = request.neighborhood
@@ -81,7 +84,7 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
             UserShelterDto(
                 userId = userId,
                 name = request.name,
-                country = request.country,
+                country = parsedCountry.displayName,
                 state = request.state,
                 city = request.city,
                 neighborhood = request.neighborhood,
@@ -111,7 +114,9 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
 
             UserShelters.update({ UserShelters.userId eq userId }) { row ->
                 request.name?.let { row[UserShelters.name] = it }
-                request.country?.let { row[UserShelters.country] = it }
+                request.country?.let {
+                    row[UserShelters.country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+                }
                 request.state?.let { row[UserShelters.state] = it }
                 request.city?.let { row[UserShelters.city] = it }
                 request.neighborhood?.let { row[UserShelters.neighborhood] = it }
@@ -141,7 +146,8 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
     }
 
     override fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserShelterDto> = transaction {
-        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean> = UserShelters.country eq country
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean> = UserShelters.country eq parsedCountry
         
         if (!state.isNullOrBlank()) {
             conditions = conditions.and(UserShelters.state eq state)

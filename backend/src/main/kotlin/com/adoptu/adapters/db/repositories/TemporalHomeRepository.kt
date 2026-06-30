@@ -3,6 +3,7 @@ package com.adoptu.adapters.db.repositories
 import com.adoptu.adapters.db.BlockedRescuers
 import com.adoptu.adapters.db.TemporalHomeRequests
 import com.adoptu.adapters.db.TemporalHomes
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateTemporalHomeRequest
 import com.adoptu.dto.input.TemporalHomeDto
 import com.adoptu.dto.input.TemporalHomeRequestDto
@@ -36,7 +37,7 @@ class TemporalHomeRepositoryImpl(
             TemporalHomeDto(
                 userId = result[TemporalHomes.userId],
                 alias = result[TemporalHomes.alias],
-                country = result[TemporalHomes.country],
+                country = result[TemporalHomes.country].displayName,
                 state = result[TemporalHomes.state],
                 city = result[TemporalHomes.city],
                 zip = result[TemporalHomes.zip],
@@ -48,11 +49,13 @@ class TemporalHomeRepositoryImpl(
 
     override fun createTemporalHome(userId: Int, request: CreateTemporalHomeRequest): TemporalHomeDto {
         val createdAt = clock.now().toEpochMilliseconds()
+        val parsedCountry = Country.fromDisplayName(request.country)
+            ?: throw IllegalArgumentException("Invalid country: ${request.country}")
         return transaction {
             TemporalHomes.insert {
                 it[TemporalHomes.userId] = userId
                 it[TemporalHomes.alias] = request.alias
-                it[TemporalHomes.country] = request.country
+                it[TemporalHomes.country] = parsedCountry
                 it[TemporalHomes.state] = request.state
                 it[TemporalHomes.city] = request.city
                 it[TemporalHomes.zip] = request.zip
@@ -63,7 +66,7 @@ class TemporalHomeRepositoryImpl(
             TemporalHomeDto(
                 userId = userId,
                 alias = request.alias,
-                country = request.country,
+                country = parsedCountry.displayName,
                 state = request.state,
                 city = request.city,
                 zip = request.zip,
@@ -80,7 +83,9 @@ class TemporalHomeRepositoryImpl(
             ?: return@transaction null
 
         val updatedAlias = request.alias ?: existing[TemporalHomes.alias]
-        val updatedCountry = request.country ?: existing[TemporalHomes.country]
+        val updatedCountry = request.country?.let {
+            Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+        } ?: existing[TemporalHomes.country]
         val updatedState = request.state ?: existing[TemporalHomes.state]
         val updatedCity = request.city ?: existing[TemporalHomes.city]
         val updatedZip = request.zip ?: existing[TemporalHomes.zip]
@@ -98,7 +103,7 @@ class TemporalHomeRepositoryImpl(
         TemporalHomeDto(
             userId = userId,
             alias = updatedAlias,
-            country = updatedCountry,
+            country = updatedCountry.displayName,
             state = updatedState,
             city = updatedCity,
             zip = updatedZip,
@@ -111,7 +116,8 @@ class TemporalHomeRepositoryImpl(
         var conditions: Op<Boolean>? = null
 
         params.country?.let { country ->
-            conditions = conditions?.and(TemporalHomes.country eq country) ?: (TemporalHomes.country eq country)
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+            conditions = conditions?.and(TemporalHomes.country eq parsedCountry) ?: (TemporalHomes.country eq parsedCountry)
         }
         params.state?.let { state ->
             conditions = conditions?.and(TemporalHomes.state eq state) ?: (TemporalHomes.state eq state)
@@ -136,7 +142,7 @@ class TemporalHomeRepositoryImpl(
             TemporalHomeDto(
                 userId = row[TemporalHomes.userId],
                 alias = row[TemporalHomes.alias],
-                country = row[TemporalHomes.country],
+                country = row[TemporalHomes.country].displayName,
                 state = row[TemporalHomes.state],
                 city = row[TemporalHomes.city],
                 zip = row[TemporalHomes.zip],

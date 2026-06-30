@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5→5 lines (2 removed)",
+      "fix": "Rewrote 5\u21925 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -111,8 +111,8 @@
       "timestamp": "2026-06-23T01:15:26.012Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -127,8 +127,8 @@
       "timestamp": "2026-06-23T01:16:02.809Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -143,8 +143,8 @@
       "timestamp": "2026-06-23T01:16:07.064Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -159,8 +159,8 @@
       "timestamp": "2026-06-23T01:16:09.579Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -175,8 +175,8 @@
       "timestamp": "2026-06-23T01:16:12.781Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -191,8 +191,8 @@
       "timestamp": "2026-06-23T01:16:15.816Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -258,7 +258,7 @@
       "timestamp": "2026-06-23T01:49:17.562Z",
       "error_message": "Missing error handling in register",
       "file": ".claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block | Also: let credential;; try {",
       "tags": [
         "auto-detected",
@@ -292,7 +292,7 @@
       "timestamp": "2026-06-23T01:51:27.949Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/swift-wiggling-conway/.wolf/buglog.json",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -309,7 +309,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→8 lines (2 removed)",
+      "fix": "Rewrote 4\u21928 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -387,6 +387,26 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-06-24T04:19:53.185Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-06-30T20:10:00.000Z",
+      "error_message": "admin-shelters.js references DOM elements (shelter-form, country, name, city, address, currency, etc.) that AdminSheltersPage.kt never renders",
+      "file": "backend/src/main/kotlin/com/adoptu/pages/AdminSheltersPage.kt; backend/src/main/resources/static/js/admin-shelters.js",
+      "root_cause": "AdminSheltersPage.kt only renders the filter-country/filter-state search controls and the shelters list container. admin-shelters.js calls document.getElementById('shelter-form').addEventListener(...) at top level (not inside DOMContentLoaded), plus getFormData()/editShelter() reference name/country/city/address/currency/etc. inputs and a shelter-form element that do not exist in the rendered page. Likely throws a TypeError on page load (shelter-form is null), which would also prevent the trailing DOMContentLoaded listener from registering. Discovered incidentally while investigating bug-050 (Mexico shelter search) \u2014 not fixed in that pass.",
+      "fix": "Not yet investigated/fixed. Needs: render the missing create/edit form markup in AdminSheltersPage.kt (or confirm it is intentionally a separate unfinished feature) and guard admin-shelters.js top-level listener registration.",
+      "tags": [
+        "admin",
+        "shelters",
+        "broken-ui",
+        "missing-markup",
+        "discovered-not-fixed"
+      ],
+      "related_bugs": [
+        "bug-050"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T20:10:00.000Z"
     }
   ]
 }

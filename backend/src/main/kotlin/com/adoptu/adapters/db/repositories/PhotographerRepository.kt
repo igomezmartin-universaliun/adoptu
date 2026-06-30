@@ -4,6 +4,7 @@ import com.adoptu.adapters.db.Photographers
 import com.adoptu.adapters.db.PhotographyRequests
 import com.adoptu.adapters.db.UserActiveRoles
 import com.adoptu.adapters.db.Users
+import com.adoptu.common.Country
 import com.adoptu.dto.input.PhotographerDto
 import com.adoptu.dto.input.PhotographerSettingsRequest
 import com.adoptu.dto.input.PhotographyRequestDto
@@ -158,7 +159,7 @@ class PhotographerRepositoryImpl(
                     username = user[Users.username],
                     photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
                     photographerCurrency = photographer?.get(Photographers.photographerCurrency),
-                    country = photographer?.get(Photographers.country),
+                    country = photographer?.get(Photographers.country)?.displayName,
                     state = photographer?.get(Photographers.state)
                 )
             } else null
@@ -166,22 +167,26 @@ class PhotographerRepositoryImpl(
     }
 
     override fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = transaction {
+        val parsedFilterCountry: Country? = if (!country.isNullOrBlank()) {
+            Country.fromDisplayName(country) ?: return@transaction emptyList()
+        } else null
+
         val photographerUserIds = UserActiveRoles.selectAll()
             .where { UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name }
             .map { row -> row[UserActiveRoles.userId] }
             .distinct()
-        
+
         photographerUserIds.mapNotNull { userId ->
             val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
             val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
-            
+
             if (user != null) {
                 val photographerCountry = photographer?.get(Photographers.country)
                 val photographerState = photographer?.get(Photographers.state)
-                
-                val matchesCountry = country.isNullOrBlank() || photographerCountry == country
+
+                val matchesCountry = parsedFilterCountry == null || photographerCountry == parsedFilterCountry
                 val matchesState = state.isNullOrBlank() || photographerState == state
-                
+
                 if (matchesCountry && matchesState) {
                     PhotographerDto(
                         userId = userId,
@@ -189,7 +194,7 @@ class PhotographerRepositoryImpl(
                         username = user[Users.username],
                         photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
                         photographerCurrency = photographer?.get(Photographers.photographerCurrency),
-                        country = photographerCountry,
+                        country = photographerCountry?.displayName,
                         state = photographerState
                     )
                 } else null
@@ -207,13 +212,17 @@ class PhotographerRepositoryImpl(
         }
         if (!userExists) return null
         
+        val parsedCountry = request.country?.let {
+            Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+        }
+
         transaction {
             val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
             if (existing != null) {
                 Photographers.update({ Photographers.userId eq userId }) {
                     it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
                     it[photographerCurrency] = request.photographerCurrency
-                    it[country] = request.country
+                    it[country] = parsedCountry
                     it[state] = request.state
                 }
             } else {
@@ -221,7 +230,7 @@ class PhotographerRepositoryImpl(
                     it[Photographers.userId] = userId
                     it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
                     it[photographerCurrency] = request.photographerCurrency
-                    it[country] = request.country
+                    it[country] = parsedCountry
                     it[state] = request.state
                 }
             }

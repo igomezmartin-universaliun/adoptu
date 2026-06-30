@@ -45,8 +45,8 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getAll returns all locations`() {
-        createLocation(name = "Location 1", country = "USA", city = "LA", address = "123 Main St")
-        createLocation(name = "Location 2", country = "USA", city = "NY", address = "456 Broadway")
+        createLocation(name = "Location 1", country = "United States", city = "LA", address = "123 Main St")
+        createLocation(name = "Location 2", country = "United States", city = "NY", address = "456 Broadway")
 
         val result = service.getAll()
 
@@ -55,10 +55,10 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getAll filters by country`() {
-        createLocation(name = "US Location", country = "USA", city = "LA", address = "123 Main St")
+        createLocation(name = "US Location", country = "United States", city = "LA", address = "123 Main St")
         createLocation(name = "Mexico Location", country = "Mexico", city = "Mexico City", address = "789 Av Principal")
 
-        val result = service.getAll(country = "USA")
+        val result = service.getAll(country = "United States")
 
         assertEquals(1, result.size)
         assertEquals("US Location", result.first().name)
@@ -66,10 +66,10 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getAll filters by country and state`() {
-        createLocation(name = "CA Location", country = "USA", state = "California", city = "LA", address = "123 Main St")
-        createLocation(name = "NY Location", country = "USA", state = "New York", city = "NY", address = "456 Broadway")
+        createLocation(name = "CA Location", country = "United States", state = "California", city = "LA", address = "123 Main St")
+        createLocation(name = "NY Location", country = "United States", state = "New York", city = "NY", address = "456 Broadway")
 
-        val result = service.getAll(country = "USA", state = "California")
+        val result = service.getAll(country = "United States", state = "California")
 
         assertEquals(1, result.size)
         assertEquals("CA Location", result.first().name)
@@ -77,10 +77,10 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getAll filters by country state and city`() {
-        createLocation(name = "LA Location", country = "USA", state = "California", city = "Los Angeles", address = "123 Main St")
-        createLocation(name = "SF Location", country = "USA", state = "California", city = "San Francisco", address = "456 Oak Ave")
+        createLocation(name = "LA Location", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
+        createLocation(name = "SF Location", country = "United States", state = "California", city = "San Francisco", address = "456 Oak Ave")
 
-        val result = service.getAll(country = "USA", state = "California", city = "Los Angeles")
+        val result = service.getAll(country = "United States", state = "California", city = "Los Angeles")
 
         assertEquals(1, result.size)
         assertEquals("LA Location", result.first().name)
@@ -94,7 +94,7 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getById returns location by id`() {
-        val id = createLocation(name = "Test Location", country = "USA", city = "LA", address = "123 Main St")
+        val id = createLocation(name = "Test Location", country = "United States", city = "LA", address = "123 Main St")
 
         val result = service.getById(id)
 
@@ -106,7 +106,7 @@ class SterilizationLocationServiceTest {
     fun `create creates location successfully`() {
         val request = CreateSterilizationLocationRequest(
             name = "New Vet Clinic",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "Los Angeles",
             address = "123 Vet Street",
@@ -121,7 +121,7 @@ class SterilizationLocationServiceTest {
 
         assertNotNull(result)
         assertEquals("New Vet Clinic", result.name)
-        assertEquals("USA", result.country)
+        assertEquals("United States", result.country)
         assertEquals("California", result.state)
         assertEquals("Los Angeles", result.city)
         assertEquals("123 Vet Street", result.address)
@@ -133,7 +133,7 @@ class SterilizationLocationServiceTest {
     fun `create throws exception when name is blank`() {
         val request = CreateSterilizationLocationRequest(
             name = "",
-            country = "USA",
+            country = "United States",
             city = "LA",
             address = "123 Main St"
         )
@@ -165,7 +165,7 @@ class SterilizationLocationServiceTest {
     fun `create throws exception when city is blank`() {
         val request = CreateSterilizationLocationRequest(
             name = "Test",
-            country = "USA",
+            country = "United States",
             city = "",
             address = "123 Main St"
         )
@@ -181,7 +181,7 @@ class SterilizationLocationServiceTest {
     fun `create throws exception when address is blank`() {
         val request = CreateSterilizationLocationRequest(
             name = "Test",
-            country = "USA",
+            country = "United States",
             city = "LA",
             address = ""
         )
@@ -204,7 +204,7 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `update updates location successfully`() {
-        val id = createLocation(name = "Original Name", country = "USA", city = "LA", address = "123 Main St")
+        val id = createLocation(name = "Original Name", country = "United States", city = "LA", address = "123 Main St")
         val request = UpdateSterilizationLocationRequest(
             name = "Updated Name",
             state = "California"
@@ -216,14 +216,14 @@ class SterilizationLocationServiceTest {
         val updated = result.data
         assertEquals("Updated Name", updated.name)
         assertEquals("California", updated.state)
-        assertEquals("USA", updated.country)
+        assertEquals("United States", updated.country)
     }
 
     @Test
     fun `update allows partial updates`() {
         val id = createLocation(
             name = "Original",
-            country = "USA",
+            country = "United States",
             state = "California",
             city = "LA",
             address = "123 Main St"
@@ -246,7 +246,7 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `delete removes location successfully`() {
-        val id = createLocation(name = "To Delete", country = "USA", city = "LA", address = "123 Main St")
+        val id = createLocation(name = "To Delete", country = "United States", city = "LA", address = "123 Main St")
 
         val result = service.delete(id)
 
@@ -256,24 +256,24 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getCountries returns list of countries`() {
-        createLocation(name = "US 1", country = "USA", city = "LA", address = "123 Main St")
-        createLocation(name = "US 2", country = "USA", city = "NY", address = "456 Broadway")
+        createLocation(name = "US 1", country = "United States", city = "LA", address = "123 Main St")
+        createLocation(name = "US 2", country = "United States", city = "NY", address = "456 Broadway")
         createLocation(name = "MX 1", country = "Mexico", city = "Mexico City", address = "789 Av")
 
         val result = service.getCountries()
 
         assertEquals(2, result.size)
-        assertTrue(result.contains("USA"))
+        assertTrue(result.contains("United States"))
         assertTrue(result.contains("Mexico"))
     }
 
     @Test
     fun `getStatesByCountry returns list of states`() {
-        createLocation(name = "CA 1", country = "USA", state = "California", city = "LA", address = "123 Main St")
-        createLocation(name = "CA 2", country = "USA", state = "California", city = "SF", address = "456 Oak")
-        createLocation(name = "NY 1", country = "USA", state = "New York", city = "NY", address = "789 Broadway")
+        createLocation(name = "CA 1", country = "United States", state = "California", city = "LA", address = "123 Main St")
+        createLocation(name = "CA 2", country = "United States", state = "California", city = "SF", address = "456 Oak")
+        createLocation(name = "NY 1", country = "United States", state = "New York", city = "NY", address = "789 Broadway")
 
-        val result = service.getStatesByCountry("USA")
+        val result = service.getStatesByCountry("United States")
 
         assertEquals(2, result.size)
         assertTrue(result.contains("California"))
@@ -282,11 +282,11 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getCitiesByCountryAndState returns list of cities`() {
-        createLocation(name = "LA 1", country = "USA", state = "California", city = "Los Angeles", address = "123 Main St")
-        createLocation(name = "LA 2", country = "USA", state = "California", city = "Los Angeles", address = "456 Oak")
-        createLocation(name = "SF 1", country = "USA", state = "California", city = "San Francisco", address = "789 Pine")
+        createLocation(name = "LA 1", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
+        createLocation(name = "LA 2", country = "United States", state = "California", city = "Los Angeles", address = "456 Oak")
+        createLocation(name = "SF 1", country = "United States", state = "California", city = "San Francisco", address = "789 Pine")
 
-        val result = service.getCitiesByCountryAndState("USA", "California")
+        val result = service.getCitiesByCountryAndState("United States", "California")
 
         assertEquals(2, result.size)
         assertTrue(result.contains("Los Angeles"))
@@ -295,10 +295,10 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getCitiesByCountryAndState returns cities without state filter`() {
-        createLocation(name = "CA City", country = "USA", state = "California", city = "LA", address = "123 Main St")
-        createLocation(name = "No State", country = "USA", state = null, city = "Unknown", address = "456 Oak")
+        createLocation(name = "CA City", country = "United States", state = "California", city = "LA", address = "123 Main St")
+        createLocation(name = "No State", country = "United States", state = null, city = "Unknown", address = "456 Oak")
 
-        val result = service.getCitiesByCountryAndState("USA", null)
+        val result = service.getCitiesByCountryAndState("United States", null)
 
         assertEquals(2, result.size)
         assertTrue(result.contains("LA"))
@@ -307,16 +307,16 @@ class SterilizationLocationServiceTest {
 
     @Test
     fun `getGroupedByLocation returns locations grouped by country state and city`() {
-        createLocation(name = "LA Vet 1", country = "USA", state = "California", city = "Los Angeles", address = "123 Main St")
-        createLocation(name = "LA Vet 2", country = "USA", state = "California", city = "Los Angeles", address = "456 Oak")
-        createLocation(name = "SF Vet 1", country = "USA", state = "California", city = "San Francisco", address = "789 Pine")
+        createLocation(name = "LA Vet 1", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
+        createLocation(name = "LA Vet 2", country = "United States", state = "California", city = "Los Angeles", address = "456 Oak")
+        createLocation(name = "SF Vet 1", country = "United States", state = "California", city = "San Francisco", address = "789 Pine")
         createLocation(name = "Mexico Vet", country = "Mexico", state = null, city = "Mexico City", address = "Av Principal")
 
         val result = service.getGroupedByLocation()
 
         assertEquals(2, result.size)
         
-        val usaGroup = result.find { it.country == "USA" }
+        val usaGroup = result.find { it.country == "United States" }
         assertNotNull(usaGroup)
         assertEquals(1, usaGroup.states.size)
         
