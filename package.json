@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/igomezmartin-universaliun/adoptu#readme",
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.0.1"
   }
 }

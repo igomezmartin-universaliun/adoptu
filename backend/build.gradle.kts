@@ -15,14 +15,14 @@ kotlin {
     jvmToolchain(17)
 }
 
-val ktorVersion = "3.4.2"
-val exposedVersion = "1.2.0"
-val postgresVersion = "42.7.10"
-val koinVersion = "4.1.1"
-val kotlinxDatetimeVersion = "0.6.1"
-val byteBuddyVersion = "1.17.0"
-val kotestVersion = "6.1.3"
-val playwrightVersion = "1.58.0"
+val ktorVersion = "3.5.1"
+val exposedVersion = "1.3.0"
+val postgresVersion = "42.7.12"
+val koinVersion = "4.2.2"
+val kotlinxDatetimeVersion = "0.8.0"
+val byteBuddyVersion = "1.18.10"
+val kotestVersion = "6.2.1"
+val playwrightVersion = "1.61.0"
 
 dependencies {
     // runtime / implementation
@@ -36,10 +36,10 @@ dependencies {
     implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
     implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
 
-    implementation("com.webauthn4j:webauthn4j-core:0.31.0.RELEASE")
+    implementation("com.webauthn4j:webauthn4j-core:0.31.7.RELEASE")
 
     implementation("org.postgresql:postgresql:$postgresVersion")
-    implementation("org.checkerframework:checker-qual:3.47.0")
+    implementation("org.checkerframework:checker-qual:4.2.0")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -54,9 +54,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetimeVersion")
 
-    implementation("ch.qos.logback:logback-classic:1.5.31")
+    implementation("ch.qos.logback:logback-classic:1.5.37")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.23"))
+    implementation(platform("software.amazon.awssdk:bom:2.46.18"))
     implementation("software.amazon.awssdk:dynamodb")
     implementation("software.amazon.awssdk:s3") {
         exclude(group = "net.bytebuddy")
@@ -75,25 +75,25 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("net.bytebuddy:byte-buddy:$byteBuddyVersion")
     testImplementation("net.bytebuddy:byte-buddy-agent:$byteBuddyVersion")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.10.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.11.0")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-property:$kotestVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
+    testImplementation("io.mockk:mockk:1.14.11")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("com.h2database:h2:2.3.232")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.4"))
+    testImplementation("com.h2database:h2:2.4.240")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.4"))
     testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
-    testImplementation("org.testcontainers:localstack:1.20.4")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("org.testcontainers:localstack:1.21.4")
+    testImplementation("org.testcontainers:postgresql:1.21.4")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("com.microsoft.playwright:playwright:$playwrightVersion")
 
     // serialization
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 }
 
 application {
