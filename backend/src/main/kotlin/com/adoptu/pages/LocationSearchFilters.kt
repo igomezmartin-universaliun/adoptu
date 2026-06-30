@@ -7,6 +7,10 @@ fun DIV.locationSearchFilters(
     includeNeighborhood: Boolean = true
 ) {
     div(classes = formClass) {
+        p(classes = "location-search-hint") {
+            attributes["data-i18n"] = "selectCountryFirst"
+            +"Select a country to enable filters"
+        }
         div(classes = "location-search-country") {
             label { htmlFor = "search-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
             select {
@@ -17,10 +21,6 @@ fun DIV.locationSearchFilters(
             }
         }
         div(classes = "location-search-filters") {
-            p(classes = "location-search-hint") {
-                attributes["data-i18n"] = "selectCountryFirst"
-                +"Select a country to enable filters"
-            }
             div(classes = "location-search-filter") {
                 label { htmlFor = "search-state"; attributes["data-i18n"] = "state"; +"State" }
                 input(InputType.text) { name = "state"; id = "search-state"; disabled = true }
