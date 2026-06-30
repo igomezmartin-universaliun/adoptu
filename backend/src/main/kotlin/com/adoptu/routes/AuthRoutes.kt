@@ -234,13 +234,13 @@ fun Route.authRoutes() {
                 }
 
                 val user = result.user
-                application.log.debug("Authenticate: success for userId=${result.userId}, username=${user.username}")
+                application.log.info("Passkey auth success: userId=${result.userId} username=${user.username}")
                 call.sessions.set(
                     SessionUser(result.userId, user.username, user.displayName)
                 )
                 call.respond(SuccessResponse(success = true))
             } else {
-                application.log.debug("Authenticate: failed - invalid credential")
+                application.log.warn("Passkey auth failed: invalid credential")
                 call.respond(SuccessWithErrorResponse(success = false, error = "Authentication failed"))
             }
         }
@@ -351,7 +351,7 @@ fun Route.authRoutes() {
             // Now consume the token and set the session
             webAuthnService.consumeMagicLink(token)
             
-            application.log.debug("Magic link login: success for userId=${magicLinkResult.userId}, username=${magicLinkResult.username}")
+            application.log.info("Magic link login success: userId=${magicLinkResult.userId} username=${magicLinkResult.username}")
             call.sessions.set(SessionUser(magicLinkResult.userId, magicLinkResult.username, magicLinkResult.displayName))
             
             // Redirect to profile or home page
@@ -415,7 +415,7 @@ fun Route.authRoutes() {
                 return@post
             }
             
-            application.log.debug("Password login: success for userId=${user.id}, username=${body.email}")
+            application.log.info("Password login success: userId=${user.id} username=${body.email}")
             call.sessions.set(SessionUser(user.id, body.email, user.displayName))
             call.respond(SuccessResponse(success = true))
         }
