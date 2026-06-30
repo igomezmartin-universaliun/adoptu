@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars and adjust. Values shown match the current live
+# deployment in account 174000857825 (us-east-1) as of 2026-06-30.
+
+aws_region  = "us-east-1"
+aws_profile = "adoptu"
+domain_name = "adopt-u.org"
+
+# Pin to a real digest/tag pushed by buildspec.yml before applying, e.g.:
+# container_image_tag = "sha256:d841f1e332819a7ec356c04924febe54da94f50d445fc6299bf62431105b6a0b"
+container_image_tag = "latest"
+
+desired_count = 1

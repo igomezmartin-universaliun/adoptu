@@ -654,3 +654,13 @@
 | 13:08 | Fixed wrong sheltersDescription i18n text (said "make donations" instead of finding/leaving pets) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | fixed, all 5 locales + backend fallback corrected | ~1.2k |
 | 15:42 | Diagnosed playwright CI email failures: e2e-verify.spec.ts needs live backend/mailpit/test-data, but playwright.yml never starts them | .github/workflows/playwright.yml | logged bug-070, no fix applied yet (pending user) | ~6000 |
 | 15:46 | Removed .github/workflows/playwright.yml (user request — never worked, was emailing failure notifications on every push) | .github/workflows/playwright.yml | deleted, bug-067 updated | ~2500 |
+| 15:50 | Built infra/ OpenTofu config for AWS deployment (account 174000857825, domain adopt-u.org) after live-account discovery via boto3 | infra/*.tf, infra/README.md | tofu validate + tofu plan against real account both clean (45 to add, 0 errors) | ~95000 |
+| 16:08 | Reverted ALB-based design after explicit, repeated user rejection ("no load balancer") | infra/*.tf | removed alb.tf, switched CloudFront app origin back to direct ECS task IPv6 (matches live config exactly, verified via API), tofu plan clean (41 to add, 0 errors) | ~38000 |
+| 16:30 | Renamed origin hostname ecs.adopt-u.org -> backend.adopt-u.org (internal-only, distinct from public api.adopt-u.org), added fully-automatic EventBridge+Lambda DNS updater (no manual re-point step) | infra/dns_updater.tf, infra/lambda/dns_updater/index.py, infra/route53.tf, infra/cloudfront.tf, infra/outputs.tf, infra/README.md | tofu plan against real account clean (49 to add, 0 errors); confirmed WebAuthn origin/RP_ID env vars unchanged | ~52000 |
+| 16:32 | Edited .claude/worktrees/test-coverage-95/backend/build.gradle.kts | 2→3 lines | ~50 |
+| 16:33 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UsersRoutesE2ETest.kt | modified post() | ~243 |
+| 16:33 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | modified get() | ~301 |
+| 16:34 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/plugins/RoutingTest.kt | — | ~722 |
+| 16:34 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/plugins/RoutingTest.kt | modified directly() | ~184 |
+| 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 8→10 lines | ~118 |
+| 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 2→3 lines | ~44 |
