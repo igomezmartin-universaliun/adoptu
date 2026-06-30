@@ -17,6 +17,8 @@
 - **Node.js 22 + yarn 1.x:** DEP0169 (`url.parse()`) and DEP0040 (`punycode`) warnings come from yarn 1.22.17 internals. Fixed by exporting `NODE_OPTIONS="--no-deprecation"` in `gradlew`.
 - **Frontend test task name:** Kotlin/JS with `js(IR)` target uses `jsTest` (not `test`) — the root test task must `dependsOn(":backend:test", ":frontend:jsTest")`.
 
+- **i18n strings are duplicated in two places:** Each page's Kotlin (e.g. `SheltersPage.kt`) renders a hardcoded English fallback string with `attributes["data-i18n"] = "<key>"`, while `frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt` holds the same key translated across 5 locales (en, es, fr, pt, zh). Both must be updated together when correcting copy — editing only one leaves a stale fallback or stale translation.
+
 - **DatabaseFactory.listOfTables must be kept in sync with Models.kt:** Every `Table` object defined in `Models.kt` must be added to `listOfTables` in `DatabaseFactory.kt` — omitting one means `SchemaUtils.create()` never creates that table, causing a PSQLException at runtime. Tables previously missing: `UserSterilizationLocations`, `UserShelters`, `PasswordResetTokens`, `EmailChangeTokens`.
 
 ## Do-Not-Repeat

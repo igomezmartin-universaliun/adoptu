@@ -230,3 +230,4 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 13:08 | Fixed wrong sheltersDescription i18n text (said "make donations" instead of finding/leaving pets) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | fixed, all 5 locales + backend fallback corrected | ~1.2k |
