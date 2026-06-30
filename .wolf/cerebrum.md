@@ -29,6 +29,7 @@
 - [2026-06-21] Do NOT define a new `Table` object in `Models.kt` without also adding it to `listOfTables` in `DatabaseFactory.kt`. Missing entries silently skip table creation and cause `PSQLException: relation "..." does not exist` at runtime.
 
 - [2026-06-22] Do NOT edit CSS files directly. All styles live in `backend/src/main/scss/`. Shared/nav styles go in `_layout.scss`; page-specific styles in their own `.scss` file. After editing SCSS, recompile: `npx sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`
+- [2026-06-30] Do NOT mix Base64 encoder/decoder variants in CryptoService. `encrypt()` uses `Base64.getUrlEncoder()` (produces URL-safe `_` and `-`). Both `decrypt()` and `decryptWithKey()` MUST use `Base64.getUrlDecoder()`. Using the standard `Base64.getDecoder()` silently returns null and causes all password operations to fail (15 tests).
 
 ## Decision Log
 
