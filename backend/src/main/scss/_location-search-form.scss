@@ -29,6 +29,14 @@
         flex-wrap: wrap;
         gap: 1rem;
 
+        .location-search-hint {
+            width: 100%;
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-muted, #888);
+            font-style: italic;
+        }
+
         .location-search-filter {
             display: flex;
             flex-direction: column;
