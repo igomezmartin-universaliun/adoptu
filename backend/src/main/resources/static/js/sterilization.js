@@ -25,16 +25,16 @@ window.searchLocations = async function() {
             container.innerHTML = '<p>'+t('noLocationsFound')+'</p>';
             return;
         }
-        container.innerHTML = '<div class="location-list">' + locations.map(loc => '
+        container.innerHTML = '<div class="location-list">' + locations.map(loc => `
             <div class="location-card card-bg">
-                <h3>'+loc.name+'</h3>
-                <p class="location-address">'+loc.address+', '+loc.city+''+(loc.state ? ', '+loc.state : '')+', '+loc.country+'</p>
-                '+(loc.phone ? '<p class="location-phone"><strong>'+t('phone')+':</strong> '+loc.phone+'</p>' : '')+'
-                '+(loc.email ? '<p class="location-email"><strong>'+t('email')+':</strong> '+loc.email+'</p>' : '')+'
-                '+(loc.website ? '<p class="location-website"><a href="'+loc.website+'" target="_blank">'+t('website')+'</a></p>' : '')+'
-                '+(loc.description ? '<p class="location-description">'+loc.description+'</p>' : '')+'
+                <h3>${loc.name}</h3>
+                <p class="location-address">${loc.address}, ${loc.city}${loc.state ? ', ' + loc.state : ''}, ${loc.country}</p>
+                ${loc.phone ? `<p class="location-phone"><strong>${t('phone')}:</strong> ${loc.phone}</p>` : ''}
+                ${loc.email ? `<p class="location-email"><strong>${t('email')}:</strong> ${loc.email}</p>` : ''}
+                ${loc.website ? `<p class="location-website"><a href="${loc.website}" target="_blank">${t('website')}</a></p>` : ''}
+                ${loc.description ? `<p class="location-description">${loc.description}</p>` : ''}
             </div>
-        ').join('') + '</div>';
+        `).join('') + '</div>';
     } catch (err) {
         document.getElementById('locations-container').innerHTML = '<p>'+t('errorLoadingLocations')+'</p>';
     }

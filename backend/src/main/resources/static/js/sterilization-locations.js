@@ -21,20 +21,20 @@ async function loadLocations() {
         container.innerHTML = '<p>'+t('noLocationsFound')+'</p>';
         return;
     }
-    container.innerHTML = '<div class="location-list">' + locations.map(loc => '
+    container.innerHTML = '<div class="location-list">' + locations.map(loc => `
         <div class="location-card card-bg">
-            <h3>'+escapeHtml(loc.name)+'</h3>
-            <p class="location-address">'+escapeHtml(loc.address)+', '+escapeHtml(loc.city)+''+(loc.state ? ', '+escapeHtml(loc.state) : '')+', '+escapeHtml(loc.country)+'</p>
-            '+(loc.phone ? '<p class="location-phone"><strong>'+t('phone')+':</strong> '+escapeHtml(loc.phone)+'</p>' : '')+'
-            '+(loc.email ? '<p class="location-email"><strong>'+t('email')+':</strong> '+escapeHtml(loc.email)+'</p>' : '')+'
-            '+(loc.website ? '<p class="location-website"><a href="'+escapeHtml(loc.website)+'" target="_blank">'+t('website')+'</a></p>' : '')+'
-            '+(loc.description ? '<p class="location-description">'+escapeHtml(loc.description)+'</p>' : '')+'
+            <h3>${escapeHtml(loc.name)}</h3>
+            <p class="location-address">${escapeHtml(loc.address)}, ${escapeHtml(loc.city)}${loc.state ? ', ' + escapeHtml(loc.state) : ''}, ${escapeHtml(loc.country)}</p>
+            ${loc.phone ? `<p class="location-phone"><strong>${t('phone')}:</strong> ${escapeHtml(loc.phone)}</p>` : ''}
+            ${loc.email ? `<p class="location-email"><strong>${t('email')}:</strong> ${escapeHtml(loc.email)}</p>` : ''}
+            ${loc.website ? `<p class="location-website"><a href="${escapeHtml(loc.website)}" target="_blank">${t('website')}</a></p>` : ''}
+            ${loc.description ? `<p class="location-description">${escapeHtml(loc.description)}</p>` : ''}
             <div class="pet-card-actions">
-                <button class="btn" onclick="editLocation('+loc.id+')">'+t('edit')+'</button>
-                <button class="btn btn-danger" onclick="deleteLocation('+loc.id+')">'+t('delete')+'</button>
+                <button class="btn" onclick="editLocation(${loc.id})">${t('edit')}</button>
+                <button class="btn btn-danger" onclick="deleteLocation(${loc.id})">${t('delete')}</button>
             </div>
         </div>
-    ').join('') + '</div>';
+    `).join('') + '</div>';
 }
 
 function showForm() {
