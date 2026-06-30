@@ -230,3 +230,4 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 19:50 | Fixed ReferenceError: api is not defined by adding api.js to commonScripts() | Shared.kt | Fixed | ~200 |
