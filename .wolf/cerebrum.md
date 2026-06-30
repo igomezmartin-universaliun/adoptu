@@ -19,6 +19,8 @@
 
 - **DatabaseFactory.listOfTables must be kept in sync with Models.kt:** Every `Table` object defined in `Models.kt` must be added to `listOfTables` in `DatabaseFactory.kt` — omitting one means `SchemaUtils.create()` never creates that table, causing a PSQLException at runtime. Tables previously missing: `UserSterilizationLocations`, `UserShelters`, `PasswordResetTokens`, `EmailChangeTokens`.
 
+- **`npx sass` fails in this sandbox** (`npm ERR! Cannot read properties of undefined (reading 'stdin')`). Use the vendored dart-sass binary directly instead: `.gradle/sass/1.54.0/dart-sass/sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`. Only top-level `.scss` files (not `_partial.scss` files) compile to their own `.css` — check which top-level files `@use`/import a changed partial (e.g. `grep -l "<partial-name>" backend/src/main/scss/*.scss`) and recompile each of those too.
+
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
@@ -29,6 +31,8 @@
 - [2026-06-21] Do NOT define a new `Table` object in `Models.kt` without also adding it to `listOfTables` in `DatabaseFactory.kt`. Missing entries silently skip table creation and cause `PSQLException: relation "..." does not exist` at runtime.
 
 - [2026-06-22] Do NOT edit CSS files directly. All styles live in `backend/src/main/scss/`. Shared/nav styles go in `_layout.scss`; page-specific styles in their own `.scss` file. After editing SCSS, recompile: `npx sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`
+
+- [2026-06-30] Do NOT assume `input`/`select`/`textarea` rules automatically pick up dark theme colors — the project sets `--bg`/`--text` as CSS vars but several rules (`form input/select/textarea`, `.auth-form input/select/textarea`, `.location-search-form` inputs) never set `background`/`color` explicitly, so they fell back to browser-default white. When adding/touching any input rule, always set `background: var(--bg); color: var(--text);` explicitly, and add the `-webkit-autofill` override (see `_base.scss`) since Chrome/Edge force a white autofill background unless overridden.
 
 ## Decision Log
 

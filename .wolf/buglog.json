@@ -387,6 +387,18 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-06-24T04:19:53.185Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-06-30T19:05:00Z",
+      "error_message": "User reported input fields render white instead of matching the dark theme",
+      "file": "backend/src/main/scss/style.scss, backend/src/main/scss/_location-search-form.scss",
+      "root_cause": "The `form input/select/textarea`, `.auth-form input/select/textarea`, and `.location-search-form` input/select rules never set `background`/`color`, so they fell back to the browser default white background instead of inheriting `var(--bg)`/`var(--text)`. The `.form-row`/`.form-row-two-col` rules in _base.scss already set these correctly, masking the gap for some pages.",
+      "fix": "Added `background: var(--bg); color: var(--text);` to the affected input/select/textarea rules, changed the disabled-input background from a hardcoded light grey (#e9ecef) to var(--card-bg), and added -webkit-autofill overrides (matching the existing pattern in _base.scss) so browser autofill doesn't force a white background. Recompiled affected .scss files to .css with the vendored dart-sass binary at .gradle/sass/1.54.0/dart-sass/sass.",
+      "tags": ["css", "scss", "dark-mode", "input", "theme"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T19:05:00Z"
     }
   ]
 }

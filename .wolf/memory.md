@@ -230,3 +230,4 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 19:08 | Fixed input/select/textarea fields rendering white instead of dark theme | style.scss, _location-search-form.scss + 6 compiled .css | fixed (bug-024) | ~3500 |
