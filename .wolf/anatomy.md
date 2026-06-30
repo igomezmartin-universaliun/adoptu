@@ -1,7 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T17:26:43.828Z
-> Files: 587 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T19:35:02.676Z
+> Files: 605 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../.claude/plans/
+
+- `enumerated-yawning-cloud.md` — Country enum as single source of truth (~1699 tok)
 
 ## ./
 
@@ -268,6 +272,10 @@
 
 - `EmailVerificationPage.kt` — HTML (~1236 tok)
 - `Shared.kt` — HTML, A, BODY, DIV, NAV (~3173 tok)
+
+## .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~927 tok)
 
 ## .claude/worktrees/elegant-coalescing-kurzweil/
 
@@ -776,6 +784,10 @@
 
 - `Shared.kt` — HTML, A, BODY, DIV, NAV (~3184 tok)
 
+## .claude/worktrees/idempotent-juggling-orbit/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~699 tok)
+
 ## .claude/worktrees/imperative-roaming-starfish/backend/
 
 - `build.gradle.kts` (~1948 tok)
@@ -876,6 +888,32 @@
 ## .claude/worktrees/quizzical-swimming-clarke/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
 
 - `ProfilePage.kt` — init, loadProfile, updateProfileUI, checkProfileExists, setupRoleToggles (~9591 tok)
+
+## .claude/worktrees/rosy-tumbling-plum/.wolf/
+
+- `buglog.json` (~4791 tok)
+- `cerebrum.md` — Cerebrum (~1045 tok)
+
+## .claude/worktrees/rosy-tumbling-plum/backend/src/main/scss/
+
+- `_location-search-form.scss` — Styles: 2 rules (~540 tok)
+- `style.scss` — Styles: 43 rules (~2496 tok)
+
+## .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~18336 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/.wolf/
+
+- `cerebrum.md` — Cerebrum (~870 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/backend/src/main/kotlin/com/adoptu/pages/
+
+- `SheltersPage.kt` — HTML (~381 tok)
+
+## .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~17728 tok)
 
 ## .claude/worktrees/sparkling-snuggling-pixel/.wolf/
 
@@ -986,6 +1024,27 @@
 - `i18n-pt.js` (~7082 tok)
 - `i18n-zh.js` (~4810 tok)
 
+## .claude/worktrees/update-libs-latest/
+
+- `build.gradle.kts` (~136 tok)
+- `package.json` — Node.js package manifest (~198 tok)
+
+## .claude/worktrees/update-libs-latest/.wolf/
+
+- `cerebrum.md` — Cerebrum (~1315 tok)
+
+## .claude/worktrees/update-libs-latest/backend/
+
+- `build.gradle.kts` (~1948 tok)
+
+## .claude/worktrees/update-libs-latest/frontend/
+
+- `build.gradle.kts` (~284 tok)
+
+## .claude/worktrees/update-libs-latest/gradle/wrapper/
+
+- `gradle-wrapper.properties` (~68 tok)
+
 ## .claude/worktrees/warm-crafting-canyon/
 
 - `playwright.config.ts` — Read environment variables from file. (~289 tok)
@@ -1024,6 +1083,10 @@
 
 - `debug-pet-edit.spec.ts` — Declares BASE (~628 tok)
 - `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9016 tok)
+
+## .claude/worktrees/webauthn-e2e-test/frontend/src/tests/
+
+- `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9827 tok)
 
 ## .claude/worktrees/woolly-mixing-catmull/
 

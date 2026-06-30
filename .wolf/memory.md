@@ -447,3 +447,28 @@
 | 11:25 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/photographers.js | modified function() | ~89 |
 | 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/sterilization.js | modified function() | ~70 |
 | 11:26 | Edited .claude/worktrees/warm-crafting-canyon/backend/src/main/resources/static/js/temporal-home-search.js | removed 13 lines | ~37 |
+| 13:07 | Edited .claude/worktrees/rosy-tumbling-plum/.wolf/cerebrum.md | 3→5 lines | ~254 |
+| 13:07 | Edited .claude/worktrees/rosy-tumbling-plum/.wolf/cerebrum.md | 3→5 lines | ~248 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~36 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~40 |
+| 13:07 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~36 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~35 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | inline fix | ~16 |
+| 13:08 | Edited .claude/worktrees/serialized-wandering-phoenix/backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | inline fix | ~47 |
+| 13:08 | Session end: 9 writes across 4 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt) | 9 reads | ~1162 tok |
+| 13:09 | Edited .claude/worktrees/serialized-wandering-phoenix/.wolf/cerebrum.md | 1→3 lines | ~134 |
+| 13:10 | Session end: 10 writes across 4 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt) | 11 reads | ~1305 tok |
+| 19:08 | Diagnosed: Mexico shelter search returns empty (dropdown sends 'Mexico', DB rows store 'México', exact-match filter fails) | ShelterRepository.kt, Shared.kt | diagnosed, awaiting fix decision | ~3k |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~163 |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~173 |
+| 13:10 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~174 |
+| 13:11 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~177 |
+| 13:11 | Edited .claude/worktrees/update-libs-latest/.wolf/cerebrum.md | 3→5 lines | ~474 |
+| 13:11 | Edited .claude/worktrees/update-libs-latest/.wolf/cerebrum.md | 1→2 lines | ~225 |
+| 13:11 | Edited .claude/worktrees/scalable-nibbling-hopper/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | expanded (+11 lines) | ~106 |
+| 13:12 | Edited .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | modified div() | ~188 |
+| 13:12 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:14 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:33 | Session end: 18 writes across 5 files (buglog.json, cerebrum.md, I18n.kt, SheltersPage.kt, LocationSearchFilters.kt) | 14 reads | ~21345 tok |
+| 13:35 | Created ../../.claude/plans/enumerated-yawning-cloud.md | — | ~1813 |
+| 13:13 | Fixed shelters.js i18n: added 11 missing keys to I18n.kt for all 5 languages, rebuilt common.js, merged worktree-scalable-nibbling-hopper | I18n.kt, common.js, common.js.map | success | ~25000 |
