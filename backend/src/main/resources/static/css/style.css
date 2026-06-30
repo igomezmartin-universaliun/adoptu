@@ -72,7 +72,7 @@ main {
   font-weight: 500;
   color: var(--text);
 }
-.form-row input, .form-row select, .form-row textarea {
+.form-row input, .form-row select {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border);
@@ -139,11 +139,9 @@ main {
 }
 
 .message {
-  display: block;
   padding: 1rem;
   border-radius: 6px;
   margin: 1rem 0;
-  min-height: 1.5rem;
 }
 .message.error {
   background: #fee;
@@ -152,18 +150,6 @@ main {
 .message.success {
   background: #efe;
   color: #060;
-}
-
-.field-error {
-  display: block;
-  color: #c00;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
-  min-height: 1.2rem;
-}
-
-input.field-invalid, select.field-invalid {
-  border-color: #c00;
 }
 
 .checkbox-group {
@@ -321,30 +307,6 @@ header nav {
   overflow: hidden;
   border: grey solid 1px;
   z-index: 1000;
-}
-.user-dropdown a {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem 0.75rem 0;
-  width: 100%;
-  box-sizing: border-box;
-  color: white;
-  text-decoration: none;
-}
-.user-dropdown a svg, .user-dropdown a .emoji-icon, .user-dropdown a .user-dropdown img, .user-dropdown a nav img {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.user-dropdown a span:first-child {
-  text-align: right;
-  flex: 1;
 }
 .user-dropdown a {
   display: flex;
@@ -527,17 +489,17 @@ footer span {
   margin-right: 0.25rem;
 }
 .resources-dropdown .resources-dropdown-content {
-    display: none;
-    position: absolute;
-    background: var(--secondary);
-    width: max-content;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    z-index: 1000;
-    overflow: visible;
-    top: calc(100% + 4px);
-    right: 0;
-    margin-top: 0;
+  display: none;
+  position: absolute;
+  background: var(--secondary);
+  width: max-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  z-index: 1000;
+  overflow: visible;
+  top: calc(100% + 4px);
+  right: 0;
+  margin-top: 0;
 }
 .resources-dropdown .resources-dropdown-content a {
   color: white;
@@ -553,12 +515,11 @@ footer span {
 .resources-dropdown .resources-dropdown-content a span:first-child {
   flex: 1;
 }
-.resources-dropdown .resources-dropdown-content a .material-symbols-outlined {
-  font-size: 20px;
+.resources-dropdown .resources-dropdown-content a svg, .resources-dropdown .resources-dropdown-content a img {
   flex-shrink: 0;
-  margin-left: 0;
-  width: 24px;
-  text-align: center;
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
 }
 .resources-dropdown .resources-dropdown-content a:hover {
   background: var(--primary);
@@ -578,12 +539,14 @@ form label {
 form input,
 form select,
 form textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-sizing: border-box;
-    resize: vertical;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+form textarea {
+  min-height: 100px;
 }
 form input[type=checkbox] {
   width: auto;
@@ -595,100 +558,12 @@ form input:disabled {
 }
 
 .auth-form {
-  max-width: 800px;
+  max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
   background: var(--card-bg);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-.register-split .auth-form {
-  max-width: 900px;
-}
-.register-simple .auth-form {
-  max-width: 500px;
-  margin: 0 auto;
-}
-.register-simple h2 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-  color: var(--text);
-}
-.register-simple h2:first-child {
-  margin-top: 0;
-}
-.method-selection {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: var(--bg);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-.method-selection label {
-  margin: 0.5rem 0;
-}
-#message {
-  display: none;
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 6px;
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-.password-fields {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--bg);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-.register-simple .btn {
-  margin-top: 1rem;
-}
-.register-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-.register-left h2,
-.register-right h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-  color: var(--text);
-}
-.register-left {
-  border-right: 1px solid var(--border);
-  padding-right: 2rem;
-}
-.register-right {
-  padding-left: 0.5rem;
-}
-.register-split .form-actions {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-.register-split .divider {
-  margin: 1.5rem 0;
-}
-
-@media (max-width: 768px) {
-  .register-columns {
-    grid-template-columns: 1fr;
-  }
-  .register-left {
-    border-right: none;
-    padding-right: 0;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .register-right {
-    padding-left: 0;
-  }
 }
 .auth-form label {
   display: block;
@@ -714,36 +589,18 @@ form input:disabled {
 }
 
 .auth-form-container {
-   flex: 1;
-   min-width: 0;
-   display: flex;
+  margin-bottom: 2rem;
 }
 
-.auth-forms-row {
-   display: flex;
-   gap: 2rem;
-   align-items: stretch;
-}
-
-.auth-forms-row .auth-form {
-   max-width: none;
-   margin: 0;
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-}
-
-.flex-spacer {
-   flex: 1;
-}
-
-@media (max-width: 768px) {
-  .auth-forms-row {
-    flex-direction: column;
-  }
-  .auth-form-container {
-    width: 100%;
-  }
+.register-notification {
+  margin: 1.5rem auto;
+  max-width: 600px;
+  padding: 1rem 1.25rem;
+  background: #e6f4ea;
+  border: 1px solid #a8d5b5;
+  border-radius: 8px;
+  color: #1a5c2a;
+  font-size: 0.95rem;
 }
 
 #auth-form #register-form #register-button {
@@ -1037,7 +894,7 @@ form input:disabled {
 }
 .filter-buttons .filter-type, .filter-buttons .filter-sex {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("https://static.adopt-u.org/chevron-down.svg");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2rem;
@@ -1100,38 +957,3 @@ form input:disabled {
   font-size: 2.5rem;
   color: var(--text);
 }
-
-/* Material Symbols Icons */
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
-  font-size: 20px;
-  vertical-align: middle;
-  line-height: 1;
-}
-
-/* Menu dropdown icons */
-.user-dropdown a .material-symbols-outlined,
-.resources-dropdown-content a .material-symbols-outlined {
-  font-size: 20px;
-  margin-left: auto;
-}
-
-/* Verification page large icons */
-.success-icon-symbol,
-.error-icon-symbol {
-  font-size: 80px !important;
-}
-
-.success-icon-symbol {
-  color: green;
-}
-
-.error-icon-symbol {
-  color: red;
-}
-
-/*# sourceMappingURL=style.css.map */

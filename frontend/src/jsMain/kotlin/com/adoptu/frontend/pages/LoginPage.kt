@@ -17,11 +17,20 @@ object LoginPageModule {
     fun init() {
         I18n.loadLang(window.localStorage.getItem("preferredLanguage") ?: "en").then({ _: dynamic ->
             I18n.updatePage()
+            showRegistrationNotification()
             setupPasskeyButton()
             setupMagicLinkButton()
             setupPasswordLoginButton()
             setupTabSwitching()
         })
+    }
+
+    private fun showRegistrationNotification() {
+        val params = window.location.search
+        if (!params.contains("registered=true")) return
+        val el = document.getElementById("register-notification") as? HTMLElement ?: return
+        el.textContent = I18n.t("emailVerificationSent")
+        el.style.display = "block"
     }
 
     private fun getPublicKey(): Promise<String> = RsaCryptoModule.getPublicKey()
