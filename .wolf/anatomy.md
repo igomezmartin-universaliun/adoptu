@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-24T04:19:53.167Z
-> Files: 553 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T01:54:05.888Z
+> Files: 570 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -282,6 +282,18 @@
 ## .claude/worktrees/elegant-coalescing-kurzweil/backend/
 
 - `build.gradle.kts` (~1930 tok)
+
+## .claude/worktrees/filter-country-hint/backend/src/main/kotlin/com/adoptu/pages/
+
+- `LocationSearchFilters.kt` — DIV (~703 tok)
+
+## .claude/worktrees/filter-country-hint/backend/src/main/scss/
+
+- `_location-search-form.scss` — Styles: 2 rules (~502 tok)
+
+## .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~17510 tok)
 
 ## .claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
 
@@ -708,6 +720,11 @@
 - `ProfilePage.kt` — init, loadProfile, isProfileComplete, setupCompletionGuard, setupRoleToggles (~7082 tok)
 - `RegisterPage.kt` — init, validatePassword, handleRegister (~1525 tok)
 
+## .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/
+
+- `sterilization-locations.js` — escapeHtml: loadCountries, loadLocations, showForm + 3 more (~1318 tok)
+- `sterilization.js` — country: executedFunction (~957 tok)
+
 ## .claude/worktrees/fix-test-task/
 
 - `build.gradle.kts` (~137 tok)
@@ -754,6 +771,34 @@
 - `MyPetsPage.kt` (~0 tok)
 - `ProfilePage.kt` (~0 tok)
 - `RegisterPage.kt` (~0 tok)
+
+## .claude/worktrees/foamy-discovering-papert/backend/src/main/kotlin/com/adoptu/pages/
+
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~3184 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/
+
+- `build.gradle.kts` (~1948 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/
+
+- `Application.kt` — main, Application (~295 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/plugins/
+
+- `Logging.kt` — Application (~217 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/
+
+- `AuthRoutes.kt` — Data class: EncryptedLoginRequest (~6912 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/
+
+- `MagicLinkService.kt` — Data class: MagicLinkService (~2660 tok)
+
+## .claude/worktrees/imperative-roaming-starfish/backend/src/main/resources/
+
+- `logback.xml` (~230 tok)
 
 ## .claude/worktrees/layout-fix/backend/src/main/resources/static/css/
 
@@ -814,6 +859,23 @@
 
 - `load_test_data.sh` (~122 tok)
 - `test_data.sql` — ============================================================================= (~22381 tok)
+
+## .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/
+
+- `UserShelterService.kt` — UserShelterService: getByUserId, create, update, delete (~689 tok)
+- `UserSterilizationLocationService.kt` — UserSterilizationLocationService: getByUserId, create, update, delete (~669 tok)
+
+## .claude/worktrees/quizzical-swimming-clarke/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
+
+- `ProfilePage.kt` — init, loadProfile, updateProfileUI, checkProfileExists, setupRoleToggles (~9591 tok)
+
+## .claude/worktrees/sparkling-snuggling-pixel/.wolf/
+
+- `buglog.json` (~5098 tok)
+
+## .claude/worktrees/sparkling-snuggling-pixel/backend/src/main/resources/static/js/
+
+- `photographers.js` — t: loadPhotographers, createRequestModal, showRequestModal, executedFunction (~2098 tok)
 
 ## .claude/worktrees/swift-orbiting-crab/
 

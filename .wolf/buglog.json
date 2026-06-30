@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-test-task/build.gradle.kts",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5→5 lines (2 removed)",
+      "fix": "Rewrote 5\u21925 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -79,8 +79,8 @@
       "timestamp": "2026-06-21T22:48:39.166Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/scss/_layout.scss",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -95,8 +95,8 @@
       "timestamp": "2026-06-21T22:48:50.716Z",
       "error_message": "CSS fix: justify-content",
       "file": ".claude/worktrees/layout-fix/backend/src/main/resources/static/css/style.css",
-      "root_cause": "justify-content: flex-end → space-between",
-      "fix": "Changed justify-content: flex-end → space-between",
+      "root_cause": "justify-content: flex-end \u2192 space-between",
+      "fix": "Changed justify-content: flex-end \u2192 space-between",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -111,8 +111,8 @@
       "timestamp": "2026-06-23T01:15:26.012Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/shelters.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -127,8 +127,8 @@
       "timestamp": "2026-06-23T01:16:02.809Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/photographers.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -143,8 +143,8 @@
       "timestamp": "2026-06-23T01:16:07.064Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/sterilization.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -159,8 +159,8 @@
       "timestamp": "2026-06-23T01:16:09.579Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/temporal-home.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -175,8 +175,8 @@
       "timestamp": "2026-06-23T01:16:12.781Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/pet-food.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -191,8 +191,8 @@
       "timestamp": "2026-06-23T01:16:15.816Z",
       "error_message": "CSS fix: justify-content, text-align",
       "file": ".claude/worktrees/zippy-rolling-cocke/backend/src/main/resources/static/css/policy.css",
-      "root_cause": "justify-content: flex-end → space-between; text-align: right → center",
-      "fix": "Changed justify-content: flex-end → space-between; text-align: right → center",
+      "root_cause": "justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
+      "fix": "Changed justify-content: flex-end \u2192 space-between; text-align: right \u2192 center",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -258,7 +258,7 @@
       "timestamp": "2026-06-23T01:49:17.562Z",
       "error_message": "Missing error handling in register",
       "file": ".claude/worktrees/swift-wiggling-conway/backend/src/main/resources/static/js/webauthn.js",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block | Also: let credential;; try {",
       "tags": [
         "auto-detected",
@@ -292,7 +292,7 @@
       "timestamp": "2026-06-23T01:51:27.949Z",
       "error_message": "Missing error handling in unknown",
       "file": ".claude/worktrees/swift-wiggling-conway/.wolf/buglog.json",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -309,7 +309,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/fix-fido-cancel-error/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/LoginPage.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→8 lines (2 removed)",
+      "fix": "Rewrote 4\u21928 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -395,8 +395,15 @@
       "file": "backend/src/main/resources/static/js/photographers.js",
       "root_cause": "photographers.js called bare t() which is not a global. The i18n function lives on window.AdoptuI18n.t() set by the Kotlin/JS main() in common.js.",
       "fix": "Added local t() shim at top of photographers.js that delegates to window.AdoptuI18n.t(key) with a fallback to the key itself.",
-      "tags": ["javascript", "i18n", "UMD", "photographers"],
-      "related_bugs": ["bug-022"],
+      "tags": [
+        "javascript",
+        "i18n",
+        "UMD",
+        "photographers"
+      ],
+      "related_bugs": [
+        "bug-022"
+      ],
       "occurrences": 1,
       "last_seen": "2026-06-30T01:50:00.000Z"
     },
@@ -407,7 +414,12 @@
       "file": "backend/src/main/resources/static/js/photographers.js",
       "root_cause": "LocationSearchFilters.kt inlines window.onCountryChange via a <script> block, but the backend may serve an old compiled JAR that lacks it; photographers.js had no fallback.",
       "fix": "Added window.onCountryChange fallback definition at the top of photographers.js using the same enable/disable logic as LocationSearchFilters.kt.",
-      "tags": ["javascript", "onCountryChange", "photographers", "location-filters"],
+      "tags": [
+        "javascript",
+        "onCountryChange",
+        "photographers",
+        "location-filters"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T01:50:00.000Z"
@@ -415,14 +427,37 @@
     {
       "id": "bug-026",
       "timestamp": "2026-06-30T01:50:00.000Z",
-      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 — api.createPhotographyRequest)",
+      "error_message": "Uncaught ReferenceError: api is not defined (photographers.js:121 \u2014 api.createPhotographyRequest)",
       "file": "backend/src/main/resources/static/js/photographers.js",
       "root_cause": "photographers.js called api.createPhotographyRequest() but no window.api global exists. The Kotlin/JS bundle does not expose an 'api' object.",
       "fix": "Replaced api.createPhotographyRequest() with a direct fetch('/api/photographers/requests', {method:'POST', ...}) call matching the CreatePhotographyRequestRequest DTO.",
-      "tags": ["javascript", "api", "photographers", "fetch"],
+      "tags": [
+        "javascript",
+        "api",
+        "photographers",
+        "fetch"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T01:50:00.000Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-06-29T21:58:00Z",
+      "error_message": "Clicking temporal home in profile menu redirects to login",
+      "file": "backend/src/main/kotlin/com/adoptu/pages/Shared.kt",
+      "root_cause": "api.js was not loaded in commonScripts(), so api was undefined when temporal-home-profile.js ran. The catch block caught the TypeError and redirected to /login.",
+      "fix": "Added script(src = \"/static/js/api.js\") {} to commonScripts() in Shared.kt. Rebuilt backend.",
+      "tags": [
+        "api",
+        "javascript",
+        "auth",
+        "redirect",
+        "temporal-home"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-29T21:58:00Z"
     }
   ]
 }

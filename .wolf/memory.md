@@ -232,3 +232,98 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 19:50 | Fixed ReferenceError: api is not defined by adding api.js to commonScripts() | Shared.kt | Fixed | ~200 |
 | 07:50 | Fixed 3 JS errors in photographers.js: t() shim, onCountryChange fallback, api→fetch | backend/src/main/resources/static/js/photographers.js | fixed | ~400 |
+## Session: 2026-06-30 19:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:35 | Edited .claude/worktrees/filter-country-hint/backend/src/main/kotlin/com/adoptu/pages/LocationSearchFilters.kt | added 3 condition(s) | ~541 |
+| 19:35 | Session end: 1 writes across 1 files (LocationSearchFilters.kt) | 1 reads | ~580 tok |
+| 19:35 | Edited .claude/worktrees/filter-country-hint/backend/src/main/scss/_location-search-form.scss | expanded (+8 lines) | ~96 |
+| 19:35 | Session end: 2 writes across 2 files (LocationSearchFilters.kt, _location-search-form.scss) | 3 reads | ~683 tok |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~39 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~42 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~42 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~41 |
+| 19:36 | Edited .claude/worktrees/filter-country-hint/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→3 lines | ~29 |
+
+## Session: 2026-06-30 19:37
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:38
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:43
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/ProfilePage.kt | added 3 condition(s) | ~184 |
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/UserShelterService.kt | added 1 condition(s) | ~340 |
+| 19:48 | Edited .claude/worktrees/quizzical-swimming-clarke/backend/src/main/kotlin/com/adoptu/services/UserSterilizationLocationService.kt | added 1 condition(s) | ~283 |
+
+## Session: 2026-06-30 19:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:50 | Fixed 404 console errors in ProfilePage: guarded checkProfileExists() with role checks; made UserShelterService/UserSterilizationLocationService.create() upsert when profile exists | ProfilePage.kt, UserShelterService.kt, UserSterilizationLocationService.kt | success | ~500 |
+
+## Session: 2026-06-30 19:49
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:49 | Created .claude/worktrees/sparkling-snuggling-pixel/backend/src/main/resources/static/js/photographers.js | — | ~2098 |
+| 19:49 | Session end: 1 writes across 1 files (photographers.js) | 3 reads | ~2098 tok |
+
+## Session: 2026-06-30 19:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-30 19:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 19:50 | Edited .claude/worktrees/foamy-discovering-papert/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | modified commonScripts() | ~85 |
+| 19:50 | Edited .claude/worktrees/sparkling-snuggling-pixel/.wolf/buglog.json | modified lives() | ~698 |
+| 19:51 | Edited .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/sterilization.js | 10→10 lines | ~231 |
+| 19:51 | Edited .claude/worktrees/fix-sterilization-js-syntax/backend/src/main/resources/static/js/sterilization-locations.js | modified escapeHtml() | ~325 |
+| 19:51 | Session end: 4 writes across 4 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js) | 7 reads | ~1345 tok |
+| 19:51 | Session end: 4 writes across 4 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js) | 9 reads | ~1345 tok |
+| 19:52 | Edited .claude/worktrees/imperative-roaming-starfish/backend/build.gradle.kts | 1→2 lines | ~36 |
+| 19:50 | Fixed JS SyntaxError: multiline strings with single quotes → template literals | sterilization.js, sterilization-locations.js | merged to main | ~200 |
+| 19:52 | Created .claude/worktrees/imperative-roaming-starfish/backend/src/main/resources/logback.xml | — | ~230 |
+| 19:52 | Created .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/plugins/Logging.kt | — | ~217 |
+| 19:52 | Session end: 7 writes across 7 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 11 reads | ~4169 tok |
+| 19:52 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/Application.kt | added 1 import(s) | ~60 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/Application.kt | 6→7 lines | ~50 |
+| 19:53 | Session end: 9 writes across 8 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 13 reads | ~4287 tok |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | 7→10 lines | ~76 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | modified requestMagicLink() | ~409 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | added 1 condition(s) | ~451 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | modified verifyMagicLink() | ~232 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Authenticate: success for" → "Passkey auth success: use" | ~30 |
+| 19:53 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Authenticate: failed - in" → "Passkey auth failed: inva" | ~22 |
+| 19:54 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Magic link login: success" → "Magic link login success:" | ~35 |
+| 19:54 | Edited .claude/worktrees/imperative-roaming-starfish/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt | "Password login: success f" → "Password login success: u" | ~27 |
+| 19:54 | Session end: 17 writes across 10 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 17 reads | ~5661 tok |
+| 19:59 | Session end: 17 writes across 10 files (Shared.kt, buglog.json, sterilization.js, sterilization-locations.js, build.gradle.kts) | 18 reads | ~5661 tok |
+
+## Session: 2026-06-30 21:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:57 | Added CallLogging plugin, colorized logback.xml, promoted auth log levels to INFO | plugins/Logging.kt, logback.xml, AuthRoutes.kt, MagicLinkService.kt | success | ~300 |
+| 21:58 | Fixed temporal-home redirect-to-login: rebuilt backend after api.js fix | Shared.kt | Fixed | ~150 |

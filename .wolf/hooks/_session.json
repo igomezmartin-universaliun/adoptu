@@ -1,52 +1,12 @@
 {
-  "session_id": "session-2026-06-24-2216",
-  "started": "2026-06-24T04:16:12.183Z",
-  "files_read": {
-    "/home/laf/Proyektes/adoptu/scripts/local_start.sh": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-24T04:16:29.014Z"
-    },
-    "/home/laf/Proyektes/adoptu/.claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts": {
-      "count": 1,
-      "tokens": 2307,
-      "first_read": "2026-06-24T04:19:12.684Z"
-    }
-  },
-  "files_written": [
-    {
-      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/elegant-coalescing-kurzweil/docker-compose.yml",
-      "action": "create",
-      "tokens": 118,
-      "at": "2026-06-24T04:18:57.100Z"
-    },
-    {
-      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/elegant-coalescing-kurzweil/local-start.sh",
-      "action": "edit",
-      "tokens": 14,
-      "at": "2026-06-24T04:19:08.303Z"
-    },
-    {
-      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts",
-      "action": "edit",
-      "tokens": 15,
-      "at": "2026-06-24T04:19:48.442Z"
-    },
-    {
-      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts",
-      "action": "edit",
-      "tokens": 15,
-      "at": "2026-06-24T04:19:53.184Z"
-    }
-  ],
-  "edit_counts": {
-    ".claude/worktrees/elegant-coalescing-kurzweil/docker-compose.yml": 1,
-    ".claude/worktrees/elegant-coalescing-kurzweil/local-start.sh": 1,
-    ".claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts": 2
-  },
-  "anatomy_hits": 1,
-  "anatomy_misses": 1,
+  "session_id": "session-2026-06-30-2154",
+  "started": "2026-06-30T03:54:36.620Z",
+  "files_read": {},
+  "files_written": [],
+  "edit_counts": {},
+  "anatomy_hits": 0,
+  "anatomy_misses": 0,
   "repeated_reads_warned": 0,
   "cerebrum_warnings": 0,
-  "stop_count": 1
+  "stop_count": 2
 }
