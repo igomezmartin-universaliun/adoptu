@@ -14,14 +14,14 @@
 ## ./
 
 - `.dockerignore` — Docker ignore rules (~22 tok)
-- `.gitignore` — Git ignore rules (~149 tok)
+- `.gitignore` — Git ignore rules; gradle-wrapper.jar negation now correctly placed after the `*.jar` rule it overrides (~145 tok)
 - `AGENTS.md` — Adopt-U - Agent Guidelines (~1284 tok)
 - `build.gradle.kts` — Gradle Kotlin build configuration (~2307 tok)
-- `buildspec.yml` (~353 tok)
+- `buildspec.yml` — CodeBuild spec: logs into ECR, builds/tags/pushes the image, emits imagedefinitions.json for ECS deploy (~520 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `docker-compose.test.yml` — Docker Compose: 1 services (~251 tok)
 - `docker-compose.yml` — Docker Compose services (~241 tok)
-- `Dockerfile` — Docker container definition (~314 tok)
+- `Dockerfile` — Multi-stage build: musl-based Corretto 25 builder (Shadow-plugin fat jar) -> jdeps-derived jlink minimal JRE on Alpine, no dead Sass step, container-aware JVM flags (~520 tok)
 - `gradle.properties` (~159 tok)
 - `gradlew` — you may not use this file except in compliance with the License. (~2292 tok)
 - `gradlew.bat` (~748 tok)
@@ -1217,6 +1217,10 @@
 ## .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1961 tok)
+
+## backend/ (canonical)
+
+- `build.gradle.kts` — Backend Gradle module: Ktor/Exposed/AWS SDK deps, application plugin, com.gradleup.shadow 9.4.3 (fat jar -> *-all.jar), jvmToolchain(25) (~750 tok)
 
 ## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
 

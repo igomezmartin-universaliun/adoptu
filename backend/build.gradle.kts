@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     application
+    id("com.gradleup.shadow") version "9.4.3"
 }
 
 group = "com.adoptu"
@@ -12,7 +13,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
 }
 
 val ktorVersion = "3.5.1"
