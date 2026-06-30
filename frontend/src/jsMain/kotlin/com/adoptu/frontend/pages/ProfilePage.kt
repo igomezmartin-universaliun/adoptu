@@ -71,14 +71,20 @@ object ProfilePageModule {
     }
 
     private fun checkProfileExists() {
-        window.asDynamic().fetch("/api/users/temporal-home").then { res ->
-            if (res.ok) hasTemporalHomeProfile = true
+        if (currentRoles.contains("TEMPORAL_HOME")) {
+            window.asDynamic().fetch("/api/users/temporal-home").then { res ->
+                if (res.ok) hasTemporalHomeProfile = true
+            }
         }
-        window.asDynamic().fetch("/api/users/shelter").then { res ->
-            if (res.ok) hasShelterProfile = true
+        if (currentRoles.contains("SHELTER")) {
+            window.asDynamic().fetch("/api/users/shelter").then { res ->
+                if (res.ok) hasShelterProfile = true
+            }
         }
-        window.asDynamic().fetch("/api/users/sterilization-location").then { res ->
-            if (res.ok) hasSterilizationProfile = true
+        if (currentRoles.contains("STERILIZATION_SERVICE")) {
+            window.asDynamic().fetch("/api/users/sterilization-location").then { res ->
+                if (res.ok) hasSterilizationProfile = true
+            }
         }
     }
 
