@@ -2,6 +2,7 @@ package com.adoptu.services
 
 import com.adoptu.adapters.db.AnimalShelters
 import com.adoptu.adapters.db.repositories.ShelterRepository
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateShelterRequest
 import com.adoptu.dto.input.UpdateShelterRequest
 import com.adoptu.mocks.TestClock
@@ -33,29 +34,29 @@ class ShelterServiceTest {
 
     @Test
     fun `getAll returns empty list when no shelters exist`() {
-        val result = shelterService.getAll("USA")
+        val result = shelterService.getAll("United States")
         assertTrue(result.isEmpty())
     }
 
     @Test
     fun `getAll returns shelters for given country`() {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "Canada", "ON", "Toronto")
 
-        val result = shelterService.getAll("USA")
+        val result = shelterService.getAll("United States")
 
         assertEquals(2, result.size)
-        assertTrue(result.all { it.country == "USA" })
+        assertTrue(result.all { it.country == "United States" })
     }
 
     @Test
     fun `getAll filters by state when provided`() {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
-        createTestShelter("Shelter 3", "USA", "NY", "Buffalo")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
+        createTestShelter("Shelter 3", "United States", "NY", "Buffalo")
 
-        val result = shelterService.getAll("USA", "NY")
+        val result = shelterService.getAll("United States", "NY")
 
         assertEquals(2, result.size)
         assertTrue(result.all { it.state == "NY" })
@@ -63,7 +64,7 @@ class ShelterServiceTest {
 
     @Test
     fun `getAll returns empty list for non-existent country`() {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
 
         val result = shelterService.getAll("France")
 
@@ -86,13 +87,13 @@ class ShelterServiceTest {
 
     @Test
     fun `getById returns shelter by id`() {
-        val shelterId = createTestShelter("Test Shelter", "USA", "NY", "New York")
+        val shelterId = createTestShelter("Test Shelter", "United States", "NY", "New York")
 
         val result = shelterService.getById(shelterId)
 
         assertNotNull(result)
         assertEquals("Test Shelter", result.name)
-        assertEquals("USA", result.country)
+        assertEquals("United States", result.country)
         assertEquals("NY", result.state)
         assertEquals("New York", result.city)
     }
@@ -107,7 +108,7 @@ class ShelterServiceTest {
     fun `create creates new shelter with all fields`() {
         val request = CreateShelterRequest(
             name = "New Shelter",
-            country = "USA",
+            country = "United States",
             state = "CA",
             city = "Los Angeles",
             address = "123 Main St",
@@ -129,7 +130,7 @@ class ShelterServiceTest {
 
         assertNotNull(result)
         assertEquals("New Shelter", result.name)
-        assertEquals("USA", result.country)
+        assertEquals("United States", result.country)
         assertEquals("CA", result.state)
         assertEquals("Los Angeles", result.city)
         assertEquals("123 Main St", result.address)
@@ -151,7 +152,7 @@ class ShelterServiceTest {
     fun `create creates shelter with minimal fields`() {
         val request = CreateShelterRequest(
             name = "Minimal Shelter",
-            country = "USA",
+            country = "United States",
             city = "NYC",
             address = "456 Oak Ave"
         )
@@ -160,7 +161,7 @@ class ShelterServiceTest {
 
         assertNotNull(result)
         assertEquals("Minimal Shelter", result.name)
-        assertEquals("USA", result.country)
+        assertEquals("United States", result.country)
         assertNull(result.state)
         assertEquals("NYC", result.city)
     }
@@ -169,7 +170,7 @@ class ShelterServiceTest {
     fun `create throws exception when name is blank`() {
         val request = CreateShelterRequest(
             name = "",
-            country = "USA",
+            country = "United States",
             city = "NYC",
             address = "456 Oak Ave"
         )
@@ -197,7 +198,7 @@ class ShelterServiceTest {
     fun `create throws exception when city is blank`() {
         val request = CreateShelterRequest(
             name = "Test",
-            country = "USA",
+            country = "United States",
             city = "",
             address = "456 Oak Ave"
         )
@@ -211,7 +212,7 @@ class ShelterServiceTest {
     fun `create throws exception when address is blank`() {
         val request = CreateShelterRequest(
             name = "Test",
-            country = "USA",
+            country = "United States",
             city = "NYC",
             address = ""
         )
@@ -223,7 +224,7 @@ class ShelterServiceTest {
 
     @Test
     fun `update updates shelter successfully`() {
-        val shelterId = createTestShelter("Old Name", "USA", "NY", "New York")
+        val shelterId = createTestShelter("Old Name", "United States", "NY", "New York")
 
         val result = shelterService.update(shelterId, UpdateShelterRequest(
             name = "Updated Name",
@@ -246,14 +247,14 @@ class ShelterServiceTest {
 
     @Test
     fun `update only modifies specified fields`() {
-        val shelterId = createTestShelter("Original", "USA", "NY", "New York", phone = "555-0000", email = "old@test.com")
+        val shelterId = createTestShelter("Original", "United States", "NY", "New York", phone = "555-0000", email = "old@test.com")
 
         val result = shelterService.update(shelterId, UpdateShelterRequest(name = "Updated"))
 
         assertTrue(result is ServiceResult.Success)
         val updated = result.data
         assertEquals("Updated", updated.name)
-        assertEquals("USA", updated.country)
+        assertEquals("United States", updated.country)
         assertEquals("NY", updated.state)
         assertEquals("New York", updated.city)
         assertEquals("555-0000", updated.phone)
@@ -262,7 +263,7 @@ class ShelterServiceTest {
 
     @Test
     fun `delete removes shelter successfully`() {
-        val shelterId = createTestShelter("To Delete", "USA", "NY", "New York")
+        val shelterId = createTestShelter("To Delete", "United States", "NY", "New York")
 
         val result = shelterService.delete(shelterId)
 
@@ -278,25 +279,25 @@ class ShelterServiceTest {
 
     @Test
     fun `getCountries returns distinct countries`() {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "Canada", "ON", "Toronto")
 
         val result = shelterService.getCountries()
 
         assertEquals(2, result.size)
-        assertTrue(result.contains("USA"))
+        assertTrue(result.contains("United States"))
         assertTrue(result.contains("Canada"))
     }
 
     @Test
     fun `getStatesByCountry returns states for country`() {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
-        createTestShelter("Shelter 3", "USA", "NY", "Buffalo")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
+        createTestShelter("Shelter 3", "United States", "NY", "Buffalo")
         createTestShelter("Shelter 4", "Canada", "ON", "Toronto")
 
-        val result = shelterService.getStatesByCountry("USA")
+        val result = shelterService.getStatesByCountry("United States")
 
         assertEquals(2, result.size)
         assertTrue(result.contains("NY"))
@@ -328,10 +329,11 @@ class ShelterServiceTest {
         currency: String = "USD",
         description: String? = null
     ): Int {
+        val parsedCountry = Country.fromDisplayName(country) ?: throw IllegalArgumentException("Invalid country: $country")
         return transaction {
             AnimalShelters.insert {
                 it[AnimalShelters.name] = name
-                it[AnimalShelters.country] = country
+                it[AnimalShelters.country] = parsedCountry
                 it[AnimalShelters.state] = state
                 it[AnimalShelters.city] = city
                 it[AnimalShelters.address] = address

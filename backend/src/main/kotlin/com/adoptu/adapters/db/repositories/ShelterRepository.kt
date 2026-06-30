@@ -1,6 +1,7 @@
 package com.adoptu.adapters.db.repositories
 
 import com.adoptu.adapters.db.AnimalShelters
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateShelterRequest
 import com.adoptu.dto.input.ShelterDto
 import com.adoptu.dto.input.UpdateShelterRequest
@@ -24,7 +25,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         return ShelterDto(
             id = row[AnimalShelters.id],
             name = row[AnimalShelters.name],
-            country = row[AnimalShelters.country],
+            country = row[AnimalShelters.country].displayName,
             state = row[AnimalShelters.state],
             city = row[AnimalShelters.city],
             neighborhood = row[AnimalShelters.neighborhood],
@@ -54,7 +55,8 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
     }
 
     override fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = transaction {
-        var conditions: Op<Boolean> = AnimalShelters.country eq country
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+        var conditions: Op<Boolean> = AnimalShelters.country eq parsedCountry
         
         if (!state.isNullOrBlank()) {
             conditions = conditions.and(AnimalShelters.state eq state)
@@ -79,7 +81,8 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         return transaction {
             val id = AnimalShelters.insert {
                 it[name] = request.name
-                it[country] = request.country
+                it[country] = Country.fromDisplayName(request.country)
+                    ?: throw IllegalArgumentException("Invalid country: ${request.country}")
                 it[state] = request.state
                 it[city] = request.city
                 it[neighborhood] = request.neighborhood
@@ -112,7 +115,9 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
 
             AnimalShelters.update({ AnimalShelters.id eq id }) { row ->
                 request.name?.let { row[name] = it }
-                request.country?.let { row[country] = it }
+                request.country?.let {
+                    row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+                }
                 request.state?.let { row[state] = it }
                 request.city?.let { row[city] = it }
                 request.neighborhood?.let { row[neighborhood] = it }
@@ -143,14 +148,15 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
 
     override fun getCountries(): List<String> = transaction {
         AnimalShelters.selectAll()
-            .map { it[AnimalShelters.country] }
+            .map { it[AnimalShelters.country].displayName }
             .distinct()
             .sorted()
     }
 
     override fun getStatesByCountry(country: String): List<String> = transaction {
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
         AnimalShelters.selectAll()
-            .where { AnimalShelters.country eq country }
+            .where { AnimalShelters.country eq parsedCountry }
             .mapNotNull { it[AnimalShelters.state] }
             .filter { it.isNotBlank() }
             .distinct()

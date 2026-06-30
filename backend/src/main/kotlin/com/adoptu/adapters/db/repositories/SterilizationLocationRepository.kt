@@ -1,6 +1,7 @@
 package com.adoptu.adapters.db.repositories
 
 import com.adoptu.adapters.db.SterilizationLocations
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateSterilizationLocationRequest
 import com.adoptu.dto.input.SterilizationLocationDto
 import com.adoptu.dto.input.SterilizationLocationsByCity
@@ -27,7 +28,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         return SterilizationLocationDto(
             id = row[SterilizationLocations.id],
             name = row[SterilizationLocations.name],
-            country = row[SterilizationLocations.country],
+            country = row[SterilizationLocations.country].displayName,
             state = row[SterilizationLocations.state],
             city = row[SterilizationLocations.city],
             neighborhood = row[SterilizationLocations.neighborhood],
@@ -53,7 +54,8 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         var conditions: org.jetbrains.exposed.v1.core.Op<Boolean>? = null
         
         if (!country.isNullOrBlank()) {
-            val countryCondition = SterilizationLocations.country eq country
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+            val countryCondition = SterilizationLocations.country eq parsedCountry
             conditions = countryCondition
         }
         if (!state.isNullOrBlank()) {
@@ -86,7 +88,8 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         return transaction {
             val id = SterilizationLocations.insert {
                 it[name] = request.name
-                it[country] = request.country
+                it[country] = Country.fromDisplayName(request.country)
+                    ?: throw IllegalArgumentException("Invalid country: ${request.country}")
                 it[state] = request.state
                 it[city] = request.city
                 it[neighborhood] = request.neighborhood
@@ -112,7 +115,9 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
 
             SterilizationLocations.update({ SterilizationLocations.id eq id }) { row ->
                 request.name?.let { row[name] = it }
-                request.country?.let { row[country] = it }
+                request.country?.let {
+                    row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+                }
                 request.state?.let { row[state] = it }
                 request.city?.let { row[city] = it }
                 request.neighborhood?.let { row[neighborhood] = it }
@@ -136,14 +141,15 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
 
     override fun getCountries(): List<String> = transaction {
         SterilizationLocations.selectAll()
-            .map { it[SterilizationLocations.country] }
+            .map { it[SterilizationLocations.country].displayName }
             .distinct()
             .sorted()
     }
 
     override fun getStatesByCountry(country: String): List<String> = transaction {
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
         SterilizationLocations.selectAll()
-            .where { SterilizationLocations.country eq country }
+            .where { SterilizationLocations.country eq parsedCountry }
             .mapNotNull { it[SterilizationLocations.state] }
             .filter { it.isNotBlank() }
             .distinct()
@@ -151,15 +157,16 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
     }
 
     override fun getCitiesByCountryAndState(country: String, state: String?): List<String> = transaction {
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
         if (!state.isNullOrBlank()) {
             SterilizationLocations.selectAll()
-                .where { (SterilizationLocations.country eq country) and (SterilizationLocations.state eq state) }
+                .where { (SterilizationLocations.country eq parsedCountry) and (SterilizationLocations.state eq state) }
                 .map { it[SterilizationLocations.city] }
                 .distinct()
                 .sorted()
         } else {
             SterilizationLocations.selectAll()
-                .where { SterilizationLocations.country eq country }
+                .where { SterilizationLocations.country eq parsedCountry }
                 .map { it[SterilizationLocations.city] }
                 .distinct()
                 .sorted()

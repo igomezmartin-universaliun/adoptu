@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:19:47.336Z
-> Files: 626 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:31:45.712Z
+> Files: 642 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/95b8a41d/tmp/
 
@@ -1087,6 +1087,37 @@
 
 - `build.gradle.kts` (~2088 tok)
 
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/
+
+- `DynamoDBAdapterTest.kt` — DynamoDBAdapterTest: setup (~13642 tok)
+
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/
+
+- `ImageStorageIT.kt` — Integration test for [S3ImageStorageAdapter] backed by a real LocalStack S3 service. (~822 tok)
+- `S3ImageStorageAdapterTest.kt` — Declares S3ImageStorageAdapterTest (~385 tok)
+
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/
+
+- `TestDatabase.kt` — initH2, clearAllData (~931 tok)
+
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/
+
+- `UserShelterServiceTest.kt` — UserShelterServiceTest: setup (~4418 tok)
+- `UserSterilizationLocationServiceTest.kt` — UserSterilizationLocationServiceTest: setup (~4323 tok)
+
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/
+
+- `SessionUserTest.kt` — Data class: SessionUserTest (~512 tok)
+
+## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/
+
+- `AuthValidationServiceTest.kt` — AuthValidationServiceTest: setup, tearDown, createTestUser, encrypted (~2100 tok)
+- `PetsValidationServiceTest.kt` — PetsValidationServiceTest: setup, tearDown, createTestUser, userDto (~2099 tok)
+- `PhotographersValidationServiceTest.kt` — PhotographersValidationServiceTest: setup, tearDown, createTestUser, userDto (~1735 tok)
+- `SheltersValidationServiceTest.kt` — SheltersValidationServiceTest: setup (~626 tok)
+- `SterilizationLocationsValidationServiceTest.kt` — SterilizationLocationsValidationServiceTest: setup (~638 tok)
+- `UsersValidationServiceTest.kt` — UsersValidationServiceTest: setup, tearDown, createTestUser, userDto (~1975 tok)
+
 ## .claude/worktrees/update-libs-latest/
 
 - `build.gradle.kts` (~136 tok)
@@ -1171,3 +1202,18 @@
 ## .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1961 tok)
+
+## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
+
+- `Models.kt` — Exposed table defs; `country` columns on AnimalShelters, SterilizationLocations, UserShelters, UserSterilizationLocations, TemporalHomes, Photographers now use `enumerationByName("country", 100, Country::class)` instead of free-text varchar (~3300 tok)
+
+## backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ (canonical)
+
+
+## backend/src/main/kotlin/com/adoptu/common/
+
+- `Country.kt` — Country enum: canonical list of 112 countries (displayName + i18nKey), `fromDisplayName()` resolves exact/accent-insensitive/case-insensitive input to an enum value. Single source of truth for the country dropdown (Shared.kt), validation, and DB storage (~1700 tok)
+
+## backend/src/main/kotlin/com/adoptu/pages/ (canonical)
+
+- `Shared.kt` — `countrySelect()` now renders `<option>`s from `Country.entries` instead of a hardcoded 112-line list (~3000 tok)

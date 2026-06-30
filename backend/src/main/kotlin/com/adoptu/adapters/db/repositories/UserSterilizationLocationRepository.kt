@@ -1,6 +1,7 @@
 package com.adoptu.adapters.db.repositories
 
 import com.adoptu.adapters.db.UserSterilizationLocations
+import com.adoptu.common.Country
 import com.adoptu.dto.input.CreateUserSterilizationLocationRequest
 import com.adoptu.dto.input.UpdateUserSterilizationLocationRequest
 import com.adoptu.dto.input.UserSterilizationLocationDto
@@ -23,7 +24,7 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
         return UserSterilizationLocationDto(
             userId = row[UserSterilizationLocations.userId],
             name = row[UserSterilizationLocations.name],
-            country = row[UserSterilizationLocations.country],
+            country = row[UserSterilizationLocations.country].displayName,
             state = row[UserSterilizationLocations.state],
             city = row[UserSterilizationLocations.city],
             neighborhood = row[UserSterilizationLocations.neighborhood],
@@ -46,11 +47,13 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
 
     override fun create(userId: Int, request: CreateUserSterilizationLocationRequest): UserSterilizationLocationDto {
         val now = clock.now().toEpochMilliseconds()
+        val parsedCountry = Country.fromDisplayName(request.country)
+            ?: throw IllegalArgumentException("Invalid country: ${request.country}")
         return transaction {
             UserSterilizationLocations.insert {
                 it[UserSterilizationLocations.userId] = userId
                 it[UserSterilizationLocations.name] = request.name
-                it[UserSterilizationLocations.country] = request.country
+                it[UserSterilizationLocations.country] = parsedCountry
                 it[UserSterilizationLocations.state] = request.state
                 it[UserSterilizationLocations.city] = request.city
                 it[UserSterilizationLocations.neighborhood] = request.neighborhood
@@ -67,7 +70,7 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
             UserSterilizationLocationDto(
                 userId = userId,
                 name = request.name,
-                country = request.country,
+                country = parsedCountry.displayName,
                 state = request.state,
                 city = request.city,
                 neighborhood = request.neighborhood,
@@ -90,7 +93,10 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
 
             UserSterilizationLocations.update({ UserSterilizationLocations.userId eq userId }) { row ->
                 request.name?.let { row[UserSterilizationLocations.name] = it }
-                request.country?.let { row[UserSterilizationLocations.country] = it }
+                request.country?.let {
+                    row[UserSterilizationLocations.country] = Country.fromDisplayName(it)
+                        ?: throw IllegalArgumentException("Invalid country: $it")
+                }
                 request.state?.let { row[UserSterilizationLocations.state] = it }
                 request.city?.let { row[UserSterilizationLocations.city] = it }
                 request.neighborhood?.let { row[UserSterilizationLocations.neighborhood] = it }
@@ -113,7 +119,8 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
     }
 
     override fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserSterilizationLocationDto> = transaction {
-        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean> = UserSterilizationLocations.country eq country
+        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean> = UserSterilizationLocations.country eq parsedCountry
         
         if (!state.isNullOrBlank()) {
             conditions = conditions.and(UserSterilizationLocations.state eq state)

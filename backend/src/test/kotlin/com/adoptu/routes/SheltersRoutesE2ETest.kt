@@ -2,6 +2,7 @@ package com.adoptu.routes
 
 import com.adoptu.adapters.db.*
 import com.adoptu.adapters.notification.SesEmailAdapter
+import com.adoptu.common.Country
 import com.adoptu.adapters.storage.S3ImageStorageAdapter
 import com.adoptu.di.appModule
 import com.adoptu.mocks.TestClock
@@ -237,10 +238,11 @@ class SheltersRoutesE2ETest {
         city: String,
         address: String = "123 Test St"
     ): Int {
+        val parsedCountry = Country.fromDisplayName(country) ?: throw IllegalArgumentException("Invalid country: $country")
         return transaction {
             AnimalShelters.insert {
                 it[AnimalShelters.name] = name
-                it[AnimalShelters.country] = country
+                it[AnimalShelters.country] = parsedCountry
                 it[AnimalShelters.state] = state
                 it[AnimalShelters.city] = city
                 it[AnimalShelters.address] = address
@@ -253,19 +255,19 @@ class SheltersRoutesE2ETest {
     @Test
     fun `GET shelters returns empty list when no shelters`() = runTestWithRetry {
         runBlocking {
-            val response = httpClient.get("$baseUrl/api/shelters?country=USA")
+            val response = httpClient.get("$baseUrl/api/shelters?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
         }
     }
 
     @Test
     fun `GET shelters returns shelters for country`() = runTestWithRetry {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "Canada", "ON", "Toronto")
 
         runBlocking {
-            val response = httpClient.get("$baseUrl/api/shelters?country=USA")
+            val response = httpClient.get("$baseUrl/api/shelters?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("Shelter 1"), "Should contain Shelter 1")
@@ -276,12 +278,12 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `GET shelters filters by state`() = runTestWithRetry {
-        createTestShelter("Shelter NY 1", "USA", "NY", "New York")
-        createTestShelter("Shelter CA", "USA", "CA", "Los Angeles")
-        createTestShelter("Shelter NY 2", "USA", "NY", "Buffalo")
+        createTestShelter("Shelter NY 1", "United States", "NY", "New York")
+        createTestShelter("Shelter CA", "United States", "CA", "Los Angeles")
+        createTestShelter("Shelter NY 2", "United States", "NY", "Buffalo")
 
         runBlocking {
-            val response = httpClient.get("$baseUrl/api/shelters?country=USA&state=NY")
+            val response = httpClient.get("$baseUrl/api/shelters?country=United%20States&state=NY")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("Shelter NY 1"), "Should contain Shelter NY 1")
@@ -302,7 +304,7 @@ class SheltersRoutesE2ETest {
         val shelterId = transaction {
             AnimalShelters.insert {
                 it[AnimalShelters.name] = "Full Shelter XYZ"
-                it[AnimalShelters.country] = "USA"
+                it[AnimalShelters.country] = Country.UNITED_STATES
                 it[AnimalShelters.state] = "CA"
                 it[AnimalShelters.city] = "Los Angeles"
                 it[AnimalShelters.address] = "123 Main St"
@@ -328,7 +330,7 @@ class SheltersRoutesE2ETest {
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("Full Shelter XYZ"), "Should contain shelter name")
-            assertTrue(body.contains("USA"), "Should contain country")
+            assertTrue(body.contains("United States"), "Should contain country")
             assertTrue(body.contains("CA"), "Should contain state")
             assertTrue(body.contains("12-3456789"), "Should contain fiscalId")
             assertTrue(body.contains("Test Bank"), "Should contain bankName")
@@ -337,14 +339,14 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `GET shelters countries returns list of countries`() = runTestWithRetry {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
         createTestShelter("Shelter 2", "Canada", "ON", "Toronto")
 
         runBlocking {
             val response = httpClient.get("$baseUrl/api/shelters/countries")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
-            assertTrue(body.contains("USA"), "Should contain USA")
+            assertTrue(body.contains("United States"), "Should contain United States")
             assertTrue(body.contains("Canada"), "Should contain Canada")
         }
     }
@@ -359,13 +361,13 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `GET shelters states returns list of states for country`() = runTestWithRetry {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
-        createTestShelter("Shelter 2", "USA", "CA", "Los Angeles")
-        createTestShelter("Shelter 3", "USA", "NY", "Buffalo")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
+        createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
+        createTestShelter("Shelter 3", "United States", "NY", "Buffalo")
         createTestShelter("Shelter 4", "Canada", "ON", "Toronto")
 
         runBlocking {
-            val response = httpClient.get("$baseUrl/api/shelters/countries/USA/states")
+            val response = httpClient.get("$baseUrl/api/shelters/countries/United%20States/states")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("NY"), "Should contain NY")
@@ -375,7 +377,7 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `GET shelters states returns empty list for country with no states`() = runTestWithRetry {
-        createTestShelter("Shelter 1", "USA", "NY", "New York")
+        createTestShelter("Shelter 1", "United States", "NY", "New York")
 
         runBlocking {
             val response = httpClient.get("$baseUrl/api/shelters/countries/Canada/states")
@@ -387,14 +389,14 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `GET shelter by id returns shelter`() = runTestWithRetry {
-        val shelterId = createTestShelter("Test Shelter", "USA", "NY", "New York")
+        val shelterId = createTestShelter("Test Shelter", "United States", "NY", "New York")
 
         runBlocking {
             val response = httpClient.get("$baseUrl/api/shelters/$shelterId")
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("Test Shelter"), "Should contain shelter name")
-            assertTrue(body.contains("USA"), "Should contain country")
+            assertTrue(body.contains("United States"), "Should contain country")
         }
     }
 
@@ -414,7 +416,7 @@ class SheltersRoutesE2ETest {
                 setBody("""
                     {
                         "name": "New Shelter",
-                        "country": "USA",
+                        "country": "United States",
                         "state": "NY",
                         "city": "New York",
                         "address": "123 Main St",
@@ -426,7 +428,7 @@ class SheltersRoutesE2ETest {
             assertEquals(HttpStatusCode.OK, response.status, "Expected 200 OK")
             val body = response.bodyAsText()
             assertTrue(body.contains("New Shelter"), "Should contain new shelter name")
-            assertTrue(body.contains("USA"), "Should contain country")
+            assertTrue(body.contains("United States"), "Should contain country")
             assertTrue(body.contains("NY"), "Should contain state")
         }
     }
@@ -439,7 +441,7 @@ class SheltersRoutesE2ETest {
                 setBody("""
                     {
                         "name": "Full Shelter",
-                        "country": "USA",
+                        "country": "United States",
                         "state": "CA",
                         "city": "Los Angeles",
                         "address": "456 Oak Ave",
@@ -468,7 +470,7 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `PUT admin shelter updates shelter`() = runTestWithRetry {
-        val shelterId = createTestShelter("Old Name", "USA", "NY", "New York")
+        val shelterId = createTestShelter("Old Name", "United States", "NY", "New York")
 
         runBlocking {
             val response = httpClient.put("$baseUrl/api/admin/shelters/$shelterId") {
@@ -489,7 +491,7 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `PUT admin shelter updates donation info`() = runTestWithRetry {
-        val shelterId = createTestShelter("Test", "USA", "NY", "New York")
+        val shelterId = createTestShelter("Test", "United States", "NY", "New York")
 
         runBlocking {
             val response = httpClient.put("$baseUrl/api/admin/shelters/$shelterId") {
@@ -527,7 +529,7 @@ class SheltersRoutesE2ETest {
 
     @Test
     fun `DELETE admin shelter removes shelter`() = runTestWithRetry {
-        val shelterId = createTestShelter("To Delete", "USA", "NY", "New York")
+        val shelterId = createTestShelter("To Delete", "United States", "NY", "New York")
 
         runBlocking {
             val deleteResponse = httpClient.delete("$baseUrl/api/admin/shelters/$shelterId")

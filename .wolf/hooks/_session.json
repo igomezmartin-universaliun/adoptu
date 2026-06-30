@@ -6,6 +6,401 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-06-30T21:19:32.059Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/notification/SesEmailAdapterIT.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:27:54.875Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/build.gradle.kts": {
+      "count": 1,
+      "tokens": 2307,
+      "first_read": "2026-06-30T21:27:55.294Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/UserShelterService.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:00.686Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/UserSterilizationLocationService.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:01.446Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:02.164Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:02.907Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/ports/UserShelterRepositoryPort.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:03.629Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/ApplicationTestcontainersIT.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:03.975Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/ports/UserSterilizationLocationRepositoryPort.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:04.914Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/e2e/BaseE2ETest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:05.898Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:06.698Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/ShelterServiceTest.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:07.217Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/UserShelterRoutes.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:09.410Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/UserSterilizationLocationRoutes.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:10.173Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/SterilizationLocationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:11.504Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/dto/input/UserDto.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:13.944Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/auth/SessionUser.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:14.271Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/UserService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:15.063Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/TemporalHomeService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:15.793Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/crypto/CryptoService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:16.509Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapter.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:17.052Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/ports/DynamoDBPort.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:17.931Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/dto/input/ShelterDto.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:21.927Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/dto/input/SterilizationLocationDto.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:22.244Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/TemporalHomeServiceTest.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:27.165Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/test/SterilizationLocationRepositoryIT.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:28.445Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/ServiceResult.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:30.974Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/dto/input/PetDto.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:34.104Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/Models.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:36.258Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt": {
+      "count": 3,
+      "tokens": 931,
+      "first_read": "2026-06-30T21:28:37.115Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestClock.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:37.683Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/UIRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:42.251Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UsersRoutesE2ETest.kt": {
+      "count": 4,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:50.897Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UIRoutesDataTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:51.182Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/PhotographerRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:53.878Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/TemporalHomeRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:28:54.433Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/validation/PhotographersValidationService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:00.122Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:00.489Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:01.150Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:06.343Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:06.751Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/SterilizationLocationRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:09.173Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/ShelterRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:09.558Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/validation/ValidationConstants.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:16.000Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/SessionUserTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:17.494Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/S3ImageStorageAdapterTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:17.948Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/ImageStorageIT.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:18.419Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:19.366Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/.wolf/cerebrum.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:24.372Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PasswordRegistrationRoutesE2ETest.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:30.110Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/AuthRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:30.565Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/EmailVerificationRoutesE2ETest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:31.763Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/UsersRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:39.334Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/routes/PetsRoutes.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:40.890Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/MockImageStorage.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:42.013Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:29:50.921Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SheltersValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:02.869Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SterilizationLocationsValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:03.688Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:04.394Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PetsValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:05.116Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PhotographersValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:05.873Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/TemporalHomesValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:06.650Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:06.925Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/ShelterService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:34.259Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/SterilizationLocationService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:34.998Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/ports/ShelterRepositoryPort.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:57.212Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/ports/SterilizationLocationRepositoryPort.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:30:58.002Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/plugins/Responses.kt": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:02.916Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:11.534Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:12.186Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/auth/WebAuthnService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:27.532Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:28.299Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:29.016Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/services/validation/AuthValidationService.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:29.508Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt": {
+      "count": 1,
+      "tokens": 13642,
+      "first_read": "2026-06-30T21:31:39.289Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/main/kotlin/com/adoptu/mocks/MockNotificationAdapter.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:31:55.890Z"
+    },
+    "/tmp/ktor_src/commonMain/io/ktor/serialization/kotlinx/SerializerLookup.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:32:01.719Z"
+    },
+    "/tmp/ktor_src/commonMain/io/ktor/serialization/kotlinx/KotlinxSerializationConverter.kt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:32:02.221Z"
+    },
+    "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/.wolf/anatomy.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-30T21:32:05.451Z"
     }
   },
   "files_written": [
@@ -20,15 +415,136 @@
       "action": "edit",
       "tokens": 456,
       "at": "2026-06-30T21:19:47.361Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt",
+      "action": "edit",
+      "tokens": 239,
+      "at": "2026-06-30T21:29:10.660Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt",
+      "action": "edit",
+      "tokens": 60,
+      "at": "2026-06-30T21:29:16.319Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/SessionUserTest.kt",
+      "action": "create",
+      "tokens": 549,
+      "at": "2026-06-30T21:29:28.371Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/S3ImageStorageAdapterTest.kt",
+      "action": "create",
+      "tokens": 412,
+      "at": "2026-06-30T21:29:33.536Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/ImageStorageIT.kt",
+      "action": "create",
+      "tokens": 880,
+      "at": "2026-06-30T21:29:41.745Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SheltersValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 671,
+      "at": "2026-06-30T21:30:17.214Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SterilizationLocationsValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 684,
+      "at": "2026-06-30T21:30:22.822Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt",
+      "action": "create",
+      "tokens": 4729,
+      "at": "2026-06-30T21:30:32.958Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt",
+      "action": "create",
+      "tokens": 14713,
+      "at": "2026-06-30T21:30:39.456Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt",
+      "action": "edit",
+      "tokens": 96,
+      "at": "2026-06-30T21:30:39.614Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PetsValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 2249,
+      "at": "2026-06-30T21:30:44.341Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt",
+      "action": "edit",
+      "tokens": 48,
+      "at": "2026-06-30T21:30:47.681Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt",
+      "action": "edit",
+      "tokens": 20,
+      "at": "2026-06-30T21:30:51.433Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt",
+      "action": "edit",
+      "tokens": 2,
+      "at": "2026-06-30T21:30:57.426Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PhotographersValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 1859,
+      "at": "2026-06-30T21:31:02.863Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserSterilizationLocationServiceTest.kt",
+      "action": "create",
+      "tokens": 4632,
+      "at": "2026-06-30T21:31:16.859Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 2116,
+      "at": "2026-06-30T21:31:23.673Z"
+    },
+    {
+      "file": "/home/laf/Proyektes/adoptu/.claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt",
+      "action": "create",
+      "tokens": 2250,
+      "at": "2026-06-30T21:31:45.731Z"
     }
   ],
   "edit_counts": {
     ".claude/worktrees/test-coverage-95/build.gradle.kts": 1,
-    ".claude/worktrees/country-enum-fix/.wolf/cerebrum.md": 1
+    ".claude/worktrees/country-enum-fix/.wolf/cerebrum.md": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt": 2,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/SessionUserTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/S3ImageStorageAdapterTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/ImageStorageIT.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SheltersValidationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SterilizationLocationsValidationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt": 2,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt": 4,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PetsValidationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PhotographersValidationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserSterilizationLocationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt": 1,
+    ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt": 1
   },
-  "anatomy_hits": 0,
-  "anatomy_misses": 1,
-  "repeated_reads_warned": 0,
+  "anatomy_hits": 2,
+  "anatomy_misses": 77,
+  "repeated_reads_warned": 31,
   "cerebrum_warnings": 0,
-  "stop_count": 0
+  "stop_count": 3
 }

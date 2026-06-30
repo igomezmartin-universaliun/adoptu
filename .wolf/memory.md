@@ -579,3 +579,41 @@
 | 15:22 | Edited .claude/worktrees/country-enum-fix/.wolf/cerebrum.md | 6→3 lines | ~459 |
 | 15:24 | Edited .claude/worktrees/country-enum-fix/.wolf/memory.md | removed 19 lines | ~60 |
 | 15:24 | Edited .claude/worktrees/country-enum-fix/.wolf/memory.md | expanded (+15 lines) | ~646 |
+
+## Session: 2026-06-30 (Mexico shelter search fix)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:08 | Diagnosed Mexico shelter search returning empty results (dropdown sends "Mexico", DB had "México") | ShelterRepository.kt, Shared.kt | diagnosed, bug-050 logged | ~3k |
+| 13:35 | Planned and approved Country enum refactor (user chose enum approach over data-only fix) | plan: enumerated-yawning-cloud.md | approved | ~2k |
+| 15:09 | Created Country.kt enum (112 countries, fromDisplayName() with accent/case-insensitive fallback) | common/Country.kt | created | ~2k |
+| 15:09 | Switched countrySelect() dropdown to render from Country.entries | Shared.kt | edited | ~1k |
+| 15:09 | Switched 6 tables' country columns to enumerationByName(Country::class) | Models.kt | edited | ~1k |
+| 15:09 | Updated 7 repositories to parse/normalize country via Country.fromDisplayName() | ShelterRepository.kt, SterilizationLocationRepository.kt, UserShelterRepository.kt, UserSterilizationLocationRepository.kt, TemporalHomeRepository.kt, PhotographerRepository.kt, UserRepository.kt | edited | ~6k |
+| 15:11 | Migrated 27 existing DB rows (8 distinct stray country strings) to canonical enum names | live dev DB (animal_shelters, sterilization_locations, user_shelters, user_sterilization_locations, temporal_homes, photographers) | migrated, verified | ~1k |
+| 15:11 | Restarted backend, verified GET /api/shelters?country=Mexico now returns 2 shelters (was empty); México (accented) input still resolves via fallback | live :8080 | verified | ~1k |
+| 15:25 | Fixed test fixtures using non-canonical "USA" placeholder (broke once country became enum-backed); ran full backend test suite | SheltersRoutesE2ETest.kt, ShelterServiceTest.kt, SterilizationLocationServiceTest.kt, TemporalHomeServiceTest.kt, SterilizationLocationRepositoryIT.kt | 426 tests, 15 pre-existing unrelated failures confirmed (Password/WebAuthn), 0 new failures | ~4k |
+| 15:35 | Marked bug-050 fixed; logged bug-064 (AdminSheltersPage create/edit form references missing DOM elements, discovered but not fixed) | buglog.json | logged | ~1k |
+| 20:25 | Merged main into worktree branch, resolved .wolf/buglog.json + cerebrum.md + memory.md append conflicts | buglog.json, cerebrum.md, memory.md | merged | ~3k |
+| 21:30 | Merged worktree-country-enum-fix into main, resolved second round of append conflicts (main moved 3 commits during the session); renumbered bug-063 collision to bug-064 | buglog.json, cerebrum.md, memory.md | merged to main | ~3k |
+| 15:28 | Session end: 2 writes across 2 files (build.gradle.kts, cerebrum.md) | 33 reads | ~2782 tok |
+| 15:29 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt | modified catch() | ~223 |
+| 15:29 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/TestDatabase.kt | 2→4 lines | ~56 |
+| 15:29 | Session end: 4 writes across 3 files (build.gradle.kts, cerebrum.md, TestDatabase.kt) | 50 reads | ~3081 tok |
+| 15:29 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/SessionUserTest.kt | — | ~512 |
+| 15:29 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/S3ImageStorageAdapterTest.kt | — | ~385 |
+| 15:29 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/storage/ImageStorageIT.kt | — | ~822 |
+| 15:30 | Session end: 7 writes across 6 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 64 reads | ~4922 tok |
+| 15:30 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SheltersValidationServiceTest.kt | — | ~626 |
+| 15:30 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/SterilizationLocationsValidationServiceTest.kt | — | ~638 |
+| 15:30 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt | — | ~4414 |
+| 15:30 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt | — | ~13732 |
+| 15:30 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt | 8→8 lines | ~89 |
+| 15:30 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PetsValidationServiceTest.kt | — | ~2099 |
+| 15:30 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt | 7→6 lines | ~45 |
+| 15:30 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt | reduced (-6 lines) | ~19 |
+| 15:30 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt | removed 6 lines | ~2 |
+| 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/PhotographersValidationServiceTest.kt | — | ~1735 |
+| 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/UserSterilizationLocationServiceTest.kt | — | ~4323 |
+| 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt | — | ~1975 |
+| 15:31 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt | — | ~2100 |

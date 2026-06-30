@@ -1,5 +1,6 @@
 package com.adoptu.adapters.db
 
+import com.adoptu.common.Country
 import org.jetbrains.exposed.v1.core.Table
 import java.math.BigDecimal
 
@@ -81,7 +82,7 @@ object Photographers : Table("photographers") {
     val userId = integer("user_id").references(Users.id)
     val photographerFee = decimal("photographer_fee", 10, 2).nullable()
     val photographerCurrency = varchar("photographer_currency", 10).nullable()
-    val country = varchar("country", 100).nullable()
+    val country = enumerationByName("country", 100, Country::class).nullable()
     val state = varchar("state", 100).nullable()
 
     override val primaryKey = PrimaryKey(userId)
@@ -179,7 +180,7 @@ object PhotographyRequests : Table("photography_requests") {
 object TemporalHomes : Table("temporal_homes") {
     val userId = integer("user_id").references(Users.id)
     val alias = varchar("alias", 255)
-    val country = varchar("country", 100)
+    val country = enumerationByName("country", 100, Country::class)
     val state = varchar("state", 100).nullable()
     val city = varchar("city", 100)
     val zip = varchar("zip", 20).nullable()
@@ -214,7 +215,7 @@ object AnimalShelters : Table("animal_shelters") {
     val id = integer("id").autoIncrement()
     val userId = integer("user_id").references(Users.id).nullable()
     val name = varchar("name", 255)
-    val country = varchar("country", 100)
+    val country = enumerationByName("country", 100, Country::class)
     val state = varchar("state", 100).nullable()
     val city = varchar("city", 100)
     val neighborhood = varchar("neighborhood", 100).nullable()
@@ -241,7 +242,7 @@ object SterilizationLocations : Table("sterilization_locations") {
     val id = integer("id").autoIncrement()
     val userId = integer("user_id").references(Users.id).nullable()
     val name = varchar("name", 255)
-    val country = varchar("country", 100)
+    val country = enumerationByName("country", 100, Country::class)
     val state = varchar("state", 100).nullable()
     val city = varchar("city", 100)
     val neighborhood = varchar("neighborhood", 100).nullable()
@@ -260,7 +261,7 @@ object SterilizationLocations : Table("sterilization_locations") {
 object UserShelters : Table("user_shelters") {
     val userId = integer("user_id").references(Users.id)
     val name = varchar("name", 255)
-    val country = varchar("country", 100)
+    val country = enumerationByName("country", 100, Country::class)
     val state = varchar("state", 100).nullable()
     val city = varchar("city", 100)
     val neighborhood = varchar("neighborhood", 100).nullable()
@@ -285,7 +286,7 @@ object UserShelters : Table("user_shelters") {
 object UserSterilizationLocations : Table("user_sterilization_locations") {
     val userId = integer("user_id").references(Users.id)
     val name = varchar("name", 255)
-    val country = varchar("country", 100)
+    val country = enumerationByName("country", 100, Country::class)
     val state = varchar("state", 100).nullable()
     val city = varchar("city", 100)
     val neighborhood = varchar("neighborhood", 100).nullable()
