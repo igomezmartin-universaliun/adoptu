@@ -230,3 +230,4 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 15:18 | Fixed misaligned pet-card fields on My Pets page (pet-name/pet-info markup + status paragraph) | backend/src/main/resources/static/js/my-pets.js, index.js; backend/src/main/scss/style.scss | fixed, recompiled to style.css | ~3200 |

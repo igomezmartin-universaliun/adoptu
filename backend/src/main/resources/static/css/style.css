@@ -698,8 +698,7 @@ form input:disabled {
 
 .pet-name {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
@@ -768,6 +767,13 @@ form input:disabled {
 }
 .pet-age .value, .pet-rescue-date .value {
   color: white;
+}
+
+.pet-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  text-transform: capitalize;
 }
 
 .pet-card-actions {

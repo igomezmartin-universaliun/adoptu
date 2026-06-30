@@ -19,6 +19,8 @@
 
 - **DatabaseFactory.listOfTables must be kept in sync with Models.kt:** Every `Table` object defined in `Models.kt` must be added to `listOfTables` in `DatabaseFactory.kt` — omitting one means `SchemaUtils.create()` never creates that table, causing a PSQLException at runtime. Tables previously missing: `UserSterilizationLocations`, `UserShelters`, `PasswordResetTokens`, `EmailChangeTokens`.
 
+- **`.pet-card` markup is duplicated across pages, not shared via a component:** `backend/src/main/resources/static/js/index.js` (home/browse page) and `my-pets.js` (My Pets page) both hand-build the same `.pet-card` HTML string against the shared `.pet-card`/`.pet-info`/`.pet-name` rules in `style.scss`. `index.js` is the more complete/correct reference implementation (it wraps age/rescue-date in `.label`/`.value` spans as the CSS expects). When fixing pet-card display bugs, check both files for the same divergence — a fix applied to only one page will leave the other inconsistent.
+
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
@@ -29,6 +31,8 @@
 - [2026-06-21] Do NOT define a new `Table` object in `Models.kt` without also adding it to `listOfTables` in `DatabaseFactory.kt`. Missing entries silently skip table creation and cause `PSQLException: relation "..." does not exist` at runtime.
 
 - [2026-06-22] Do NOT edit CSS files directly. All styles live in `backend/src/main/scss/`. Shared/nav styles go in `_layout.scss`; page-specific styles in their own `.scss` file. After editing SCSS, recompile: `npx sass backend/src/main/scss/<name>.scss backend/src/main/resources/static/css/<name>.css --no-source-map`
+
+- [2026-06-30] `npx sass ...` fails in this sandbox/background-job environment with `npm ERR! Cannot read properties of undefined (reading 'stdin')` (npm 9.2.0 `npm exec` spawn bug, reproduces even with `--no-sandbox` and `</dev/null`). Workaround: `npm pack sass` into a scratch dir, extract it, `npm pack` its runtime deps (`immutable`, `source-map-js`, `chokidar`, then `readdirp@^5` for chokidar — versions must match what chokidar's package.json declares), extract each into `node_modules/` next to `sass.js`, then run `node /path/to/sass.js <in.scss> <out.css> --no-source-map` directly. `npm install` (even `--no-save`) also fails here with `ELOOP`/`spawn ELOOP` — only `npm pack` (download-only, no postinstall scripts) works reliably.
 
 ## Decision Log
 
