@@ -230,3 +230,4 @@
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/local-start.sh | inline fix | ~13 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
 | 22:19 | Edited .claude/worktrees/elegant-coalescing-kurzweil/backend/build.gradle.kts | inline fix | ~14 |
+| 07:50 | Fixed 3 JS errors in photographers.js: t() shim, onCountryChange fallback, api→fetch | backend/src/main/resources/static/js/photographers.js | fixed | ~400 |
