@@ -83,17 +83,12 @@ resource "aws_ecs_service" "app" {
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
+  # No load balancer: CloudFront origins directly to this task over IPv6
+  # (see cloudfront.tf / dns_updater.tf), matching the live deployment's
+  # design.
   network_configuration {
     subnets          = [for s in aws_subnet.ecs_ipv6_only : s.id]
     security_groups  = [aws_security_group.ecs_task.id]
     assign_public_ip = false # no IPv4 at all on these subnets; tasks get a public IPv6 address automatically (subnet is ipv6_native)
   }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
-    container_name   = "Main"
-    container_port   = var.container_port
-  }
-
-  depends_on = [aws_lb_listener.https]
 }

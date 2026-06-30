@@ -9,6 +9,14 @@ and auto-named security groups indicate the ECS "Express" deploy wizard).
 Domain: `adopt-u.org` (existing Route 53 zone `Z02544353GT8GHBAPPWSE`,
 ACM cert already issued, both reused via data sources — not recreated).
 
+**No load balancer.** CloudFront's app origin points directly at the
+running ECS Fargate task over IPv6, matching the live deployment exactly
+(verified against the live distribution's actual `CustomOriginConfig`:
+`http-only`, port `8080`) — not an ALB/NLB. The tradeoff this carries
+(`ecs.adopt-u.org` has to be re-pointed manually after a deploy that
+replaces the task) is the same tradeoff the live deployment already has;
+see "Releasing new versions" below.
+
 ## What this is NOT
 
 This is **not** a blank-slate `tofu apply`. Several resources already exist
@@ -18,11 +26,11 @@ unique per account) — `apply`-ing this against an empty state will fail
 with `BucketAlreadyExists` / `DBInstanceAlreadyExists` / `CNAMEAlreadyExists`
 errors. Those resources must be **imported** first (commands below).
 
-Compute (ECS cluster/service/task definition/ALB/security groups) is
-instead stood up **fresh, in parallel**, under a new `adoptu` ECS cluster,
-so the existing live service (`Adopt-u-ipv6` in cluster `default`) keeps
-serving traffic unmodified until you've verified the new stack and are
-ready to cut over.
+Compute (ECS cluster/service/task definition/security groups) is instead
+stood up **fresh, in parallel**, under a new `adoptu` ECS cluster, so the
+existing live service (`Adopt-u-ipv6` in cluster `default`) keeps serving
+traffic unmodified until you've verified the new stack and are ready to
+cut over.
 
 ## Findings from the live account (fixed here, not silently)
 
@@ -32,24 +40,25 @@ ready to cut over.
 2. **The task IAM policy's S3 statement was unscoped** — it referenced the
    literal placeholder `arn:aws:s3:::your-bucket-name`, not the real
    buckets. Fixed in `iam.tf`.
-3. **`api`/apex DNS is fragile**: `ecs.adopt-u.org` A/AAAA records point at
-   one Fargate task's IP address directly (hand-entered, breaks on every
-   task restart/redeploy). There's also a stale `AAAA` alias to an
-   `ecs-express-gateway-alb` that no longer exists (`describe-load-balancers`
-   returns nothing). Replaced with a real ALB + target group.
-4. **Container port mismatch**: the live task definition maps port `80`,
+3. **Container port mismatch**: the live task definition maps port `80`,
    but the app actually listens on `8080` (`Dockerfile` `EXPOSE 8080`,
    `application.conf` `ktor.deployment.port = 8080`). Fixed.
-5. **RDS is IPv4-only** (`NetworkType: IPV4`). IPv6-only ECS tasks have no
+4. **RDS is IPv4-only** (`NetworkType: IPV4`). IPv6-only ECS tasks have no
    IPv4 address at all, so they cannot reach an IPv4-only endpoint. Fixed
    by setting `network_type = "DUAL"` on the instance (its subnet group
    already supports `DUAL`).
-6. The `adoptu-dynamic-images` bucket policy references **two** CloudFront
+5. The `adoptu-dynamic-images` bucket policy references **two** CloudFront
    distribution ARNs, one of which (`E1ASJX2YFBE5IN`) doesn't exist in the
    account anymore — a stale leftover. Dropped.
-7. RDS `deletion_protection` was `false` and `backup_retention_period` was
+6. RDS `deletion_protection` was `false` and `backup_retention_period` was
    `1` day. Defaulted to `true` / `7` days here (override via
    `db_deletion_protection` if you actually need to destroy/recreate it).
+7. There's also a stale Route 53 `AAAA` alias to an
+   `ecs-express-gateway-alb` that no longer exists
+   (`describe-load-balancers` returns nothing for the account) — leftover
+   from an earlier, abandoned attempt at exactly the load-balanced design
+   this stack deliberately does *not* use. Not imported/managed; delete it
+   manually whenever convenient (it isn't referenced by anything).
 
 ## Prerequisites
 
@@ -92,6 +101,7 @@ tofu import aws_iam_role_policy_attachment.ecs_task_app \
 
 # Existing DNS records (most names already exist in the zone; importing
 # avoids "RRSet already exists" on apply). <ZONE_ID> = Z02544353GT8GHBAPPWSE
+tofu import aws_route53_record.ecs_task Z02544353GT8GHBAPPWSE_ecs.adopt-u.org_AAAA
 tofu import 'aws_route53_record.app_a["adopt-u.org"]' Z02544353GT8GHBAPPWSE_adopt-u.org_A
 tofu import 'aws_route53_record.app_aaaa["adopt-u.org"]' Z02544353GT8GHBAPPWSE_adopt-u.org_AAAA
 tofu import 'aws_route53_record.app_a["www.adopt-u.org"]' Z02544353GT8GHBAPPWSE_www.adopt-u.org_A
@@ -107,48 +117,59 @@ Then:
 tofu plan
 ```
 
-Read the plan carefully. Expect diffs for the deliberate fixes above
-(S3 policy ARNs, IAM policy resources, RDS `network_type`/security group/
-`deletion_protection`, CloudFront `app` origin domain_name once the new ALB
-exists). You should **not** see anything proposing to destroy/recreate the
-S3 buckets, the RDS instance, or any CloudFront distribution — if you do,
-stop and figure out why before applying (likely an import ID mismatch).
+Read the plan carefully. Expect diffs for the deliberate fixes above (S3
+policy ARNs, IAM policy resources, RDS `network_type`/security
+group/`deletion_protection`). You should **not** see anything proposing to
+destroy/recreate the S3 buckets, the RDS instance, or any CloudFront
+distribution — if you do, stop and figure out why before applying (likely
+an import ID mismatch).
 
 ## Step 2 — stand up the new compute (no impact on the live service)
 
 ```bash
 tofu apply -target=aws_subnet.ecs_ipv6_only \
-           -target=aws_security_group.alb \
            -target=aws_security_group.ecs_task \
            -target=aws_security_group.rds \
            -target=aws_ecs_cluster.this \
-           -target=aws_lb.app \
-           -target=aws_lb_target_group.app \
-           -target=aws_lb_listener.https \
-           -target=aws_lb_listener.http_redirect \
            -target=aws_iam_role.ecs_execution \
            -target=aws_ecs_task_definition.app \
            -target=aws_ecs_service.app
 ```
 
-Verify the new stack directly (bypassing DNS/CloudFront):
+Find the new task's public IPv6 address and verify it directly (bypassing
+DNS/CloudFront):
 
 ```bash
-curl -v --resolve adopt-u.org:443:$(tofu output -raw alb_dns_name) https://adopt-u.org/
+TASK_ARN=$(aws ecs list-tasks --cluster adoptu --service-name adoptu --profile adoptu --query 'taskArns[0]' --output text)
+ENI_ID=$(aws ecs describe-tasks --cluster adoptu --tasks "$TASK_ARN" --profile adoptu \
+  --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text)
+TASK_IPV6=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --profile adoptu \
+  --query 'NetworkInterfaces[0].Ipv6Addresses[0].Ipv6Address' --output text)
+
+curl -g -v "http://[$TASK_IPV6]:8080/"
 ```
 
 ## Step 3 — cut over
 
-Once the new ECS service is healthy behind the ALB:
+Once the new task is verified healthy, point the `ecs.adopt-u.org` record
+at it (Terraform won't touch this value on its own — see
+`lifecycle.ignore_changes` in `route53.tf`):
 
 ```bash
-tofu apply   # remaining resources: RDS network_type/SG, CloudFront app
-             # origin -> new ALB, the imported Route53 records
+aws route53 change-resource-record-sets --hosted-zone-id Z02544353GT8GHBAPPWSE \
+  --profile adoptu --change-batch "{\"Changes\":[{\"Action\":\"UPSERT\",\"ResourceRecordSet\":{\"Name\":\"ecs.adopt-u.org.\",\"Type\":\"AAAA\",\"TTL\":60,\"ResourceRecords\":[{\"Value\":\"$TASK_IPV6\"}]}}]}"
 ```
 
-This is the moment apex/www/api traffic moves from the hand-maintained
-`ecs.adopt-u.org` origin to the new ALB. CloudFront propagation takes a
-few minutes; watch error rates before proceeding.
+Then apply the rest (RDS `network_type`/SG, the imported Route53 records,
+etc.):
+
+```bash
+tofu apply
+```
+
+CloudFront resolves `ecs.adopt-u.org` per-request at the DNS TTL (60s
+here), so this is the moment apex/www/api traffic moves to the new task.
+Watch error rates for a few minutes before proceeding.
 
 ## Step 4 — decommission the old manual resources
 
@@ -158,26 +179,27 @@ After confirming the new stack is serving correctly for a while:
 aws ecs update-service --cluster default --service Adopt-u-ipv6 --desired-count 0 --profile adoptu
 aws ecs delete-service --cluster default --service Adopt-u-ipv6 --profile adoptu
 
-# Stale hardcoded-IP records, no longer referenced by anything:
-aws route53 change-resource-record-sets --hosted-zone-id Z02544353GT8GHBAPPWSE \
-  --profile adoptu --change-batch '{"Changes":[
-    {"Action":"DELETE","ResourceRecordSet":{"Name":"ecs.adopt-u.org.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"54.175.207.9"}]}},
-    {"Action":"DELETE","ResourceRecordSet":{"Name":"ecs.adopt-u.org.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"2600:1f18:4f77:4e01:386a:77e7:3b9e:7605"}]}}
-  ]}'
+# Stale orphaned alias from an abandoned ALB attempt - not referenced by
+# anything; check its current value with list-resource-record-sets first.
+# aws route53 change-resource-record-sets --hosted-zone-id Z02544353GT8GHBAPPWSE --profile adoptu \
+#   --change-batch '{"Changes":[{"Action":"DELETE","ResourceRecordSet":{...}}]}'
 ```
-
-(Re-check the current record values with `aws route53 list-resource-record-sets`
-before deleting — they may have drifted since this was written.)
 
 ## Releasing new versions
 
 `buildspec.yml` builds and pushes to ECR but was never wired into a real
 CodeBuild/CodePipeline project (both are empty in the account) — releases
-have been manual `docker build` + `push` + Console redeploys. To ship a new
-image with this stack:
+have been manual `docker build` + `push` + Console redeploys.
+
+To ship a new image with this stack, **every** deploy replaces the task
+(new IP), so the `ecs.adopt-u.org` record needs re-pointing afterward —
+same operational step as Step 3 above, every time, since there's no load
+balancer to hold a stable address:
 
 ```bash
 tofu apply -var="container_image_tag=sha256:<new digest>"
+# then re-run the describe-tasks/describe-network-interfaces/UPSERT
+# sequence from Step 3 against the new task
 ```
 
 ## Things intentionally left unmanaged

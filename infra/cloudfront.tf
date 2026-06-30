@@ -93,10 +93,13 @@ resource "aws_cloudfront_distribution" "dynamic_images" {
   }
 }
 
-# --- adopt-u.org / www / api: the app itself, fronting the ALB -------------
-# Live setup pointed this at a hand-maintained DNS record holding one
-# Fargate task's IP directly (broke on every task restart). Points at the
-# ALB's stable DNS name instead.
+# --- adopt-u.org / www / api: the app itself, fronting the ECS task directly -
+# No load balancer, by design - same as the live deployment. Origin is the
+# "ecs.<domain>" DNS record (route53.tf), which resolves straight to the
+# running Fargate task's public IPv6 address. That record is NOT
+# auto-updated by this stack (see route53.tf / README "Releasing new
+# versions") - re-point it after every deploy that replaces the task,
+# exactly like today.
 
 resource "aws_cloudfront_distribution" "app" {
   enabled         = true
@@ -104,22 +107,22 @@ resource "aws_cloudfront_distribution" "app" {
   price_class     = "PriceClass_All"
   http_version    = "http2"
   aliases         = [var.domain_name, "www.${var.domain_name}", "api.${var.domain_name}"]
-  comment         = "adopt-u app (ECS Fargate via ALB)"
+  comment         = "adopt-u app (ECS Fargate, direct origin, no load balancer)"
 
   origin {
-    domain_name = aws_lb.app.dns_name
-    origin_id   = "app-alb"
+    domain_name = "ecs.${var.domain_name}"
+    origin_id   = "ecs-task"
 
     custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      http_port              = var.container_port
+      https_port             = 443 # unused (origin_protocol_policy is http-only - matches live, no TLS to origin)
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"] # unused under http-only; matches live config exactly for clean import
     }
   }
 
   default_cache_behavior {
-    target_origin_id         = "app-alb"
+    target_origin_id         = "ecs-task"
     viewer_protocol_policy   = "redirect-to-https"
     allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD"]

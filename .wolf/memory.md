@@ -636,3 +636,4 @@
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:50 | Built infra/ OpenTofu config for AWS deployment (account 174000857825, domain adopt-u.org) after live-account discovery via boto3 | infra/*.tf, infra/README.md | tofu validate + tofu plan against real account both clean (45 to add, 0 errors) | ~95000 |
+| 16:08 | Reverted ALB-based design after explicit, repeated user rejection ("no load balancer") | infra/*.tf | removed alb.tf, switched CloudFront app origin back to direct ECS task IPv6 (matches live config exactly, verified via API), tofu plan clean (41 to add, 0 errors) | ~38000 |

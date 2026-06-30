@@ -1,5 +1,6 @@
-output "alb_dns_name" {
-  value = aws_lb.app.dns_name
+output "ecs_task_origin_record" {
+  description = "DNS name CloudFront's app origin points to - update its value after every deploy that replaces the task (no load balancer)."
+  value       = aws_route53_record.ecs_task.fqdn
 }
 
 output "ecs_cluster_name" {

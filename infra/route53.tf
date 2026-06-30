@@ -7,6 +7,24 @@ locals {
   app_hostnames = [var.domain_name, "www.${var.domain_name}", "api.${var.domain_name}"]
 }
 
+# Points at whichever Fargate task is currently running - the CloudFront
+# "app" origin (cloudfront.tf) targets this name rather than a load
+# balancer. Brought under management via `tofu import` (it already exists
+# live); `ignore_changes` because its value is updated operationally after
+# each deploy that replaces the task (see README "Releasing new
+# versions"), not by Terraform.
+resource "aws_route53_record" "ecs_task" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "ecs.${var.domain_name}"
+  type    = "AAAA"
+  ttl     = 60
+  records = ["2600:1f18:4f77:4e01:386a:77e7:3b9e:7605"] # seeded from the current live task; updated operationally after that
+
+  lifecycle {
+    ignore_changes = [records]
+  }
+}
+
 resource "aws_route53_record" "app_a" {
   for_each = toset(local.app_hostnames)
 
