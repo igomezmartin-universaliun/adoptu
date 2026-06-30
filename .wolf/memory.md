@@ -652,3 +652,5 @@
 | 15:40 | Edited .claude/worktrees/opentofu-aws-infra/infra/variables.tf | expanded (+20 lines) | ~284 |
 | 15:41 | Edited .claude/worktrees/opentofu-aws-infra/infra/data.tf | expanded (+10 lines) | ~116 |
 | 13:08 | Fixed wrong sheltersDescription i18n text (said "make donations" instead of finding/leaving pets) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | fixed, all 5 locales + backend fallback corrected | ~1.2k |
+| 15:42 | Diagnosed playwright CI email failures: e2e-verify.spec.ts needs live backend/mailpit/test-data, but playwright.yml never starts them | .github/workflows/playwright.yml | logged bug-070, no fix applied yet (pending user) | ~6000 |
+| 15:46 | Removed .github/workflows/playwright.yml (user request — never worked, was emailing failure notifications on every push) | .github/workflows/playwright.yml | deleted, bug-067 updated | ~2500 |
