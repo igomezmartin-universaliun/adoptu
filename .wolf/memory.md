@@ -635,3 +635,4 @@
 | 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 15:50 | Built infra/ OpenTofu config for AWS deployment (account 174000857825, domain adopt-u.org) after live-account discovery via boto3 | infra/*.tf, infra/README.md | tofu validate + tofu plan against real account both clean (45 to add, 0 errors) | ~95000 |
