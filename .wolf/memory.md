@@ -705,3 +705,64 @@
 | 17:04 | Session end: 1 writes across 1 files (.gitattributes) | 0 reads | ~75 tok |
 | 18:52 | Merged main (19 commits, incl. Kover 95% gate + test-coverage-95 suite) into worktree-agent-aa2e565a38703b52b; resolved memory.md union conflict; fixed 109 compile errors across 9 test files (main's new tests called now-suspend repo/service methods synchronously) by wrapping in runBlocking{} + trailing Unit; also fixed a merge-broken buglog.json (missing `},{` separator) | .wolf/memory.md, .wolf/buglog.json, UserRepositoryTest.kt, UIRoutesE2ETest.kt, UserShelterServiceTest.kt, UserSterilizationLocationServiceTest.kt, AuthValidationServiceTest.kt, PetsValidationServiceTest.kt, PhotographersValidationServiceTest.kt, TemporalHomesValidationServiceTest.kt, UsersValidationServiceTest.kt | compile clean, 1118 tests / 0 failures / 0 errors, koverVerify (95% gate) PASSED | ~large |
 | 19:50 | Load-tested 95a5ce8's Dispatchers.IO fix against real ECS limits (--cpus=0.5): regressed to 0.1 RPS / 30-58s p50 (thread thrashing, 70-84 OS threads). Fixed by replacing Dispatchers.IO with a shared bounded dbDispatcher = Dispatchers.IO.limitedParallelism(4) in new DbDispatcher.kt, applied across all 8 repositories | backend/src/main/kotlin/com/adoptu/adapters/db/DbDispatcher.kt, 8 repository files | compile clean, tests + koverVerify (95% gate) PASSED, merged to main | ~medium |
+| 18:01 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 14 reads | ~3870 tok |
+| 18:01 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 14 reads | ~3870 tok |
+| 18:05 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 34 reads | ~3870 tok |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | added 2 import(s) | ~130 |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | modified getAll() | ~361 |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | modified withContext() | ~33 |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | modified update() | ~94 |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | modified delete() | ~233 |
+| 18:06 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | modified getAdoptionRequestsForPet() | ~1431 |
+| 18:07 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt | — | ~2134 |
+| 18:08 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/SterilizationLocationRepository.kt | — | ~2661 |
+| 18:08 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserShelterRepository.kt | — | ~2304 |
+| 18:09 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserSterilizationLocationRepository.kt | — | ~2105 |
+| 18:10 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/UserRepository.kt | — | ~6146 |
+| 18:10 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/TemporalHomeRepository.kt | — | ~3016 |
+| 18:11 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt | — | ~3826 |
+| 18:12 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/PetService.kt | — | ~2824 |
+| 18:13 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/PhotographerService.kt | — | ~2627 |
+| 18:13 | Created .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/TemporalHomeService.kt | — | ~1143 |
+| 18:15 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/EmailVerificationService.kt | modified verifyToken() | ~358 |
+| 18:15 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/EmailChangeService.kt | inline fix | ~30 |
+| 18:15 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/MagicLinkService.kt | inline fix | ~23 |
+| 18:15 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/PasswordService.kt | inline fix | ~24 |
+| 18:15 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/auth/WebAuthnService.kt | modified verifyToken() | ~323 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/AuthValidationService.kt | modified validateEmailAndUser() | ~435 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/UsersValidationService.kt | inline fix | ~19 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/PetsValidationService.kt | inline fix | ~19 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/PhotographersValidationService.kt | inline fix | ~19 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt | modified validateUserById() | ~61 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt | inline fix | ~38 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt | inline fix | ~22 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt | inline fix | ~20 |
+| 18:16 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/TemporalHomesValidationService.kt | inline fix | ~22 |
+| 18:17 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PetRepository.kt | 2→2 lines | ~15 |
+| 18:18 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/PhotographerRepository.kt | 3→3 lines | ~22 |
+| 18:18 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/routes/UIRoutes.kt | inline fix | ~18 |
+| 18:18 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/routes/UIRoutes.kt | modified respondHtml() | ~56 |
+| 18:22 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/PetServiceTest.kt | inline fix | ~30 |
+| 18:22 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/SterilizationLocationServiceTest.kt | modified createLocation() | ~90 |
+| 18:22 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/TemporalHomeServiceTest.kt | modified createTemporalHome() | ~67 |
+| 18:23 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | added 1 import(s) | ~25 |
+| 18:23 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | 3→3 lines | ~45 |
+| 18:23 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | 3→3 lines | ~45 |
+| 18:23 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | 3→3 lines | ~47 |
+| 18:23 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | 3→3 lines | ~49 |
+| 18:27 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/TemporalHomeServiceTest.kt | 6→7 lines | ~45 |
+| 18:28 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/ShelterServiceTest.kt | 12→14 lines | ~108 |
+| 18:28 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/ShelterServiceTest.kt | 54→58 lines | ~402 |
+| 18:28 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/UserServiceTest.kt | 7→8 lines | ~67 |
+| 18:28 | Edited .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/UIRoutesDataTest.kt | 8→9 lines | ~64 |
+| 18:38 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 78 reads | ~60453 tok |
+| 18:53 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 83 reads | ~60453 tok |
+| 18:57 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 83 reads | ~60453 tok |
+| 18:58 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 83 reads | ~60453 tok |
+| 19:04 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 83 reads | ~60453 tok |
+| 19:05 | Session end: 49 writes across 31 files (loadtest.py, stats_sampler.sh, PetRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt) | 83 reads | ~60453 tok |
+
+## Session: 2026-07-01 19:37
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T23:35:37.452Z
-> Files: 683 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T00:28:43.138Z
+> Files: 713 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -44,6 +44,56 @@
 ## .claude/rules/
 
 - `openwolf.md` (~313 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/
+
+- `PetRepository.kt` — PetRepositoryImpl: rowToPetDto, getPetImages, getAll, getById (~4175 tok)
+- `PhotographerRepository.kt` — Data class: PhotographerRepositoryImpl (~3826 tok)
+- `ShelterRepository.kt` — ShelterRepository: rowToDto, getById, getAll, create (~2134 tok)
+- `SterilizationLocationRepository.kt` — SterilizationLocationRepository: rowToDto, getById, getAll, create (~2661 tok)
+- `TemporalHomeRepository.kt` — Data class: TemporalHomeRepositoryImpl (~3016 tok)
+- `UserRepository.kt` — UserRepository: getActiveRolesForUser, getById, getByEmail, getAllUsers (~6146 tok)
+- `UserShelterRepository.kt` — UserShelterRepository: rowToDto, getByUserId, create, update (~2304 tok)
+- `UserSterilizationLocationRepository.kt` — UserSterilizationLocationRepository: rowToDto, getByUserId, create, update (~2105 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/routes/
+
+- `UIRoutes.kt` — Data class: NavParams (~2430 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/
+
+- `EmailChangeService.kt` — EmailChangeService: requestEmailChange, verifyEmailChange, generateToken, getLocalizedEmailChangeCon (~1816 tok)
+- `EmailVerificationService.kt` — EmailVerificationService: getLocalizedContent, generateAndSendVerificationEmail, verifyToken, verify (~1773 tok)
+- `MagicLinkService.kt` — Data class: MagicLinkService (~2662 tok)
+- `PasswordService.kt` — PasswordService: hasPassword, extractPassword, setPassword, changePassword (~2988 tok)
+- `PetService.kt` — PetService: getAll, getById, create, update (~2824 tok)
+- `PhotographerService.kt` — PhotographerService: getPhotographers, getPhotographerById, updatePhotographerSettings, canSendMessa (~2627 tok)
+- `TemporalHomeService.kt` — TemporalHomeService: getTemporalHome, createTemporalHome, updateTemporalHome, searchTemporalHomes (~1143 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/auth/
+
+- `WebAuthnService.kt` — Data class: WebAuthnService (~5433 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/services/validation/
+
+- `AuthValidationService.kt` — AuthValidationService: validateAndDecryptEmail, validateEmailAndUser, validateSession, validateUserB (~673 tok)
+- `PetsValidationService.kt` — PetsValidationService: validateSession, validateUserById, validateUser, validateId (~639 tok)
+- `PhotographersValidationService.kt` — PhotographersValidationService: validateSession, validateUserById, validateUser, validateId (~481 tok)
+- `TemporalHomesValidationService.kt` — TemporalHomesValidationService: validateSession, validateUserById, validateUser, validateId (~1194 tok)
+- `UsersValidationService.kt` — UsersValidationService: validateSession, validateUserById, validateUser, validateId (~631 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/routes/
+
+- `PetsRoutesE2ETest.kt` — Ktor routing (~6098 tok)
+- `UIRoutesDataTest.kt` — UIRoutesDataTest: setup (~4470 tok)
+
+## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/test/kotlin/com/adoptu/services/
+
+- `PetServiceTest.kt` — PetServiceTest: setup (~6373 tok)
+- `ShelterServiceTest.kt` — ShelterServiceTest: setup, createTestShelter (~3345 tok)
+- `SterilizationLocationServiceTest.kt` — SterilizationLocationServiceTest: setup, cleanup (~3602 tok)
+- `TemporalHomeServiceTest.kt` — TemporalHomeServiceTest: setup, cleanup (~4011 tok)
+- `UserServiceTest.kt` — UserServiceTest: setup (~4229 tok)
 
 ## .claude/worktrees/cached-hopping-sutton/
 
