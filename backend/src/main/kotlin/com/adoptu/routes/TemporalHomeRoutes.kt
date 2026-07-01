@@ -10,6 +10,7 @@ import com.adoptu.services.TemporalHomeService
 import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.validation.TemporalHomesValidationService
 import com.adoptu.services.validation.ValidationConstants
+import io.ktor.http.HttpHeaders
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -122,6 +123,13 @@ fun Route.temporalHomeRoutes() {
             )
 
             val results = temporalHomeService.searchTemporalHomes(params)
+            // Public, unauthenticated listing - cached at the CDN edge via an
+            // EXACT path_pattern ("/api/temporal-homes", no wildcard) in
+            // infra/cloudfront.tf. POST /api/temporal-homes/request shares
+            // this prefix and is authenticated - a wildcard would also force
+            // that route's cache behavior to a GET/HEAD/OPTIONS-only
+            // allowed_methods list, which would make CloudFront reject the POST.
+            call.response.header(HttpHeaders.CacheControl, "public, max-age=30")
             call.respond(results)
         }
 

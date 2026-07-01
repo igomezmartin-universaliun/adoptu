@@ -16,6 +16,7 @@ import com.adoptu.services.ServiceResult
 import com.adoptu.services.UserService
 import com.adoptu.services.validation.PhotographersValidationService
 import com.adoptu.services.auth.SessionUser
+import io.ktor.http.HttpHeaders
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -40,6 +41,13 @@ fun Route.photographerRoutes() {
             val country = call.parameters["country"]
             val state = call.parameters["state"]
             val photographers = photographerService.getPhotographers(country, state)
+            // Public, unauthenticated listing - cached at the CDN edge via an
+            // EXACT path_pattern ("/api/photographers", no wildcard) in
+            // infra/cloudfront.tf. This prefix also has authenticated routes
+            // like GET /api/photographers/requests (a user's own requests) -
+            // a wildcard here would risk serving one user's private request
+            // list to another from the shared edge cache.
+            call.response.header(HttpHeaders.CacheControl, "public, max-age=30")
             call.respond(photographers)
         }
 

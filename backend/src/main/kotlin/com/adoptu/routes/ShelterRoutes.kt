@@ -8,6 +8,7 @@ import com.adoptu.plugins.respondSuccess
 import com.adoptu.services.ServiceResult
 import com.adoptu.services.ShelterService
 import com.adoptu.services.validation.ValidationConstants
+import io.ktor.http.HttpHeaders
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -27,6 +28,11 @@ fun Route.shelterRoutes() {
             val neighborhood = call.request.queryParameters["neighborhood"]
             val zip = call.request.queryParameters["zip"]
             val shelters = shelterService.getAll(country, state, city, neighborhood, zip)
+            // Public, unauthenticated listing - cached at the CDN edge (see
+            // infra/cloudfront.tf: ordered_cache_behavior for "/api/shelters*").
+            // The admin variant lives under the separate /api/admin/shelters
+            // prefix, so this wildcard never touches an authenticated route.
+            call.response.header(HttpHeaders.CacheControl, "public, max-age=30")
             call.respond(shelters)
         }
 
