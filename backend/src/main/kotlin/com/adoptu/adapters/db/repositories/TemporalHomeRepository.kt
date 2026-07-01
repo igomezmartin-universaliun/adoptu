@@ -12,7 +12,7 @@ import com.adoptu.dto.input.UpdateTemporalHomeRequest
 import com.adoptu.ports.PetRepositoryPort
 import com.adoptu.ports.TemporalHomeRepositoryPort
 import com.adoptu.ports.UserRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.and
@@ -41,7 +41,7 @@ class TemporalHomeRepositoryImpl(
         val createdAt: Long
     )
 
-    override suspend fun getTemporalHome(userId: Int): TemporalHomeDto? = withContext(Dispatchers.IO) {
+    override suspend fun getTemporalHome(userId: Int): TemporalHomeDto? = withContext(dbDispatcher) {
         transaction {
             val result = TemporalHomes.selectAll()
                 .where { TemporalHomes.userId eq userId }
@@ -65,7 +65,7 @@ class TemporalHomeRepositoryImpl(
         val createdAt = clock.now().toEpochMilliseconds()
         val parsedCountry = Country.fromDisplayName(request.country)
             ?: throw IllegalArgumentException("Invalid country: ${request.country}")
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 TemporalHomes.insert {
                     it[TemporalHomes.userId] = userId
@@ -92,7 +92,7 @@ class TemporalHomeRepositoryImpl(
         }
     }
 
-    override suspend fun updateTemporalHome(userId: Int, request: UpdateTemporalHomeRequest): TemporalHomeDto? = withContext(Dispatchers.IO) {
+    override suspend fun updateTemporalHome(userId: Int, request: UpdateTemporalHomeRequest): TemporalHomeDto? = withContext(dbDispatcher) {
         transaction {
             val existing = TemporalHomes.selectAll()
                 .where { TemporalHomes.userId eq userId }
@@ -130,7 +130,7 @@ class TemporalHomeRepositoryImpl(
         }
     }
 
-    override suspend fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> = withContext(Dispatchers.IO) {
+    override suspend fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> = withContext(dbDispatcher) {
         transaction {
             var conditions: Op<Boolean>? = null
 
@@ -177,7 +177,7 @@ class TemporalHomeRepositoryImpl(
         rescuerId: Int,
         petId: Int?,
         message: String
-    ): Int = withContext(Dispatchers.IO) {
+    ): Int = withContext(dbDispatcher) {
         transaction {
             val createdAt = clock.now().toEpochMilliseconds()
             val requestId = TemporalHomeRequests.insert {
@@ -193,7 +193,7 @@ class TemporalHomeRepositoryImpl(
         }
     }
 
-    override suspend fun isBlocked(temporalHomeId: Int, rescuerId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun isBlocked(temporalHomeId: Int, rescuerId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val blocked = BlockedRescuers.selectAll()
                 .where { (BlockedRescuers.temporalHomeId eq temporalHomeId).and(BlockedRescuers.rescuerId eq rescuerId) }
@@ -202,7 +202,7 @@ class TemporalHomeRepositoryImpl(
         }
     }
 
-    override suspend fun blockRescuer(temporalHomeId: Int, rescuerId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun blockRescuer(temporalHomeId: Int, rescuerId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val alreadyBlocked = BlockedRescuers.selectAll()
                 .where { (BlockedRescuers.temporalHomeId eq temporalHomeId).and(BlockedRescuers.rescuerId eq rescuerId) }
@@ -226,7 +226,7 @@ class TemporalHomeRepositoryImpl(
         // Raw rows are fetched inside the transaction; the cross-repository lookups
         // (userRepository / petRepository, now suspend) happen afterward since they
         // cannot be called from within the transaction {} lambda.
-        val rawRequests = withContext(Dispatchers.IO) {
+        val rawRequests = withContext(dbDispatcher) {
             transaction {
                 TemporalHomeRequests.selectAll()
                     .where { TemporalHomeRequests.temporalHomeId eq userId }

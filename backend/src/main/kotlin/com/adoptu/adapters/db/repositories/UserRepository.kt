@@ -9,7 +9,7 @@ import com.adoptu.dto.input.UserDto
 import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.EmailVerificationTokenInfo
 import com.adoptu.ports.UserRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -44,7 +44,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
-    override suspend fun getById(userId: Int): UserDto? = withContext(Dispatchers.IO) {
+    override suspend fun getById(userId: Int): UserDto? = withContext(dbDispatcher) {
         transaction {
             Users.selectAll()
                 .where { Users.id eq userId }
@@ -76,7 +76,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
-    override suspend fun getByEmail(email: String): UserDto? = withContext(Dispatchers.IO) {
+    override suspend fun getByEmail(email: String): UserDto? = withContext(dbDispatcher) {
         transaction {
             Users.selectAll()
                 .where { Users.username eq email }
@@ -99,7 +99,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
-    override suspend fun getAllUsers(): List<UserDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAllUsers(): List<UserDto> = withContext(dbDispatcher) {
         transaction {
             Users.selectAll()
                 .map { user ->
@@ -120,7 +120,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
-    override suspend fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = withContext(Dispatchers.IO) {
+    override suspend fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = withContext(dbDispatcher) {
         transaction {
             val parsedFilterCountry: Country? = if (!country.isNullOrBlank()) {
                 Country.fromDisplayName(country) ?: return@transaction emptyList()
@@ -161,7 +161,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     override suspend fun getRescuers(): List<UserDto> {
         // Raw id lookup stays inside the transaction; getById (now suspend) is called afterward
         // since it cannot be invoked from within the transaction {} lambda.
-        val rescuerIds = withContext(Dispatchers.IO) {
+        val rescuerIds = withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.selectAll()
                     .where { UserActiveRoles.role eq UserRole.RESCUER.name }
@@ -173,7 +173,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun banUser(userId: Int, reason: String?): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val rowsUpdated = Users.update({ Users.id eq userId }) {
                     it[Users.isBanned] = true
@@ -185,7 +185,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun unbanUser(userId: Int): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val rowsUpdated = Users.update({ Users.id eq userId }) {
                     it[Users.isBanned] = false
@@ -197,7 +197,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun isBanned(userId: Int): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 Users.selectAll()
                     .where { Users.id eq userId }
@@ -208,7 +208,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun isRoleActive(userId: Int, role: UserRole): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq role.name) }
@@ -220,7 +220,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     override suspend fun activateRescuerProfile(userId: Int): UserDto? {
         val user = getById(userId) ?: return null
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existingRole = UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name) }
@@ -237,7 +237,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun deactivateRescuerProfile(userId: Int): UserDto? {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.deleteWhere {
                     (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name)
@@ -254,7 +254,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     override suspend fun activateTemporalHomeProfile(userId: Int): UserDto? {
         val user = getById(userId) ?: return null
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existingRole = UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name) }
@@ -271,7 +271,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun deactivateTemporalHomeProfile(userId: Int): UserDto? {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.deleteWhere {
                     (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name)
@@ -284,7 +284,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     override suspend fun activateShelterProfile(userId: Int): UserDto? {
         val user = getById(userId) ?: return null
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existingRole = UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name) }
@@ -301,7 +301,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun deactivateShelterProfile(userId: Int): UserDto? {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.deleteWhere {
                     (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name)
@@ -314,7 +314,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     override suspend fun activateSterilizationProfile(userId: Int): UserDto? {
         val user = getById(userId) ?: return null
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existingRole = UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name) }
@@ -331,7 +331,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun deactivateSterilizationProfile(userId: Int): UserDto? {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.deleteWhere {
                     (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name)
@@ -345,7 +345,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         if (displayName.isBlank()) {
             throw IllegalArgumentException("Display name cannot be empty")
         }
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 Users.update({ Users.id eq userId }) {
                     it[Users.displayName] = displayName
@@ -362,7 +362,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         if (language.isBlank()) {
             throw IllegalArgumentException("Language cannot be empty")
         }
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 Users.update({ Users.id eq userId }) {
                     it[Users.language] = language
@@ -377,7 +377,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
             throw IllegalArgumentException("Photographer fee must be zero or positive")
         }
 
-        val userExists = withContext(Dispatchers.IO) {
+        val userExists = withContext(dbDispatcher) {
             transaction {
                 Users.selectAll().where { Users.id eq userId }.firstOrNull() != null
             }
@@ -388,7 +388,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
             Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
         }
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
                 if (existing != null) {
@@ -410,7 +410,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
             }
         }
 
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
                 val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
@@ -430,7 +430,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
 
     override suspend fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? {
         val now = clock.now().toEpochMilliseconds()
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 Users.update({ Users.id eq userId }) {
                     if (request.acceptPrivacyPolicy) {
@@ -446,7 +446,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun isEmailVerified(userId: Int): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 Users.selectAll()
                     .where { Users.id eq userId }
@@ -457,7 +457,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun setEmailVerified(userId: Int, verified: Boolean): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val rowsUpdated = Users.update({ Users.id eq userId }) {
                     it[Users.isEmailVerified] = verified
@@ -468,7 +468,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 try {
                     EmailVerificationTokens.insert {
@@ -486,7 +486,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun verifyToken(token: String): Int? {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val now = clock.now().toEpochMilliseconds()
                 val tokenRow = EmailVerificationTokens
@@ -504,7 +504,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun getUserIdByToken(token: String): Int? {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 EmailVerificationTokens
                     .selectAll()
@@ -516,7 +516,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun deleteVerificationTokens(userId: Int) {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
             }
@@ -524,7 +524,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun getVerificationAttemptsToday(userId: Int): Int {
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val startOfDay = getStartOfDayMillis()
                 EmailVerificationAttempts.selectAll()
@@ -536,7 +536,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun recordVerificationAttempt(userId: Int) {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 EmailVerificationAttempts.insert {
                     it[EmailVerificationAttempts.userId] = userId
@@ -547,7 +547,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
     }
 
     override suspend fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo? {
-        val result = withContext(Dispatchers.IO) {
+        val result = withContext(dbDispatcher) {
             transaction {
                 EmailVerificationTokens
                     .selectAll()

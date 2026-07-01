@@ -6,7 +6,7 @@ import com.adoptu.dto.input.CreateShelterRequest
 import com.adoptu.dto.input.ShelterDto
 import com.adoptu.dto.input.UpdateShelterRequest
 import com.adoptu.ports.ShelterRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
@@ -49,7 +49,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         )
     }
 
-    override suspend fun getById(id: Int): ShelterDto? = withContext(Dispatchers.IO) {
+    override suspend fun getById(id: Int): ShelterDto? = withContext(dbDispatcher) {
         transaction {
             AnimalShelters.selectAll()
                 .where { AnimalShelters.id eq id }
@@ -58,7 +58,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         }
     }
 
-    override suspend fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             var conditions: Op<Boolean> = AnimalShelters.country eq parsedCountry
@@ -84,7 +84,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
 
     override suspend fun create(request: CreateShelterRequest): ShelterDto {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val id = AnimalShelters.insert {
                     it[name] = request.name
@@ -117,7 +117,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
 
     override suspend fun update(id: Int, request: UpdateShelterRequest): ShelterDto? {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val existing = AnimalShelters.selectAll().where { AnimalShelters.id eq id }.firstOrNull()
                     ?: return@transaction null
@@ -151,14 +151,14 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         }
     }
 
-    override suspend fun delete(id: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun delete(id: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val rowsDeleted = AnimalShelters.deleteWhere { AnimalShelters.id eq id }
             rowsDeleted > 0
         }
     }
 
-    override suspend fun getCountries(): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun getCountries(): List<String> = withContext(dbDispatcher) {
         transaction {
             AnimalShelters.selectAll()
                 .map { it[AnimalShelters.country].displayName }
@@ -167,7 +167,7 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         }
     }
 
-    override suspend fun getStatesByCountry(country: String): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun getStatesByCountry(country: String): List<String> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             AnimalShelters.selectAll()

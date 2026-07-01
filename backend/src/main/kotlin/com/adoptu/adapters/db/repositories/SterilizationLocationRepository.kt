@@ -9,7 +9,7 @@ import com.adoptu.dto.input.SterilizationLocationsByLocation
 import com.adoptu.dto.input.SterilizationLocationsByState
 import com.adoptu.dto.input.UpdateSterilizationLocationRequest
 import com.adoptu.ports.SterilizationLocationRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
@@ -45,7 +45,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         )
     }
 
-    override suspend fun getById(id: Int): SterilizationLocationDto? = withContext(Dispatchers.IO) {
+    override suspend fun getById(id: Int): SterilizationLocationDto? = withContext(dbDispatcher) {
         transaction {
             SterilizationLocations.selectAll()
                 .where { SterilizationLocations.id eq id }
@@ -54,7 +54,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         }
     }
 
-    override suspend fun getAll(country: String?, state: String?, city: String?, neighborhood: String?, zip: String?): List<SterilizationLocationDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAll(country: String?, state: String?, city: String?, neighborhood: String?, zip: String?): List<SterilizationLocationDto> = withContext(dbDispatcher) {
         transaction {
             var conditions: Op<Boolean>? = null
 
@@ -91,7 +91,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
 
     override suspend fun create(request: CreateSterilizationLocationRequest): SterilizationLocationDto {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val id = SterilizationLocations.insert {
                     it[name] = request.name
@@ -117,7 +117,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
 
     override suspend fun update(id: Int, request: UpdateSterilizationLocationRequest): SterilizationLocationDto? {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val existing = SterilizationLocations.selectAll().where { SterilizationLocations.id eq id }.firstOrNull()
                     ?: return@transaction null
@@ -144,14 +144,14 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         }
     }
 
-    override suspend fun delete(id: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun delete(id: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val rowsDeleted = SterilizationLocations.deleteWhere { SterilizationLocations.id eq id }
             rowsDeleted > 0
         }
     }
 
-    override suspend fun getCountries(): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun getCountries(): List<String> = withContext(dbDispatcher) {
         transaction {
             SterilizationLocations.selectAll()
                 .map { it[SterilizationLocations.country].displayName }
@@ -160,7 +160,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         }
     }
 
-    override suspend fun getStatesByCountry(country: String): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun getStatesByCountry(country: String): List<String> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             SterilizationLocations.selectAll()
@@ -172,7 +172,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         }
     }
 
-    override suspend fun getCitiesByCountryAndState(country: String, state: String?): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun getCitiesByCountryAndState(country: String, state: String?): List<String> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             if (!state.isNullOrBlank()) {
@@ -191,7 +191,7 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         }
     }
 
-    override suspend fun getGroupedByLocation(): List<SterilizationLocationsByLocation> = withContext(Dispatchers.IO) {
+    override suspend fun getGroupedByLocation(): List<SterilizationLocationsByLocation> = withContext(dbDispatcher) {
         transaction {
             val allLocations = SterilizationLocations.selectAll().map { rowToDto(it) }
 

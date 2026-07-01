@@ -1243,6 +1243,7 @@
 
 ## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
 
+- `DbDispatcher.kt` — Shared bounded `dbDispatcher = Dispatchers.IO.limitedParallelism(4)`, reused by all 8 repositories' `withContext(...) { transaction {...} }` calls; bounded to avoid unbounded-Dispatchers.IO thread-thrashing under a cgroup-capped container (~150 tok)
 - `Models.kt` — Exposed table defs; `country` columns on AnimalShelters, SterilizationLocations, UserShelters, UserSterilizationLocations, TemporalHomes, Photographers now use `enumerationByName("country", 100, Country::class)` instead of free-text varchar (~3300 tok)
 
 ## backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ (canonical)

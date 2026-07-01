@@ -1387,6 +1387,27 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T18:50:00Z"
+    },
+    {
+      "id": "bug-078",
+      "timestamp": "2026-06-30T19:47:00Z",
+      "error_message": "Load test against real ECS Fargate resource limits (--cpus=0.5 --memory=1024m) regressed badly after commit 95a5ce8's Dispatchers.IO fix: throughput dropped from 18.2 RPS (before, single-thread-serialized bug) to 0.1 RPS (after), p50 latency 30-58s, OS thread count 20 idle -> 70-84 under load (docker stats).",
+      "file": "backend/src/main/kotlin/com/adoptu/adapters/db/repositories/{PetRepository,PhotographerRepository,ShelterRepository,SterilizationLocationRepository,TemporalHomeRepository,UserRepository,UserShelterRepository,UserSterilizationLocationRepository}.kt",
+      "root_cause": "Dispatchers.IO is Kotlin's elastic, unbounded dispatcher (up to 64 threads), designed assuming blocked-on-I/O threads don't consume real CPU while waiting. Under a cgroup-capped container (0.5 vCPU), that assumption breaks: there's no extra parallelism to exploit, so spinning up dozens of OS threads just adds severe scheduling/context-switch contention on top of an already-saturated half core, ballooning wall-clock latency per request even though CPU% reads the same (~50%, the cgroup cap). Also noted: DatabaseFactory.kt uses plain Database.connect() with no HikariCP/pooled DataSource, so each transaction likely opens a fresh raw JDBC connection via DriverManager.",
+      "fix": "Replaced Dispatchers.IO with a single shared bounded dispatcher, dbDispatcher = Dispatchers.IO.limitedParallelism(4), defined once in a new file backend/src/main/kotlin/com/adoptu/adapters/db/DbDispatcher.kt and reused across all 8 repository implementations' withContext(...) { transaction { ... } } calls. Sized to 4 to keep a few requests' I/O-wait phases overlapping without triggering the same thread-thrashing regression on a 0.5 vCPU task. Did not add HikariCP in this pass (kept the fix minimal/low-risk to preserve the 95% Kover gate); flagged as a good complementary follow-up.",
+      "tags": [
+        "kotlin",
+        "coroutines",
+        "dispatchers",
+        "performance",
+        "regression",
+        "load-test",
+        "ecs-fargate",
+        "thread-contention"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T19:47:00Z"
     }
   ]
 }
