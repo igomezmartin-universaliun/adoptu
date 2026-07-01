@@ -635,3 +635,4 @@
 | 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 18:30 | Converted 8 DB repositories/ports/services to suspend + withContext(Dispatchers.IO) to fix Fargate thread-starvation load-test regression; fixed 46 files incl. tests; committed 95a5ce8 | PetRepository.kt, PhotographerRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt, TemporalHomeRepository.kt, UserRepository.kt, UserShelterRepository.kt, UserSterilizationLocationRepository.kt, +8 ports +8 services +auxiliary services/validation +11 test files | 426/426 tests pass, compile clean | ~large
