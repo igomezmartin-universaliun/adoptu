@@ -784,6 +784,10 @@
 
 - `build.gradle.kts` (~137 tok)
 
+## .claude/worktrees/fix-wolf-merge-conflicts/
+
+- `.gitattributes` — OpenWolf metadata logs are appended to independently by every parallel (~70 tok)
+
 ## .claude/worktrees/floating-crafting-charm/
 
 - `.dockerignore` — Docker ignore rules (~0 tok)
@@ -1091,7 +1095,7 @@
 ## .claude/worktrees/test-coverage-95/.wolf/
 
 - `anatomy.md` — anatomy.md (~11957 tok)
-- `cerebrum.md` — Cerebrum (~2155 tok)
+- `cerebrum.md` — Cerebrum (~3476 tok)
 - `memory.md` — Memory (~8610 tok)
 
 ## .claude/worktrees/test-coverage-95/backend/
