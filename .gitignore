@@ -40,7 +40,7 @@ logs/
 *.ktds
 
 # Kotlin/JS
-kotlin-js-store/
+# yarn.lock is committed for reproducible builds (see kotlinUpgradeYarnLock task)
 
 # Distributions
 build/distributions/*.zip

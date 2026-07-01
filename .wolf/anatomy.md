@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T17:41:32.528Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T18:46:21.175Z
 > Files: 764 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
@@ -21,7 +21,7 @@
 ## ./
 
 - `.dockerignore` — Docker ignore rules (~22 tok)
-- `.gitignore` — Git ignore rules; gradle-wrapper.jar negation now correctly placed after the `*.jar` rule it overrides (~145 tok)
+- `.gitignore` — Git ignore rules (~180 tok)
 - `AGENTS.md` — Adopt-U - Agent Guidelines (~1284 tok)
 - `build.gradle.kts` — Gradle Kotlin build configuration (~2307 tok)
 - `buildspec.yml` — CodeBuild spec: logs into ECR, builds/tags/pushes the image, emits imagedefinitions.json for ECS deploy (~520 tok)
