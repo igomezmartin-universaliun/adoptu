@@ -52,7 +52,7 @@ variable "container_port" {
 
 variable "task_cpu" {
   type    = number
-  default = 1024
+  default = 512
 }
 
 variable "task_memory" {
