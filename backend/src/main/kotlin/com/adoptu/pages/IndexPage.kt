@@ -12,6 +12,18 @@ fun HTML.indexPage(navParams: NavParams = NavParams()) {
         }
         main {
             h1 { attributes["data-i18n"] = "petsForAdoption"; +"Pets for Adoption" }
+            div(classes = "location-search-form") {
+                p(classes = "location-search-hint") { id = "pets-country-hint"; attributes["data-i18n"] = "selectCountryFirst"; +"Select a country to enable filters" }
+                div(classes = "location-search-country") {
+                    label { htmlFor = "pets-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
+                    select {
+                        id = "pets-country"
+                        name = "country"
+                        countrySelect("pets-country", true, "selectCountryToSearch")
+                    }
+                }
+            }
+            div { id = "pets-error"; classes = setOf("error-message"); style = "display:none" }
             div(classes = "filter-buttons") {
                 button(classes = "filter-btn active", type = ButtonType.button) { attributes["data-type"] = ""; attributes["data-i18n"] = "all"; +"All" }
                 button(classes = "filter-btn", type = ButtonType.button) { attributes["data-type"] = "DOG"; +"🐕 Dogs" }
