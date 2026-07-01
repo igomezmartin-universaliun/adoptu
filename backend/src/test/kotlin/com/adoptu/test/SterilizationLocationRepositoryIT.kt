@@ -17,6 +17,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class SterilizationLocationRepositoryIT {
@@ -38,7 +39,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `create and get sterilization location`() {
+    fun `create and get sterilization location`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "Test Vet Clinic",
             country = "United States",
@@ -66,7 +67,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `get all sterilization locations`() {
+    fun `get all sterilization locations`() = runBlocking {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
             country = "United States",
@@ -104,7 +105,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `update sterilization location`() {
+    fun `update sterilization location`() = runBlocking {
         val created = repository.create(CreateSterilizationLocationRequest(
             name = "Original Name",
             country = "United States",
@@ -125,7 +126,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `delete sterilization location`() {
+    fun `delete sterilization location`() = runBlocking {
         val created = repository.create(CreateSterilizationLocationRequest(
             name = "To Delete",
             country = "United States",
@@ -141,7 +142,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `get countries`() {
+    fun `get countries`() = runBlocking {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
             country = "United States",
@@ -168,7 +169,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `get states by country`() {
+    fun `get states by country`() = runBlocking {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
             country = "United States",
@@ -198,7 +199,7 @@ class SterilizationLocationRepositoryIT {
     }
 
     @Test
-    fun `get grouped by location`() {
+    fun `get grouped by location`() = runBlocking {
         repository.create(CreateSterilizationLocationRequest(
             name = "Vet 1",
             country = "United States",

@@ -20,6 +20,7 @@ import java.math.BigDecimal
 import kotlin.test.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class PhotographerServiceTest {
@@ -38,7 +39,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographers returns photographers from UserService`() {
+    fun `getPhotographers returns photographers from UserService`() = runBlocking {
         createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -49,7 +50,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `canSendMessage returns true when no recent requests`() {
+    fun `canSendMessage returns true when no recent requests`() = runBlocking {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val result = photographerService.canSendMessage(userId)
@@ -58,7 +59,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `canSendMessage returns false when request sent within week`() {
+    fun `canSendMessage returns false when request sent within week`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -78,7 +79,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `canSendMessage returns true when request older than week`() {
+    fun `canSendMessage returns true when request older than week`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         val oneWeekAgo = clock.now().toEpochMilliseconds() - (PhotographerRepositoryImpl.ONE_WEEK + 1000)
@@ -99,7 +100,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest fails with empty photographer list`() {
+    fun `createPhotographyRequest fails with empty photographer list`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val result = photographerService.createPhotographyRequest(
@@ -114,7 +115,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest fails with more than 3 photographers`() {
+    fun `createPhotographyRequest fails with more than 3 photographers`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
@@ -133,7 +134,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest fails when rate limited`() {
+    fun `createPhotographyRequest fails when rate limited`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -159,7 +160,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest fails when user not found`() {
+    fun `createPhotographyRequest fails when user not found`() = runBlocking {
         val result = photographerService.createPhotographyRequest(
             requesterId = 999,
             photographerIds = listOf(1),
@@ -172,7 +173,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest creates requests successfully`() {
+    fun `createPhotographyRequest creates requests successfully`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -202,7 +203,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest creates requests with pet`() {
+    fun `createPhotographyRequest creates requests with pet`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         val petId = createTestPet(rescuerId = requesterId, name = "Buddy", type = "DOG")
@@ -221,7 +222,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest sends notification to photographers`() {
+    fun `createPhotographyRequest sends notification to photographers`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -246,7 +247,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getMyRequests returns empty list when no requests`() {
+    fun `getMyRequests returns empty list when no requests`() = runBlocking {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val result = photographerService.getMyRequests(userId)
@@ -255,7 +256,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getMyRequests returns requests for user`() {
+    fun `getMyRequests returns requests for user`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -276,7 +277,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getRequestsForPhotographer returns empty list when no requests`() {
+    fun `getRequestsForPhotographer returns empty list when no requests`() = runBlocking {
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
         val result = photographerService.getRequestsForPhotographer(photographerId)
@@ -285,7 +286,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getRequestsForPhotographer returns requests for photographer`() {
+    fun `getRequestsForPhotographer returns requests for photographer`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         val petId = createTestPet(rescuerId = requesterId, name = "Buddy", type = "DOG")
@@ -309,7 +310,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest skips non-existent photographers`() {
+    fun `createPhotographyRequest skips non-existent photographers`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -326,7 +327,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest allows exactly 3 photographers`() {
+    fun `createPhotographyRequest allows exactly 3 photographers`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
@@ -345,7 +346,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographers returns only photographers`() {
+    fun `getPhotographers returns only photographers`() = runBlocking {
         createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         createTestUser(username = "photographer2@test.com", displayName = "Photo 2", role = "PHOTOGRAPHER")
@@ -357,7 +358,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographers returns empty list when no photographers`() {
+    fun `getPhotographers returns empty list when no photographers`() = runBlocking {
         createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val result = photographerService.getPhotographers()
@@ -366,7 +367,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographers includes photographer fee and currency`() {
+    fun `getPhotographers includes photographer fee and currency`() = runBlocking {
         val photographerId = createTestUser(
             username = "photographer1@test.com",
             displayName = "Photo 1",
@@ -389,7 +390,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographerSettings updates fee and currency`() {
+    fun `updatePhotographerSettings updates fee and currency`() = runBlocking {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         val result = photographerService.updatePhotographerSettings(
@@ -403,7 +404,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographerSettings throws exception for negative fee`() {
+    fun `updatePhotographerSettings throws exception for negative fee`() = runBlocking {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         val exception = assertThrows<IllegalArgumentException> {
@@ -417,7 +418,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographerSettings allows zero fee`() {
+    fun `updatePhotographerSettings allows zero fee`() = runBlocking {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         val result = photographerService.updatePhotographerSettings(
@@ -430,7 +431,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographerSettings returns null for non-existent user`() {
+    fun `updatePhotographerSettings returns null for non-existent user`() = runBlocking {
         val result = photographerService.updatePhotographerSettings(
             999,
             PhotographerSettingsRequest(photographerFee = 50.0, photographerCurrency = "USD")
@@ -483,7 +484,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographerById returns photographer when exists`() {
+    fun `getPhotographerById returns photographer when exists`() = runBlocking {
         val photographerId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         transaction {
@@ -502,14 +503,14 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getPhotographerById returns null when not found`() {
+    fun `getPhotographerById returns null when not found`() = runBlocking {
         val result = photographerService.getPhotographerById(999)
 
         assertNull(result)
     }
 
     @Test
-    fun `createPhotographyRequest single creates request successfully`() {
+    fun `createPhotographyRequest single creates request successfully`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -534,7 +535,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `createPhotographyRequest single throws when photographer not found`() {
+    fun `createPhotographyRequest single throws when photographer not found`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val exception = assertThrows<IllegalArgumentException> {
@@ -550,7 +551,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getRequestsForUser returns requests for photographer role`() {
+    fun `getRequestsForUser returns requests for photographer role`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -582,7 +583,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `getRequestsForUser returns requests for non-photographer role`() {
+    fun `getRequestsForUser returns requests for non-photographer role`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -614,7 +615,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `activatePhotographerProfile adds photographer role`() {
+    fun `activatePhotographerProfile adds photographer role`() = runBlocking {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
 
         val result = photographerService.activatePhotographerProfile(userId)
@@ -624,7 +625,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `deactivatePhotographerProfile removes photographer role`() {
+    fun `deactivatePhotographerProfile removes photographer role`() = runBlocking {
         val userId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "PHOTOGRAPHER")
 
         val result = photographerService.deactivatePhotographerProfile(userId)
@@ -634,7 +635,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest returns NotFound when request not exists`() {
+    fun `updatePhotographyRequest returns NotFound when request not exists`() = runBlocking {
         val userId = createTestUser(username = "photographer@test.com", displayName = "Photo", role = "PHOTOGRAPHER")
 
         val result = photographerService.updatePhotographyRequest(
@@ -648,7 +649,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest returns Forbidden when user not authorized`() {
+    fun `updatePhotographyRequest returns Forbidden when user not authorized`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
         val otherUserId = createTestUser(username = "other@test.com", displayName = "Other", role = "ADOPTER")
@@ -674,7 +675,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest allows photographer to approve request`() {
+    fun `updatePhotographyRequest allows photographer to approve request`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -699,7 +700,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest allows requester to cancel request`() {
+    fun `updatePhotographyRequest allows requester to cancel request`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -724,7 +725,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest allows admin to update any request`() {
+    fun `updatePhotographyRequest allows admin to update any request`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 
@@ -760,7 +761,7 @@ class PhotographerServiceTest {
     }
 
     @Test
-    fun `updatePhotographyRequest throws on invalid status transition`() {
+    fun `updatePhotographyRequest throws on invalid status transition`() = runBlocking {
         val requesterId = createTestUser(username = "user1@test.com", displayName = "User 1", role = "ADOPTER")
         val photographerId = createTestUser(username = "photographer1@test.com", displayName = "Photo 1", role = "PHOTOGRAPHER")
 

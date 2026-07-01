@@ -7,14 +7,14 @@ import com.adoptu.ports.ShelterRepositoryPort
 
 class ShelterService(private val shelterRepository: ShelterRepositoryPort) {
 
-    fun getAll(country: String, state: String? = null, city: String? = null, neighborhood: String? = null, zip: String? = null): List<ShelterDto> {
+    suspend fun getAll(country: String, state: String? = null, city: String? = null, neighborhood: String? = null, zip: String? = null): List<ShelterDto> {
         require(country.isNotBlank()) { "Country is required" }
         return shelterRepository.getAll(country, state, city, neighborhood, zip)
     }
 
-    fun getById(id: Int): ShelterDto? = shelterRepository.getById(id)
+    suspend fun getById(id: Int): ShelterDto? = shelterRepository.getById(id)
 
-    fun create(request: CreateShelterRequest): ShelterDto {
+    suspend fun create(request: CreateShelterRequest): ShelterDto {
         require(request.name.isNotBlank()) { "Name is required" }
         require(request.country.isNotBlank()) { "Country is required" }
         require(request.city.isNotBlank()) { "City is required" }
@@ -22,19 +22,19 @@ class ShelterService(private val shelterRepository: ShelterRepositoryPort) {
         return shelterRepository.create(request)
     }
 
-    fun update(id: Int, request: UpdateShelterRequest): ServiceResult<ShelterDto> {
+    suspend fun update(id: Int, request: UpdateShelterRequest): ServiceResult<ShelterDto> {
         val existing = shelterRepository.getById(id) ?: return ServiceResult.NotFound
         val updated = shelterRepository.update(id, request)
         return if (updated != null) ServiceResult.Success(updated) else ServiceResult.NotFound
     }
 
-    fun delete(id: Int): ServiceResult<Unit> {
+    suspend fun delete(id: Int): ServiceResult<Unit> {
         val existing = shelterRepository.getById(id) ?: return ServiceResult.NotFound
         val deleted = shelterRepository.delete(id)
         return if (deleted) ServiceResult.Success(Unit) else ServiceResult.NotFound
     }
 
-    fun getCountries(): List<String> = shelterRepository.getCountries()
+    suspend fun getCountries(): List<String> = shelterRepository.getCountries()
 
-    fun getStatesByCountry(country: String): List<String> = shelterRepository.getStatesByCountry(country)
+    suspend fun getStatesByCountry(country: String): List<String> = shelterRepository.getStatesByCountry(country)
 }

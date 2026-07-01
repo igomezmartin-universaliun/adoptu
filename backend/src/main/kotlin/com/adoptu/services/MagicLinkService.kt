@@ -37,7 +37,7 @@ class MagicLinkService(
     private val magicLinkExpirationMs = 5 * 60 * 1000L
     private val maxMagicLinksPerDay = 5
 
-    fun requestMagicLink(email: String, language: String): Result<Boolean> {
+    suspend fun requestMagicLink(email: String, language: String): Result<Boolean> {
         val user = userRepository.getByEmail(email) ?: run {
             logger.info("Magic link requested for unknown email (returning success to avoid enumeration)")
             return Result.success(true)

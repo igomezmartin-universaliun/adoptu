@@ -26,6 +26,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class TemporalHomeServiceTest {
@@ -61,13 +62,13 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `getTemporalHome returns null for non-existent user`() {
+    fun `getTemporalHome returns null for non-existent user`() = runBlocking {
         val result = service.getTemporalHome(999)
         assertNull(result)
     }
 
     @Test
-    fun `getTemporalHome returns temporal home by userId`() {
+    fun `getTemporalHome returns temporal home by userId`() = runBlocking {
         val userId = createTestUser("home@test.com", "Test Home")
         createTemporalHome(userId, "My Home", "United States", "California", "Los Angeles")
 
@@ -81,7 +82,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `createTemporalHome creates successfully`() {
+    fun `createTemporalHome creates successfully`() = runBlocking {
         val userId = createTestUser("create@test.com", "Create User")
         val request = CreateTemporalHomeRequest(
             alias = "New Home",
@@ -104,7 +105,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `updateTemporalHome updates successfully`() {
+    fun `updateTemporalHome updates successfully`() = runBlocking {
         val userId = createTestUser("update@test.com", "Update User")
         createTemporalHome(userId, "Old Alias", "United States", "California", "LA")
         val request = UpdateTemporalHomeRequest(
@@ -121,7 +122,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `updateTemporalHome allows partial updates`() {
+    fun `updateTemporalHome allows partial updates`() = runBlocking {
         val userId = createTestUser("partial@test.com", "Partial User")
         createTemporalHome(userId, "Original", "United States", "California", "LA")
         val request = UpdateTemporalHomeRequest(phone = "+1-555-9999")
@@ -133,7 +134,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `updateTemporalHome returns null for non-existent user`() {
+    fun `updateTemporalHome returns null for non-existent user`() = runBlocking {
         val request = UpdateTemporalHomeRequest(alias = "New")
 
         val result = service.updateTemporalHome(999, request)
@@ -142,13 +143,13 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `searchTemporalHomes returns empty list when no results`() {
+    fun `searchTemporalHomes returns empty list when no results`() = runBlocking {
         val result = service.searchTemporalHomes(TemporalHomeSearchParams(country = "United States"))
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `searchTemporalHomes filters by country`() {
+    fun `searchTemporalHomes filters by country`() = runBlocking {
         val user1 = createTestUser("home1@test.com", "Home 1")
         val user2 = createTestUser("home2@test.com", "Home 2")
         createTemporalHome(user1, "US Home", "United States", "California", "LA")
@@ -161,7 +162,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `searchTemporalHomes filters by country and state`() {
+    fun `searchTemporalHomes filters by country and state`() = runBlocking {
         val user1 = createTestUser("ca@test.com", "CA User")
         val user2 = createTestUser("ny@test.com", "NY User")
         createTemporalHome(user1, "CA Home", "United States", "California", "LA")
@@ -176,7 +177,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `searchTemporalHomes filters by all params`() {
+    fun `searchTemporalHomes filters by all params`() = runBlocking {
         val user1 = createTestUser("la@test.com", "LA User")
         val user2 = createTestUser("sf@test.com", "SF User")
         createTemporalHome(user1, "LA Home", "United States", "California", "Los Angeles")
@@ -195,7 +196,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `sendRequest fails when temporal home not found`() {
+    fun `sendRequest fails when temporal home not found`() = runBlocking {
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
         val request = SendTemporalHomeRequestRequest(
             temporalHomeId = 999,
@@ -209,7 +210,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `sendRequest fails when user not found`() {
+    fun `sendRequest fails when user not found`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
 
@@ -223,7 +224,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `sendRequest fails when user is not rescuer or admin`() {
+    fun `sendRequest fails when user is not rescuer or admin`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val adopterId = createTestUser("adopter@test.com", "Adopter", "ADOPTER")
@@ -238,7 +239,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `sendRequest succeeds for rescuer`() {
+    fun `sendRequest succeeds for rescuer`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -251,10 +252,11 @@ class TemporalHomeServiceTest {
 
         assertTrue(result.isSuccess)
         assertNotNull(result.getOrNull())
+        Unit
     }
 
     @Test
-    fun `sendRequest succeeds for admin`() {
+    fun `sendRequest succeeds for admin`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val adminId = createTestUser("admin@test.com", "Admin", "ADMIN")
@@ -268,7 +270,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `sendRequest fails when blocked`() {
+    fun `sendRequest fails when blocked`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -284,7 +286,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `isBlocked returns true when blocked`() {
+    fun `isBlocked returns true when blocked`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -296,7 +298,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `isBlocked returns false when not blocked`() {
+    fun `isBlocked returns false when not blocked`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -307,7 +309,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `blockRescuer blocks rescuer successfully`() {
+    fun `blockRescuer blocks rescuer successfully`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -319,7 +321,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `blockRescuer returns false for already blocked`() {
+    fun `blockRescuer returns false for already blocked`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -331,7 +333,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `getMyRequests returns empty list when no requests`() {
+    fun `getMyRequests returns empty list when no requests`() = runBlocking {
         val userId = createTestUser("test@test.com", "Test User")
 
         val result = service.getMyRequests(userId)
@@ -340,7 +342,7 @@ class TemporalHomeServiceTest {
     }
 
     @Test
-    fun `getMyRequests returns requests for user`() {
+    fun `getMyRequests returns requests for user`() = runBlocking {
         val homeUserId = createTestUser("home@test.com", "Home User")
         createTemporalHome(homeUserId, "My Home", "United States", "California", "LA")
         val rescuerId = createTestUser("rescuer@test.com", "Rescuer", "RESCUER")
@@ -356,7 +358,7 @@ class TemporalHomeServiceTest {
         assertEquals("Need help", result.first().message)
     }
 
-    private fun createTemporalHome(
+    private suspend fun createTemporalHome(
         userId: Int,
         alias: String,
         country: String,

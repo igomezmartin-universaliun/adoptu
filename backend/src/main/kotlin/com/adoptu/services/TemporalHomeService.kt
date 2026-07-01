@@ -23,18 +23,18 @@ class TemporalHomeService(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun getTemporalHome(userId: Int): TemporalHomeDto? = temporalHomeRepository.getTemporalHome(userId)
+    suspend fun getTemporalHome(userId: Int): TemporalHomeDto? = temporalHomeRepository.getTemporalHome(userId)
 
-    fun createTemporalHome(userId: Int, request: CreateTemporalHomeRequest): TemporalHomeDto =
+    suspend fun createTemporalHome(userId: Int, request: CreateTemporalHomeRequest): TemporalHomeDto =
         temporalHomeRepository.createTemporalHome(userId, request)
 
-    fun updateTemporalHome(userId: Int, request: UpdateTemporalHomeRequest): TemporalHomeDto? =
+    suspend fun updateTemporalHome(userId: Int, request: UpdateTemporalHomeRequest): TemporalHomeDto? =
         temporalHomeRepository.updateTemporalHome(userId, request)
 
-    fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> =
+    suspend fun searchTemporalHomes(params: TemporalHomeSearchParams): List<TemporalHomeDto> =
         temporalHomeRepository.searchTemporalHomes(params)
 
-    fun sendRequest(requesterId: Int, request: SendTemporalHomeRequestRequest): Result<Int> {
+    suspend fun sendRequest(requesterId: Int, request: SendTemporalHomeRequestRequest): Result<Int> {
         val temporalHome = getTemporalHome(request.temporalHomeId)
             ?: return Result.failure(IllegalArgumentException("Temporal home not found"))
 
@@ -62,7 +62,7 @@ class TemporalHomeService(
             val baseUrl = "https://adopt-u.com"
             val spamReportLink = "$baseUrl/temporal-home/block/${request.temporalHomeId}?rescuer=$requesterId"
             val pet = if (request.petId != null) temporalHomeRepository.getTemporalHome(request.temporalHomeId) else null
-            
+
             scope.launch {
                 notificationAdapter.sendTemporalHomeRequest(
                     temporalHomeEmail = temporalHomeEmail,
@@ -78,16 +78,16 @@ class TemporalHomeService(
         return Result.success(createdRequestId)
     }
 
-    fun isBlocked(temporalHomeId: Int, rescuerId: Int): Boolean =
+    suspend fun isBlocked(temporalHomeId: Int, rescuerId: Int): Boolean =
         temporalHomeRepository.isBlocked(temporalHomeId, rescuerId)
 
-    fun blockRescuer(temporalHomeId: Int, rescuerId: Int): Boolean =
+    suspend fun blockRescuer(temporalHomeId: Int, rescuerId: Int): Boolean =
         temporalHomeRepository.blockRescuer(temporalHomeId, rescuerId)
 
-    fun getMyRequests(userId: Int): List<TemporalHomeRequestDto> =
+    suspend fun getMyRequests(userId: Int): List<TemporalHomeRequestDto> =
         temporalHomeRepository.getMyRequests(userId)
 
-    fun activateTemporalHomeProfile(userId: Int): UserDto? = userRepository.activateTemporalHomeProfile(userId)
+    suspend fun activateTemporalHomeProfile(userId: Int): UserDto? = userRepository.activateTemporalHomeProfile(userId)
 
-    fun deactivateTemporalHomeProfile(userId: Int): UserDto? = userRepository.deactivateTemporalHomeProfile(userId)
+    suspend fun deactivateTemporalHomeProfile(userId: Int): UserDto? = userRepository.deactivateTemporalHomeProfile(userId)
 }

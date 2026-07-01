@@ -137,7 +137,7 @@ class PasswordService(
         return true
     }
 
-    fun requestPasswordReset(email: String, language: String): Result<Boolean> {
+    suspend fun requestPasswordReset(email: String, language: String): Result<Boolean> {
         val user = userRepository.getByEmail(email) ?: return Result.success(true)
         
         val resetAttemptsToday = transaction {

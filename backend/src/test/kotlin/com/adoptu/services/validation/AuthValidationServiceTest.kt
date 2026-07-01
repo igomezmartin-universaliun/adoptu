@@ -17,6 +17,7 @@ import org.jetbrains.exposed.v1.jdbc.update
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
@@ -83,120 +84,132 @@ class AuthValidationServiceTest {
     // validateAndDecryptEmail
 
     @Test
-    fun `validateAndDecryptEmail returns Success for valid encrypted email`() {
+    fun `validateAndDecryptEmail returns Success for valid encrypted email`() = runBlocking {
         val data = encrypted("user@test.com")
 
         val result = service.validateAndDecryptEmail(data)
 
         assertIs<ServiceResult.Success<String>>(result)
         assertEquals("user@test.com", result.data)
+        Unit
     }
 
     @Test
-    fun `validateAndDecryptEmail returns Error when decryption fails`() {
+    fun `validateAndDecryptEmail returns Error when decryption fails`() = runBlocking {
         val result = service.validateAndDecryptEmail("not-a-valid-ciphertext!!")
 
         assertIs<ServiceResult.Error<String>>(result)
         assertEquals("Failed to decrypt email", result.message)
+        Unit
     }
 
     @Test
-    fun `validateAndDecryptEmail returns Error for invalid email format`() {
+    fun `validateAndDecryptEmail returns Error for invalid email format`() = runBlocking {
         val data = encrypted("not-an-email")
 
         val result = service.validateAndDecryptEmail(data)
 
         assertIs<ServiceResult.Error<String>>(result)
         assertEquals("Invalid email format", result.message)
+        Unit
     }
 
     // validateEmailAndUser
 
     @Test
-    fun `validateEmailAndUser returns Error for invalid email format`() {
+    fun `validateEmailAndUser returns Error for invalid email format`() = runBlocking {
         val result = service.validateEmailAndUser("not-an-email")
 
         assertIs<ServiceResult.Error<UserDto>>(result)
         assertEquals("Invalid email format", result.message)
+        Unit
     }
 
     @Test
-    fun `validateEmailAndUser returns Error when user not found`() {
+    fun `validateEmailAndUser returns Error when user not found`() = runBlocking {
         val result = service.validateEmailAndUser("missing@test.com")
 
         assertIs<ServiceResult.Error<UserDto>>(result)
         assertEquals("Invalid credentials", result.message)
+        Unit
     }
 
     @Test
-    fun `validateEmailAndUser returns Success when user found`() {
+    fun `validateEmailAndUser returns Success when user found`() = runBlocking {
         createTestUser(username = "found@test.com")
 
         val result = service.validateEmailAndUser("found@test.com")
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals("found@test.com", result.data.username)
+        Unit
     }
 
     // validateSession
 
     @Test
-    fun `validateSession returns Forbidden when session is null`() {
+    fun `validateSession returns Forbidden when session is null`() = runBlocking {
         val result = service.validateSession(null)
 
         assertIs<ServiceResult.Forbidden>(result)
+        Unit
     }
 
     @Test
-    fun `validateSession returns Success when session is present`() {
+    fun `validateSession returns Success when session is present`() = runBlocking {
         val session = SessionUser(userId = 1, email = "a@test.com", displayName = "A")
 
         val result = service.validateSession(session)
 
         assertIs<ServiceResult.Success<SessionUser>>(result)
         assertEquals(session, result.data)
+        Unit
     }
 
     // validateUserById
 
     @Test
-    fun `validateUserById returns Success when user exists`() {
+    fun `validateUserById returns Success when user exists`() = runBlocking {
         val userId = createTestUser()
 
         val result = service.validateUserById(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateUserById returns NotFound when user does not exist`() {
+    fun `validateUserById returns NotFound when user does not exist`() = runBlocking {
         val result = service.validateUserById(999)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     // validateNotBanned
 
     @Test
-    fun `validateNotBanned returns Success when user is not banned`() {
+    fun `validateNotBanned returns Success when user is not banned`() = runBlocking {
         val userId = createTestUser()
 
         val result = service.validateNotBanned(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateNotBanned returns NotFound when user does not exist`() {
+    fun `validateNotBanned returns NotFound when user does not exist`() = runBlocking {
         val result = service.validateNotBanned(999)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     @Test
-    fun `validateNotBanned returns Error with reason when user is banned with a reason`() {
+    fun `validateNotBanned returns Error with reason when user is banned with a reason`() = runBlocking {
         val userId = createTestUser()
         userService.banUser(userId, "Spam activity")
 
@@ -204,10 +217,11 @@ class AuthValidationServiceTest {
 
         assertIs<ServiceResult.Error<UserDto>>(result)
         assertEquals("Your account has been suspended. Reason: Spam activity", result.message)
+        Unit
     }
 
     @Test
-    fun `validateNotBanned returns Error with default reason when user is banned without a reason`() {
+    fun `validateNotBanned returns Error with default reason when user is banned without a reason`() = runBlocking {
         val userId = createTestUser()
         userService.banUser(userId)
 
@@ -215,22 +229,24 @@ class AuthValidationServiceTest {
 
         assertIs<ServiceResult.Error<UserDto>>(result)
         assertEquals("Your account has been suspended. Reason: Contact administrator", result.message)
+        Unit
     }
 
     // validateVerified
 
     @Test
-    fun `validateVerified returns Error with email when user is not verified`() {
+    fun `validateVerified returns Error with email when user is not verified`() = runBlocking {
         val userId = createTestUser()
 
         val result = service.validateVerified(userId, "user@test.com")
 
         assertIs<ServiceResult.Error<Unit>>(result)
         assertEquals("user@test.com", result.message)
+        Unit
     }
 
     @Test
-    fun `validateVerified returns Success when user is verified`() {
+    fun `validateVerified returns Success when user is verified`() = runBlocking {
         val userId = createTestUser()
         transaction {
             Users.update({ Users.id eq userId }) {
@@ -241,23 +257,26 @@ class AuthValidationServiceTest {
         val result = service.validateVerified(userId, "user@test.com")
 
         assertIs<ServiceResult.Success<Unit>>(result)
+        Unit
     }
 
     // getUserByEmail
 
     @Test
-    fun `getUserByEmail returns user when found`() {
+    fun `getUserByEmail returns user when found`() = runBlocking {
         createTestUser(username = "lookup@test.com")
 
         val result = service.getUserByEmail("lookup@test.com")
 
         assertEquals("lookup@test.com", result?.username)
+        Unit
     }
 
     @Test
-    fun `getUserByEmail returns null when not found`() {
+    fun `getUserByEmail returns null when not found`() = runBlocking {
         val result = service.getUserByEmail("missing@test.com")
 
         assertNull(result)
+        Unit
     }
 }

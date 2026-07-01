@@ -19,6 +19,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
@@ -100,45 +101,49 @@ class TemporalHomesValidationServiceTest {
     // validateSession
 
     @Test
-    fun `validateSession returns Forbidden when session is null`() {
+    fun `validateSession returns Forbidden when session is null`() = runBlocking {
         val result = service.validateSession(null)
 
         assertIs<ServiceResult.Forbidden>(result)
+        Unit
     }
 
     @Test
-    fun `validateSession returns Success when session is present`() {
+    fun `validateSession returns Success when session is present`() = runBlocking {
         val session = SessionUser(userId = 1, email = "a@test.com", displayName = "A")
 
         val result = service.validateSession(session)
 
         assertIs<ServiceResult.Success<SessionUser>>(result)
         assertEquals(session, result.data)
+        Unit
     }
 
     // validateUserById
 
     @Test
-    fun `validateUserById returns Success when user exists`() {
+    fun `validateUserById returns Success when user exists`() = runBlocking {
         val userId = createTestUser()
 
         val result = service.validateUserById(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateUserById returns NotFound when user does not exist`() {
+    fun `validateUserById returns NotFound when user does not exist`() = runBlocking {
         val result = service.validateUserById(999)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     // validateUser
 
     @Test
-    fun `validateUser returns Success when user is not null`() {
+    fun `validateUser returns Success when user is not null`() = runBlocking {
         val userId = createTestUser()
         val user = userService.getById(userId)!!
 
@@ -146,103 +151,114 @@ class TemporalHomesValidationServiceTest {
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(user, result.data)
+        Unit
     }
 
     @Test
-    fun `validateUser returns NotFound when user is null`() {
+    fun `validateUser returns NotFound when user is null`() = runBlocking {
         val result = service.validateUser(null)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     // validateId
 
     @Test
-    fun `validateId returns Success for valid numeric id`() {
+    fun `validateId returns Success for valid numeric id`() = runBlocking {
         val result = service.validateId("11")
 
         assertIs<ServiceResult.Success<Int>>(result)
         assertEquals(11, result.data)
+        Unit
     }
 
     @Test
-    fun `validateId returns Error for null id`() {
+    fun `validateId returns Error for null id`() = runBlocking {
         val result = service.validateId(null)
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_ID, result.message)
+        Unit
     }
 
     @Test
-    fun `validateId returns Error for non-numeric id`() {
+    fun `validateId returns Error for non-numeric id`() = runBlocking {
         val result = service.validateId("bad")
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_ID, result.message)
+        Unit
     }
 
     // validateRequired
 
     @Test
-    fun `validateRequired returns Success for non-blank value`() {
+    fun `validateRequired returns Success for non-blank value`() = runBlocking {
         val result = service.validateRequired("Some Value", "Alias")
 
         assertIs<ServiceResult.Success<String>>(result)
         assertEquals("Some Value", result.data)
+        Unit
     }
 
     @Test
-    fun `validateRequired returns Error for null value`() {
+    fun `validateRequired returns Error for null value`() = runBlocking {
         val result = service.validateRequired(null, "Alias")
 
         assertIs<ServiceResult.Error<String>>(result)
         assertEquals("Alias is required", result.message)
+        Unit
     }
 
     @Test
-    fun `validateRequired returns Error for blank value`() {
+    fun `validateRequired returns Error for blank value`() = runBlocking {
         val result = service.validateRequired("   ", "Alias")
 
         assertIs<ServiceResult.Error<String>>(result)
         assertEquals("Alias is required", result.message)
+        Unit
     }
 
     // validateRole
 
     @Test
-    fun `validateRole returns Success when user has required role`() {
+    fun `validateRole returns Success when user has required role`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
         val user = userService.getById(userId)!!
 
         val result = service.validateRole(user, "TEMPORAL_HOME")
 
         assertIs<ServiceResult.Success<Unit>>(result)
+        Unit
     }
 
     @Test
-    fun `validateRole returns Success when user is admin`() {
+    fun `validateRole returns Success when user is admin`() = runBlocking {
         val userId = createTestUser(role = "ADMIN")
         val user = userService.getById(userId)!!
 
         val result = service.validateRole(user, "TEMPORAL_HOME")
 
         assertIs<ServiceResult.Success<Unit>>(result)
+        Unit
     }
 
     @Test
-    fun `validateRole returns Forbidden when user lacks required role`() {
+    fun `validateRole returns Forbidden when user lacks required role`() = runBlocking {
         val userId = createTestUser(role = "ADOPTER")
         val user = userService.getById(userId)!!
 
         val result = service.validateRole(user, "TEMPORAL_HOME")
 
         assertIs<ServiceResult.Forbidden>(result)
+        Unit
     }
 
     // validateCreateTemporalHomeRequest
 
     @Test
-    fun `validateCreateTemporalHomeRequest returns Error when profile already exists`() {
+    fun `validateCreateTemporalHomeRequest returns Error when profile already exists`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
         temporalHomeService.createTemporalHome(userId, createTemporalHomeRequest())
 
@@ -250,40 +266,44 @@ class TemporalHomesValidationServiceTest {
 
         assertIs<ServiceResult.Error<CreateTemporalHomeRequest>>(result)
         assertEquals(ValidationConstants.TEMPORAL_HOME_PROFILE_ALREADY_EXISTS, result.message)
+        Unit
     }
 
     @Test
-    fun `validateCreateTemporalHomeRequest returns Error when alias is blank`() {
+    fun `validateCreateTemporalHomeRequest returns Error when alias is blank`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
 
         val result = service.validateCreateTemporalHomeRequest(userId, createTemporalHomeRequest(alias = ""))
 
         assertIs<ServiceResult.Error<CreateTemporalHomeRequest>>(result)
         assertEquals("Alias is required", result.message)
+        Unit
     }
 
     @Test
-    fun `validateCreateTemporalHomeRequest returns Error when country is blank`() {
+    fun `validateCreateTemporalHomeRequest returns Error when country is blank`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
 
         val result = service.validateCreateTemporalHomeRequest(userId, createTemporalHomeRequest(country = ""))
 
         assertIs<ServiceResult.Error<CreateTemporalHomeRequest>>(result)
         assertEquals("Country is required", result.message)
+        Unit
     }
 
     @Test
-    fun `validateCreateTemporalHomeRequest returns Error when city is blank`() {
+    fun `validateCreateTemporalHomeRequest returns Error when city is blank`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
 
         val result = service.validateCreateTemporalHomeRequest(userId, createTemporalHomeRequest(city = ""))
 
         assertIs<ServiceResult.Error<CreateTemporalHomeRequest>>(result)
         assertEquals("City is required", result.message)
+        Unit
     }
 
     @Test
-    fun `validateCreateTemporalHomeRequest returns Success when all fields valid and no existing profile`() {
+    fun `validateCreateTemporalHomeRequest returns Success when all fields valid and no existing profile`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
         val request = createTemporalHomeRequest()
 
@@ -291,156 +311,173 @@ class TemporalHomesValidationServiceTest {
 
         assertIs<ServiceResult.Success<CreateTemporalHomeRequest>>(result)
         assertEquals(request, result.data)
+        Unit
     }
 
     // validateTemporalHomeProfile
 
     @Test
-    fun `validateTemporalHomeProfile returns Success when profile exists`() {
+    fun `validateTemporalHomeProfile returns Success when profile exists`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
         temporalHomeService.createTemporalHome(userId, createTemporalHomeRequest())
 
         val result = service.validateTemporalHomeProfile(userId)
 
         assertIs<ServiceResult.Success<Unit>>(result)
+        Unit
     }
 
     @Test
-    fun `validateTemporalHomeProfile returns Error when profile does not exist`() {
+    fun `validateTemporalHomeProfile returns Error when profile does not exist`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
 
         val result = service.validateTemporalHomeProfile(userId)
 
         assertIs<ServiceResult.Error<Unit>>(result)
         assertEquals(ValidationConstants.TEMPORAL_HOME_PROFILE_NOT_FOUND, result.message)
+        Unit
     }
 
     // validateRescuerRole
 
     @Test
-    fun `validateRescuerRole returns NotFound when user does not exist`() {
+    fun `validateRescuerRole returns NotFound when user does not exist`() = runBlocking {
         val result = service.validateRescuerRole(999)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     @Test
-    fun `validateRescuerRole returns Success when user is a rescuer`() {
+    fun `validateRescuerRole returns Success when user is a rescuer`() = runBlocking {
         val userId = createTestUser(role = "RESCUER")
 
         val result = service.validateRescuerRole(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateRescuerRole returns Success when user is admin`() {
+    fun `validateRescuerRole returns Success when user is admin`() = runBlocking {
         val userId = createTestUser(role = "ADMIN")
 
         val result = service.validateRescuerRole(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateRescuerRole returns Error when user is neither rescuer nor admin`() {
+    fun `validateRescuerRole returns Error when user is neither rescuer nor admin`() = runBlocking {
         val userId = createTestUser(role = "ADOPTER")
 
         val result = service.validateRescuerRole(userId)
 
         assertIs<ServiceResult.Error<UserDto>>(result)
         assertEquals(ValidationConstants.ONLY_RESCUERS_CAN_SEND_REQUESTS, result.message)
+        Unit
     }
 
     // validateBlockRescuerRequest
 
     @Test
-    fun `validateBlockRescuerRequest returns NotFound when user does not exist`() {
+    fun `validateBlockRescuerRequest returns NotFound when user does not exist`() = runBlocking {
         val result = service.validateBlockRescuerRequest(999)
 
         assertIs<ServiceResult.NotFound>(result)
+        Unit
     }
 
     @Test
-    fun `validateBlockRescuerRequest returns Success when user is a temporal home`() {
+    fun `validateBlockRescuerRequest returns Success when user is a temporal home`() = runBlocking {
         val userId = createTestUser(role = "TEMPORAL_HOME")
 
         val result = service.validateBlockRescuerRequest(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateBlockRescuerRequest returns Success when user is admin`() {
+    fun `validateBlockRescuerRequest returns Success when user is admin`() = runBlocking {
         val userId = createTestUser(role = "ADMIN")
 
         val result = service.validateBlockRescuerRequest(userId)
 
         assertIs<ServiceResult.Success<UserDto>>(result)
         assertEquals(userId, result.data.id)
+        Unit
     }
 
     @Test
-    fun `validateBlockRescuerRequest returns Forbidden when user is neither temporal home nor admin`() {
+    fun `validateBlockRescuerRequest returns Forbidden when user is neither temporal home nor admin`() = runBlocking {
         val userId = createTestUser(role = "ADOPTER")
 
         val result = service.validateBlockRescuerRequest(userId)
 
         assertIs<ServiceResult.Forbidden>(result)
+        Unit
     }
 
     // validateTemporalHomeId
 
     @Test
-    fun `validateTemporalHomeId returns Success for valid numeric id`() {
+    fun `validateTemporalHomeId returns Success for valid numeric id`() = runBlocking {
         val result = service.validateTemporalHomeId("7")
 
         assertIs<ServiceResult.Success<Int>>(result)
         assertEquals(7, result.data)
+        Unit
     }
 
     @Test
-    fun `validateTemporalHomeId returns Error for null id`() {
+    fun `validateTemporalHomeId returns Error for null id`() = runBlocking {
         val result = service.validateTemporalHomeId(null)
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_TEMPORAL_HOME_ID, result.message)
+        Unit
     }
 
     @Test
-    fun `validateTemporalHomeId returns Error for non-numeric id`() {
+    fun `validateTemporalHomeId returns Error for non-numeric id`() = runBlocking {
         val result = service.validateTemporalHomeId("nope")
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_TEMPORAL_HOME_ID, result.message)
+        Unit
     }
 
     // validateRescuerId
 
     @Test
-    fun `validateRescuerId returns Success for valid numeric id`() {
+    fun `validateRescuerId returns Success for valid numeric id`() = runBlocking {
         val result = service.validateRescuerId("13")
 
         assertIs<ServiceResult.Success<Int>>(result)
         assertEquals(13, result.data)
+        Unit
     }
 
     @Test
-    fun `validateRescuerId returns Error for null id`() {
+    fun `validateRescuerId returns Error for null id`() = runBlocking {
         val result = service.validateRescuerId(null)
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_RESCUER_ID, result.message)
+        Unit
     }
 
     @Test
-    fun `validateRescuerId returns Error for non-numeric id`() {
+    fun `validateRescuerId returns Error for non-numeric id`() = runBlocking {
         val result = service.validateRescuerId("nope")
 
         assertIs<ServiceResult.Error<Int>>(result)
         assertEquals(ValidationConstants.INVALID_RESCUER_ID, result.message)
+        Unit
     }
 }

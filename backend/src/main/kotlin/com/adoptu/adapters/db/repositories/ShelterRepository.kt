@@ -6,6 +6,8 @@ import com.adoptu.dto.input.CreateShelterRequest
 import com.adoptu.dto.input.ShelterDto
 import com.adoptu.dto.input.UpdateShelterRequest
 import com.adoptu.ports.ShelterRepositoryPort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -47,119 +49,133 @@ class ShelterRepository(private val clock: Clock) : ShelterRepositoryPort {
         )
     }
 
-    override fun getById(id: Int): ShelterDto? = transaction {
-        AnimalShelters.selectAll()
-            .where { AnimalShelters.id eq id }
-            .firstOrNull()
-            ?.let { rowToDto(it) }
-    }
-
-    override fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = transaction {
-        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
-        var conditions: Op<Boolean> = AnimalShelters.country eq parsedCountry
-        
-        if (!state.isNullOrBlank()) {
-            conditions = conditions.and(AnimalShelters.state eq state)
-        }
-        if (!city.isNullOrBlank()) {
-            conditions = conditions.and(AnimalShelters.city eq city)
-        }
-        if (!neighborhood.isNullOrBlank()) {
-            conditions = conditions.and(AnimalShelters.neighborhood eq neighborhood)
-        }
-        if (!zip.isNullOrBlank()) {
-            conditions = conditions.and(AnimalShelters.zip eq zip)
-        }
-        
-        val query = AnimalShelters.selectAll()
-            .where { conditions }
-        query.map { rowToDto(it) }
-    }
-
-    override fun create(request: CreateShelterRequest): ShelterDto {
-        val now = clock.now().toEpochMilliseconds()
-        return transaction {
-            val id = AnimalShelters.insert {
-                it[name] = request.name
-                it[country] = Country.fromDisplayName(request.country)
-                    ?: throw IllegalArgumentException("Invalid country: ${request.country}")
-                it[state] = request.state
-                it[city] = request.city
-                it[neighborhood] = request.neighborhood
-                it[address] = request.address
-                it[zip] = request.zip
-                it[phone] = request.phone
-                it[email] = request.email
-                it[website] = request.website
-                it[fiscalId] = request.fiscalId
-                it[bankName] = request.bankName
-                it[accountHolderName] = request.accountHolderName
-                it[accountNumber] = request.accountNumber
-                it[iban] = request.iban
-                it[swiftBic] = request.swiftBic
-                it[currency] = request.currency
-                it[description] = request.description
-                it[createdAt] = now
-                it[updatedAt] = now
-            } get AnimalShelters.id
-
-            getById(id)!!
+    override suspend fun getById(id: Int): ShelterDto? = withContext(Dispatchers.IO) {
+        transaction {
+            AnimalShelters.selectAll()
+                .where { AnimalShelters.id eq id }
+                .firstOrNull()
+                ?.let { rowToDto(it) }
         }
     }
 
-    override fun update(id: Int, request: UpdateShelterRequest): ShelterDto? {
-        val now = clock.now().toEpochMilliseconds()
-        return transaction {
-            val existing = AnimalShelters.selectAll().where { AnimalShelters.id eq id }.firstOrNull()
-                ?: return@transaction null
+    override suspend fun getAll(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<ShelterDto> = withContext(Dispatchers.IO) {
+        transaction {
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+            var conditions: Op<Boolean> = AnimalShelters.country eq parsedCountry
 
-            AnimalShelters.update({ AnimalShelters.id eq id }) { row ->
-                request.name?.let { row[name] = it }
-                request.country?.let {
-                    row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
-                }
-                request.state?.let { row[state] = it }
-                request.city?.let { row[city] = it }
-                request.neighborhood?.let { row[neighborhood] = it }
-                request.address?.let { row[address] = it }
-                request.zip?.let { row[zip] = it }
-                request.phone?.let { row[phone] = it }
-                request.email?.let { row[email] = it }
-                request.website?.let { row[website] = it }
-                request.fiscalId?.let { row[fiscalId] = it }
-                request.bankName?.let { row[bankName] = it }
-                request.accountHolderName?.let { row[accountHolderName] = it }
-                request.accountNumber?.let { row[accountNumber] = it }
-                request.iban?.let { row[iban] = it }
-                request.swiftBic?.let { row[swiftBic] = it }
-                request.currency?.let { row[currency] = it }
-                request.description?.let { row[description] = it }
-                row[updatedAt] = now
+            if (!state.isNullOrBlank()) {
+                conditions = conditions.and(AnimalShelters.state eq state)
+            }
+            if (!city.isNullOrBlank()) {
+                conditions = conditions.and(AnimalShelters.city eq city)
+            }
+            if (!neighborhood.isNullOrBlank()) {
+                conditions = conditions.and(AnimalShelters.neighborhood eq neighborhood)
+            }
+            if (!zip.isNullOrBlank()) {
+                conditions = conditions.and(AnimalShelters.zip eq zip)
             }
 
-            getById(id)
+            val query = AnimalShelters.selectAll()
+                .where { conditions }
+            query.map { rowToDto(it) }
         }
     }
 
-    override fun delete(id: Int): Boolean = transaction {
-        val rowsDeleted = AnimalShelters.deleteWhere { AnimalShelters.id eq id }
-        rowsDeleted > 0
+    override suspend fun create(request: CreateShelterRequest): ShelterDto {
+        val now = clock.now().toEpochMilliseconds()
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val id = AnimalShelters.insert {
+                    it[name] = request.name
+                    it[country] = Country.fromDisplayName(request.country)
+                        ?: throw IllegalArgumentException("Invalid country: ${request.country}")
+                    it[state] = request.state
+                    it[city] = request.city
+                    it[neighborhood] = request.neighborhood
+                    it[address] = request.address
+                    it[zip] = request.zip
+                    it[phone] = request.phone
+                    it[email] = request.email
+                    it[website] = request.website
+                    it[fiscalId] = request.fiscalId
+                    it[bankName] = request.bankName
+                    it[accountHolderName] = request.accountHolderName
+                    it[accountNumber] = request.accountNumber
+                    it[iban] = request.iban
+                    it[swiftBic] = request.swiftBic
+                    it[currency] = request.currency
+                    it[description] = request.description
+                    it[createdAt] = now
+                    it[updatedAt] = now
+                } get AnimalShelters.id
+
+                AnimalShelters.selectAll().where { AnimalShelters.id eq id }.first().let { rowToDto(it) }
+            }
+        }
     }
 
-    override fun getCountries(): List<String> = transaction {
-        AnimalShelters.selectAll()
-            .map { it[AnimalShelters.country].displayName }
-            .distinct()
-            .sorted()
+    override suspend fun update(id: Int, request: UpdateShelterRequest): ShelterDto? {
+        val now = clock.now().toEpochMilliseconds()
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val existing = AnimalShelters.selectAll().where { AnimalShelters.id eq id }.firstOrNull()
+                    ?: return@transaction null
+
+                AnimalShelters.update({ AnimalShelters.id eq id }) { row ->
+                    request.name?.let { row[name] = it }
+                    request.country?.let {
+                        row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+                    }
+                    request.state?.let { row[state] = it }
+                    request.city?.let { row[city] = it }
+                    request.neighborhood?.let { row[neighborhood] = it }
+                    request.address?.let { row[address] = it }
+                    request.zip?.let { row[zip] = it }
+                    request.phone?.let { row[phone] = it }
+                    request.email?.let { row[email] = it }
+                    request.website?.let { row[website] = it }
+                    request.fiscalId?.let { row[fiscalId] = it }
+                    request.bankName?.let { row[bankName] = it }
+                    request.accountHolderName?.let { row[accountHolderName] = it }
+                    request.accountNumber?.let { row[accountNumber] = it }
+                    request.iban?.let { row[iban] = it }
+                    request.swiftBic?.let { row[swiftBic] = it }
+                    request.currency?.let { row[currency] = it }
+                    request.description?.let { row[description] = it }
+                    row[updatedAt] = now
+                }
+
+                AnimalShelters.selectAll().where { AnimalShelters.id eq id }.firstOrNull()?.let { rowToDto(it) }
+            }
+        }
     }
 
-    override fun getStatesByCountry(country: String): List<String> = transaction {
-        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
-        AnimalShelters.selectAll()
-            .where { AnimalShelters.country eq parsedCountry }
-            .mapNotNull { it[AnimalShelters.state] }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .sorted()
+    override suspend fun delete(id: Int): Boolean = withContext(Dispatchers.IO) {
+        transaction {
+            val rowsDeleted = AnimalShelters.deleteWhere { AnimalShelters.id eq id }
+            rowsDeleted > 0
+        }
+    }
+
+    override suspend fun getCountries(): List<String> = withContext(Dispatchers.IO) {
+        transaction {
+            AnimalShelters.selectAll()
+                .map { it[AnimalShelters.country].displayName }
+                .distinct()
+                .sorted()
+        }
+    }
+
+    override suspend fun getStatesByCountry(country: String): List<String> = withContext(Dispatchers.IO) {
+        transaction {
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+            AnimalShelters.selectAll()
+                .where { AnimalShelters.country eq parsedCountry }
+                .mapNotNull { it[AnimalShelters.state] }
+                .filter { it.isNotBlank() }
+                .distinct()
+                .sorted()
+        }
     }
 }

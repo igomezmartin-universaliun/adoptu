@@ -9,6 +9,8 @@ import com.adoptu.dto.input.SterilizationLocationsByLocation
 import com.adoptu.dto.input.SterilizationLocationsByState
 import com.adoptu.dto.input.UpdateSterilizationLocationRequest
 import com.adoptu.ports.SterilizationLocationRepositoryPort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -43,153 +45,171 @@ class SterilizationLocationRepository(private val clock: Clock) : SterilizationL
         )
     }
 
-    override fun getById(id: Int): SterilizationLocationDto? = transaction {
-        SterilizationLocations.selectAll()
-            .where { SterilizationLocations.id eq id }
-            .firstOrNull()
-            ?.let { rowToDto(it) }
-    }
-
-    override fun getAll(country: String?, state: String?, city: String?, neighborhood: String?, zip: String?): List<SterilizationLocationDto> = transaction {
-        var conditions: org.jetbrains.exposed.v1.core.Op<Boolean>? = null
-        
-        if (!country.isNullOrBlank()) {
-            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
-            val countryCondition = SterilizationLocations.country eq parsedCountry
-            conditions = countryCondition
-        }
-        if (!state.isNullOrBlank()) {
-            val stateCondition = SterilizationLocations.state eq state
-            conditions = conditions?.and(stateCondition) ?: stateCondition
-        }
-        if (!city.isNullOrBlank()) {
-            val cityCondition = SterilizationLocations.city eq city
-            conditions = conditions?.and(cityCondition) ?: cityCondition
-        }
-        if (!neighborhood.isNullOrBlank()) {
-            val neighborhoodCondition = SterilizationLocations.neighborhood eq neighborhood
-            conditions = conditions?.and(neighborhoodCondition) ?: neighborhoodCondition
-        }
-        if (!zip.isNullOrBlank()) {
-            val zipCondition = SterilizationLocations.zip eq zip
-            conditions = conditions?.and(zipCondition) ?: zipCondition
-        }
-        
-        val query = if (conditions != null) {
-            SterilizationLocations.selectAll().where { conditions }
-        } else {
+    override suspend fun getById(id: Int): SterilizationLocationDto? = withContext(Dispatchers.IO) {
+        transaction {
             SterilizationLocations.selectAll()
-        }
-        query.map { rowToDto(it) }
-    }
-
-    override fun create(request: CreateSterilizationLocationRequest): SterilizationLocationDto {
-        val now = clock.now().toEpochMilliseconds()
-        return transaction {
-            val id = SterilizationLocations.insert {
-                it[name] = request.name
-                it[country] = Country.fromDisplayName(request.country)
-                    ?: throw IllegalArgumentException("Invalid country: ${request.country}")
-                it[state] = request.state
-                it[city] = request.city
-                it[neighborhood] = request.neighborhood
-                it[address] = request.address
-                it[zip] = request.zip
-                it[phone] = request.phone
-                it[email] = request.email
-                it[website] = request.website
-                it[description] = request.description
-                it[createdAt] = now
-                it[updatedAt] = now
-            } get SterilizationLocations.id
-
-            getById(id)!!
+                .where { SterilizationLocations.id eq id }
+                .firstOrNull()
+                ?.let { rowToDto(it) }
         }
     }
 
-    override fun update(id: Int, request: UpdateSterilizationLocationRequest): SterilizationLocationDto? {
-        val now = clock.now().toEpochMilliseconds()
-        return transaction {
-            val existing = SterilizationLocations.selectAll().where { SterilizationLocations.id eq id }.firstOrNull()
-                ?: return@transaction null
+    override suspend fun getAll(country: String?, state: String?, city: String?, neighborhood: String?, zip: String?): List<SterilizationLocationDto> = withContext(Dispatchers.IO) {
+        transaction {
+            var conditions: Op<Boolean>? = null
 
-            SterilizationLocations.update({ SterilizationLocations.id eq id }) { row ->
-                request.name?.let { row[name] = it }
-                request.country?.let {
-                    row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
-                }
-                request.state?.let { row[state] = it }
-                request.city?.let { row[city] = it }
-                request.neighborhood?.let { row[neighborhood] = it }
-                request.address?.let { row[address] = it }
-                request.zip?.let { row[zip] = it }
-                request.phone?.let { row[phone] = it }
-                request.email?.let { row[email] = it }
-                request.website?.let { row[website] = it }
-                request.description?.let { row[description] = it }
-                row[updatedAt] = now
+            if (!country.isNullOrBlank()) {
+                val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+                val countryCondition = SterilizationLocations.country eq parsedCountry
+                conditions = countryCondition
+            }
+            if (!state.isNullOrBlank()) {
+                val stateCondition = SterilizationLocations.state eq state
+                conditions = conditions?.and(stateCondition) ?: stateCondition
+            }
+            if (!city.isNullOrBlank()) {
+                val cityCondition = SterilizationLocations.city eq city
+                conditions = conditions?.and(cityCondition) ?: cityCondition
+            }
+            if (!neighborhood.isNullOrBlank()) {
+                val neighborhoodCondition = SterilizationLocations.neighborhood eq neighborhood
+                conditions = conditions?.and(neighborhoodCondition) ?: neighborhoodCondition
+            }
+            if (!zip.isNullOrBlank()) {
+                val zipCondition = SterilizationLocations.zip eq zip
+                conditions = conditions?.and(zipCondition) ?: zipCondition
             }
 
-            getById(id)
+            val query = if (conditions != null) {
+                SterilizationLocations.selectAll().where { conditions }
+            } else {
+                SterilizationLocations.selectAll()
+            }
+            query.map { rowToDto(it) }
         }
     }
 
-    override fun delete(id: Int): Boolean = transaction {
-        val rowsDeleted = SterilizationLocations.deleteWhere { SterilizationLocations.id eq id }
-        rowsDeleted > 0
+    override suspend fun create(request: CreateSterilizationLocationRequest): SterilizationLocationDto {
+        val now = clock.now().toEpochMilliseconds()
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val id = SterilizationLocations.insert {
+                    it[name] = request.name
+                    it[country] = Country.fromDisplayName(request.country)
+                        ?: throw IllegalArgumentException("Invalid country: ${request.country}")
+                    it[state] = request.state
+                    it[city] = request.city
+                    it[neighborhood] = request.neighborhood
+                    it[address] = request.address
+                    it[zip] = request.zip
+                    it[phone] = request.phone
+                    it[email] = request.email
+                    it[website] = request.website
+                    it[description] = request.description
+                    it[createdAt] = now
+                    it[updatedAt] = now
+                } get SterilizationLocations.id
+
+                SterilizationLocations.selectAll().where { SterilizationLocations.id eq id }.first().let { rowToDto(it) }
+            }
+        }
     }
 
-    override fun getCountries(): List<String> = transaction {
-        SterilizationLocations.selectAll()
-            .map { it[SterilizationLocations.country].displayName }
-            .distinct()
-            .sorted()
+    override suspend fun update(id: Int, request: UpdateSterilizationLocationRequest): SterilizationLocationDto? {
+        val now = clock.now().toEpochMilliseconds()
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val existing = SterilizationLocations.selectAll().where { SterilizationLocations.id eq id }.firstOrNull()
+                    ?: return@transaction null
+
+                SterilizationLocations.update({ SterilizationLocations.id eq id }) { row ->
+                    request.name?.let { row[name] = it }
+                    request.country?.let {
+                        row[country] = Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+                    }
+                    request.state?.let { row[state] = it }
+                    request.city?.let { row[city] = it }
+                    request.neighborhood?.let { row[neighborhood] = it }
+                    request.address?.let { row[address] = it }
+                    request.zip?.let { row[zip] = it }
+                    request.phone?.let { row[phone] = it }
+                    request.email?.let { row[email] = it }
+                    request.website?.let { row[website] = it }
+                    request.description?.let { row[description] = it }
+                    row[updatedAt] = now
+                }
+
+                SterilizationLocations.selectAll().where { SterilizationLocations.id eq id }.firstOrNull()?.let { rowToDto(it) }
+            }
+        }
     }
 
-    override fun getStatesByCountry(country: String): List<String> = transaction {
-        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
-        SterilizationLocations.selectAll()
-            .where { SterilizationLocations.country eq parsedCountry }
-            .mapNotNull { it[SterilizationLocations.state] }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .sorted()
+    override suspend fun delete(id: Int): Boolean = withContext(Dispatchers.IO) {
+        transaction {
+            val rowsDeleted = SterilizationLocations.deleteWhere { SterilizationLocations.id eq id }
+            rowsDeleted > 0
+        }
     }
 
-    override fun getCitiesByCountryAndState(country: String, state: String?): List<String> = transaction {
-        val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
-        if (!state.isNullOrBlank()) {
+    override suspend fun getCountries(): List<String> = withContext(Dispatchers.IO) {
+        transaction {
             SterilizationLocations.selectAll()
-                .where { (SterilizationLocations.country eq parsedCountry) and (SterilizationLocations.state eq state) }
-                .map { it[SterilizationLocations.city] }
+                .map { it[SterilizationLocations.country].displayName }
                 .distinct()
                 .sorted()
-        } else {
+        }
+    }
+
+    override suspend fun getStatesByCountry(country: String): List<String> = withContext(Dispatchers.IO) {
+        transaction {
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             SterilizationLocations.selectAll()
                 .where { SterilizationLocations.country eq parsedCountry }
-                .map { it[SterilizationLocations.city] }
+                .mapNotNull { it[SterilizationLocations.state] }
+                .filter { it.isNotBlank() }
                 .distinct()
                 .sorted()
         }
     }
 
-    override fun getGroupedByLocation(): List<SterilizationLocationsByLocation> = transaction {
-        val allLocations = SterilizationLocations.selectAll().map { rowToDto(it) }
-        
-        allLocations.groupBy { it.country }
-            .map { (country, locations) ->
-                val statesData = locations.groupBy { it.state }
-                    .map { (state, stateLocations) ->
-                        val citiesData = stateLocations.groupBy { it.city }
-                            .map { (city, cityLocations) ->
-                                SterilizationLocationsByCity(city, cityLocations)
-                            }
-                            .sortedBy { it.city }
-                        SterilizationLocationsByState(state, citiesData)
-                    }
-                    .sortedBy { it.state ?: "" }
-                SterilizationLocationsByLocation(country, statesData)
+    override suspend fun getCitiesByCountryAndState(country: String, state: String?): List<String> = withContext(Dispatchers.IO) {
+        transaction {
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+            if (!state.isNullOrBlank()) {
+                SterilizationLocations.selectAll()
+                    .where { (SterilizationLocations.country eq parsedCountry) and (SterilizationLocations.state eq state) }
+                    .map { it[SterilizationLocations.city] }
+                    .distinct()
+                    .sorted()
+            } else {
+                SterilizationLocations.selectAll()
+                    .where { SterilizationLocations.country eq parsedCountry }
+                    .map { it[SterilizationLocations.city] }
+                    .distinct()
+                    .sorted()
             }
-            .sortedBy { it.country }
+        }
+    }
+
+    override suspend fun getGroupedByLocation(): List<SterilizationLocationsByLocation> = withContext(Dispatchers.IO) {
+        transaction {
+            val allLocations = SterilizationLocations.selectAll().map { rowToDto(it) }
+
+            allLocations.groupBy { it.country }
+                .map { (country, locations) ->
+                    val statesData = locations.groupBy { it.state }
+                        .map { (state, stateLocations) ->
+                            val citiesData = stateLocations.groupBy { it.city }
+                                .map { (city, cityLocations) ->
+                                    SterilizationLocationsByCity(city, cityLocations)
+                                }
+                                .sortedBy { it.city }
+                            SterilizationLocationsByState(state, citiesData)
+                        }
+                        .sortedBy { it.state ?: "" }
+                    SterilizationLocationsByLocation(country, statesData)
+                }
+                .sortedBy { it.country }
+        }
     }
 }

@@ -27,7 +27,7 @@ fun Route.uiRoutes() {
     val userRepository by inject<UserRepositoryPort>()
     staticResources("/static", "static")
     
-    fun getNavParams(session: SessionUser?): NavParams {
+    suspend fun getNavParams(session: SessionUser?): NavParams {
         return if (session != null) {
             val isAdmin = userRepository.isRoleActive(session.userId, UserRole.ADMIN)
             val isRescuer = userRepository.isRoleActive(session.userId, UserRole.RESCUER)
@@ -156,7 +156,8 @@ fun Route.uiRoutes() {
                 call.sessions.set(SessionUser(user.id, user.username, user.displayName))
             }
         }
-        call.respondHtml(HttpStatusCode.OK) { emailVerificationPage(result.first, result.second, getNavParams(call.sessions.get())) }
+        val emailVerificationNavParams = getNavParams(call.sessions.get())
+        call.respondHtml(HttpStatusCode.OK) { emailVerificationPage(result.first, result.second, emailVerificationNavParams) }
     }
     get("/verify-email") {
         val session: SessionUser? = call.sessions.get()

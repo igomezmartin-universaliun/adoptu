@@ -24,6 +24,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class PetServiceTest {
@@ -102,13 +103,13 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAll returns empty list when no pets exist`() {
+    fun `getAll returns empty list when no pets exist`() = runBlocking {
         val result = petService.getAll()
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `getAll returns pets filtered by type`() {
+    fun `getAll returns pets filtered by type`() = runBlocking {
         createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         createTestPet(rescuerId = 1, name = "Whiskers", type = "CAT")
         createTestPet(rescuerId = 1, name = "Max", type = "DOG")
@@ -119,13 +120,13 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getById returns null for non-existent pet`() {
+    fun `getById returns null for non-existent pet`() = runBlocking {
         val result = petService.getById(999)
         assertNull(result)
     }
 
     @Test
-    fun `getById returns pet by id`() {
+    fun `getById returns pet by id`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.getById(created.id)
@@ -134,7 +135,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `create throws exception for negative weight`() {
+    fun `create throws exception for negative weight`() = runBlocking {
         val request = CreatePetRequest(
             name = "Buddy",
             type = "DOG",
@@ -152,7 +153,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `create throws exception for invalid age months`() {
+    fun `create throws exception for invalid age months`() = runBlocking {
         val request = CreatePetRequest(
             name = "Buddy",
             type = "DOG",
@@ -170,13 +171,13 @@ class PetServiceTest {
     }
 
     @Test
-    fun `update returns NotFound for non-existent pet`() {
+    fun `update returns NotFound for non-existent pet`() = runBlocking {
         val result = petService.update(999, 1, setOf("RESCUER"), UpdatePetRequest(name = "Test"))
         assertEquals(ServiceResult.NotFound, result)
     }
 
     @Test
-    fun `update returns Forbidden when user is not owner`() {
+    fun `update returns Forbidden when user is not owner`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.update(created.id, 2, setOf("RESCUER"), UpdatePetRequest(name = "Hacked"))
@@ -185,13 +186,13 @@ class PetServiceTest {
     }
 
     @Test
-    fun `delete returns NotFound for non-existent pet`() {
+    fun `delete returns NotFound for non-existent pet`() = runBlocking {
         val result = petService.delete(999, 1, setOf("ADMIN"))
         assertEquals(ServiceResult.NotFound, result)
     }
 
     @Test
-    fun `delete returns Forbidden when user is not owner`() {
+    fun `delete returns Forbidden when user is not owner`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.delete(created.id, 2, setOf("RESCUER"))
@@ -200,13 +201,13 @@ class PetServiceTest {
     }
 
     @Test
-    fun `addImage returns NotFound for non-existent pet`() {
+    fun `addImage returns NotFound for non-existent pet`() = runBlocking {
         val result = petService.addImage(999, 1, setOf("ADMIN"), "https://example.com/image.jpg", false)
         assertEquals(ServiceResult.NotFound, result)
     }
 
     @Test
-    fun `addImage returns Forbidden when user is not owner`() {
+    fun `addImage returns Forbidden when user is not owner`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.addImage(created.id, 2, setOf("RESCUER"), "https://example.com/image.jpg", false)
@@ -215,7 +216,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `addImage adds image successfully`() {
+    fun `addImage adds image successfully`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", true)
@@ -225,7 +226,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `addImage allows admin to add image`() {
+    fun `addImage allows admin to add image`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.addImage(created.id, 999, setOf("ADMIN"), "https://example.com/admin-image.jpg", false)
@@ -234,7 +235,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAll returns only promoted pets when showPromotedOnly is true`() {
+    fun `getAll returns only promoted pets when showPromotedOnly is true`() = runBlocking {
         createTestPet(rescuerId = 1, name = "Buddy", type = "DOG", isPromoted = true)
         createTestPet(rescuerId = 1, name = "Max", type = "DOG", isPromoted = false)
         createTestPet(rescuerId = 1, name = "Rocky", type = "DOG", isPromoted = true)
@@ -246,7 +247,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAll returns all available pets without filters`() {
+    fun `getAll returns all available pets without filters`() = runBlocking {
         createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         createTestPet(rescuerId = 1, name = "Whiskers", type = "CAT")
 
@@ -256,7 +257,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `create creates pet successfully`() {
+    fun `create creates pet successfully`() = runBlocking {
         val request = CreatePetRequest(
             name = "Buddy",
             type = "DOG",
@@ -280,7 +281,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `create throws exception for negative ageYears`() {
+    fun `create throws exception for negative ageYears`() = runBlocking {
         val request = CreatePetRequest(
             name = "Buddy",
             type = "DOG",
@@ -297,7 +298,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `create throws exception for negative adoptionFee`() {
+    fun `create throws exception for negative adoptionFee`() = runBlocking {
         val request = CreatePetRequest(
             name = "Buddy",
             type = "DOG",
@@ -315,7 +316,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `update updates pet successfully`() {
+    fun `update updates pet successfully`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.update(created.id, 1, setOf("RESCUER"), UpdatePetRequest(name = "Max", weight = 30.0))
@@ -327,7 +328,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `update allows admin to update any pet`() {
+    fun `update allows admin to update any pet`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.update(created.id, 999, setOf("ADMIN"), UpdatePetRequest(name = "Admin Buddy"))
@@ -337,7 +338,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `delete deletes pet successfully`() {
+    fun `delete deletes pet successfully`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val petId = created.id
 
@@ -348,7 +349,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `delete allows admin to delete any pet`() {
+    fun `delete allows admin to delete any pet`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val petId = created.id
 
@@ -359,7 +360,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getImages returns empty list when no images`() {
+    fun `getImages returns empty list when no images`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.getImages(created.id)
@@ -368,7 +369,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getImages returns pet images`() {
+    fun `getImages returns pet images`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
         petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
@@ -380,7 +381,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `setPrimaryImage sets primary image successfully`() {
+    fun `setPrimaryImage sets primary image successfully`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val img1Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
         val img2Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
@@ -398,7 +399,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `setPrimaryImage returns NotFound for non-existent image`() {
+    fun `setPrimaryImage returns NotFound for non-existent image`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.setPrimaryImage(created.id, 999, 1, setOf("RESCUER"))
@@ -407,7 +408,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `setPrimaryImage returns Forbidden when user is not owner`() {
+    fun `setPrimaryImage returns Forbidden when user is not owner`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val imgResult = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image.jpg", false)
         val img = (imgResult as ServiceResult.Success).data
@@ -418,7 +419,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `setPrimaryImage allows admin to set primary image`() {
+    fun `setPrimaryImage allows admin to set primary image`() = runBlocking {
         val created = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image1.jpg", true)
         val img2Result = petService.addImage(created.id, 1, setOf("RESCUER"), "https://example.com/image2.jpg", false)
@@ -488,7 +489,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `createAdoptionRequest creates adoption request successfully`() {
+    fun `createAdoptionRequest creates adoption request successfully`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.createAdoptionRequest(pet.id, 2, "I would love to adopt this pet!")
@@ -500,7 +501,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAdoptionRequestsForPet returns requests for owner`() {
+    fun `getAdoptionRequestsForPet returns requests for owner`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.createAdoptionRequest(pet.id, 2, "Request 1")
         petService.createAdoptionRequest(pet.id, 3, "Request 2")
@@ -512,7 +513,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAdoptionRequestsForPet returns Forbidden when user is not owner`() {
+    fun `getAdoptionRequestsForPet returns Forbidden when user is not owner`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
 
         val result = petService.getAdoptionRequestsForPet(pet.id, 2, setOf("RESCUER"))
@@ -521,7 +522,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getAdoptionRequestsForPet allows admin to view requests`() {
+    fun `getAdoptionRequestsForPet allows admin to view requests`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.createAdoptionRequest(pet.id, 2, "Request 1")
 
@@ -532,7 +533,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `getMyAdoptionRequests returns user's adoption requests`() {
+    fun `getMyAdoptionRequests returns user's adoption requests`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         petService.createAdoptionRequest(pet.id, 2, "My request 1")
         petService.createAdoptionRequest(pet.id, 2, "My request 2")
@@ -545,7 +546,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `updateAdoptionRequest updates request to APPROVED`() {
+    fun `updateAdoptionRequest updates request to APPROVED`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
@@ -556,7 +557,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `updateAdoptionRequest updates request to REJECTED`() {
+    fun `updateAdoptionRequest updates request to REJECTED`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
@@ -567,14 +568,14 @@ class PetServiceTest {
     }
 
     @Test
-    fun `updateAdoptionRequest returns NotFound for non-existent request`() {
+    fun `updateAdoptionRequest returns NotFound for non-existent request`() = runBlocking {
         val result = petService.updateAdoptionRequest(999, "APPROVED", 1, setOf("RESCUER"))
 
         assertEquals(ServiceResult.NotFound, result)
     }
 
     @Test
-    fun `updateAdoptionRequest returns Forbidden for invalid status`() {
+    fun `updateAdoptionRequest returns Forbidden for invalid status`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
@@ -584,7 +585,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `updateAdoptionRequest returns Forbidden when user is not owner`() {
+    fun `updateAdoptionRequest returns Forbidden when user is not owner`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
@@ -594,7 +595,7 @@ class PetServiceTest {
     }
 
     @Test
-    fun `updateAdoptionRequest allows admin to update request`() {
+    fun `updateAdoptionRequest allows admin to update request`() = runBlocking {
         val pet = createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         val request = petService.createAdoptionRequest(pet.id, 2, "I want to adopt")
 
@@ -604,7 +605,7 @@ class PetServiceTest {
         assertEquals("APPROVED", result.data.status)
     }
 
-    private fun createTestPet(rescuerId: Int, name: String, type: String, isPromoted: Boolean = false) =
+    private suspend fun createTestPet(rescuerId: Int, name: String, type: String, isPromoted: Boolean = false) =
         petRepository.create(
             rescuerId = rescuerId,
             name = name,

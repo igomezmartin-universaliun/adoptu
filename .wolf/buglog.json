@@ -850,8 +850,6 @@
       "timestamp": "2026-06-30T19:08:00.000Z",
       "error_message": "Searching shelters by Mexico returns no results despite shelters existing",
       "file": "backend/src/main/kotlin/com/adoptu/pages/Shared.kt; backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ShelterRepository.kt",
-      "root_cause": "Country search dropdown (Shared.kt countrySelect) sends canonical value \"Mexico\" (no accent), but ShelterRepository.getAll() does exact-match filtering (AnimalShelters.country eq country). Two shelter rows in the DB (ids 403, 404) are stored with country=\"México\" (accented), so \"Mexico\" != \"México\" and the query returns zero rows even though matching shelters exist.",
-      "fix": "Replaced free-text country varchar columns (6 tables: animal_shelters, sterilization_locations, user_shelters, user_sterilization_locations, temporal_homes, photographers) with an Exposed enumerationByName(Country::class) column. New backend/src/main/kotlin/com/adoptu/common/Country.kt enum (112 entries) is now the single source of truth for the dropdown (Shared.kt countrySelect), validation, and DB storage. Country.fromDisplayName() resolves exact + accent/case-insensitive input. Migrated 27 existing rows (8 distinct stray values incl. the ones affected by the Mexico accent mismatch) to canonical enum names via one-time SQL UPDATE. Verified live: GET /api/shelters?country=Mexico now returns the 2 previously-invisible shelters; GET /api/shelters?country=México (legacy accented input) also still resolves via the normalization fallback.",
       "root_cause": "Country search dropdown (Shared.kt countrySelect) sends canonical value \"Mexico\" (no accent), but ShelterRepository.getAll() does exact-match filtering (AnimalShelters.country eq country). Two shelter rows in the DB (ids 403, 404) are stored with country=\"M\u00e9xico\" (accented), so \"Mexico\" != \"M\u00e9xico\" and the query returns zero rows even though matching shelters exist.",
       "fix": "Not yet applied \u2014 pending user decision. Options: (1) normalize the two DB rows to country=\"Mexico\" to match the canonical dropdown value used by all exact-match filters app-wide, or (2) make shelter/photographer/sterilization/temporal-home country filtering accent-insensitive/case-insensitive at the query level so stray data variants still match.",
       "tags": [
@@ -990,8 +988,8 @@
       "timestamp": "2026-06-30T21:11:42.556Z",
       "error_message": "CSS fix: align-items",
       "file": ".claude/worktrees/replicated-yawning-lantern/backend/src/main/scss/style.scss",
-      "root_cause": "align-items: center → baseline",
-      "fix": "Changed align-items: center → baseline",
+      "root_cause": "align-items: center \u2192 baseline",
+      "fix": "Changed align-items: center \u2192 baseline",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -1056,7 +1054,7 @@
       "timestamp": "2026-06-30T20:10:00.000Z",
       "error_message": "admin-shelters.js references DOM elements (shelter-form, country, name, city, address, currency, etc.) that AdminSheltersPage.kt never renders",
       "file": "backend/src/main/kotlin/com/adoptu/pages/AdminSheltersPage.kt; backend/src/main/resources/static/js/admin-shelters.js",
-      "root_cause": "AdminSheltersPage.kt only renders the filter-country/filter-state search controls and the shelters list container. admin-shelters.js calls document.getElementById('shelter-form').addEventListener(...) at top level (not inside DOMContentLoaded), plus getFormData()/editShelter() reference name/country/city/address/currency/etc. inputs and a shelter-form element that do not exist in the rendered page. Likely throws a TypeError on page load (shelter-form is null), which would also prevent the trailing DOMContentLoaded listener from registering. Discovered incidentally while investigating the Mexico shelter search bug (bug-050) — not fixed in that pass.",
+      "root_cause": "AdminSheltersPage.kt only renders the filter-country/filter-state search controls and the shelters list container. admin-shelters.js calls document.getElementById('shelter-form').addEventListener(...) at top level (not inside DOMContentLoaded), plus getFormData()/editShelter() reference name/country/city/address/currency/etc. inputs and a shelter-form element that do not exist in the rendered page. Likely throws a TypeError on page load (shelter-form is null), which would also prevent the trailing DOMContentLoaded listener from registering. Discovered incidentally while investigating the Mexico shelter search bug (bug-050) \u2014 not fixed in that pass.",
       "fix": "Not yet investigated/fixed. Needs: render the missing create/edit form markup in AdminSheltersPage.kt (or confirm it is intentionally a separate unfinished feature) and guard admin-shelters.js top-level listener registration.",
       "tags": [
         "admin",
@@ -1077,7 +1075,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 6→4 lines (2 removed)",
+      "fix": "Rewrote 6\u21924 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1129,7 +1127,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 13→16 lines (2 removed)",
+      "fix": "Rewrote 13\u219216 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1145,7 +1143,7 @@
       "error_message": "Significant refactor of ",
       "file": ".claude/worktrees/opentofu-aws-infra/infra/variables.tf",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→24 lines (2 removed)",
+      "fix": "Rewrote 4\u219224 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1160,8 +1158,8 @@
       "timestamp": "2026-06-30T21:42:00.000Z",
       "error_message": "GitHub Actions 'Playwright Tests' workflow fails on every push/PR to main (e.g. run #3, #4 on 2026-06-30 ~21:36 UTC), triggering GitHub's automatic failure-notification emails to the repo owner",
       "file": ".github/workflows/playwright.yml",
-      "root_cause": "frontend/src/tests/e2e-verify.spec.ts requires a live backend on http://localhost:8080, mailpit on http://localhost:8025, and pre-loaded test data (scripts/load_test_data.sh) per its own file header — but playwright.yml's 'test' job only runs `npm ci` + `npx playwright install --with-deps` + `npx playwright test` with no step to build/start the Ktor backend, start mailpit, or load test data, and playwright.config.ts has its webServer block commented out. Every test in the suite fails with connection-refused since nothing is listening on :8080/:8025 in the CI runner.",
-      "fix": "User opted to remove the workflow entirely rather than wire up backend/mailpit/test-data in CI. Deleted .github/workflows/playwright.yml — no CI job will run these tests until a future workflow properly provisions the backend + mailpit + test data.",
+      "root_cause": "frontend/src/tests/e2e-verify.spec.ts requires a live backend on http://localhost:8080, mailpit on http://localhost:8025, and pre-loaded test data (scripts/load_test_data.sh) per its own file header \u2014 but playwright.yml's 'test' job only runs `npm ci` + `npx playwright install --with-deps` + `npx playwright test` with no step to build/start the Ktor backend, start mailpit, or load test data, and playwright.config.ts has its webServer block commented out. Every test in the suite fails with connection-refused since nothing is listening on :8080/:8025 in the CI runner.",
+      "fix": "User opted to remove the workflow entirely rather than wire up backend/mailpit/test-data in CI. Deleted .github/workflows/playwright.yml \u2014 no CI job will run these tests until a future workflow properly provisions the backend + mailpit + test data.",
       "tags": [
         "ci",
         "playwright",
@@ -1286,6 +1284,8 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-30T22:55:33.263Z"
+    },
+    {
       "id": "bug-052",
       "timestamp": "2026-06-30T15:32:00Z",
       "error_message": "UserShelterService and UserSterilizationLocationService had 0% test coverage and no test file existed",
@@ -1367,6 +1367,26 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-30T16:34:00Z"
+    },
+    {
+      "id": "bug-077",
+      "timestamp": "2026-06-30T18:50:00Z",
+      "error_message": "compileTestKotlin failed with 109 errors ('Suspend function ... can only be called from a coroutine or another suspend function') after merging main into worktree-agent-aa2e565a38703b52b",
+      "file": "backend/src/test/kotlin/com/adoptu/adapters/db/repositories/UserRepositoryTest.kt, backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt, backend/src/test/kotlin/com/adoptu/services/UserShelterServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/UserSterilizationLocationServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/validation/AuthValidationServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/validation/PetsValidationServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/validation/PhotographersValidationServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/validation/TemporalHomesValidationServiceTest.kt, backend/src/test/kotlin/com/adoptu/services/validation/UsersValidationServiceTest.kt",
+      "root_cause": "Branch worktree-agent-aa2e565a38703b52b (commit 95a5ce8) converted the DB repository/port/service call chain to suspend + withContext(Dispatchers.IO) to fix a Fargate thread-starvation load-test regression. Main diverged 19 commits earlier and, via the parallel worktree-test-coverage-95 merge, added 9 new/expanded test files that call those same repository/service methods synchronously (pre-suspend API). Merging main into this branch combined both changes and surfaced the mismatch as a compile error, not a merge conflict (git auto-merged the non-overlapping lines cleanly).",
+      "fix": "Wrapped every affected @Test function body in kotlinx.coroutines.runBlocking { } (matching the established convention from commit 95a5ce8, see MagicLinkServiceTest.kt/PetsRoutesE2ETest.kt), added the runBlocking import to each file, and appended an explicit trailing Unit statement to every wrapped test body to avoid the 'assertThrows-as-last-expression makes runBlocking return non-Unit, causing JUnit5 to silently skip the test' pitfall documented in commit 95a5ce8. Recompiled clean, then ran :backend:test :backend:koverVerify -- 1118 tests, 0 failures, 0 errors, Kover 95% line-coverage gate passed.",
+      "tags": [
+        "kotlin",
+        "coroutines",
+        "suspend",
+        "merge-conflict",
+        "compile-error",
+        "gradle",
+        "kover"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-30T18:50:00Z"
     }
   ]
 }

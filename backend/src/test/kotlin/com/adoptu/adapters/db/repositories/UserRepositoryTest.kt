@@ -16,6 +16,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 /**
  * Direct repository-level tests for two UserRepository methods that exist to satisfy the
@@ -49,16 +50,17 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `updatePhotographerSettings returns null for non-existent user`() {
+    fun `updatePhotographerSettings returns null for non-existent user`() = runBlocking {
         val result = repository.updatePhotographerSettings(
             9999,
             PhotographerSettingsRequest(photographerFee = 50.0, photographerCurrency = "USD")
         )
         assertNull(result)
+        Unit
     }
 
     @Test
-    fun `updatePhotographerSettings throws for negative fee`() {
+    fun `updatePhotographerSettings throws for negative fee`() = runBlocking {
         val userId = createTestUser()
         assertThrows<IllegalArgumentException> {
             repository.updatePhotographerSettings(
@@ -66,10 +68,11 @@ class UserRepositoryTest {
                 PhotographerSettingsRequest(photographerFee = -1.0, photographerCurrency = "USD")
             )
         }
+        Unit
     }
 
     @Test
-    fun `updatePhotographerSettings creates settings when none exist`() {
+    fun `updatePhotographerSettings creates settings when none exist`() = runBlocking {
         val userId = createTestUser()
 
         val result = repository.updatePhotographerSettings(
@@ -80,10 +83,11 @@ class UserRepositoryTest {
         assertEquals(userId, result?.userId)
         assertEquals(75.0, result?.photographerFee)
         assertEquals("United States", result?.country)
+        Unit
     }
 
     @Test
-    fun `updatePhotographerSettings updates existing settings`() {
+    fun `updatePhotographerSettings updates existing settings`() = runBlocking {
         val userId = createTestUser()
         repository.updatePhotographerSettings(
             userId,
@@ -98,10 +102,11 @@ class UserRepositoryTest {
         assertEquals(100.0, result?.photographerFee)
         assertEquals("EUR", result?.photographerCurrency)
         assertEquals("Canada", result?.country)
+        Unit
     }
 
     @Test
-    fun `getPhotographers filters by country and state`() {
+    fun `getPhotographers filters by country and state`() = runBlocking {
         val userId = createTestUser()
         transaction {
             UserActiveRoles.insert {
@@ -118,5 +123,6 @@ class UserRepositoryTest {
         assertTrue(repository.getPhotographers("Canada", null).isEmpty())
         assertTrue(repository.getPhotographers("United States", "CA").isEmpty())
         assertEquals(1, repository.getPhotographers(null, null).size)
+        Unit
     }
 }

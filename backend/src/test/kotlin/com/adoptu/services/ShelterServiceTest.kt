@@ -18,6 +18,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class ShelterServiceTest {
@@ -33,13 +34,13 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getAll returns empty list when no shelters exist`() {
+    fun `getAll returns empty list when no shelters exist`() = runBlocking {
         val result = shelterService.getAll("United States")
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `getAll returns shelters for given country`() {
+    fun `getAll returns shelters for given country`() = runBlocking {
         createTestShelter("Shelter 1", "United States", "NY", "New York")
         createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "Canada", "ON", "Toronto")
@@ -51,7 +52,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getAll filters by state when provided`() {
+    fun `getAll filters by state when provided`() = runBlocking {
         createTestShelter("Shelter 1", "United States", "NY", "New York")
         createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "United States", "NY", "Buffalo")
@@ -63,7 +64,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getAll returns empty list for non-existent country`() {
+    fun `getAll returns empty list for non-existent country`() = runBlocking {
         createTestShelter("Shelter 1", "United States", "NY", "New York")
 
         val result = shelterService.getAll("France")
@@ -72,21 +73,23 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getAll throws exception when country is blank`() {
+    fun `getAll throws exception when country is blank`() = runBlocking {
         assertThrows<IllegalArgumentException> {
             shelterService.getAll("")
         }
+        Unit
     }
 
     @Test
-    fun `getAll throws exception when country is whitespace only`() {
+    fun `getAll throws exception when country is whitespace only`() = runBlocking {
         assertThrows<IllegalArgumentException> {
             shelterService.getAll("   ")
         }
+        Unit
     }
 
     @Test
-    fun `getById returns shelter by id`() {
+    fun `getById returns shelter by id`() = runBlocking {
         val shelterId = createTestShelter("Test Shelter", "United States", "NY", "New York")
 
         val result = shelterService.getById(shelterId)
@@ -99,13 +102,13 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getById returns null for non-existent id`() {
+    fun `getById returns null for non-existent id`() = runBlocking {
         val result = shelterService.getById(999)
         assertNull(result)
     }
 
     @Test
-    fun `create creates new shelter with all fields`() {
+    fun `create creates new shelter with all fields`() = runBlocking {
         val request = CreateShelterRequest(
             name = "New Shelter",
             country = "United States",
@@ -149,7 +152,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `create creates shelter with minimal fields`() {
+    fun `create creates shelter with minimal fields`() = runBlocking {
         val request = CreateShelterRequest(
             name = "Minimal Shelter",
             country = "United States",
@@ -167,7 +170,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `create throws exception when name is blank`() {
+    fun `create throws exception when name is blank`() = runBlocking {
         val request = CreateShelterRequest(
             name = "",
             country = "United States",
@@ -178,10 +181,11 @@ class ShelterServiceTest {
         assertThrows<IllegalArgumentException> {
             shelterService.create(request)
         }
+        Unit
     }
 
     @Test
-    fun `create throws exception when country is blank`() {
+    fun `create throws exception when country is blank`() = runBlocking {
         val request = CreateShelterRequest(
             name = "Test",
             country = "",
@@ -192,10 +196,11 @@ class ShelterServiceTest {
         assertThrows<IllegalArgumentException> {
             shelterService.create(request)
         }
+        Unit
     }
 
     @Test
-    fun `create throws exception when city is blank`() {
+    fun `create throws exception when city is blank`() = runBlocking {
         val request = CreateShelterRequest(
             name = "Test",
             country = "United States",
@@ -206,10 +211,11 @@ class ShelterServiceTest {
         assertThrows<IllegalArgumentException> {
             shelterService.create(request)
         }
+        Unit
     }
 
     @Test
-    fun `create throws exception when address is blank`() {
+    fun `create throws exception when address is blank`() = runBlocking {
         val request = CreateShelterRequest(
             name = "Test",
             country = "United States",
@@ -220,10 +226,11 @@ class ShelterServiceTest {
         assertThrows<IllegalArgumentException> {
             shelterService.create(request)
         }
+        Unit
     }
 
     @Test
-    fun `update updates shelter successfully`() {
+    fun `update updates shelter successfully`() = runBlocking {
         val shelterId = createTestShelter("Old Name", "United States", "NY", "New York")
 
         val result = shelterService.update(shelterId, UpdateShelterRequest(
@@ -239,14 +246,14 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `update returns not found for non-existent id`() {
+    fun `update returns not found for non-existent id`() = runBlocking {
         val result = shelterService.update(999, UpdateShelterRequest(name = "New Name"))
 
         assertTrue(result is ServiceResult.NotFound)
     }
 
     @Test
-    fun `update only modifies specified fields`() {
+    fun `update only modifies specified fields`() = runBlocking {
         val shelterId = createTestShelter("Original", "United States", "NY", "New York", phone = "555-0000", email = "old@test.com")
 
         val result = shelterService.update(shelterId, UpdateShelterRequest(name = "Updated"))
@@ -262,7 +269,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `delete removes shelter successfully`() {
+    fun `delete removes shelter successfully`() = runBlocking {
         val shelterId = createTestShelter("To Delete", "United States", "NY", "New York")
 
         val result = shelterService.delete(shelterId)
@@ -272,13 +279,13 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `delete returns not found for non-existent id`() {
+    fun `delete returns not found for non-existent id`() = runBlocking {
         val result = shelterService.delete(999)
         assertTrue(result is ServiceResult.NotFound)
     }
 
     @Test
-    fun `getCountries returns distinct countries`() {
+    fun `getCountries returns distinct countries`() = runBlocking {
         createTestShelter("Shelter 1", "United States", "NY", "New York")
         createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "Canada", "ON", "Toronto")
@@ -291,7 +298,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getStatesByCountry returns states for country`() {
+    fun `getStatesByCountry returns states for country`() = runBlocking {
         createTestShelter("Shelter 1", "United States", "NY", "New York")
         createTestShelter("Shelter 2", "United States", "CA", "Los Angeles")
         createTestShelter("Shelter 3", "United States", "NY", "Buffalo")
@@ -305,7 +312,7 @@ class ShelterServiceTest {
     }
 
     @Test
-    fun `getStatesByCountry returns empty for non-existent country`() {
+    fun `getStatesByCountry returns empty for non-existent country`() = runBlocking {
         val result = shelterService.getStatesByCountry("France")
         assertTrue(result.isEmpty())
     }

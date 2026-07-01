@@ -261,7 +261,7 @@ class UIRoutesE2ETest {
     // ==================== Pet detail ====================
 
     @Test
-    fun `GET pet by numeric id returns 200`() {
+    fun `GET pet by numeric id returns 200`() = kotlinx.coroutines.runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = rescuerId,
             name = "Buddy",
@@ -284,6 +284,7 @@ class UIRoutesE2ETest {
             val authedResponse = client.get("/pet/${created.id}")
             assertEquals(HttpStatusCode.OK, authedResponse.status)
         }
+        Unit
     }
 
     @Test

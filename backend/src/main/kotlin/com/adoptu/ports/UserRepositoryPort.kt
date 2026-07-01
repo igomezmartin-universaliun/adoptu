@@ -7,34 +7,34 @@ import com.adoptu.dto.input.UserDto
 import com.adoptu.dto.input.UserRole
 
 interface UserRepositoryPort {
-    fun getById(userId: Int): UserDto?
-    fun getByEmail(email: String): UserDto?
-    fun getAllUsers(): List<UserDto>
-    fun getPhotographers(country: String? = null, state: String? = null): List<PhotographerDto>
-    fun getRescuers(): List<UserDto>
-    fun banUser(userId: Int, reason: String?): Boolean
-    fun unbanUser(userId: Int): Boolean
-    fun isBanned(userId: Int): Boolean
-    fun isRoleActive(userId: Int, role: UserRole): Boolean
-    fun activateRescuerProfile(userId: Int): UserDto?
-    fun deactivateRescuerProfile(userId: Int): UserDto?
-    fun activateTemporalHomeProfile(userId: Int): UserDto?
-    fun deactivateTemporalHomeProfile(userId: Int): UserDto?
-    fun activateShelterProfile(userId: Int): UserDto?
-    fun deactivateShelterProfile(userId: Int): UserDto?
-    fun activateSterilizationProfile(userId: Int): UserDto?
-    fun deactivateSterilizationProfile(userId: Int): UserDto?
-    fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto?
-    fun updateLanguage(userId: Int, language: String): UserDto?
-    fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto?
-    fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto?
-    fun isEmailVerified(userId: Int): Boolean
-    fun setEmailVerified(userId: Int, verified: Boolean): Boolean
-    fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean
-    fun verifyToken(token: String): Int?
-    fun getUserIdByToken(token: String): Int?
-    fun deleteVerificationTokens(userId: Int)
-    fun getVerificationAttemptsToday(userId: Int): Int
-    fun recordVerificationAttempt(userId: Int)
-    fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo?
+    suspend fun getById(userId: Int): UserDto?
+    suspend fun getByEmail(email: String): UserDto?
+    suspend fun getAllUsers(): List<UserDto>
+    suspend fun getPhotographers(country: String? = null, state: String? = null): List<PhotographerDto>
+    suspend fun getRescuers(): List<UserDto>
+    suspend fun banUser(userId: Int, reason: String?): Boolean
+    suspend fun unbanUser(userId: Int): Boolean
+    suspend fun isBanned(userId: Int): Boolean
+    suspend fun isRoleActive(userId: Int, role: UserRole): Boolean
+    suspend fun activateRescuerProfile(userId: Int): UserDto?
+    suspend fun deactivateRescuerProfile(userId: Int): UserDto?
+    suspend fun activateTemporalHomeProfile(userId: Int): UserDto?
+    suspend fun deactivateTemporalHomeProfile(userId: Int): UserDto?
+    suspend fun activateShelterProfile(userId: Int): UserDto?
+    suspend fun deactivateShelterProfile(userId: Int): UserDto?
+    suspend fun activateSterilizationProfile(userId: Int): UserDto?
+    suspend fun deactivateSterilizationProfile(userId: Int): UserDto?
+    suspend fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto?
+    suspend fun updateLanguage(userId: Int, language: String): UserDto?
+    suspend fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto?
+    suspend fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto?
+    suspend fun isEmailVerified(userId: Int): Boolean
+    suspend fun setEmailVerified(userId: Int, verified: Boolean): Boolean
+    suspend fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean
+    suspend fun verifyToken(token: String): Int?
+    suspend fun getUserIdByToken(token: String): Int?
+    suspend fun deleteVerificationTokens(userId: Int)
+    suspend fun getVerificationAttemptsToday(userId: Int): Int
+    suspend fun recordVerificationAttempt(userId: Int)
+    suspend fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo?
 }

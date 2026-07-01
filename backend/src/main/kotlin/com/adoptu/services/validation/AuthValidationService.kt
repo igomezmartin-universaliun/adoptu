@@ -24,29 +24,29 @@ class AuthValidationService : KoinComponent {
         return ServiceResult.Success(email)
     }
 
-    fun validateEmailAndUser(email: String): ServiceResult<UserDto> {
+    suspend fun validateEmailAndUser(email: String): ServiceResult<UserDto> {
         val emailRegex = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
         if (!emailRegex.matches(email)) {
             return ServiceResult.Error("Invalid email format")
         }
-        
+
         val user = userService.getByEmail(email)
         return if (user != null) ServiceResult.Success(user)
                else ServiceResult.Error("Invalid credentials")
     }
 
     fun validateSession(session: SessionUser?): ServiceResult<SessionUser> {
-        return if (session != null) ServiceResult.Success(session) 
+        return if (session != null) ServiceResult.Success(session)
                else ServiceResult.Forbidden
     }
 
-    fun validateUserById(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateUserById(userId: Int): ServiceResult<UserDto> {
         val user = userService.getById(userId)
-        return if (user != null) ServiceResult.Success(user) 
+        return if (user != null) ServiceResult.Success(user)
                else ServiceResult.NotFound
     }
 
-    fun validateNotBanned(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateNotBanned(userId: Int): ServiceResult<UserDto> {
         if (userService.isBanned(userId)) {
             val user = userService.getById(userId)
             return if (user != null) ServiceResult.Error("Your account has been suspended. Reason: ${user.banReason ?: "Contact administrator"}")
@@ -55,14 +55,14 @@ class AuthValidationService : KoinComponent {
         return validateUserById(userId)
     }
 
-    fun validateVerified(userId: Int, email: String): ServiceResult<Unit> {
+    suspend fun validateVerified(userId: Int, email: String): ServiceResult<Unit> {
         if (!userService.isUserVerified(userId)) {
             return ServiceResult.Error(email)
         }
         return ServiceResult.Success(Unit)
     }
 
-    fun getUserByEmail(email: String): UserDto? {
+    suspend fun getUserByEmail(email: String): UserDto? {
         return userService.getByEmail(email)
     }
 }

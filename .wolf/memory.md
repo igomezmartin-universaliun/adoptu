@@ -635,6 +635,7 @@
 | 15:35 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | modified route() | ~635 |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 18:30 | Converted 8 DB repositories/ports/services to suspend + withContext(Dispatchers.IO) to fix Fargate thread-starvation load-test regression; fixed 46 files incl. tests; committed 95a5ce8 | PetRepository.kt, PhotographerRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt, TemporalHomeRepository.kt, UserRepository.kt, UserShelterRepository.kt, UserSterilizationLocationRepository.kt, +8 ports +8 services +auxiliary services/validation +11 test files | 426/426 tests pass, compile clean | ~large
 | 15:05 | Fixed missing noPets i18n key (My Pets empty state untranslated) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/.../static/js/common.js | fixed, bundle rebuilt, verified via curl on live dev server | ~12000 |
 | 15:37 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/AuthRoutesE2ETest.kt | — | ~12878 |
 | 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/versions.tf | — | ~155 |
@@ -702,3 +703,4 @@
 |------|--------|---------|---------|--------|
 | 17:03 | Created .claude/worktrees/fix-wolf-merge-conflicts/.gitattributes | — | ~70 |
 | 17:04 | Session end: 1 writes across 1 files (.gitattributes) | 0 reads | ~75 tok |
+| 18:52 | Merged main (19 commits, incl. Kover 95% gate + test-coverage-95 suite) into worktree-agent-aa2e565a38703b52b; resolved memory.md union conflict; fixed 109 compile errors across 9 test files (main's new tests called now-suspend repo/service methods synchronously) by wrapping in runBlocking{} + trailing Unit; also fixed a merge-broken buglog.json (missing `},{` separator) | .wolf/memory.md, .wolf/buglog.json, UserRepositoryTest.kt, UIRoutesE2ETest.kt, UserShelterServiceTest.kt, UserSterilizationLocationServiceTest.kt, AuthValidationServiceTest.kt, PetsValidationServiceTest.kt, PhotographersValidationServiceTest.kt, TemporalHomesValidationServiceTest.kt, UsersValidationServiceTest.kt | compile clean, 1118 tests / 0 failures / 0 errors, koverVerify (95% gate) PASSED | ~large |

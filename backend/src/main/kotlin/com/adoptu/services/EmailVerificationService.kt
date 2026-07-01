@@ -129,7 +129,7 @@ class EmailVerificationService(
         return Result.success(notificationPort.sendEmail(email, subject, body))
     }
 
-    fun verifyToken(token: String): Boolean {
+    suspend fun verifyToken(token: String): Boolean {
         val userId = userRepository.verifyToken(token) ?: return false
         val updated = userRepository.setEmailVerified(userId, true)
         if (updated) {
@@ -138,7 +138,7 @@ class EmailVerificationService(
         return updated
     }
 
-    fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
+    suspend fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
         val userId = userRepository.verifyToken(token) ?: return false to "en"
         val user = userRepository.getById(userId)
         val language = user?.language ?: "en"
@@ -149,7 +149,7 @@ class EmailVerificationService(
         return updated to language
     }
 
-    fun isUserVerified(userId: Int): Boolean {
+    suspend fun isUserVerified(userId: Int): Boolean {
         return userRepository.isEmailVerified(userId)
     }
 
@@ -158,7 +158,7 @@ class EmailVerificationService(
         return generateAndSendVerificationEmail(userId, email, displayName, language)
     }
 
-    fun canSendVerificationEmail(userId: Int): Boolean {
+    suspend fun canSendVerificationEmail(userId: Int): Boolean {
         return userRepository.getVerificationAttemptsToday(userId) < maxVerificationEmailsPerDay
     }
 

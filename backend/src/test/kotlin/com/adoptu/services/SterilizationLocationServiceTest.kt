@@ -17,6 +17,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class SterilizationLocationServiceTest {
@@ -38,13 +39,13 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getAll returns empty list when no locations exist`() {
+    fun `getAll returns empty list when no locations exist`() = runBlocking {
         val result = service.getAll()
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `getAll returns all locations`() {
+    fun `getAll returns all locations`() = runBlocking {
         createLocation(name = "Location 1", country = "United States", city = "LA", address = "123 Main St")
         createLocation(name = "Location 2", country = "United States", city = "NY", address = "456 Broadway")
 
@@ -54,7 +55,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getAll filters by country`() {
+    fun `getAll filters by country`() = runBlocking {
         createLocation(name = "US Location", country = "United States", city = "LA", address = "123 Main St")
         createLocation(name = "Mexico Location", country = "Mexico", city = "Mexico City", address = "789 Av Principal")
 
@@ -65,7 +66,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getAll filters by country and state`() {
+    fun `getAll filters by country and state`() = runBlocking {
         createLocation(name = "CA Location", country = "United States", state = "California", city = "LA", address = "123 Main St")
         createLocation(name = "NY Location", country = "United States", state = "New York", city = "NY", address = "456 Broadway")
 
@@ -76,7 +77,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getAll filters by country state and city`() {
+    fun `getAll filters by country state and city`() = runBlocking {
         createLocation(name = "LA Location", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
         createLocation(name = "SF Location", country = "United States", state = "California", city = "San Francisco", address = "456 Oak Ave")
 
@@ -87,13 +88,13 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getById returns null for non-existent location`() {
+    fun `getById returns null for non-existent location`() = runBlocking {
         val result = service.getById(999)
         assertNull(result)
     }
 
     @Test
-    fun `getById returns location by id`() {
+    fun `getById returns location by id`() = runBlocking {
         val id = createLocation(name = "Test Location", country = "United States", city = "LA", address = "123 Main St")
 
         val result = service.getById(id)
@@ -103,7 +104,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `create creates location successfully`() {
+    fun `create creates location successfully`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "New Vet Clinic",
             country = "United States",
@@ -130,7 +131,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `create throws exception when name is blank`() {
+    fun `create throws exception when name is blank`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "",
             country = "United States",
@@ -146,7 +147,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `create throws exception when country is blank`() {
+    fun `create throws exception when country is blank`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "Test",
             country = "",
@@ -162,7 +163,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `create throws exception when city is blank`() {
+    fun `create throws exception when city is blank`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "Test",
             country = "United States",
@@ -178,7 +179,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `create throws exception when address is blank`() {
+    fun `create throws exception when address is blank`() = runBlocking {
         val request = CreateSterilizationLocationRequest(
             name = "Test",
             country = "United States",
@@ -194,7 +195,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `update returns NotFound for non-existent location`() {
+    fun `update returns NotFound for non-existent location`() = runBlocking {
         val request = UpdateSterilizationLocationRequest(name = "Updated")
 
         val result = service.update(999, request)
@@ -203,7 +204,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `update updates location successfully`() {
+    fun `update updates location successfully`() = runBlocking {
         val id = createLocation(name = "Original Name", country = "United States", city = "LA", address = "123 Main St")
         val request = UpdateSterilizationLocationRequest(
             name = "Updated Name",
@@ -220,7 +221,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `update allows partial updates`() {
+    fun `update allows partial updates`() = runBlocking {
         val id = createLocation(
             name = "Original",
             country = "United States",
@@ -239,13 +240,13 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `delete returns NotFound for non-existent location`() {
+    fun `delete returns NotFound for non-existent location`() = runBlocking {
         val result = service.delete(999)
         assertTrue(result is ServiceResult.NotFound)
     }
 
     @Test
-    fun `delete removes location successfully`() {
+    fun `delete removes location successfully`() = runBlocking {
         val id = createLocation(name = "To Delete", country = "United States", city = "LA", address = "123 Main St")
 
         val result = service.delete(id)
@@ -255,7 +256,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getCountries returns list of countries`() {
+    fun `getCountries returns list of countries`() = runBlocking {
         createLocation(name = "US 1", country = "United States", city = "LA", address = "123 Main St")
         createLocation(name = "US 2", country = "United States", city = "NY", address = "456 Broadway")
         createLocation(name = "MX 1", country = "Mexico", city = "Mexico City", address = "789 Av")
@@ -268,7 +269,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getStatesByCountry returns list of states`() {
+    fun `getStatesByCountry returns list of states`() = runBlocking {
         createLocation(name = "CA 1", country = "United States", state = "California", city = "LA", address = "123 Main St")
         createLocation(name = "CA 2", country = "United States", state = "California", city = "SF", address = "456 Oak")
         createLocation(name = "NY 1", country = "United States", state = "New York", city = "NY", address = "789 Broadway")
@@ -281,7 +282,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getCitiesByCountryAndState returns list of cities`() {
+    fun `getCitiesByCountryAndState returns list of cities`() = runBlocking {
         createLocation(name = "LA 1", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
         createLocation(name = "LA 2", country = "United States", state = "California", city = "Los Angeles", address = "456 Oak")
         createLocation(name = "SF 1", country = "United States", state = "California", city = "San Francisco", address = "789 Pine")
@@ -294,7 +295,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getCitiesByCountryAndState returns cities without state filter`() {
+    fun `getCitiesByCountryAndState returns cities without state filter`() = runBlocking {
         createLocation(name = "CA City", country = "United States", state = "California", city = "LA", address = "123 Main St")
         createLocation(name = "No State", country = "United States", state = null, city = "Unknown", address = "456 Oak")
 
@@ -306,7 +307,7 @@ class SterilizationLocationServiceTest {
     }
 
     @Test
-    fun `getGroupedByLocation returns locations grouped by country state and city`() {
+    fun `getGroupedByLocation returns locations grouped by country state and city`() = runBlocking {
         createLocation(name = "LA Vet 1", country = "United States", state = "California", city = "Los Angeles", address = "123 Main St")
         createLocation(name = "LA Vet 2", country = "United States", state = "California", city = "Los Angeles", address = "456 Oak")
         createLocation(name = "SF Vet 1", country = "United States", state = "California", city = "San Francisco", address = "789 Pine")
@@ -334,7 +335,7 @@ class SterilizationLocationServiceTest {
         assertNull(mexicoGroup.states.first().state)
     }
 
-    private fun createLocation(
+    private suspend fun createLocation(
         name: String,
         country: String,
         city: String,
