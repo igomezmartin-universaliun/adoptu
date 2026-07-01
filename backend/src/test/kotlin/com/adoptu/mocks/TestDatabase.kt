@@ -38,6 +38,8 @@ object TestDatabase {
                     TemporalHomes,
                     SterilizationLocations,
                     AnimalShelters,
+                    UserShelters,
+                    UserSterilizationLocations,
                     Users
                 )
             } catch (e: Exception) {
@@ -55,6 +57,8 @@ object TestDatabase {
                 UserActiveRoles,
                 AnimalShelters,
                 SterilizationLocations,
+                UserShelters,
+                UserSterilizationLocations,
                 Photographers,
                 TemporalHomes,
                 BlockedRescuers,
@@ -88,6 +92,8 @@ object TestDatabase {
             exec("DELETE FROM users")
             exec("DELETE FROM animal_shelters")
             exec("DELETE FROM sterilization_locations")
+            exec("DELETE FROM user_shelters")
+            exec("DELETE FROM user_sterilization_locations")
         }
     }
 }

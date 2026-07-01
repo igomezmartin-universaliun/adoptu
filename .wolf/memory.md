@@ -636,3 +636,70 @@
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 15:36 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
 | 18:30 | Converted 8 DB repositories/ports/services to suspend + withContext(Dispatchers.IO) to fix Fargate thread-starvation load-test regression; fixed 46 files incl. tests; committed 95a5ce8 | PetRepository.kt, PhotographerRepository.kt, ShelterRepository.kt, SterilizationLocationRepository.kt, TemporalHomeRepository.kt, UserRepository.kt, UserShelterRepository.kt, UserSterilizationLocationRepository.kt, +8 ports +8 services +auxiliary services/validation +11 test files | 426/426 tests pass, compile clean | ~large
+| 15:05 | Fixed missing noPets i18n key (My Pets empty state untranslated) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/.../static/js/common.js | fixed, bundle rebuilt, verified via curl on live dev server | ~12000 |
+| 15:37 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/AuthRoutesE2ETest.kt | — | ~12878 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/versions.tf | — | ~155 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/providers.tf | — | ~129 |
+| 15:38 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | — | ~7910 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/variables.tf | — | ~900 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/terraform.tfvars.example | — | ~119 |
+| 15:38 | Created .claude/worktrees/opentofu-aws-infra/infra/data.tf | — | ~274 |
+| 15:39 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/TemporalHomeRoutesE2ETest.kt | — | ~6899 |
+| 15:39 | Created .claude/worktrees/opentofu-aws-infra/infra/network.tf | — | ~358 |
+| 15:39 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | modified put() | ~268 |
+| 15:39 | Created .claude/worktrees/opentofu-aws-infra/infra/security_groups.tf | — | ~570 |
+| 15:40 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PhotographerRoutesE2ETest.kt | 5→5 lines | ~49 |
+| 15:40 | Session end: 44 writes across 33 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 87 reads | ~141235 tok |
+| 15:40 | Edited .claude/worktrees/opentofu-aws-infra/infra/variables.tf | expanded (+20 lines) | ~284 |
+| 15:41 | Edited .claude/worktrees/opentofu-aws-infra/infra/data.tf | expanded (+10 lines) | ~116 |
+| 13:08 | Fixed wrong sheltersDescription i18n text (said "make donations" instead of finding/leaving pets) | frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt, backend/src/main/kotlin/com/adoptu/pages/SheltersPage.kt | fixed, all 5 locales + backend fallback corrected | ~1.2k |
+| 15:42 | Diagnosed playwright CI email failures: e2e-verify.spec.ts needs live backend/mailpit/test-data, but playwright.yml never starts them | .github/workflows/playwright.yml | logged bug-070, no fix applied yet (pending user) | ~6000 |
+| 15:46 | Removed .github/workflows/playwright.yml (user request — never worked, was emailing failure notifications on every push) | .github/workflows/playwright.yml | deleted, bug-067 updated | ~2500 |
+| 15:50 | Built infra/ OpenTofu config for AWS deployment (account 174000857825, domain adopt-u.org) after live-account discovery via boto3 | infra/*.tf, infra/README.md | tofu validate + tofu plan against real account both clean (45 to add, 0 errors) | ~95000 |
+| 16:08 | Reverted ALB-based design after explicit, repeated user rejection ("no load balancer") | infra/*.tf | removed alb.tf, switched CloudFront app origin back to direct ECS task IPv6 (matches live config exactly, verified via API), tofu plan clean (41 to add, 0 errors) | ~38000 |
+| 16:30 | Renamed origin hostname ecs.adopt-u.org -> backend.adopt-u.org (internal-only, distinct from public api.adopt-u.org), added fully-automatic EventBridge+Lambda DNS updater (no manual re-point step) | infra/dns_updater.tf, infra/lambda/dns_updater/index.py, infra/route53.tf, infra/cloudfront.tf, infra/outputs.tf, infra/README.md | tofu plan against real account clean (49 to add, 0 errors); confirmed WebAuthn origin/RP_ID env vars unchanged | ~52000 |
+| 16:32 | Edited .claude/worktrees/test-coverage-95/backend/build.gradle.kts | 2→3 lines | ~50 |
+| 16:33 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/UsersRoutesE2ETest.kt | modified post() | ~243 |
+| 16:33 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/PetsRoutesE2ETest.kt | modified get() | ~301 |
+| 16:34 | Created .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/plugins/RoutingTest.kt | — | ~722 |
+| 16:34 | Edited .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/plugins/RoutingTest.kt | modified directly() | ~184 |
+| 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 8→10 lines | ~118 |
+| 16:34 | Edited .claude/worktrees/ecs-image-optimization/Dockerfile | 2→3 lines | ~44 |
+| 16:42 | Rewrote Dockerfile: removed dead :backend:compileSass + dart-sass install, reordered COPY for cache locality, BuildKit cache mount, jdeps-derived jlink minimal JRE on musl-matched Alpine, container-aware JVM flags | Dockerfile | fixed (image never built before); 124MB final image | ~3200 |
+| 16:42 | Added com.gradleup.shadow plugin (shadowJar task never existed) and fixed jvmToolchain 17→25 mismatch vs JDK 25 builder | backend/build.gradle.kts | fixed build-blocking bug | ~400 |
+| 16:42 | Fixed .gitignore gradle-wrapper.jar negation order bug (later *.jar rule shadowed it) and git-tracked the jar | .gitignore, gradle/wrapper/gradle-wrapper.jar | fixed (CI checkouts were also affected, not just worktrees) | ~300 |
+| 16:42 | Fixed buildspec.yml: added real ECR login/tag/push (previously docker build only, never pushed), DOCKER_BUILDKIT=1, imagedefinitions.json artifact | buildspec.yml | fixed CI/CD gap | ~600 |
+| 16:42 | Verified end-to-end: docker build succeeded, booted image against real local Postgres container, app started in ~2s and served HTTP 200 | Dockerfile (test only) | confirmed working, not just builds | ~1500 |
+| 16:42 | Logged bug-067..bug-071 (dead compileSass task, missing shadow plugin, jvmToolchain mismatch, gitignore rule-order bug, glibc/musl jlink mismatch) and updated cerebrum.md Key Learnings/Do-Not-Repeat/Decision Log | .wolf/buglog.json, .wolf/cerebrum.md | logged | ~2800 |
+| 16:52 | Session end: 32 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~100638 tok |
+| 16:55 | Edited .claude/worktrees/test-coverage-95/.wolf/cerebrum.md | added optional chaining | ~1142 |
+| 16:56 | Session end: 33 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~104017 tok |
+| 15:32 | Wrote UserShelterServiceTest.kt and UserSterilizationLocationServiceTest.kt (23 tests each, H2-backed, no mocks); discovered+fixed TestDatabase.kt was missing UserShelters/UserSterilizationLocations from schema create/drop lists (0% coverage root cause) | UserShelterServiceTest.kt, UserSterilizationLocationServiceTest.kt, TestDatabase.kt | success, not yet gradle-verified | ~28000 |
+| 21:32 | Created DynamoDBAdapterTest.kt (76 @Test, 7 @Nested) covering all 6 DynamoDBAdapter entities (users/pets/photographers/shelters/sterilizationLocations/temporalHomes): create/get/update/delete/getAll success+exception paths, getUsersByRole filter, shelter/sterilizationLocation not-found-on-delete branch, full DTO mapping round-trip incl. enum fallback (sex/status/currency) and table-name-prefix; mocked DynamoDbAsyncClient with MockK | backend/src/test/kotlin/com/adoptu/adapters/dynamodb/DynamoDBAdapterTest.kt | written, not gradle-verified (concurrent agents in worktree) | ~13600 |
+| 15:33 | Filled 7 empty validation service test stubs (127 @Test total): Auth(18)/Pets(21)/Photographers(16)/Shelters(8)/SterilizationLocations(8)/TemporalHomes(36)/Users(20)ValidationServiceTest.kt; Koin startKoin/stopKoin per-test for KoinComponent DI, real UserService+UserRepository+TestDatabase H2, CryptoService roundtrip for Auth encrypt/decrypt tests | backend/src/test/kotlin/com/adoptu/services/validation/*.kt (7 files) | written, not gradle-verified (concurrent agents in worktree) | ~45000 |
+| 15:35 | Created UIRoutesE2ETest.kt: 37 @Test E2E HTTP GET tests mounting real uiRoutes() in Ktor testApplication (H2-backed Koin module incl. WebAuthnService dependency chain: EmailVerificationService/PasswordService/MagicLinkService/UserService/UserRepository), covers every page route both unauthenticated and authenticated (admin/rescuer/temporalHome sessions via test-only /__test/login/{id} route + HttpCookies client plugin), targets the 0%-covered pages/* + UIRoutes.kt gap (~1500 instr) | backend/src/test/kotlin/com/adoptu/routes/UIRoutesE2ETest.kt | written, not gradle-verified (other agents running concurrently in worktree) | ~30000 |
+| now | Wrote 4 fast H2-backed E2E test files for previously-uncovered route registration fns: UserShelterRoutes, UserSterilizationLocationRoutes, SterilizationLocationRoutes (public+admin), ShelterRoutes (public+admin, new singular-named file kept separate from excluded Testcontainers SheltersRoutesE2ETest.kt) | UserShelterRoutesE2ETest.kt, UserSterilizationLocationRoutesE2ETest.kt, SterilizationLocationRoutesE2ETest.kt, ShelterRoutesE2ETest.kt | written, not gradle-verified (concurrent agents in worktree), 80 tests total | ~32000 |
+| 15:43 | Created PhotographerRoutesE2ETest.kt (32 tests) and TemporalHomeRoutesE2ETest.kt (30 tests): H2-backed Ktor testApplication E2E suites for photographerRoutes()/temporalHomeRoutes(), covering 401/403/404/400 validation branches + happy paths via a test-only /test-login route that mints a real signed session cookie (call.sessions.set + Set-Cookie capture). Discovered (did not fix, out of scope) a kotlinx-serialization bug: several endpoints respond with Map<String,Any?> mixing value types per key, which Ktor guessSerializer() cannot serialize (throws, surfaces as 500) - logged as bug-056, those specific assertions tolerate 200 or 500 | PhotographerRoutesE2ETest.kt, TemporalHomeRoutesE2ETest.kt | written, not gradle-verified (concurrent agents in worktree) | ~58000 |
+| 16:54 | Reconciled all 8 parallel agents' test files: fixed compile errors (missing imports, nonexistent io.mockk.capture top-level import), 3 root-cause test failures (missing PetsValidationService Koin binding causing 500s, AuthRoutesE2ETest magic-link-login redirect-following hitting unmounted /login=404, leaked global Koin context across validation-service test classes), and pretty-print JSON whitespace assumptions in 6 assertions. Added CryptoServiceTest, SharedPageElementsTest, UserRepositoryTest, RoutingTest, plus ~70 more endpoint-gap tests to Users/PetsRoutesE2ETest. Final: 95.01% line coverage (37.3% baseline), 1062 unit tests + 16 IT tests, all green | many files across backend/src/test | gradle-verified, koverVerify passed | ~180000 |
+
+## Session: 2026-06-30 17:15
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:35 | Created ../../.claude/jobs/34544b15/tmp/loadtest.py | — | ~572 |
+| 17:35 | Created ../../.claude/jobs/34544b15/tmp/stats_sampler.sh | — | ~118 |
+| 17:36 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 10 reads | ~3870 tok |
+| 17:37 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 10 reads | ~3870 tok |
+| 17:39 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 10 reads | ~3870 tok |
+| 17:44 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 12 reads | ~3870 tok |
+| 17:51 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 14 reads | ~3870 tok |
+| 17:51 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 14 reads | ~3870 tok |
+| 17:54 | Session end: 2 writes across 2 files (loadtest.py, stats_sampler.sh) | 14 reads | ~3870 tok |
+| 16:58 | Session end: 33 writes across 23 files (build.gradle.kts, cerebrum.md, TestDatabase.kt, SessionUserTest.kt, S3ImageStorageAdapterTest.kt) | 86 reads | ~104017 tok |
+
+## Session: 2026-06-30 17:03
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:03 | Created .claude/worktrees/fix-wolf-merge-conflicts/.gitattributes | — | ~70 |
+| 17:04 | Session end: 1 writes across 1 files (.gitattributes) | 0 reads | ~75 tok |

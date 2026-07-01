@@ -1,0 +1,5 @@
+# OpenWolf metadata logs are appended to independently by every parallel
+# worktree/agent. Union-merge so concurrent appends combine instead of
+# producing conflict markers on every merge back to main.
+.wolf/memory.md merge=union
+.wolf/buglog.json merge=union

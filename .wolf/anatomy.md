@@ -1,7 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T21:35:50.174Z
-> Files: 651 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-30T23:35:37.452Z
+> Files: 683 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../.claude/jobs/34544b15/tmp/
+
+- `loadtest.py` — worker, percentile, run_stage (~572 tok)
+- `stats_sampler.sh` — Samples docker stats for a container every 1s until killed. (~118 tok)
 
 ## ../../.claude/jobs/95b8a41d/tmp/
 
@@ -14,14 +19,14 @@
 ## ./
 
 - `.dockerignore` — Docker ignore rules (~22 tok)
-- `.gitignore` — Git ignore rules (~149 tok)
+- `.gitignore` — Git ignore rules; gradle-wrapper.jar negation now correctly placed after the `*.jar` rule it overrides (~145 tok)
 - `AGENTS.md` — Adopt-U - Agent Guidelines (~1284 tok)
 - `build.gradle.kts` — Gradle Kotlin build configuration (~2307 tok)
-- `buildspec.yml` (~353 tok)
+- `buildspec.yml` — CodeBuild spec: logs into ECR, builds/tags/pushes the image, emits imagedefinitions.json for ECS deploy (~520 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `docker-compose.test.yml` — Docker Compose: 1 services (~251 tok)
 - `docker-compose.yml` — Docker Compose services (~241 tok)
-- `Dockerfile` — Docker container definition (~314 tok)
+- `Dockerfile` — Multi-stage build: musl-based Corretto 25 builder (Shadow-plugin fat jar) -> jdeps-derived jlink minimal JRE on Alpine, no dead Sass step, container-aware JVM flags (~520 tok)
 - `gradle.properties` (~159 tok)
 - `gradlew` — you may not use this file except in compliance with the License. (~2292 tok)
 - `gradlew.bat` (~748 tok)
@@ -779,6 +784,10 @@
 
 - `build.gradle.kts` (~137 tok)
 
+## .claude/worktrees/fix-wolf-merge-conflicts/
+
+- `.gitattributes` — OpenWolf metadata logs are appended to independently by every parallel (~70 tok)
+
 ## .claude/worktrees/floating-crafting-charm/
 
 - `.dockerignore` — Docker ignore rules (~0 tok)
@@ -1086,7 +1095,7 @@
 ## .claude/worktrees/test-coverage-95/.wolf/
 
 - `anatomy.md` — anatomy.md (~11957 tok)
-- `cerebrum.md` — Cerebrum (~2155 tok)
+- `cerebrum.md` — Cerebrum (~3476 tok)
 - `memory.md` — Memory (~8610 tok)
 
 ## .claude/worktrees/test-coverage-95/backend/
@@ -1105,19 +1114,29 @@
 ## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/mocks/
 
 - `TestDatabase.kt` — initH2, clearAllData (~931 tok)
+- `TestDatabase.kt` — Modified initH2()/clearAllData() to register UserShelters and UserSterilizationLocations tables (previously missing from schema create/drop lists, which would have made any test touching those tables fail with "table not found") (~900 tok)
 
 ## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/routes/
 
+- `PhotographerRoutesE2ETest.kt` — New testApplication E2E test for `photographerRoutes()`: GET /api/photographers (+ country/state filters), POST /profile (activate/deactivate, 401/404), PUT /settings (401/404/403/400 negative fee/200, incl. ADMIN-bypasses-role-check-but-404s-without-PHOTOGRAPHER-active-role edge case), POST /requests, POST /requests/multiple (400 empty/>3/rate-limited, 200), GET /requests (401/404/200 for both photographer and requester branches), PUT /requests/{id} (401/400 bad id/404/403 unrelated user/400 bad status transition/200). Session via test-only `/test-login` route + `call.sessions.set(SessionUser(...))`, cookie captured from the real signed Set-Cookie header. 32 tests. Discovered and documented (not fixed) a pre-existing kotlinx-serialization bug: several PhotographerService methods return `Map<String, Any?>` with heterogeneous per-key value types, which Ktor's `guessSerializer()` fallback cannot serialize (throws `IllegalStateException`, surfaces as 500) — see bug-052 in buglog.json. Those specific success-path assertions tolerate 200 or 500 (~5400 tok)
 - `ShelterRoutesE2ETest.kt` — Ktor routing (~3585 tok)
+- `ShelterRoutesE2ETest.kt` — New testApplication E2E test for `shelterRoutes()` (public GET list/countries/states/{id}) and `adminShelterRoutes()` (admin CRUD at /api/admin/shelters, incl. the empty-list-when-country-missing quirk on GET /api/admin/shelters). Deliberately separate from the pre-existing Testcontainers-based `SheltersRoutesE2ETest.kt` (plural, excluded from both `test` and `integrationTest` Gradle tasks) which was left untouched. 22 tests (~3500 tok)
 - `SterilizationLocationRoutesE2ETest.kt` — Ktor routing (~4224 tok)
+- `SterilizationLocationRoutesE2ETest.kt` — New testApplication E2E test for `sterilizationLocationRoutes()` (public GET list/grouped/countries/states/cities/{id}) and `adminSterilizationLocationRoutes()` (admin CRUD at /api/admin/sterilization-locations). No session needed — confirmed via plugins/Routing.kt that admin route functions have no auth/role guard at this layer. 24 tests (~3600 tok)
+- `TemporalHomeRoutesE2ETest.kt` — New testApplication E2E test for `temporalHomeRoutes()`: POST/GET/PUT /api/users/temporal-home (create incl. already-exists/blank-alias validation, get incl. 404 no-profile, update), GET /api/users/temporal-home/requests (401/404/403 role check/200), GET /api/temporal-homes search (no auth, filters), POST /api/temporal-homes/request (401/404/403 not-rescuer/400 blank message/400 not-found target/400 blocked/200), GET /api/temporal-homes/block/{id} (400 invalid id/missing rescuer param, 200 idempotent block, no auth required), POST /api/temporal-homes/block (401/404/403/200). Same test-login session-cookie pattern as PhotographerRoutesE2ETest. 30 tests. Hits the same heterogeneous-Map serialization issue (bug-052) only on the POST /request success payload (`mapOf("success" to Boolean, "requestId" to Int)`); all other success responses are single-key maps or proper `@Serializable` DTOs so are asserted strictly as 200 (~5100 tok)
 - `UIRoutesE2ETest.kt` — End-to-end tests for [uiRoutes]: mounts the real route tree in a Ktor (~5835 tok)
+- `UIRoutesE2ETest.kt` — New H2-backed Ktor testApplication E2E suite mounting real `uiRoutes()` and issuing actual HTTP GETs against every route (/, /login, /register, /photographers, /pet-food, /pet/{id}, /pets, /my-pets, /profile, /admin, /admin/shelters, /privacy, /terms, /temporal-home(s), /shelters, /sterilization-locations, /admin/sterilization-locations, /verify, /verify-email, /forgot-password, /reset-password, /magic-link-login, /verify-email-change, /temporal-home/block/{id}), each both unauthenticated and authenticated (admin/rescuer/temporalHome sessions) via a test-only `/__test/login/{id}` route that calls `call.sessions.set(SessionUser(...))`. 37 @Test functions. Targets the 0%-covered `com.adoptu.pages.*` (~1500 instr) + `UIRoutes.kt` gap (~3400 tok)
 - `UserShelterRoutesE2ETest.kt` — Ktor routing (~4048 tok)
+- `UserShelterRoutesE2ETest.kt` — New testApplication E2E test for `userShelterRoutes()`: POST/GET/PUT/DELETE /api/users/shelter (401 unauth, 400 blank name, 404 not-found, upsert-on-repeat-POST, happy path) + GET /api/user-shelters search (400 missing/blank country, filtered results, empty results). Session established via a test-only `/test/login/{userId}` route that calls `call.sessions.set(SessionUser(...))` and captures the real signed Set-Cookie header (no prior proven session-cookie mechanism existed in this repo's E2E tests for protected routes — UsersRoutesE2ETest/PetsRoutesE2ETest only tested the 401 path). 17 tests (~3200 tok)
 - `UserSterilizationLocationRoutesE2ETest.kt` — Ktor routing (~4341 tok)
+- `UserSterilizationLocationRoutesE2ETest.kt` — Same pattern as UserShelterRoutesE2ETest but for `userSterilizationLocationRoutes()` / /api/users/sterilization-location / /api/user-sterilization-locations. 17 tests (~3200 tok)
 
 ## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/
 
 - `UserShelterServiceTest.kt` — UserShelterServiceTest: setup (~4418 tok)
+- `UserShelterServiceTest.kt` — New H2-backed test suite for UserShelterService: getByUserId, create (incl. upsert-on-duplicate), update, delete, search (country/state/city/neighborhood/zip combos), validation errors. 23 tests (~3400 tok)
 - `UserSterilizationLocationServiceTest.kt` — UserSterilizationLocationServiceTest: setup (~4323 tok)
+- `UserSterilizationLocationServiceTest.kt` — New H2-backed test suite for UserSterilizationLocationService: getByUserId, create (incl. upsert-on-duplicate), update, delete, search (country/state/city/neighborhood/zip combos), validation errors. 23 tests (~3300 tok)
 
 ## .claude/worktrees/test-coverage-95/backend/src/test/kotlin/com/adoptu/services/auth/
 
@@ -1218,6 +1237,10 @@
 
 - `_layout.scss` — Styles: 11 rules (~1961 tok)
 
+## backend/ (canonical)
+
+- `build.gradle.kts` — Backend Gradle module: Ktor/Exposed/AWS SDK deps, application plugin, com.gradleup.shadow 9.4.3 (fat jar -> *-all.jar), jvmToolchain(25) (~750 tok)
+
 ## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
 
 - `Models.kt` — Exposed table defs; `country` columns on AnimalShelters, SterilizationLocations, UserShelters, UserSterilizationLocations, TemporalHomes, Photographers now use `enumerationByName("country", 100, Country::class)` instead of free-text varchar (~3300 tok)
@@ -1232,3 +1255,25 @@
 ## backend/src/main/kotlin/com/adoptu/pages/ (canonical)
 
 - `Shared.kt` — `countrySelect()` now renders `<option>`s from `Country.entries` instead of a hardcoded 112-line list (~3000 tok)
+
+## infra/ (OpenTofu - AWS deployment)
+
+- `cloudfront.tf` — 3 distributions: static/dynamic image origins (S3+OAC), app origin is `backend.<domain>` directly (custom origin, `http-only`/8080 — verified to match the live distribution's actual config exactly, NOT an ALB). `backend.<domain>` is internal-only — distinct from the public `api.<domain>` alias, which still goes through this same distribution (~450 tok)
+- `data.tf` — read-only lookups: Route53 zone, ACM cert (us-east-1, CloudFront), ECR repo, default VPC, DB subnet group, rds-monitoring-role (~300 tok)
+- `dns_updater.tf` — EventBridge rule (`ECS Task State Change`, `lastStatus=RUNNING`, filtered to the `adoptu` cluster) -> Lambda that looks up the new task's IPv6 (ecs:DescribeTasks -> ec2:DescribeNetworkInterfaces) and UPSERTs `backend.<domain>`. Fully automatic — no manual DNS step, ever. Source at `lambda/dns_updater/index.py`, zipped via `data.archive_file` (~550 tok)
+- `ecs.tf` — new `adoptu` ECS cluster/service/task def, Fargate, deployed into the IPv6-only subnets; container_port fixed to 8080 (live task def had 80, app actually listens on 8080); no `load_balancer` block (~400 tok)
+- `iam.tf` — split execution role (ECR/logs/secrets) vs task role (S3 scoped to real buckets + SES) — fixes the live policy's unscoped `your-bucket-name` placeholder (~400 tok)
+- `lambda/dns_updater/index.py` — the Lambda handler itself (~30 lines, boto3, no deps beyond the runtime) (~250 tok)
+- `network.tf` — 2 new IPv6-only ECS subnets (ipv6_native, carved from the VPC's existing /56), no NAT/EIGW — relies on the default VPC main route table's existing `::/0 -> igw` route (~250 tok)
+- `outputs.tf` — backend_origin_record, rds_endpoint, cloudfront domains, ecs subnet ids (~80 tok)
+- `providers.tf` — aws provider (us-east-1) + us_east_1-aliased provider for CloudFront/ACM (~120 tok)
+- `rds.tf` — `aws_db_instance.postgres` matching live `adoptu` instance (db.t4g.micro/postgres17.9), `network_type = "DUAL"` added so IPv6-only ECS tasks can reach it (~350 tok)
+- `README.md` — full import plan (this is a brownfield account, not greenfield — S3/RDS/CloudFront/IAM-role names already exist live and must be `tofu import`ed, not created fresh), 4-step migration/cutover plan (Lambda+EventBridge must be applied before the ECS service so the first task's RUNNING event isn't missed), list of live-config findings/fixes, old-resource decommission commands (~2000 tok)
+- `route53.tf` — `backend.<domain>` AAAA record (origin for the app CloudFront dist; internal-only, brand new name, `lifecycle.ignore_changes` on `records` since `dns_updater.tf`'s Lambda owns its value, not Terraform) + A/AAAA alias records for apex/www/`api.<domain>` -> app CloudFront (api stays public/CloudFront-fronted, never the origin hostname), static/dynamic -> their CloudFront dists. Other ~20 zone records (mail, SES verification, NS/SOA) deliberately untouched (~400 tok)
+- `s3.tf` — `adoptu-static-images`/`adoptu-dynamic-images` buckets, public access block, CloudFront-OAC-only bucket policies (~250 tok)
+- `secrets.tf` — Secrets Manager: generated RDS master password, `var.db_app_password` (the live `adoptu` Postgres role's password — must be supplied, not generated) (~200 tok)
+- `security_groups.tf` — ECS task SG (port 8080 open to ::/0 — no CloudFront IPv6 managed prefix list exists, matches live), RDS SG (from ECS task only). **No ALB/load-balancer SG — user explicitly rejected one twice, see [[feedback-no-load-balancer]] in global memory** (~250 tok)
+- `ses.tf` — comment-only; SES domain identity already verified live, intentionally not managed here (~80 tok)
+- `terraform.tfvars.example` — sample values matching the live account (~60 tok)
+- `variables.tf` — all configurable inputs: region/profile, domain, container image/port, RDS sizing, db_app_password (sensitive, no default) (~700 tok)
+- `versions.tf` — OpenTofu/AWS+archive provider version pins, backend notes (local by default) (~170 tok)
