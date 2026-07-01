@@ -16,7 +16,7 @@ window.searchLocations = async function() {
         container.innerHTML = '<div class="location-list">' + locations.map(loc => `
             <div class="location-card card-bg">
                 <h3>${loc.name}</h3>
-                <p class="location-address">${loc.address}, ${loc.city}${loc.state ? ', ' + loc.state : ''}, ${loc.country}</p>
+                <p class="location-address">${loc.address}, ${loc.city}${loc.state ? ', ' + loc.state : ''}, ${tCountry(loc.country)}</p>
                 ${loc.phone ? `<p class="location-phone"><strong>${t('phone')}:</strong> ${loc.phone}</p>` : ''}
                 ${loc.email ? `<p class="location-email"><strong>${t('email')}:</strong> ${loc.email}</p>` : ''}
                 ${loc.website ? `<p class="location-website"><a href="${loc.website}" target="_blank">${t('website')}</a></p>` : ''}

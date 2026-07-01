@@ -9,8 +9,8 @@ async function loadCountries() {
     const res = await fetch('/api/sterilization-locations/countries');
     const data = await res.json();
     const select = document.getElementById('form-country');
-    select.innerHTML = '<option value="">' + t('selectCountry') + '</option>' + 
-        data.countries.map(c => '<option value="'+c+'">'+c+'</option>').join('');
+    select.innerHTML = '<option value="">' + t('selectCountry') + '</option>' +
+        data.countries.map(c => '<option value="'+c+'">'+escapeHtml(tCountry(c))+'</option>').join('');
 }
 
 async function loadLocations() {
@@ -24,7 +24,7 @@ async function loadLocations() {
     container.innerHTML = '<div class="location-list">' + locations.map(loc => `
         <div class="location-card card-bg">
             <h3>${escapeHtml(loc.name)}</h3>
-            <p class="location-address">${escapeHtml(loc.address)}, ${escapeHtml(loc.city)}${loc.state ? ', ' + escapeHtml(loc.state) : ''}, ${escapeHtml(loc.country)}</p>
+            <p class="location-address">${escapeHtml(loc.address)}, ${escapeHtml(loc.city)}${loc.state ? ', ' + escapeHtml(loc.state) : ''}, ${escapeHtml(tCountry(loc.country))}</p>
             ${loc.phone ? `<p class="location-phone"><strong>${t('phone')}:</strong> ${escapeHtml(loc.phone)}</p>` : ''}
             ${loc.email ? `<p class="location-email"><strong>${t('email')}:</strong> ${escapeHtml(loc.email)}</p>` : ''}
             ${loc.website ? `<p class="location-website"><a href="${escapeHtml(loc.website)}" target="_blank">${t('website')}</a></p>` : ''}

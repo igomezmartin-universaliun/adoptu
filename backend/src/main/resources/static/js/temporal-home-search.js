@@ -18,7 +18,7 @@ window.displayResults = function(homes) {
         container.innerHTML = '<p data-i18n="noTemporalHomes">No temporal homes found.</p>';
         return;
     }
-    container.innerHTML = homes.map(home => '<div class="temporal-home-card"><h3>' + (home.alias || 'Temporal Home') + '</h3><p>' + home.city + ', ' + home.state + ', ' + home.country + '</p><a href="/temporal-home/' + home.id + '" data-i18n="viewDetails">View Details</a></div>').join('');
+    container.innerHTML = homes.map(home => '<div class="temporal-home-card"><h3>' + (home.alias || 'Temporal Home') + '</h3><p>' + home.city + ', ' + home.state + ', ' + tCountry(home.country) + '</p><a href="/temporal-home/' + home.id + '" data-i18n="viewDetails">View Details</a></div>').join('');
 };
 
 document.addEventListener('DOMContentLoaded', () => {
