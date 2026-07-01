@@ -1,10 +1,33 @@
 const emoji = { DOG: '🐕', CAT: '🐱', BIRD: '🐦', FISH: '🐟' };
 let currentType = '';
 let currentSex = '';
+const countrySelect = document.getElementById('pets-country');
+const petsErrorDiv = document.getElementById('pets-error');
+const petsCountryHint = document.getElementById('pets-country-hint');
+
+function updateCountryHint() {
+    const hasCountry = !!(countrySelect && countrySelect.value);
+    if (petsCountryHint) petsCountryHint.style.display = hasCountry ? 'none' : '';
+}
+
 async function loadPets() {
-    const pets = await api.getPets(currentType || undefined);
-    const filteredPets = pets.filter(p => !currentSex || p.sex === currentSex);
+    const country = countrySelect ? countrySelect.value : '';
+    updateCountryHint();
     const container = document.getElementById('pets');
+    if (!country) {
+        if (petsErrorDiv) {
+            petsErrorDiv.style.display = 'block';
+            petsErrorDiv.textContent = t('countryRequired');
+        }
+        container.innerHTML = '';
+        return;
+    }
+    if (petsErrorDiv) {
+        petsErrorDiv.style.display = 'none';
+        petsErrorDiv.textContent = '';
+    }
+    const pets = await api.getPets(currentType || undefined, country);
+    const filteredPets = pets.filter(p => !currentSex || p.sex === currentSex);
     container.innerHTML = filteredPets.length ? filteredPets.map(p => {
         const primaryImage = p.images && p.images.length > 0 ? p.images.find(img => img.isPrimary) || p.images[0] : null;
         const imageHtml = primaryImage 
@@ -28,4 +51,23 @@ if (sexFilter) {
         loadPets();
     };
 }
-loadPets();
+if (countrySelect) {
+    countrySelect.onchange = () => loadPets();
+}
+
+// Default the country dropdown to the logged-in user's saved profile country, if any.
+// No IP geolocation - if the user isn't logged in or has no saved country, the dropdown
+// stays unselected and loadPets() shows the "select a country" prompt until they pick one.
+(async function initCountry() {
+    if (countrySelect) {
+        try {
+            const user = await api.me();
+            if (user && user.authenticated !== false && user.country) {
+                countrySelect.value = user.country;
+            }
+        } catch (e) {
+            // Not logged in or lookup failed - leave the dropdown unselected.
+        }
+    }
+    loadPets();
+})();

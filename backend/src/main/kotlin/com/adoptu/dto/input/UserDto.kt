@@ -13,6 +13,7 @@ data class UserDto(
     val email: String? = null,
     val displayName: String,
     val language: String = "en",
+    val country: String? = null,
     val isEmailVerified: Boolean = false,
     val activeRoles: Set<UserRole> = emptySet(),
     val lastAcceptedPrivacyPolicy: Long? = null,

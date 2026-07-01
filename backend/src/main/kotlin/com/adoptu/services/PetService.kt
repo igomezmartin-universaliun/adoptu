@@ -21,7 +21,15 @@ class PetService(
     private val userService: UserService
 ) {
 
-    suspend fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = petRepository.getAll(type, showPromotedOnly)
+    suspend fun getAll(type: String? = null, showPromotedOnly: Boolean = false, country: String): List<PetDto> {
+        require(country.isNotBlank()) { "Country is required" }
+        return petRepository.getAll(type, showPromotedOnly, country)
+    }
+
+    // Unfiltered listing (any status/country, no rescuer-role restriction) backing the
+    // rescuer/admin "my pets" management page - it must keep showing legacy pets that have
+    // no country set yet, which the country-required public getAll() above would hide.
+    suspend fun getMine(): List<PetDto> = petRepository.getAllUnfiltered()
 
     suspend fun getById(id: Int): PetDto? = petRepository.getById(id)
 
@@ -31,6 +39,11 @@ class PetService(
         require(request.ageMonths >= 0) { "Age (months) must be zero or positive" }
         require(request.ageMonths < 12) { "Age (months) must be less than 12" }
         require(request.adoptionFee >= 0) { "Adoption fee must be zero or positive" }
+        val resolvedCountry = request.country?.takeIf { it.isNotBlank() }
+            ?: userService.getById(rescuerId)?.country
+        require(!resolvedCountry.isNullOrBlank()) {
+            "Country is required - set one on your profile or specify one for this pet"
+        }
         return petRepository.create(
             rescuerId = rescuerId,
             name = request.name,
@@ -55,6 +68,7 @@ class PetService(
             energyLevel = request.energyLevel,
             rescueDate = request.rescueDate,
             rescueLocation = request.rescueLocation,
+            country = resolvedCountry,
             specialNeeds = request.specialNeeds,
             adoptionFee = request.adoptionFee,
             currency = request.currency,

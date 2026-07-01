@@ -39,6 +39,11 @@ fun HTML.profilePage(navParams: NavParams = NavParams()) {
                     }
                 }
                 div(classes = "form-row") {
+                    label { htmlFor = "country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
+                    select { id = "country"; countrySelect("country", true) }
+                    span(classes = "field-error") { id = "country-error" }
+                }
+                div(classes = "form-row") {
                     label { attributes["data-i18n"] = "yourRoles"; +"Your Roles:" }
                     div(classes = "roles-section") {
                         div(classes = "checkbox-group") {

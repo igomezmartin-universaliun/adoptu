@@ -75,6 +75,7 @@ class UIRoutesDataTest {
         // Create pets
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Buddy",
             type = "DOG",
             description = "A friendly dog",
@@ -87,6 +88,7 @@ class UIRoutesDataTest {
         
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Luna",
             type = "CAT",
             description = "A sweet cat",
@@ -97,7 +99,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val pets = PetRepositoryImpl(clock).getAll()
+        val pets = PetRepositoryImpl(clock).getAll(country = "United States")
         
         assertEquals(2, pets.size)
     }
@@ -106,6 +108,7 @@ class UIRoutesDataTest {
     fun `pets list filters by type DOG`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Dog1",
             type = "DOG",
             description = "Dog",
@@ -118,6 +121,7 @@ class UIRoutesDataTest {
         
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Cat1",
             type = "CAT",
             description = "Cat",
@@ -128,7 +132,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val dogs = PetRepositoryImpl(clock).getAll("DOG")
+        val dogs = PetRepositoryImpl(clock).getAll("DOG", country = "United States")
         
         assertEquals(1, dogs.size)
         assertEquals("DOG", dogs[0].type)
@@ -138,6 +142,7 @@ class UIRoutesDataTest {
     fun `pets list filters by type CAT`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Cat1",
             type = "CAT",
             description = "Cat",
@@ -150,6 +155,7 @@ class UIRoutesDataTest {
         
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Dog1",
             type = "DOG",
             description = "Dog",
@@ -160,7 +166,7 @@ class UIRoutesDataTest {
             status = "AVAILABLE"
         )
         
-        val cats = PetRepositoryImpl(clock).getAll("CAT")
+        val cats = PetRepositoryImpl(clock).getAll("CAT", country = "United States")
         
         assertEquals(1, cats.size)
         assertEquals("CAT", cats[0].type)
@@ -170,6 +176,7 @@ class UIRoutesDataTest {
     fun `pets list excludes adopted pets`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Available",
             type = "DOG",
             description = "Available",
@@ -182,6 +189,7 @@ class UIRoutesDataTest {
         
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Adopted",
             type = "DOG",
             description = "Adopted",
@@ -192,7 +200,7 @@ class UIRoutesDataTest {
             status = "ADOPTED"
         )
         
-        val pets = PetRepositoryImpl(clock).getAll()
+        val pets = PetRepositoryImpl(clock).getAll(country = "United States")
         
         assertEquals(1, pets.size)
         assertEquals(Status.AVAILABLE, pets[0].status)
@@ -204,6 +212,7 @@ class UIRoutesDataTest {
     fun `pet detail returns pet by id`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Buddy",
             type = "DOG",
             description = "A friendly dog",
@@ -231,6 +240,7 @@ class UIRoutesDataTest {
     fun `pet detail includes all attributes`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "Max",
             type = "DOG",
             breed = "German Shepherd",
@@ -295,6 +305,7 @@ class UIRoutesDataTest {
     fun `pet images returns empty list when no images`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "NoImages",
             type = "DOG",
             description = "No images",
@@ -314,6 +325,7 @@ class UIRoutesDataTest {
     fun `pet images returns added images`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "WithImages",
             type = "DOG",
             description = "With images",
@@ -336,6 +348,7 @@ class UIRoutesDataTest {
     fun `pet images first added is primary by default`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "PrimaryTest",
             type = "DOG",
             description = "Primary mocks",
@@ -362,6 +375,7 @@ class UIRoutesDataTest {
     fun `urgent pets show isUrgent flag`() = runBlocking {
         val urgent = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "UrgentBuddy",
             type = "DOG",
             description = "Urgent",
@@ -383,6 +397,7 @@ class UIRoutesDataTest {
     fun `non-urgent pets show isUrgent false`() = runBlocking {
         val normal = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "NormalBuddy",
             type = "DOG",
             description = "Normal",
@@ -406,6 +421,7 @@ class UIRoutesDataTest {
     fun `pets show MALE gender`() = runBlocking {
         val male = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "MalePet",
             type = "DOG",
             description = "Male",
@@ -426,6 +442,7 @@ class UIRoutesDataTest {
     fun `pets show FEMALE gender`() = runBlocking {
         val female = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "FemalePet",
             type = "CAT",
             description = "Female",
@@ -448,6 +465,7 @@ class UIRoutesDataTest {
     fun `pets show SMALL size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "SmallPet",
             type = "CAT",
             description = "Small",
@@ -469,6 +487,7 @@ class UIRoutesDataTest {
     fun `pets show MEDIUM size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "MediumPet",
             type = "DOG",
             description = "Medium",
@@ -490,6 +509,7 @@ class UIRoutesDataTest {
     fun `pets show LARGE size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "LargePet",
             type = "DOG",
             description = "Large",
@@ -514,6 +534,7 @@ class UIRoutesDataTest {
         val rescueTime = clock.now().toEpochMilliseconds()
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "RescuedPet",
             type = "DOG",
             description = "Rescued",
@@ -536,6 +557,7 @@ class UIRoutesDataTest {
     fun `pets show null rescue date when not set`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
+            country = "United States",
             name = "NoRescueDate",
             type = "DOG",
             description = "No rescue date",

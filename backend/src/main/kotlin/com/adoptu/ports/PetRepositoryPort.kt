@@ -8,7 +8,10 @@ import com.adoptu.dto.input.PetImageDto
 import com.adoptu.dto.input.UpdatePetRequest
 
 interface PetRepositoryPort {
-    suspend fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto>
+    suspend fun getAll(type: String? = null, showPromotedOnly: Boolean = false, country: String): List<PetDto>
+    // Returns every pet regardless of status/country/rescuer-role, for the rescuer/admin
+    // "my pets" management view - which must keep working for legacy pets with no country set.
+    suspend fun getAllUnfiltered(): List<PetDto>
     suspend fun getById(id: Int): PetDto?
     suspend fun create(
         rescuerId: Int,
@@ -34,6 +37,7 @@ interface PetRepositoryPort {
         energyLevel: String? = null,
         rescueDate: Long? = null,
         rescueLocation: String? = null,
+        country: String? = null,
         specialNeeds: String? = null,
         adoptionFee: Double = 0.0,
         currency: Currency = Currency.USD,

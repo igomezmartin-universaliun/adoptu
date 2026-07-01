@@ -9,6 +9,7 @@ object Users : Table("users") {
     val username = varchar("username", 255).uniqueIndex()
     val displayName = varchar("display_name", 255)
     val language = varchar("language", 10).default("en")
+    val country = enumerationByName("country", 100, Country::class).nullable()
     val createdAt = long("created_at")
     val lastAcceptedPrivacyPolicy = long("last_accepted_privacy_policy").nullable()
     val lastAcceptedTermsAndConditions = long("last_accepted_terms_and_conditions").nullable()
@@ -133,6 +134,10 @@ object Pets : Table("pets") {
     val energyLevel = varchar("energy_level", 20).nullable() // LOW, MEDIUM, HIGH
     val rescueDate = long("rescue_date").nullable()
     val rescueLocation = varchar("rescue_location", 255).nullable()
+    // Nullable at the DB level: ~190 pre-existing pet rows have no reliable way to derive a
+    // country from the free-text rescueLocation field, so we leave them null rather than guess
+    // (see feature brief for "mandatory country-based search"). No backfill is performed.
+    val country = enumerationByName("country", 100, Country::class).nullable()
     val specialNeeds = text("special_needs").nullable()
     val adoptionFee = decimal("adoption_fee", 10, 2).default(BigDecimal.ZERO)
     val currency = varchar("currency", 10).default("USD")

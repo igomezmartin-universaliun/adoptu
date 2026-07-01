@@ -42,6 +42,7 @@ data class PetDto(
     val energyLevel: String? = null,
     val rescueDate: Long? = null,
     val rescueLocation: String? = null,
+    val country: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double = 0.0,
     val currency: Currency = Currency.USD,
@@ -83,6 +84,9 @@ data class CreatePetRequest(
     val energyLevel: String? = null,
     val rescueDate: Long? = null,
     val rescueLocation: String? = null,
+    // Optional here: PetService.create() defaults this from the rescuer's own Users.country
+    // profile field when omitted, then validates that a country is present one way or another.
+    val country: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double = 0.0,
     val currency: Currency = Currency.USD,
@@ -115,6 +119,7 @@ data class UpdatePetRequest(
     val energyLevel: String? = null,
     val rescueDate: Long? = null,
     val rescueLocation: String? = null,
+    val country: String? = null,
     val specialNeeds: String? = null,
     val adoptionFee: Double? = null,
     val currency: Currency? = null,

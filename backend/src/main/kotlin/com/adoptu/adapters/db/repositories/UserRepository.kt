@@ -62,6 +62,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
                         email = user[Users.username],
                         displayName = user[Users.displayName],
                         language = user[Users.language],
+                        country = user[Users.country]?.displayName,
                         activeRoles = activeRoles,
                         lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
                         lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
@@ -89,6 +90,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
                         email = user[Users.username],
                         displayName = user[Users.displayName],
                         language = user[Users.language],
+                        country = user[Users.country]?.displayName,
                         activeRoles = activeRoles,
                         lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
                         lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
@@ -110,6 +112,7 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
                         email = user[Users.username],
                         displayName = user[Users.displayName],
                         language = user[Users.language],
+                        country = user[Users.country]?.displayName,
                         activeRoles = activeRoles,
                         lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
                         lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
@@ -341,9 +344,12 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         return getById(userId)
     }
 
-    override suspend fun updateProfile(userId: Int, displayName: String, language: String?): UserDto? {
+    override suspend fun updateProfile(userId: Int, displayName: String, language: String?, country: String?): UserDto? {
         if (displayName.isBlank()) {
             throw IllegalArgumentException("Display name cannot be empty")
+        }
+        val parsedCountry = country?.let {
+            Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
         }
         withContext(dbDispatcher) {
             transaction {
@@ -351,6 +357,9 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
                     it[Users.displayName] = displayName
                     if (language != null) {
                         it[Users.language] = language
+                    }
+                    if (parsedCountry != null) {
+                        it[Users.country] = parsedCountry
                     }
                 }
             }

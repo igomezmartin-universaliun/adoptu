@@ -35,8 +35,26 @@ fun Route.petsRoutes() {
         get {
             val type = call.request.queryParameters["type"]
             val promoted = call.request.queryParameters["promoted"]?.toBoolean() ?: false
-            val pets = petService.getAll(type, promoted)
+            val country = call.request.queryParameters["country"]
+            if (country.isNullOrBlank()) {
+                return@get call.respondError(ValidationConstants.COUNTRY_IS_REQUIRED, 400)
+            }
+            val pets = petService.getAll(type, promoted, country)
             call.respond(pets)
+        }
+
+        get("/mine") {
+            val session = call.sessions.get<SessionUser>()
+                ?: return@get call.respondUnauthorized()
+            val userResult = validationService.validateUserById(session.userId)
+            if (userResult is ServiceResult.NotFound) {
+                return@get call.respondNotFound()
+            }
+            val user = (userResult as ServiceResult.Success).data
+            val activeRoles = user.activeRoles.map { it.name }
+            if (!activeRoles.contains("RESCUER") && !activeRoles.contains("ADMIN")) return@get call.respondForbidden()
+
+            call.respond(petService.getMine())
         }
 
         get("/{id}") {
@@ -57,8 +75,12 @@ fun Route.petsRoutes() {
             if (!activeRoles.contains("RESCUER") && !activeRoles.contains("ADMIN")) return@post call.respondForbidden()
 
             val request = call.receive<CreatePetRequest>()
-            val pet = petService.create(session.userId, request)
-            call.respond(pet)
+            try {
+                val pet = petService.create(session.userId, request)
+                call.respond(pet)
+            } catch (e: IllegalArgumentException) {
+                call.respondError(e.message ?: "Invalid request", 400)
+            }
         }
 
         put("/{id}") {
@@ -73,7 +95,11 @@ fun Route.petsRoutes() {
             val id = call.parameters["id"]!!.toIntOrNull() ?: return@put call.respondError(ValidationConstants.INVALID_ID)
 
             val body = call.receive<UpdatePetRequest>()
-            call.respondData(petService.update(id, session.userId, activeRoles, body))
+            try {
+                call.respondData(petService.update(id, session.userId, activeRoles, body))
+            } catch (e: IllegalArgumentException) {
+                call.respondError(e.message ?: "Invalid request", 400)
+            }
         }
 
         delete("/{id}") {

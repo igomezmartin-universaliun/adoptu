@@ -10,7 +10,14 @@ const api = {
     },
     async me() { return this.fetch('/api/auth/me'); },
     async logout() { return this.fetch('/api/auth/logout', { method: 'POST' }); },
-    async getPets(type) { return this.fetch('/api/pets' + (type ? '?type=' + encodeURIComponent(type) : '')); },
+    async getPets(type, country) {
+        const params = new URLSearchParams();
+        if (type) params.append('type', type);
+        if (country) params.append('country', country);
+        const query = params.toString();
+        return this.fetch('/api/pets' + (query ? '?' + query : ''));
+    },
+    async getMyPets() { return this.fetch('/api/pets/mine'); },
     async getPet(id) { return this.fetch('/api/pets/' + id); },
     async createPet(pet) {
         return this.fetch('/api/pets', {
@@ -67,11 +74,11 @@ const api = {
     async getPhotographers() {
         return this.fetch('/api/photographers');
     },
-    async updateProfile(displayName) {
+    async updateProfile(displayName, country) {
         return this.fetch('/api/users/profile', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ displayName })
+            body: JSON.stringify({ displayName, country: country || null })
         });
     },
     async updatePhotographerSettings(fee, currency, country, state) {

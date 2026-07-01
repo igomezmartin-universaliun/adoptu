@@ -13,8 +13,10 @@ import com.adoptu.mocks.MockImageStorage
 import com.adoptu.mocks.MockNotificationAdapter
 import com.adoptu.mocks.TestClock
 import com.adoptu.mocks.TestDatabase
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -104,7 +106,7 @@ class PetServiceTest {
 
     @Test
     fun `getAll returns empty list when no pets exist`() = runBlocking {
-        val result = petService.getAll()
+        val result = petService.getAll(country = "United States")
         assertTrue(result.isEmpty())
     }
 
@@ -114,9 +116,46 @@ class PetServiceTest {
         createTestPet(rescuerId = 1, name = "Whiskers", type = "CAT")
         createTestPet(rescuerId = 1, name = "Max", type = "DOG")
 
-        val dogs = petService.getAll("DOG")
+        val dogs = petService.getAll("DOG", country = "United States")
         assertEquals(2, dogs.size)
         assertTrue(dogs.all { it.type == "DOG" })
+    }
+
+    @Test
+    fun `getAll throws exception when country is blank`() = runBlocking {
+        assertThrows<IllegalArgumentException> {
+            petService.getAll(country = "")
+        }
+        Unit
+    }
+
+    @Test
+    fun `getAll throws exception when country is whitespace only`() = runBlocking {
+        assertThrows<IllegalArgumentException> {
+            petService.getAll(country = "   ")
+        }
+        Unit
+    }
+
+    @Test
+    fun `getAll only returns pets matching the given country`() = runBlocking {
+        createTestPet(rescuerId = 1, name = "Buddy", type = "DOG", country = "United States")
+        createTestPet(rescuerId = 1, name = "Milo", type = "DOG", country = "Canada")
+
+        val result = petService.getAll(country = "United States")
+
+        assertEquals(1, result.size)
+        assertEquals("Buddy", result[0].name)
+    }
+
+    @Test
+    fun `getMine returns pets regardless of country or status`() = runBlocking {
+        createTestPet(rescuerId = 1, name = "Buddy", type = "DOG", country = "United States")
+        createTestPet(rescuerId = 1, name = "NoCountry", type = "DOG", country = null)
+
+        val result = petService.getMine()
+
+        assertEquals(2, result.size)
     }
 
     @Test
@@ -240,7 +279,7 @@ class PetServiceTest {
         createTestPet(rescuerId = 1, name = "Max", type = "DOG", isPromoted = false)
         createTestPet(rescuerId = 1, name = "Rocky", type = "DOG", isPromoted = true)
 
-        val result = petService.getAll("DOG", showPromotedOnly = true)
+        val result = petService.getAll("DOG", showPromotedOnly = true, country = "United States")
 
         assertEquals(2, result.size)
         assertTrue(result.all { it.isPromoted })
@@ -251,7 +290,7 @@ class PetServiceTest {
         createTestPet(rescuerId = 1, name = "Buddy", type = "DOG")
         createTestPet(rescuerId = 1, name = "Whiskers", type = "CAT")
 
-        val result = petService.getAll()
+        val result = petService.getAll(country = "United States")
 
         assertTrue(result.size >= 2)
     }
@@ -266,7 +305,8 @@ class PetServiceTest {
             ageYears = 3,
             ageMonths = 6,
             sex = Gender.MALE,
-            breed = "Golden Retriever"
+            breed = "Golden Retriever",
+            country = "United States"
         )
 
         val result = petService.create(1, request)
@@ -278,6 +318,7 @@ class PetServiceTest {
         assertEquals(6, result.ageMonths)
         assertEquals(Gender.MALE, result.sex)
         assertEquals("Golden Retriever", result.breed)
+        assertEquals("United States", result.country)
     }
 
     @Test
@@ -295,6 +336,61 @@ class PetServiceTest {
             petService.create(1, request)
         }
         assertEquals("Age (years) must be zero or positive", exception.message)
+    }
+
+    @Test
+    fun `create uses request country when explicitly provided`() = runBlocking {
+        val request = CreatePetRequest(
+            name = "Buddy",
+            type = "DOG",
+            weight = 25.0,
+            ageYears = 3,
+            ageMonths = 0,
+            sex = Gender.MALE,
+            country = "Canada"
+        )
+
+        val result = petService.create(1, request)
+
+        assertEquals("Canada", result.country)
+    }
+
+    @Test
+    fun `create defaults country from the rescuer's profile when request omits it`() = runBlocking {
+        transaction {
+            Users.update({ Users.id eq 1 }) {
+                it[Users.country] = com.adoptu.common.Country.MEXICO
+            }
+        }
+        val request = CreatePetRequest(
+            name = "Buddy",
+            type = "DOG",
+            weight = 25.0,
+            ageYears = 3,
+            ageMonths = 0,
+            sex = Gender.MALE
+        )
+
+        val result = petService.create(1, request)
+
+        assertEquals("Mexico", result.country)
+    }
+
+    @Test
+    fun `create throws when neither request nor rescuer profile has a country`() = runBlocking {
+        val request = CreatePetRequest(
+            name = "Buddy",
+            type = "DOG",
+            weight = 25.0,
+            ageYears = 3,
+            ageMonths = 0,
+            sex = Gender.MALE
+        )
+
+        val exception = assertThrows<IllegalArgumentException> {
+            petService.create(1, request)
+        }
+        assertEquals("Country is required - set one on your profile or specify one for this pet", exception.message)
     }
 
     @Test
@@ -605,7 +701,13 @@ class PetServiceTest {
         assertEquals("APPROVED", result.data.status)
     }
 
-    private suspend fun createTestPet(rescuerId: Int, name: String, type: String, isPromoted: Boolean = false) =
+    private suspend fun createTestPet(
+        rescuerId: Int,
+        name: String,
+        type: String,
+        isPromoted: Boolean = false,
+        country: String? = "United States"
+    ) =
         petRepository.create(
             rescuerId = rescuerId,
             name = name,
@@ -616,6 +718,7 @@ class PetServiceTest {
             ageMonths = 0,
             sex = Gender.MALE,
             breed = "Test breed",
-            isPromoted = isPromoted
+            isPromoted = isPromoted,
+            country = country
         )
 }

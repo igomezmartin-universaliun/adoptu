@@ -1,11 +1,13 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T00:28:43.138Z
-> Files: 713 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T04:37:25.473Z
+> Files: 762 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
 - `loadtest.py` — worker, percentile, run_stage (~572 tok)
+- `nginx-cdn-sim-v2.conf` (~736 tok)
+- `nginx-cdn-sim.conf` (~267 tok)
 - `stats_sampler.sh` — Samples docker stats for a container every 1s until killed. (~118 tok)
 
 ## ../../.claude/jobs/95b8a41d/tmp/
@@ -44,6 +46,56 @@
 ## .claude/rules/
 
 - `openwolf.md` (~313 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/adapters/db/
+
+- `Models.kt` (~3434 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/
+
+- `PetRepository.kt` — PetRepositoryImpl: rowToPetDto, getPetImages, getAll, getAllUnfiltered (~4397 tok)
+- `UserRepository.kt` — UserRepository: getActiveRolesForUser, getById, getByEmail, getAllUsers (~6264 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/dto/input/
+
+- `PetDto.kt` — Data class: Gender (~1024 tok)
+- `UserDto.kt` — Data class: UserRole (~1119 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/pages/
+
+- `PetsPage.kt` — HTML (~644 tok)
+- `ProfilePage.kt` — HTML (~4822 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/ports/
+
+- `PetRepositoryPort.kt` — getAll, getAllUnfiltered, getById, create, update (~682 tok)
+- `UserRepositoryPort.kt` — getById, getByEmail, getAllUsers, getPhotographers, getRescuers (~614 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/routes/
+
+- `PetsRoutes.kt` — Route (~3615 tok)
+- `UsersRoutes.kt` — Data class: UpdateProfileRequest (~3462 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/kotlin/com/adoptu/services/
+
+- `PetService.kt` — PetService: getAll, getMine, getById, create (~3030 tok)
+- `UserService.kt` — UserService: getById, getByEmail, getAllUsers, getRescuers (~871 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/main/resources/static/js/
+
+- `api.js` — Declares api (~2504 tok)
+- `index.js` — emoji: updateCountryHint, loadPets, initCountry (~1036 tok)
+- `my-pets.js` — API routes: GET (2 endpoints) (~4229 tok)
+- `profile.js` — load: loadPhotographer, loadTemporalHome, loadShelter, loadSterilization (~9633 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/test/kotlin/com/adoptu/routes/
+
+- `PetsRoutesE2ETest.kt` — Ktor routing (~16513 tok)
+- `UIRoutesDataTest.kt` — UIRoutesDataTest: setup (~4628 tok)
+
+## .claude/worktrees/agent-a49663a67d3c8a3ea/backend/src/test/kotlin/com/adoptu/services/
+
+- `PetServiceTest.kt` — PetServiceTest: setup (~7222 tok)
 
 ## .claude/worktrees/agent-aa2e565a38703b52b/backend/src/main/kotlin/com/adoptu/adapters/db/repositories/
 
@@ -94,6 +146,19 @@
 - `SterilizationLocationServiceTest.kt` — SterilizationLocationServiceTest: setup, cleanup (~3602 tok)
 - `TemporalHomeServiceTest.kt` — TemporalHomeServiceTest: setup, cleanup (~4011 tok)
 - `UserServiceTest.kt` — UserServiceTest: setup (~4229 tok)
+
+## .claude/worktrees/bump-task-cpu/backend/src/main/kotlin/com/adoptu/routes/
+
+- `PetsRoutes.kt` — Route (~3423 tok)
+- `PhotographerRoutes.kt` — Route, RoutingContext (~2148 tok)
+- `ShelterRoutes.kt` — Route, Route (~1197 tok)
+- `SterilizationLocationRoutes.kt` — Route, Route (~1309 tok)
+- `TemporalHomeRoutes.kt` — Route (~2396 tok)
+
+## .claude/worktrees/bump-task-cpu/infra/
+
+- `cloudfront.tf` (~2707 tok)
+- `variables.tf` (~1167 tok)
 
 ## .claude/worktrees/cached-hopping-sutton/
 
@@ -1291,10 +1356,19 @@
 
 - `build.gradle.kts` — Backend Gradle module: Ktor/Exposed/AWS SDK deps, application plugin, com.gradleup.shadow 9.4.3 (fat jar -> *-all.jar), jvmToolchain(25) (~750 tok)
 
+## backend/src/main/kotlin/com/adoptu/adapters/db/
+
+- `Models.kt` (~3434 tok)
+
 ## backend/src/main/kotlin/com/adoptu/adapters/db/ (canonical)
 
 - `DbDispatcher.kt` — Shared bounded `dbDispatcher = Dispatchers.IO.limitedParallelism(4)`, reused by all 8 repositories' `withContext(...) { transaction {...} }` calls; bounded to avoid unbounded-Dispatchers.IO thread-thrashing under a cgroup-capped container (~150 tok)
 - `Models.kt` — Exposed table defs; `country` columns on AnimalShelters, SterilizationLocations, UserShelters, UserSterilizationLocations, TemporalHomes, Photographers now use `enumerationByName("country", 100, Country::class)` instead of free-text varchar (~3300 tok)
+
+## backend/src/main/kotlin/com/adoptu/adapters/db/repositories/
+
+- `PetRepository.kt` — PetRepositoryImpl: rowToPetDto, getPetImages, getAll, getAllUnfiltered (~4397 tok)
+- `UserRepository.kt` — UserRepository: getActiveRolesForUser, getById, getByEmail, getAllUsers (~6264 tok)
 
 ## backend/src/main/kotlin/com/adoptu/adapters/db/repositories/ (canonical)
 
@@ -1303,9 +1377,49 @@
 
 - `Country.kt` — Country enum: canonical list of 112 countries (displayName + i18nKey), `fromDisplayName()` resolves exact/accent-insensitive/case-insensitive input to an enum value. Single source of truth for the country dropdown (Shared.kt), validation, and DB storage (~1700 tok)
 
+## backend/src/main/kotlin/com/adoptu/dto/input/
+
+- `PetDto.kt` — Data class: Gender (~1025 tok)
+- `UserDto.kt` — Data class: UserRole (~1119 tok)
+
+## backend/src/main/kotlin/com/adoptu/pages/
+
+- `PetsPage.kt` — HTML (~644 tok)
+- `ProfilePage.kt` — HTML (~4822 tok)
+
 ## backend/src/main/kotlin/com/adoptu/pages/ (canonical)
 
 - `Shared.kt` — `countrySelect()` now renders `<option>`s from `Country.entries` instead of a hardcoded 112-line list (~3000 tok)
+
+## backend/src/main/kotlin/com/adoptu/ports/
+
+- `PetRepositoryPort.kt` — getAll, getAllUnfiltered, getById, create, update (~682 tok)
+- `UserRepositoryPort.kt` — getById, getByEmail, getAllUsers, getPhotographers, getRescuers (~614 tok)
+
+## backend/src/main/kotlin/com/adoptu/routes/
+
+- `PetsRoutes.kt` — Route (~3615 tok)
+- `UsersRoutes.kt` — Data class: UpdateProfileRequest (~3500 tok)
+
+## backend/src/main/kotlin/com/adoptu/services/
+
+- `PetService.kt` — PetService: getAll, getMine, getById, create (~3030 tok)
+- `UserService.kt` — UserService: getById, getByEmail, getAllUsers, getRescuers (~892 tok)
+
+## backend/src/main/resources/static/js/
+
+- `api.js` — Declares api (~2504 tok)
+- `index.js` — emoji: updateCountryHint, loadPets, initCountry (~1036 tok)
+- `my-pets.js` — API routes: GET (2 endpoints) (~4244 tok)
+- `profile.js` — load: loadPhotographer, loadTemporalHome, loadShelter, loadSterilization (~9709 tok)
+
+## backend/src/test/kotlin/com/adoptu/routes/
+
+- `PetsRoutesE2ETest.kt` — Ktor routing (~16534 tok)
+
+## backend/src/test/kotlin/com/adoptu/services/
+
+- `PetServiceTest.kt` — PetServiceTest: setup (~7228 tok)
 
 ## infra/ (OpenTofu - AWS deployment)
 

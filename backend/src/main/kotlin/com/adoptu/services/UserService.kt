@@ -41,8 +41,8 @@ class UserService(
     
     suspend fun deactivateSterilizationProfile(userId: Int): UserDto? = userRepository.deactivateSterilizationProfile(userId)
     
-    suspend fun updateProfile(userId: Int, displayName: String, language: String? = null): UserDto? = 
-        userRepository.updateProfile(userId, displayName, language)
+    suspend fun updateProfile(userId: Int, displayName: String, language: String? = null, country: String? = null): UserDto? =
+        userRepository.updateProfile(userId, displayName, language, country)
     
     suspend fun updateLanguage(userId: Int, language: String): UserDto? = userRepository.updateLanguage(userId, language)
     

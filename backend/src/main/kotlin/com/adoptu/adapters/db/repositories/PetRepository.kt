@@ -4,6 +4,7 @@ import com.adoptu.adapters.db.AdoptionRequests
 import com.adoptu.adapters.db.PetImages
 import com.adoptu.adapters.db.Pets
 import com.adoptu.adapters.db.UserActiveRoles
+import com.adoptu.common.Country
 import com.adoptu.dto.input.AdoptionRequestDto
 import com.adoptu.dto.input.Currency
 import com.adoptu.dto.input.Gender
@@ -57,6 +58,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             energyLevel = row[Pets.energyLevel],
             rescueDate = row[Pets.rescueDate],
             rescueLocation = row[Pets.rescueLocation],
+            country = row[Pets.country]?.displayName,
             specialNeeds = row[Pets.specialNeeds],
             adoptionFee = row[Pets.adoptionFee].toDouble(),
             currency = Currency.valueOf(row[Pets.currency]),
@@ -81,9 +83,11 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             }
     }
 
-    override suspend fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = withContext(dbDispatcher) {
+    override suspend fun getAll(type: String?, showPromotedOnly: Boolean, country: String): List<PetDto> = withContext(dbDispatcher) {
         transaction {
-            val baseCondition = Pets.status eq "AVAILABLE"
+            val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
+
+            val baseCondition = (Pets.status eq "AVAILABLE") and (Pets.country eq parsedCountry)
             val finalCondition = if (type != null) {
                 if (showPromotedOnly) {
                     baseCondition and (Pets.type eq type.uppercase()) and (Pets.isPromoted eq true)
@@ -104,6 +108,14 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
 
             Pets.selectAll()
                 .where { finalCondition and (Pets.rescuerId inList rescuerIds) }
+                .orderBy(Pets.createdAt, SortOrder.DESC)
+                .map(::rowToPetDto)
+        }
+    }
+
+    override suspend fun getAllUnfiltered(): List<PetDto> = withContext(dbDispatcher) {
+        transaction {
+            Pets.selectAll()
                 .orderBy(Pets.createdAt, SortOrder.DESC)
                 .map(::rowToPetDto)
         }
@@ -139,6 +151,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         energyLevel: String?,
         rescueDate: Long?,
         rescueLocation: String?,
+        country: String?,
         specialNeeds: String?,
         adoptionFee: Double,
         currency: Currency,
@@ -146,6 +159,9 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         isPromoted: Boolean,
         status: String
     ): PetDto = withContext(dbDispatcher) {
+        val parsedCountry = country?.let {
+            Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
+        }
         transaction {
         val id = Pets.insert {
             it[Pets.rescuerId] = rescuerId
@@ -172,6 +188,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             it[Pets.energyLevel] = energyLevel
             it[Pets.rescueDate] = rescueDate
             it[Pets.rescueLocation] = rescueLocation
+            it[Pets.country] = parsedCountry
             it[Pets.specialNeeds] = specialNeeds
             it[Pets.adoptionFee] = BigDecimal(adoptionFee.toString())
             it[Pets.currency] = currency.name
@@ -210,6 +227,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             body.energyLevel?.let { e -> it[Pets.energyLevel] = e }
             body.rescueDate?.let { r -> it[Pets.rescueDate] = r }
             body.rescueLocation?.let { l -> it[Pets.rescueLocation] = l }
+            body.country?.let { c -> it[Pets.country] = Country.fromDisplayName(c) ?: throw IllegalArgumentException("Invalid country: $c") }
             body.specialNeeds?.let { s -> it[Pets.specialNeeds] = s }
             body.adoptionFee?.let { f -> it[Pets.adoptionFee] = BigDecimal(f.toString()) }
             body.currency?.let { c -> it[Pets.currency] = c.name }

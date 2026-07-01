@@ -21,6 +21,7 @@ async function load() {
     document.getElementById('email').value = user.email || '';
     document.getElementById('displayName').value = user.displayName || '';
     document.getElementById('language').value = user.language || 'en';
+    document.getElementById('country').value = user.country || '';
     currentRoles = user.activeRoles || [];
     console.log('Active roles:', currentRoles);
     
@@ -166,13 +167,14 @@ if (saveBtn) {
         const msg = document.getElementById('message');
         const displayName = document.getElementById('displayName').value;
         const language = document.getElementById('language').value;
+        const country = document.getElementById('country').value;
         if (!displayName.trim()) {
             msg.className = 'message error';
             msg.textContent = 'Display name cannot be empty';
             return;
         }
         try {
-            await api.updateProfile(displayName);
+            await api.updateProfile(displayName, country || null);
             await api.updateLanguage(language);
             i18n.setLang(language);
         } catch (err) { throw err; }

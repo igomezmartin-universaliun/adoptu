@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 
 @Serializable
-data class UpdateProfileRequest(val displayName: String)
+data class UpdateProfileRequest(val displayName: String, val country: String? = null)
 
 @Serializable
 data class UpdateLanguageRequest(val language: String)
@@ -66,7 +66,7 @@ fun Route.usersRoutes() {
             val body = call.receive<UpdateProfileRequest>()
             val language = call.request.queryParameters["language"]
             try {
-                val user = userService.updateProfile(session.userId, body.displayName, language)
+                val user = userService.updateProfile(session.userId, body.displayName, language, body.country)
                     ?: return@put call.respondNotFound(ValidationConstants.USER_NOT_FOUND)
                 call.respond(user)
             } catch (e: IllegalArgumentException) {

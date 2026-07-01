@@ -11,7 +11,11 @@ function escapeHtml(s) {
 async function load() {
     user = await api.me();
     if (user.authenticated === false || !user.activeRoles?.includes('RESCUER') && !user.activeRoles?.includes('ADMIN')) { location.href = '/'; return; }
-    let pets = await api.getPets(params.get('filter'));
+    let pets = await api.getMyPets();
+    // /api/pets/mine is unfiltered by status/country (unlike the public /api/pets search) so
+    // rescuers can still see and edit their own legacy pets that have no country set yet.
+    const filterType = params.get('filter');
+    if (filterType) pets = pets.filter(p => p.type === filterType);
     if (!user.activeRoles?.includes('ADMIN')) pets = pets.filter(p => p.rescuerId === user.id);
     const container = document.getElementById('pets');
     container.innerHTML = pets.length ? pets.map(p => {

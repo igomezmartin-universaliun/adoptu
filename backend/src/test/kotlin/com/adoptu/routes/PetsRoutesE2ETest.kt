@@ -48,6 +48,7 @@ import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.dsl.module
@@ -189,13 +190,32 @@ class PetsRoutesE2ETest {
     @Test
     fun `GET pets returns empty list when no pets`() {
         TestDatabase.clearAllData()
-        
+
         testApplication {
             setupApp()
-            val response = client.get("/api/pets")
+            val response = client.get("/api/pets?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status)
             val body = response.bodyAsText()
             assertTrue(body == "[]" || !body.contains("id"))
+        }
+    }
+
+    @Test
+    fun `GET pets returns 400 when country is missing`() {
+        testApplication {
+            setupApp()
+            val response = client.get("/api/pets")
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+            assertTrue(response.bodyAsText().contains("Country is required"))
+        }
+    }
+
+    @Test
+    fun `GET pets returns 400 when country is blank`() {
+        testApplication {
+            setupApp()
+            val response = client.get("/api/pets?country=")
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
@@ -206,10 +226,25 @@ class PetsRoutesE2ETest {
 
         testApplication {
             setupApp()
-            val response = client.get("/api/pets")
+            val response = client.get("/api/pets?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status)
             val body = response.bodyAsText()
             assertTrue(body.contains("Buddy") || body.contains("Whiskers"))
+        }
+    }
+
+    @Test
+    fun `GET pets excludes pets from a different country`() {
+        createPetInDb("Buddy", "DOG", country = "United States")
+        createPetInDb("Milo", "DOG", country = "Canada")
+
+        testApplication {
+            setupApp()
+            val response = client.get("/api/pets?country=United%20States")
+            assertEquals(HttpStatusCode.OK, response.status)
+            val body = response.bodyAsText()
+            assertTrue(body.contains("Buddy"))
+            assertTrue(!body.contains("Milo"))
         }
     }
 
@@ -221,7 +256,7 @@ class PetsRoutesE2ETest {
         testApplication {
             setupApp()
 
-            val dogsResponse = client.get("/api/pets?type=DOG")
+            val dogsResponse = client.get("/api/pets?type=DOG&country=United%20States")
             assertEquals(HttpStatusCode.OK, dogsResponse.status)
             val body = dogsResponse.bodyAsText()
             assertTrue(body.contains("Buddy"))
@@ -236,11 +271,54 @@ class PetsRoutesE2ETest {
 
         testApplication {
             setupApp()
-            val response = client.get("/api/pets")
+            val response = client.get("/api/pets?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status)
             val body = response.bodyAsText()
             assertTrue(body.contains("Whiskers"))
             assertTrue(!body.contains("Buddy") || body.indexOf("Buddy") > body.indexOf("Whiskers"))
+        }
+    }
+
+    // ==================== GET /api/pets/mine ====================
+
+    @Test
+    fun `GET pets mine returns 401 when no session`() {
+        testApplication {
+            setupApp()
+            val response = client.get("/api/pets/mine")
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+    }
+
+    @Test
+    fun `GET pets mine returns 403 for adopter role`() {
+        testApplication {
+            setupApp()
+            val cookie = client.loginAs(2) // adopter
+
+            val response = client.get("/api/pets/mine") {
+                header(HttpHeaders.Cookie, cookie)
+            }
+            assertEquals(HttpStatusCode.Forbidden, response.status)
+        }
+    }
+
+    @Test
+    fun `GET pets mine includes pets with no country and non-available status`() {
+        createPetInDb("NoCountryPet", "DOG", country = null)
+        createPetInDb("AdoptedPet", "DOG", status = "ADOPTED", country = "Canada")
+
+        testApplication {
+            setupApp()
+            val cookie = client.loginAs(1) // rescuer/owner
+
+            val response = client.get("/api/pets/mine") {
+                header(HttpHeaders.Cookie, cookie)
+            }
+            assertEquals(HttpStatusCode.OK, response.status)
+            val body = response.bodyAsText()
+            assertTrue(body.contains("NoCountryPet"))
+            assertTrue(body.contains("AdoptedPet"))
         }
     }
 
@@ -382,7 +460,7 @@ class PetsRoutesE2ETest {
 
         testApplication {
             setupApp()
-            val response = client.get("/api/pets")
+            val response = client.get("/api/pets?country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status)
             val body = response.bodyAsText()
             assertTrue(body.contains("Buddy"))
@@ -397,7 +475,7 @@ class PetsRoutesE2ETest {
 
         testApplication {
             setupApp()
-            val response = client.get("/api/pets?type=dog")
+            val response = client.get("/api/pets?type=dog&country=United%20States")
             assertEquals(HttpStatusCode.OK, response.status)
         }
     }
@@ -681,7 +759,7 @@ class PetsRoutesE2ETest {
             val response = client.post("/api/pets") {
                 header(HttpHeaders.Cookie, cookie)
                 contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(CreatePetRequest(name = "Rover", type = "DOG")))
+                setBody(Json.encodeToString(CreatePetRequest(name = "Rover", type = "DOG", country = "United States")))
             }
             assertEquals(HttpStatusCode.OK, response.status)
             assertTrue(response.bodyAsText().contains("Rover"))
@@ -697,10 +775,48 @@ class PetsRoutesE2ETest {
             val response = client.post("/api/pets") {
                 header(HttpHeaders.Cookie, cookie)
                 contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(CreatePetRequest(name = "AdminPet", type = "CAT")))
+                setBody(Json.encodeToString(CreatePetRequest(name = "AdminPet", type = "CAT", country = "United States")))
             }
             assertEquals(HttpStatusCode.OK, response.status)
             assertTrue(response.bodyAsText().contains("AdminPet"))
+        }
+    }
+
+    @Test
+    fun `POST pets returns 400 when no country provided and rescuer profile has no country`() {
+        testApplication {
+            setupApp()
+            val cookie = client.loginAs(1) // rescuer, no profile country set
+
+            val response = client.post("/api/pets") {
+                header(HttpHeaders.Cookie, cookie)
+                contentType(ContentType.Application.Json)
+                setBody(Json.encodeToString(CreatePetRequest(name = "NoCountry", type = "DOG")))
+            }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+            assertTrue(response.bodyAsText().contains("Country is required"))
+        }
+    }
+
+    @Test
+    fun `POST pets defaults country from the rescuer's profile when omitted`() {
+        transaction {
+            Users.update({ Users.id eq 1 }) {
+                it[Users.country] = com.adoptu.common.Country.CANADA
+            }
+        }
+
+        testApplication {
+            setupApp()
+            val cookie = client.loginAs(1) // rescuer with profile country set
+
+            val response = client.post("/api/pets") {
+                header(HttpHeaders.Cookie, cookie)
+                contentType(ContentType.Application.Json)
+                setBody(Json.encodeToString(CreatePetRequest(name = "DefaultedCountryPet", type = "DOG")))
+            }
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertTrue(response.bodyAsText().contains("Canada"))
         }
     }
 
@@ -1245,7 +1361,8 @@ class PetsRoutesE2ETest {
         status: String = "AVAILABLE",
         breed: String = "Test breed",
         description: String = "Test description",
-        weight: Double = 10.0
+        weight: Double = 10.0,
+        country: String? = "United States"
     ): Int {
         return transaction {
             Pets.insert {
@@ -1261,6 +1378,7 @@ class PetsRoutesE2ETest {
                 it[Pets.status] = status
                 it[Pets.size] = "MEDIUM"
                 it[Pets.isUrgent] = false
+                it[Pets.country] = country?.let { com.adoptu.common.Country.fromDisplayName(it) }
                 it[Pets.createdAt] = clock.now().toEpochMilliseconds()
             } get Pets.id
         }
