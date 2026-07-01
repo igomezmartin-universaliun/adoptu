@@ -6,7 +6,7 @@ import com.adoptu.dto.input.CreateUserSterilizationLocationRequest
 import com.adoptu.dto.input.UpdateUserSterilizationLocationRequest
 import com.adoptu.dto.input.UserSterilizationLocationDto
 import com.adoptu.ports.UserSterilizationLocationRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.and
@@ -40,7 +40,7 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
         )
     }
 
-    override suspend fun getByUserId(userId: Int): UserSterilizationLocationDto? = withContext(Dispatchers.IO) {
+    override suspend fun getByUserId(userId: Int): UserSterilizationLocationDto? = withContext(dbDispatcher) {
         transaction {
             UserSterilizationLocations.selectAll()
                 .where { UserSterilizationLocations.userId eq userId }
@@ -53,7 +53,7 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
         val now = clock.now().toEpochMilliseconds()
         val parsedCountry = Country.fromDisplayName(request.country)
             ?: throw IllegalArgumentException("Invalid country: ${request.country}")
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 UserSterilizationLocations.insert {
                     it[UserSterilizationLocations.userId] = userId
@@ -93,7 +93,7 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
 
     override suspend fun update(userId: Int, request: UpdateUserSterilizationLocationRequest): UserSterilizationLocationDto? {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val existing = UserSterilizationLocations.selectAll().where { UserSterilizationLocations.userId eq userId }.firstOrNull()
                     ?: return@transaction null
@@ -121,14 +121,14 @@ class UserSterilizationLocationRepository(private val clock: Clock) : UserSteril
         }
     }
 
-    override suspend fun delete(userId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun delete(userId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val rowsDeleted = UserSterilizationLocations.deleteWhere { UserSterilizationLocations.userId eq userId }
             rowsDeleted > 0
         }
     }
 
-    override suspend fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserSterilizationLocationDto> = withContext(Dispatchers.IO) {
+    override suspend fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserSterilizationLocationDto> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             var conditions: Op<Boolean> = UserSterilizationLocations.country eq parsedCountry

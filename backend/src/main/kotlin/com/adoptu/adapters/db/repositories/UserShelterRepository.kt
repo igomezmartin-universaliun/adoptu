@@ -6,7 +6,7 @@ import com.adoptu.dto.input.CreateUserShelterRequest
 import com.adoptu.dto.input.UpdateUserShelterRequest
 import com.adoptu.dto.input.UserShelterDto
 import com.adoptu.ports.UserShelterRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.and
@@ -47,7 +47,7 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
         )
     }
 
-    override suspend fun getByUserId(userId: Int): UserShelterDto? = withContext(Dispatchers.IO) {
+    override suspend fun getByUserId(userId: Int): UserShelterDto? = withContext(dbDispatcher) {
         transaction {
             UserShelters.selectAll()
                 .where { UserShelters.userId eq userId }
@@ -60,7 +60,7 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
         val now = clock.now().toEpochMilliseconds()
         val parsedCountry = Country.fromDisplayName(request.country)
             ?: throw IllegalArgumentException("Invalid country: ${request.country}")
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 UserShelters.insert {
                     it[UserShelters.userId] = userId
@@ -114,7 +114,7 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
 
     override suspend fun update(userId: Int, request: UpdateUserShelterRequest): UserShelterDto? {
         val now = clock.now().toEpochMilliseconds()
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val existing = UserShelters.selectAll().where { UserShelters.userId eq userId }.firstOrNull()
                     ?: return@transaction null
@@ -148,14 +148,14 @@ class UserShelterRepository(private val clock: Clock) : UserShelterRepositoryPor
         }
     }
 
-    override suspend fun delete(userId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun delete(userId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val rowsDeleted = UserShelters.deleteWhere { UserShelters.userId eq userId }
             rowsDeleted > 0
         }
     }
 
-    override suspend fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserShelterDto> = withContext(Dispatchers.IO) {
+    override suspend fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserShelterDto> = withContext(dbDispatcher) {
         transaction {
             val parsedCountry = Country.fromDisplayName(country) ?: return@transaction emptyList()
             var conditions: Op<Boolean> = UserShelters.country eq parsedCountry

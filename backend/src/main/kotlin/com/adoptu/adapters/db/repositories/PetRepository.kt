@@ -13,7 +13,7 @@ import com.adoptu.dto.input.Status
 import com.adoptu.dto.input.UpdatePetRequest
 import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.PetRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -81,7 +81,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             }
     }
 
-    override suspend fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = withContext(dbDispatcher) {
         transaction {
             val baseCondition = Pets.status eq "AVAILABLE"
             val finalCondition = if (type != null) {
@@ -109,7 +109,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun getById(id: Int): PetDto? = withContext(Dispatchers.IO) {
+    override suspend fun getById(id: Int): PetDto? = withContext(dbDispatcher) {
         transaction {
             Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).firstOrNull()
         }
@@ -145,7 +145,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         isUrgent: Boolean,
         isPromoted: Boolean,
         status: String
-    ): PetDto = withContext(Dispatchers.IO) {
+    ): PetDto = withContext(dbDispatcher) {
         transaction {
         val id = Pets.insert {
             it[Pets.rescuerId] = rescuerId
@@ -184,7 +184,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun update(id: Int, body: UpdatePetRequest): PetDto? = withContext(Dispatchers.IO) {
+    override suspend fun update(id: Int, body: UpdatePetRequest): PetDto? = withContext(dbDispatcher) {
         transaction {
         Pets.update({ Pets.id eq id }) {
             body.name?.let { name -> it[Pets.name] = name }
@@ -220,7 +220,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun delete(petId: Int): Unit = withContext(Dispatchers.IO) {
+    override suspend fun delete(petId: Int): Unit = withContext(dbDispatcher) {
         transaction {
             exec("DELETE FROM pet_images WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
             exec("DELETE FROM adoption_requests WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
@@ -228,7 +228,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = withContext(Dispatchers.IO) {
+    override suspend fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = withContext(dbDispatcher) {
         transaction {
         val createdAt = clock.now().toEpochMilliseconds()
         val id = AdoptionRequests.insert {
@@ -250,7 +250,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = withContext(dbDispatcher) {
         transaction {
             AdoptionRequests.selectAll()
                 .where { AdoptionRequests.petId eq petId }
@@ -267,7 +267,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = withContext(Dispatchers.IO) {
+    override suspend fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = withContext(dbDispatcher) {
         transaction {
             AdoptionRequests.selectAll()
                 .where { AdoptionRequests.adopterId eq userId }
@@ -284,7 +284,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = withContext(dbDispatcher) {
         transaction {
             val updated = AdoptionRequests.update({ AdoptionRequests.id eq requestId }) {
                 it[AdoptionRequests.status] = status
@@ -293,7 +293,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = withContext(Dispatchers.IO) {
+    override suspend fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = withContext(dbDispatcher) {
         transaction {
             AdoptionRequests.selectAll()
                 .where { AdoptionRequests.id eq requestId }
@@ -311,7 +311,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean, sortOrder: Int): PetImageDto = withContext(Dispatchers.IO) {
+    override suspend fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean, sortOrder: Int): PetImageDto = withContext(dbDispatcher) {
         transaction {
             if (isPrimary) {
                 PetImages.update({ PetImages.petId eq petId }) {
@@ -341,7 +341,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun removeImage(petId: Int, imageId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun removeImage(petId: Int, imageId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val image = PetImages.selectAll()
                 .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
@@ -355,7 +355,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun setPrimaryImage(petId: Int, imageId: Int): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun setPrimaryImage(petId: Int, imageId: Int): Boolean = withContext(dbDispatcher) {
         transaction {
             val image = PetImages.selectAll()
                 .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
@@ -374,7 +374,7 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         }
     }
 
-    override suspend fun getImages(petId: Int): List<PetImageDto> = withContext(Dispatchers.IO) {
+    override suspend fun getImages(petId: Int): List<PetImageDto> = withContext(dbDispatcher) {
         getPetImages(petId)
     }
 }

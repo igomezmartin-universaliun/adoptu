@@ -13,7 +13,7 @@ import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.PetRepositoryPort
 import com.adoptu.ports.PhotographerRepositoryPort
 import com.adoptu.ports.UserRepositoryPort
-import kotlinx.coroutines.Dispatchers
+import com.adoptu.adapters.db.dbDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -62,7 +62,7 @@ class PhotographerRepositoryImpl(
 
     override suspend fun canSendMessage(userId: Int): Boolean {
         val oneWeekAgo = clock.now().toEpochMilliseconds() - ONE_WEEK
-        val requests = withContext(Dispatchers.IO) {
+        val requests = withContext(dbDispatcher) {
             transaction {
                 PhotographyRequests.selectAll()
                     .where { PhotographyRequests.requesterId.eq(userId).and(PhotographyRequests.createdAt.greaterEq(oneWeekAgo)) }
@@ -77,7 +77,7 @@ class PhotographerRepositoryImpl(
         photographerId: Int,
         petId: Int?,
         message: String
-    ): Int = withContext(Dispatchers.IO) {
+    ): Int = withContext(dbDispatcher) {
         transaction {
             val createdAt = clock.now().toEpochMilliseconds()
             val requestId = PhotographyRequests.insert {
@@ -97,7 +97,7 @@ class PhotographerRepositoryImpl(
         // Raw rows are fetched inside the transaction; the cross-repository lookup
         // (userRepository.getPhotographers, now suspend) happens afterward since it
         // cannot be called from within the transaction {} lambda.
-        val rawRequests = withContext(Dispatchers.IO) {
+        val rawRequests = withContext(dbDispatcher) {
             transaction {
                 PhotographyRequests.selectAll()
                     .where { PhotographyRequests.requesterId eq userId }
@@ -125,7 +125,7 @@ class PhotographerRepositoryImpl(
     }
 
     override suspend fun getRequestsForPhotographer(photographerId: Int): List<PhotographyRequestDto> {
-        val rawRequests = withContext(Dispatchers.IO) {
+        val rawRequests = withContext(dbDispatcher) {
             transaction {
                 PhotographyRequests.selectAll()
                     .where { PhotographyRequests.photographerId eq photographerId }
@@ -153,7 +153,7 @@ class PhotographerRepositoryImpl(
     }
 
     override suspend fun getRequestById(requestId: Int): PhotographyRequestDto? {
-        val raw = withContext(Dispatchers.IO) {
+        val raw = withContext(dbDispatcher) {
             transaction {
                 PhotographyRequests.selectAll()
                     .where { PhotographyRequests.id eq requestId }
@@ -182,7 +182,7 @@ class PhotographerRepositoryImpl(
     }
 
     override suspend fun updatePhotographyRequest(requestId: Int, status: String?, scheduledDate: Long?) {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 PhotographyRequests.update({ PhotographyRequests.id eq requestId }) {
                     if (status != null) it[PhotographyRequests.status] = status
@@ -193,7 +193,7 @@ class PhotographerRepositoryImpl(
     }
 
     override suspend fun getPhotographerById(userId: Int): PhotographerDto? {
-        val hasPhotographerRole = withContext(Dispatchers.IO) {
+        val hasPhotographerRole = withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name) }
@@ -202,7 +202,7 @@ class PhotographerRepositoryImpl(
         }
         if (!hasPhotographerRole) return null
 
-        return withContext(Dispatchers.IO) {
+        return withContext(dbDispatcher) {
             transaction {
                 val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
                 val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
@@ -221,7 +221,7 @@ class PhotographerRepositoryImpl(
         }
     }
 
-    override suspend fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = withContext(Dispatchers.IO) {
+    override suspend fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = withContext(dbDispatcher) {
         transaction {
             val parsedFilterCountry: Country? = if (!country.isNullOrBlank()) {
                 Country.fromDisplayName(country) ?: return@transaction emptyList()
@@ -264,7 +264,7 @@ class PhotographerRepositoryImpl(
             throw IllegalArgumentException("Photographer fee must be zero or positive")
         }
 
-        val userExists = withContext(Dispatchers.IO) {
+        val userExists = withContext(dbDispatcher) {
             transaction {
                 Users.selectAll().where { Users.id eq userId }.firstOrNull() != null
             }
@@ -275,7 +275,7 @@ class PhotographerRepositoryImpl(
             Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
         }
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
                 if (existing != null) {
@@ -303,7 +303,7 @@ class PhotographerRepositoryImpl(
     override suspend fun activatePhotographerProfile(userId: Int): UserDto? {
         val user = userRepository.getById(userId) ?: return null
 
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 val existingRole = UserActiveRoles.selectAll()
                     .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name) }
@@ -330,7 +330,7 @@ class PhotographerRepositoryImpl(
     }
 
     override suspend fun deactivatePhotographerProfile(userId: Int): UserDto? {
-        withContext(Dispatchers.IO) {
+        withContext(dbDispatcher) {
             transaction {
                 UserActiveRoles.deleteWhere {
                     (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name)
