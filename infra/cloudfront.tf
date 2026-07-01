@@ -10,6 +10,36 @@ data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name = "Managed-AllViewer"
 }
 
+# Shared by every public, unauthenticated listing endpoint (pets, shelters,
+# sterilization-locations, photographers, temporal-homes). Load testing
+# GET /api/pets showed origin CPU (JSON serialization + DB query) is the
+# throughput bottleneck at realistic concurrency - the same shape applies to
+# the other listings. Managed-CachingOptimized isn't used here because it
+# drops all query strings from the cache key, but these endpoints vary by
+# filters (country/state/city/type/etc.) - this policy forwards all query
+# strings instead so filtered requests don't collide with unfiltered ones.
+resource "aws_cloudfront_cache_policy" "api_public_listings" {
+  name        = "adoptu-api-public-listings"
+  comment     = "Public GET listings (pets/shelters/sterilization-locations/photographers/temporal-homes) - vary by query string"
+  default_ttl = 30
+  min_ttl     = 0
+  max_ttl     = 300
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+    enable_accept_encoding_gzip   = true
+    enable_accept_encoding_brotli = true
+  }
+}
+
 resource "aws_cloudfront_origin_access_control" "s3" {
   name                              = "adoptu-s3-oac"
   origin_access_control_origin_type = "s3"
@@ -127,6 +157,84 @@ resource "aws_cloudfront_distribution" "app" {
     cached_methods           = ["GET", "HEAD"]
     compress                 = true
     cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Exact path match only (no wildcard) - PetsRoutes.kt defines no mutating
+  # method on the bare "/api/pets" path (POST/PUT/DELETE all live under
+  # sub-paths like /{id}, /{id}/adopt), and a wildcard like "/api/pets/*"
+  # would incorrectly sweep in authenticated, user-specific sub-routes like
+  # /api/pets/my-adoption-requests - caching those at a shared edge cache
+  # would leak one user's data to another. Everything else on this
+  # distribution keeps CachingDisabled.
+  ordered_cache_behavior {
+    path_pattern             = "/api/pets"
+    target_origin_id         = "ecs-task"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = aws_cloudfront_cache_policy.api_public_listings.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Wildcard is safe here: every route under /api/shelters (bare listing,
+  # /countries, /countries/{c}/states, /{id}) is public and GET-only - the
+  # admin CRUD routes live entirely under the separate /api/admin/shelters
+  # prefix, so this can never sweep in an authenticated or mutating route.
+  ordered_cache_behavior {
+    path_pattern             = "/api/shelters*"
+    target_origin_id         = "ecs-task"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = aws_cloudfront_cache_policy.api_public_listings.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Same reasoning as /api/shelters* - every route under this prefix (bare
+  # listing, /grouped, /countries, /countries/{c}/states, .../{s}/cities,
+  # /{id}) is public and GET-only; admin CRUD is the separate
+  # /api/admin/sterilization-locations prefix.
+  ordered_cache_behavior {
+    path_pattern             = "/api/sterilization-locations*"
+    target_origin_id         = "ecs-task"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = aws_cloudfront_cache_policy.api_public_listings.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Exact path match only (no wildcard) - GET /api/photographers/requests
+  # (a user's own request list) is authenticated and shares this prefix; a
+  # wildcard would risk serving one user's private requests to another from
+  # the shared edge cache.
+  ordered_cache_behavior {
+    path_pattern             = "/api/photographers"
+    target_origin_id         = "ecs-task"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = aws_cloudfront_cache_policy.api_public_listings.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+  }
+
+  # Exact path match only (no wildcard) - POST /api/temporal-homes/request is
+  # authenticated and shares this prefix. A wildcard would also force that
+  # route's allowed_methods down to GET/HEAD/OPTIONS for the whole prefix,
+  # which would make CloudFront reject the POST outright.
+  ordered_cache_behavior {
+    path_pattern             = "/api/temporal-homes"
+    target_origin_id         = "ecs-task"
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = aws_cloudfront_cache_policy.api_public_listings.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
   }
 

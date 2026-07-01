@@ -19,6 +19,7 @@ import com.adoptu.services.ServiceResult
 import com.adoptu.services.UserService
 import com.adoptu.services.auth.SessionUser
 import com.adoptu.services.validation.PetsValidationService
+import io.ktor.http.HttpHeaders
 import io.ktor.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -36,6 +37,11 @@ fun Route.petsRoutes() {
             val type = call.request.queryParameters["type"]
             val promoted = call.request.queryParameters["promoted"]?.toBoolean() ?: false
             val pets = petService.getAll(type, promoted)
+            // Public, unauthenticated, read-heavy listing - safe to cache at the CDN edge.
+            // Paired with an ordered_cache_behavior for the exact "/api/pets" path in
+            // infra/cloudfront.tf (not a wildcard, so sibling authenticated routes like
+            // /api/pets/my-adoption-requests are never swept into the same cache behavior).
+            call.response.header(HttpHeaders.CacheControl, "public, max-age=30")
             call.respond(pets)
         }
 
