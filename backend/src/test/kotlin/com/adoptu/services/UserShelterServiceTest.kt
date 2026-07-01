@@ -19,6 +19,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class UserShelterServiceTest {
@@ -34,16 +35,17 @@ class UserShelterServiceTest {
     }
 
     @Test
-    fun `getByUserId returns null when no shelter exists`() {
+    fun `getByUserId returns null when no shelter exists`() = runBlocking {
         val userId = createTestUser("alice")
 
         val result = userShelterService.getByUserId(userId)
 
         assertNull(result)
+        Unit
     }
 
     @Test
-    fun `getByUserId returns shelter for existing user`() {
+    fun `getByUserId returns shelter for existing user`() = runBlocking {
         val userId = createTestUser("bob")
         createTestUserShelter(userId, name = "Bob's Shelter", country = "United States", state = "NY", city = "New York")
 
@@ -55,10 +57,11 @@ class UserShelterServiceTest {
         assertEquals("United States", result.country)
         assertEquals("NY", result.state)
         assertEquals("New York", result.city)
+        Unit
     }
 
     @Test
-    fun `create creates new shelter with all fields`() {
+    fun `create creates new shelter with all fields`() = runBlocking {
         val userId = createTestUser("carol")
         val request = CreateUserShelterRequest(
             name = "Carol's Shelter",
@@ -106,10 +109,11 @@ class UserShelterServiceTest {
         val stored = userShelterService.getByUserId(userId)
         assertNotNull(stored)
         assertEquals("Carol's Shelter", stored.name)
+        Unit
     }
 
     @Test
-    fun `create creates shelter with minimal fields`() {
+    fun `create creates shelter with minimal fields`() = runBlocking {
         val userId = createTestUser("dave")
         val request = CreateUserShelterRequest(
             name = "Minimal Shelter",
@@ -125,10 +129,11 @@ class UserShelterServiceTest {
         assertEquals("United States", result.country)
         assertNull(result.state)
         assertEquals("NYC", result.city)
+        Unit
     }
 
     @Test
-    fun `create throws exception when name is blank`() {
+    fun `create throws exception when name is blank`() = runBlocking {
         val userId = createTestUser("erin")
         val request = CreateUserShelterRequest(
             name = "",
@@ -141,10 +146,11 @@ class UserShelterServiceTest {
             userShelterService.create(userId, request)
         }
         assertEquals("Name is required", exception.message)
+        Unit
     }
 
     @Test
-    fun `create throws exception when country is blank`() {
+    fun `create throws exception when country is blank`() = runBlocking {
         val userId = createTestUser("frank")
         val request = CreateUserShelterRequest(
             name = "Test",
@@ -157,10 +163,11 @@ class UserShelterServiceTest {
             userShelterService.create(userId, request)
         }
         assertEquals("Country is required", exception.message)
+        Unit
     }
 
     @Test
-    fun `create throws exception when city is blank`() {
+    fun `create throws exception when city is blank`() = runBlocking {
         val userId = createTestUser("grace")
         val request = CreateUserShelterRequest(
             name = "Test",
@@ -173,10 +180,11 @@ class UserShelterServiceTest {
             userShelterService.create(userId, request)
         }
         assertEquals("City is required", exception.message)
+        Unit
     }
 
     @Test
-    fun `create throws exception when address is blank`() {
+    fun `create throws exception when address is blank`() = runBlocking {
         val userId = createTestUser("heidi")
         val request = CreateUserShelterRequest(
             name = "Test",
@@ -189,10 +197,11 @@ class UserShelterServiceTest {
             userShelterService.create(userId, request)
         }
         assertEquals("Address is required", exception.message)
+        Unit
     }
 
     @Test
-    fun `create called twice for same user updates rather than duplicates`() {
+    fun `create called twice for same user updates rather than duplicates`() = runBlocking {
         val userId = createTestUser("ivan")
         val firstRequest = CreateUserShelterRequest(
             name = "First Shelter",
@@ -228,10 +237,11 @@ class UserShelterServiceTest {
             UserShelters.selectAll().count()
         }
         assertEquals(1L, count)
+        Unit
     }
 
     @Test
-    fun `update updates shelter successfully`() {
+    fun `update updates shelter successfully`() = runBlocking {
         val userId = createTestUser("judy")
         createTestUserShelter(userId, name = "Old Name", country = "United States", state = "NY", city = "New York")
 
@@ -245,19 +255,21 @@ class UserShelterServiceTest {
         assertEquals("Updated Name", updated.name)
         assertEquals("Brooklyn", updated.city)
         assertEquals("NY", updated.state)
+        Unit
     }
 
     @Test
-    fun `update returns not found for user without shelter`() {
+    fun `update returns not found for user without shelter`() = runBlocking {
         val userId = createTestUser("kevin")
 
         val result = userShelterService.update(userId, UpdateUserShelterRequest(name = "New Name"))
 
         assertTrue(result is ServiceResult.NotFound)
+        Unit
     }
 
     @Test
-    fun `update only modifies specified fields`() {
+    fun `update only modifies specified fields`() = runBlocking {
         val userId = createTestUser("laura")
         createTestUserShelter(
             userId, name = "Original", country = "United States", state = "NY", city = "New York",
@@ -274,10 +286,11 @@ class UserShelterServiceTest {
         assertEquals("New York", updated.city)
         assertEquals("555-0000", updated.phone)
         assertEquals("old@test.com", updated.email)
+        Unit
     }
 
     @Test
-    fun `delete removes shelter successfully`() {
+    fun `delete removes shelter successfully`() = runBlocking {
         val userId = createTestUser("mallory")
         createTestUserShelter(userId, name = "To Delete", country = "United States", state = "NY", city = "New York")
 
@@ -285,33 +298,37 @@ class UserShelterServiceTest {
 
         assertTrue(result is ServiceResult.Success)
         assertNull(userShelterService.getByUserId(userId))
+        Unit
     }
 
     @Test
-    fun `delete returns not found for user without shelter`() {
+    fun `delete returns not found for user without shelter`() = runBlocking {
         val userId = createTestUser("nina")
 
         val result = userShelterService.delete(userId)
 
         assertTrue(result is ServiceResult.NotFound)
+        Unit
     }
 
     @Test
-    fun `search throws exception when country is blank`() {
+    fun `search throws exception when country is blank`() = runBlocking {
         assertThrows<IllegalArgumentException> {
             userShelterService.search("")
         }
+        Unit
     }
 
     @Test
-    fun `search throws exception when country is whitespace only`() {
+    fun `search throws exception when country is whitespace only`() = runBlocking {
         assertThrows<IllegalArgumentException> {
             userShelterService.search("   ")
         }
+        Unit
     }
 
     @Test
-    fun `search filters by country only`() {
+    fun `search filters by country only`() = runBlocking {
         val u1 = createTestUser("o1")
         val u2 = createTestUser("o2")
         val u3 = createTestUser("o3")
@@ -323,10 +340,11 @@ class UserShelterServiceTest {
 
         assertEquals(2, result.size)
         assertTrue(result.all { it.country == "United States" })
+        Unit
     }
 
     @Test
-    fun `search filters by country and state`() {
+    fun `search filters by country and state`() = runBlocking {
         val u1 = createTestUser("p1")
         val u2 = createTestUser("p2")
         val u3 = createTestUser("p3")
@@ -338,10 +356,11 @@ class UserShelterServiceTest {
 
         assertEquals(2, result.size)
         assertTrue(result.all { it.state == "NY" })
+        Unit
     }
 
     @Test
-    fun `search filters by country state and city`() {
+    fun `search filters by country state and city`() = runBlocking {
         val u1 = createTestUser("q1")
         val u2 = createTestUser("q2")
         createTestUserShelter(u1, name = "Shelter 1", country = "United States", state = "NY", city = "New York")
@@ -351,10 +370,11 @@ class UserShelterServiceTest {
 
         assertEquals(1, result.size)
         assertEquals("Shelter 1", result.first().name)
+        Unit
     }
 
     @Test
-    fun `search filters by country state city and neighborhood`() {
+    fun `search filters by country state city and neighborhood`() = runBlocking {
         val u1 = createTestUser("r1")
         val u2 = createTestUser("r2")
         createTestUserShelter(u1, name = "Shelter 1", country = "United States", state = "NY", city = "New York", neighborhood = "Brooklyn")
@@ -364,10 +384,11 @@ class UserShelterServiceTest {
 
         assertEquals(1, result.size)
         assertEquals("Shelter 1", result.first().name)
+        Unit
     }
 
     @Test
-    fun `search filters by all parameters including zip`() {
+    fun `search filters by all parameters including zip`() = runBlocking {
         val u1 = createTestUser("s1")
         val u2 = createTestUser("s2")
         createTestUserShelter(u1, name = "Shelter 1", country = "United States", state = "NY", city = "New York", neighborhood = "Brooklyn", zip = "11201")
@@ -377,26 +398,29 @@ class UserShelterServiceTest {
 
         assertEquals(1, result.size)
         assertEquals("Shelter 1", result.first().name)
+        Unit
     }
 
     @Test
-    fun `search ignores blank optional filters`() {
+    fun `search ignores blank optional filters`() = runBlocking {
         val u1 = createTestUser("t1")
         createTestUserShelter(u1, name = "Shelter 1", country = "United States", state = "NY", city = "New York")
 
         val result = userShelterService.search("United States", state = "", city = "  ", neighborhood = null, zip = "")
 
         assertEquals(1, result.size)
+        Unit
     }
 
     @Test
-    fun `search returns empty list for no match`() {
+    fun `search returns empty list for no match`() = runBlocking {
         val u1 = createTestUser("u1")
         createTestUserShelter(u1, name = "Shelter 1", country = "United States", state = "NY", city = "New York")
 
         val result = userShelterService.search("France")
 
         assertTrue(result.isEmpty())
+        Unit
     }
 
     private fun createTestUser(username: String, displayName: String = username): Int {
