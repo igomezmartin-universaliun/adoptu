@@ -16,7 +16,7 @@ class PetsValidationService : KoinComponent {
                else ServiceResult.Forbidden
     }
 
-    fun validateUserById(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateUserById(userId: Int): ServiceResult<UserDto> {
         val user = userService.getById(userId)
         return if (user != null) ServiceResult.Success(user) 
                else ServiceResult.NotFound

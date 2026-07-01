@@ -460,23 +460,23 @@ class WebAuthnService(
         return result.getOrDefault(false)
     }
 
-    fun verifyToken(token: String): Boolean {
+    suspend fun verifyToken(token: String): Boolean {
         return userService.verifyToken(token)
     }
 
-    fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
+    suspend fun verifyTokenAndGetLanguage(token: String): Pair<Boolean, String> {
         return userService.verifyTokenAndGetLanguage(token)
     }
 
-    fun isUserVerified(userId: Int): Boolean {
+    suspend fun isUserVerified(userId: Int): Boolean {
         return userService.isUserVerified(userId)
     }
 
-    fun getUserByEmail(email: String): com.adoptu.dto.input.UserDto? {
+    suspend fun getUserByEmail(email: String): com.adoptu.dto.input.UserDto? {
         return userService.getByEmail(email)
     }
 
-    fun getLanguageByEmail(email: String): String {
+    suspend fun getLanguageByEmail(email: String): String {
         return userService.getByEmail(email)?.language ?: "en"
     }
 
@@ -484,12 +484,12 @@ class WebAuthnService(
         return passwordService.verifyPassword(userId, encryptedPassword)
     }
 
-    fun requestMagicLink(email: String): Result<Boolean> {
+    suspend fun requestMagicLink(email: String): Result<Boolean> {
         val language = userService.getByEmail(email)?.language ?: "en"
         return magicLinkService.requestMagicLink(email, language)
     }
 
-    fun requestPasswordReset(email: String): Result<Boolean> {
+    suspend fun requestPasswordReset(email: String): Result<Boolean> {
         val language = userService.getByEmail(email)?.language ?: "en"
         return passwordService.requestPasswordReset(email, language)
     }

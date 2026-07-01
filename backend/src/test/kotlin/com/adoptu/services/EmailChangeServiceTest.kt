@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class EmailChangeServiceTest {
@@ -124,7 +125,7 @@ class EmailChangeServiceTest {
     }
 
     @Test
-    fun `verifyEmailChange updates user email`() {
+    fun `verifyEmailChange updates user email`() = runBlocking {
         val userId = createTestUser("old@example.com", "Test User")
         val token = createEmailChangeToken(userId, "new@example.com")
 
@@ -136,7 +137,7 @@ class EmailChangeServiceTest {
     }
 
     @Test
-    fun `verifyEmailChange deletes token after use`() {
+    fun `verifyEmailChange deletes token after use`() = runBlocking {
         val userId = createTestUser("old@example.com", "Test User")
         val token = createEmailChangeToken(userId, "new@example.com")
 
@@ -151,13 +152,13 @@ class EmailChangeServiceTest {
     }
 
     @Test
-    fun `verifyEmailChange returns false for invalid token`() {
+    fun `verifyEmailChange returns false for invalid token`() = runBlocking {
         val result = emailChangeService.verifyEmailChange("invalid-token")
         assertFalse(result)
     }
 
     @Test
-    fun `verifyEmailChange returns false for expired token`() {
+    fun `verifyEmailChange returns false for expired token`() = runBlocking {
         val userId = createTestUser("old@example.com", "Test User")
         val token = createExpiredEmailChangeToken(userId, "new@example.com")
 
@@ -166,13 +167,13 @@ class EmailChangeServiceTest {
     }
 
     @Test
-    fun `verifyEmailChange returns false when token not found`() {
+    fun `verifyEmailChange returns false when token not found`() = runBlocking {
         val result = emailChangeService.verifyEmailChange("nonexistent-token-123")
         assertFalse(result)
     }
 
     @Test
-    fun `verifyEmailChange does not update email when token invalid`() {
+    fun `verifyEmailChange does not update email when token invalid`() = runBlocking {
         val userId = createTestUser("old@example.com", "Test User")
 
         emailChangeService.verifyEmailChange("invalid-token")

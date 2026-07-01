@@ -5,9 +5,9 @@ import com.adoptu.dto.input.UpdateUserSterilizationLocationRequest
 import com.adoptu.dto.input.UserSterilizationLocationDto
 
 interface UserSterilizationLocationRepositoryPort {
-    fun getByUserId(userId: Int): UserSterilizationLocationDto?
-    fun create(userId: Int, request: CreateUserSterilizationLocationRequest): UserSterilizationLocationDto
-    fun update(userId: Int, request: UpdateUserSterilizationLocationRequest): UserSterilizationLocationDto?
-    fun delete(userId: Int): Boolean
-    fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserSterilizationLocationDto>
+    suspend fun getByUserId(userId: Int): UserSterilizationLocationDto?
+    suspend fun create(userId: Int, request: CreateUserSterilizationLocationRequest): UserSterilizationLocationDto
+    suspend fun update(userId: Int, request: UpdateUserSterilizationLocationRequest): UserSterilizationLocationDto?
+    suspend fun delete(userId: Int): Boolean
+    suspend fun search(country: String, state: String?, city: String?, neighborhood: String?, zip: String?): List<UserSterilizationLocationDto>
 }

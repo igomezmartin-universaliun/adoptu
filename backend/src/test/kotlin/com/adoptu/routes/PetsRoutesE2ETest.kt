@@ -28,6 +28,7 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -399,13 +400,13 @@ class PetsRoutesE2ETest {
     // ==================== POST /api/pets/{id}/images - Service Tests with Mocked Repository ====================
 
     @Test
-    fun `POST pets images service returns Success when user is owner`() {
+    fun `POST pets images service returns Success when user is owner`() = runBlocking {
         val mockRepository = mockk<PetRepositoryPort>(relaxed = true)
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
-        every { mockRepository.addImage(1, "https://test.com/new.jpg", false) } returns createMockPetImage()
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
+        coEvery { mockRepository.addImage(1, "https://test.com/new.jpg", false) } returns createMockPetImage()
 
         val result = petService.addImage(
             petId = 1,
@@ -419,13 +420,13 @@ class PetsRoutesE2ETest {
     }
 
     @Test
-    fun `POST pets images service returns Success when user is admin`() {
+    fun `POST pets images service returns Success when user is admin`() = runBlocking {
         val mockRepository = mockk<PetRepositoryPort>(relaxed = true)
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
-        every { mockRepository.addImage(1, "test.jpg", false) } returns createMockPetImage()
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
+        coEvery { mockRepository.addImage(1, "test.jpg", false) } returns createMockPetImage()
 
         val result = petService.addImage(
             petId = 1,
@@ -439,12 +440,12 @@ class PetsRoutesE2ETest {
     }
 
     @Test
-    fun `POST pets images service returns NotFound when pet does not exist`() {
+    fun `POST pets images service returns NotFound when pet does not exist`() = runBlocking {
         val mockRepository = mockk<PetRepositoryPort>(relaxed = true)
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(999) } returns null
+        coEvery { mockRepository.getById(999) } returns null
 
         val result = petService.addImage(
             petId = 999,
@@ -458,12 +459,12 @@ class PetsRoutesE2ETest {
     }
 
     @Test
-    fun `POST pets images service returns Forbidden when user is not owner or admin`() {
+    fun `POST pets images service returns Forbidden when user is not owner or admin`() = runBlocking {
         val mockRepository = mockk<PetRepositoryPort>(relaxed = true)
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
 
         val result = petService.addImage(
             petId = 1,
@@ -484,9 +485,9 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
-        every { mockRepository.getImages(1) } returns listOf(createMockPetImage(10))
-        every { mockRepository.removeImage(1, 10) } returns true
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
+        coEvery { mockRepository.getImages(1) } returns listOf(createMockPetImage(10))
+        coEvery { mockRepository.removeImage(1, 10) } returns true
 
         val result = petService.removeImage(
             petId = 1,
@@ -505,9 +506,9 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
-        every { mockRepository.getImages(1) } returns listOf(createMockPetImage(10))
-        every { mockRepository.removeImage(1, 10) } returns true
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
+        coEvery { mockRepository.getImages(1) } returns listOf(createMockPetImage(10))
+        coEvery { mockRepository.removeImage(1, 10) } returns true
 
         val result = petService.removeImage(
             petId = 1,
@@ -525,7 +526,7 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(999) } returns null
+        coEvery { mockRepository.getById(999) } returns null
 
         val result = petService.removeImage(
             petId = 999,
@@ -543,8 +544,8 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
-        every { mockRepository.getImages(1) } returns emptyList()
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 1)
+        coEvery { mockRepository.getImages(1) } returns emptyList()
 
         val result = petService.removeImage(
             petId = 1,
@@ -562,7 +563,7 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
 
         val result = petService.removeImage(
             petId = 1,
@@ -580,7 +581,7 @@ class PetsRoutesE2ETest {
         val mockImageStorage = mockk<ImageStoragePort>(relaxed = true)
         val petService = PetService(mockRepository, mockImageStorage, mockk(relaxed = true), mockk(relaxed = true))
         
-        every { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
+        coEvery { mockRepository.getById(1) } returns createMockPetDto(1, rescuerId = 99)
 
         val result = petService.removeImage(
             petId = 1,

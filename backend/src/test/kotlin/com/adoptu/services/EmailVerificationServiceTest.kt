@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class EmailVerificationServiceTest {
@@ -162,7 +163,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `verifyToken returns true and marks email as verified`() {
+    fun `verifyToken returns true and marks email as verified`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User")
         val token = createVerificationToken(userId)
 
@@ -175,21 +176,21 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `verifyToken returns false for invalid token`() {
+    fun `verifyToken returns false for invalid token`() = runBlocking {
         val result = emailVerificationService.verifyToken("invalid-token")
 
         assertFalse(result)
     }
 
     @Test
-    fun `verifyToken returns false when token not found`() {
+    fun `verifyToken returns false when token not found`() = runBlocking {
         val result = emailVerificationService.verifyToken("nonexistenttoken123")
 
         assertFalse(result)
     }
 
     @Test
-    fun `verifyTokenAndGetLanguage returns true and language when token valid`() {
+    fun `verifyTokenAndGetLanguage returns true and language when token valid`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User", language = "es")
         val token = createVerificationToken(userId)
 
@@ -200,7 +201,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `verifyTokenAndGetLanguage returns false and default language for invalid token`() {
+    fun `verifyTokenAndGetLanguage returns false and default language for invalid token`() = runBlocking {
         val (success, language) = emailVerificationService.verifyTokenAndGetLanguage("invalid-token")
 
         assertFalse(success)
@@ -208,7 +209,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `isUserVerified returns true when email is verified`() {
+    fun `isUserVerified returns true when email is verified`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User", isEmailVerified = true)
 
         val result = emailVerificationService.isUserVerified(userId)
@@ -217,7 +218,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `isUserVerified returns false when email is not verified`() {
+    fun `isUserVerified returns false when email is not verified`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User", isEmailVerified = false)
 
         val result = emailVerificationService.isUserVerified(userId)
@@ -242,7 +243,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `canSendVerificationEmail returns true when under limit`() {
+    fun `canSendVerificationEmail returns true when under limit`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User")
 
         val result = emailVerificationService.canSendVerificationEmail(userId)
@@ -251,7 +252,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `canSendVerificationEmail returns false when at limit`() {
+    fun `canSendVerificationEmail returns false when at limit`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User")
 
         repeat(3) {
@@ -270,7 +271,7 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    fun `verifyToken cleans up tokens after verification`() {
+    fun `verifyToken cleans up tokens after verification`() = runBlocking {
         val userId = createTestUser("test@example.com", "Test User")
         val token = createVerificationToken(userId)
 

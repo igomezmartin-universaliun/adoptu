@@ -21,11 +21,11 @@ class PetService(
     private val userService: UserService
 ) {
 
-    fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = petRepository.getAll(type, showPromotedOnly)
+    suspend fun getAll(type: String? = null, showPromotedOnly: Boolean = false): List<PetDto> = petRepository.getAll(type, showPromotedOnly)
 
-    fun getById(id: Int): PetDto? = petRepository.getById(id)
+    suspend fun getById(id: Int): PetDto? = petRepository.getById(id)
 
-    fun create(rescuerId: Int, request: CreatePetRequest): PetDto {
+    suspend fun create(rescuerId: Int, request: CreatePetRequest): PetDto {
         require(request.weight >= 0) { "Weight must be zero or positive" }
         require(request.ageYears >= 0) { "Age (years) must be zero or positive" }
         require(request.ageMonths >= 0) { "Age (months) must be zero or positive" }
@@ -63,7 +63,7 @@ class PetService(
         )
     }
 
-    fun update(id: Int, userId: Int, userRoles: Set<String>, body: UpdatePetRequest): ServiceResult<PetDto> {
+    suspend fun update(id: Int, userId: Int, userRoles: Set<String>, body: UpdatePetRequest): ServiceResult<PetDto> {
         body.weight?.let { require(it >= 0) { "Weight must be zero or positive" } }
         body.ageYears?.let { require(it >= 0) { "Age (years) must be zero or positive" } }
         body.ageMonths?.let { require(it >= 0) { "Age (months) must be zero or positive" } }
@@ -78,7 +78,7 @@ class PetService(
         return if (pet != null) ServiceResult.Success(pet) else ServiceResult.NotFound
     }
 
-    fun delete(id: Int, userId: Int, userRoles: Set<String>): ServiceResult<Unit> {
+    suspend fun delete(id: Int, userId: Int, userRoles: Set<String>): ServiceResult<Unit> {
         val existing = petRepository.getById(id) ?: return ServiceResult.NotFound
         val isAdmin = userRoles.contains("ADMIN")
         if (!isAdmin && existing.rescuerId != userId) {
@@ -88,7 +88,7 @@ class PetService(
         return ServiceResult.Success(Unit)
     }
 
-    fun addImage(petId: Int, userId: Int, userRoles: Set<String>, imageUrl: String, isPrimary: Boolean): ServiceResult<PetImageDto> {
+    suspend fun addImage(petId: Int, userId: Int, userRoles: Set<String>, imageUrl: String, isPrimary: Boolean): ServiceResult<PetImageDto> {
         val existing = petRepository.getById(petId) ?: return ServiceResult.NotFound
         val isAdmin = userRoles.contains("ADMIN")
         if (!isAdmin && existing.rescuerId != userId) {
@@ -158,7 +158,7 @@ class PetService(
         return ServiceResult.Success(remainingImages)
     }
 
-    fun setPrimaryImage(petId: Int, imageId: Int, userId: Int, userRoles: Set<String>): ServiceResult<Unit> {
+    suspend fun setPrimaryImage(petId: Int, imageId: Int, userId: Int, userRoles: Set<String>): ServiceResult<Unit> {
         val existing = petRepository.getById(petId) ?: return ServiceResult.NotFound
         val isAdmin = userRoles.contains("ADMIN")
         if (!isAdmin && existing.rescuerId != userId) {
@@ -168,11 +168,11 @@ class PetService(
         return if (success) ServiceResult.Success(Unit) else ServiceResult.NotFound
     }
 
-    fun getImages(petId: Int): List<PetImageDto> = petRepository.getImages(petId)
+    suspend fun getImages(petId: Int): List<PetImageDto> = petRepository.getImages(petId)
 
-    fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto {
+    suspend fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto {
         val request = petRepository.createAdoptionRequest(petId, adopterId, message)
-        
+
         val pet = petRepository.getById(petId)
         if (pet != null) {
             val rescuer = userService.getById(pet.rescuerId)
@@ -188,11 +188,11 @@ class PetService(
                 }
             }
         }
-        
+
         return request
     }
 
-    fun getAdoptionRequestsForPet(petId: Int, userId: Int, userRoles: Set<String>): ServiceResult<List<AdoptionRequestDto>> {
+    suspend fun getAdoptionRequestsForPet(petId: Int, userId: Int, userRoles: Set<String>): ServiceResult<List<AdoptionRequestDto>> {
         val pet = petRepository.getById(petId) ?: return ServiceResult.NotFound
         val isAdmin = userRoles.contains("ADMIN")
         if (!isAdmin && pet.rescuerId != userId) {
@@ -201,11 +201,11 @@ class PetService(
         return ServiceResult.Success(petRepository.getAdoptionRequestsForPet(petId))
     }
 
-    fun getMyAdoptionRequests(userId: Int): List<AdoptionRequestDto> {
+    suspend fun getMyAdoptionRequests(userId: Int): List<AdoptionRequestDto> {
         return petRepository.getAdoptionRequestsForUser(userId)
     }
 
-    fun updateAdoptionRequest(requestId: Int, status: String, userId: Int, userRoles: Set<String>): ServiceResult<AdoptionRequestDto> {
+    suspend fun updateAdoptionRequest(requestId: Int, status: String, userId: Int, userRoles: Set<String>): ServiceResult<AdoptionRequestDto> {
         val request = petRepository.getAdoptionRequestById(requestId) ?: return ServiceResult.NotFound
         val pet = petRepository.getById(request.petId) ?: return ServiceResult.NotFound
         val isAdmin = userRoles.contains("ADMIN")
@@ -216,14 +216,14 @@ class PetService(
             return ServiceResult.Forbidden
         }
         petRepository.updateAdoptionRequestStatus(requestId, status)
-        
+
         if (status == "APPROVED") {
             petRepository.update(request.petId, UpdatePetRequest(status = Status.ADOPTED))
             petRepository.getAdoptionRequestsForPet(request.petId)
                 .filter { it.id != requestId && it.status == "PENDING" }
                 .forEach { petRepository.updateAdoptionRequestStatus(it.id, "REJECTED") }
         }
-        
+
         val updatedRequest = petRepository.getAdoptionRequestById(requestId)
         return if (updatedRequest != null) ServiceResult.Success(updatedRequest) else ServiceResult.NotFound
     }

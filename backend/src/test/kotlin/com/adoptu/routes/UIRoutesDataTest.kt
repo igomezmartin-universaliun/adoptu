@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class UIRoutesDataTest {
@@ -70,7 +71,7 @@ class UIRoutesDataTest {
     // ==================== Pets List Data ====================
 
     @Test
-    fun `pets list returns all available pets`() {
+    fun `pets list returns all available pets`() = runBlocking {
         // Create pets
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
@@ -102,7 +103,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets list filters by type DOG`() {
+    fun `pets list filters by type DOG`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "Dog1",
@@ -134,7 +135,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets list filters by type CAT`() {
+    fun `pets list filters by type CAT`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "Cat1",
@@ -166,7 +167,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets list excludes adopted pets`() {
+    fun `pets list excludes adopted pets`() = runBlocking {
         PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "Available",
@@ -200,7 +201,7 @@ class UIRoutesDataTest {
     // ==================== Pet Detail Data ====================
 
     @Test
-    fun `pet detail returns pet by id`() {
+    fun `pet detail returns pet by id`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "Buddy",
@@ -220,14 +221,14 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pet detail returns null for non-existent id`() {
+    fun `pet detail returns null for non-existent id`() = runBlocking {
         val pet = PetRepositoryImpl(clock).getById(999)
         
         assertNull(pet)
     }
 
     @Test
-    fun `pet detail includes all attributes`() {
+    fun `pet detail includes all attributes`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "Max",
@@ -291,7 +292,7 @@ class UIRoutesDataTest {
     // ==================== Pet Images ====================
 
     @Test
-    fun `pet images returns empty list when no images`() {
+    fun `pet images returns empty list when no images`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "NoImages",
@@ -310,7 +311,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pet images returns added images`() {
+    fun `pet images returns added images`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "WithImages",
@@ -332,7 +333,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pet images first added is primary by default`() {
+    fun `pet images first added is primary by default`() = runBlocking {
         val created = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "PrimaryTest",
@@ -358,7 +359,7 @@ class UIRoutesDataTest {
     // ==================== Urgent Pets ====================
 
     @Test
-    fun `urgent pets show isUrgent flag`() {
+    fun `urgent pets show isUrgent flag`() = runBlocking {
         val urgent = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "UrgentBuddy",
@@ -379,7 +380,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `non-urgent pets show isUrgent false`() {
+    fun `non-urgent pets show isUrgent false`() = runBlocking {
         val normal = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "NormalBuddy",
@@ -402,7 +403,7 @@ class UIRoutesDataTest {
     // ==================== Pet Gender Display ====================
 
     @Test
-    fun `pets show MALE gender`() {
+    fun `pets show MALE gender`() = runBlocking {
         val male = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "MalePet",
@@ -422,7 +423,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets show FEMALE gender`() {
+    fun `pets show FEMALE gender`() = runBlocking {
         val female = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "FemalePet",
@@ -444,7 +445,7 @@ class UIRoutesDataTest {
     // ==================== Pet Size Display ====================
 
     @Test
-    fun `pets show SMALL size`() {
+    fun `pets show SMALL size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "SmallPet",
@@ -465,7 +466,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets show MEDIUM size`() {
+    fun `pets show MEDIUM size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "MediumPet",
@@ -486,7 +487,7 @@ class UIRoutesDataTest {
     }
 
     @Test
-    fun `pets show LARGE size`() {
+    fun `pets show LARGE size`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "LargePet",
@@ -509,7 +510,7 @@ class UIRoutesDataTest {
     // ==================== Rescue Date ====================
 
     @Test
-    fun `pets show rescue date when present`() {
+    fun `pets show rescue date when present`() = runBlocking {
         val rescueTime = clock.now().toEpochMilliseconds()
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
@@ -525,13 +526,14 @@ class UIRoutesDataTest {
         )
         
         val retrieved = PetRepositoryImpl(clock).getById(pet.id)
-        
+
         assertNotNull(retrieved)
         assertNotNull(retrieved.rescueDate)
+        Unit
     }
 
     @Test
-    fun `pets show null rescue date when not set`() {
+    fun `pets show null rescue date when not set`() = runBlocking {
         val pet = PetRepositoryImpl(clock).create(
             rescuerId = 1,
             name = "NoRescueDate",

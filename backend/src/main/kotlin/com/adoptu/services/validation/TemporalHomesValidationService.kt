@@ -19,9 +19,9 @@ class TemporalHomesValidationService : KoinComponent {
                else ServiceResult.Forbidden
     }
 
-    fun validateUserById(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateUserById(userId: Int): ServiceResult<UserDto> {
         val user = userService.getById(userId)
-        return if (user != null) ServiceResult.Success(user) 
+        return if (user != null) ServiceResult.Success(user)
                else ServiceResult.NotFound
     }
 
@@ -49,7 +49,7 @@ class TemporalHomesValidationService : KoinComponent {
             ServiceResult.Forbidden
     }
 
-    fun validateCreateTemporalHomeRequest(userId: Int, body: CreateTemporalHomeRequest): ServiceResult<CreateTemporalHomeRequest> {
+    suspend fun validateCreateTemporalHomeRequest(userId: Int, body: CreateTemporalHomeRequest): ServiceResult<CreateTemporalHomeRequest> {
         val existing = temporalHomeService.getTemporalHome(userId)
         if (existing != null) {
             return ServiceResult.Error(ValidationConstants.TEMPORAL_HOME_PROFILE_ALREADY_EXISTS)
@@ -67,20 +67,20 @@ class TemporalHomesValidationService : KoinComponent {
         return ServiceResult.Success(body)
     }
 
-    fun validateTemporalHomeProfile(userId: Int): ServiceResult<Unit> {
+    suspend fun validateTemporalHomeProfile(userId: Int): ServiceResult<Unit> {
         val existing = temporalHomeService.getTemporalHome(userId)
         return if (existing != null) ServiceResult.Success(Unit)
         else ServiceResult.Error(ValidationConstants.TEMPORAL_HOME_PROFILE_NOT_FOUND)
     }
 
-    fun validateRescuerRole(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateRescuerRole(userId: Int): ServiceResult<UserDto> {
         val user = userService.getById(userId) ?: return ServiceResult.NotFound
         val activeRoles = user.activeRoles.map { it.name }
         return if (activeRoles.contains("RESCUER") || activeRoles.contains("ADMIN")) ServiceResult.Success(user)
         else ServiceResult.Error(ValidationConstants.ONLY_RESCUERS_CAN_SEND_REQUESTS)
     }
 
-    fun validateBlockRescuerRequest(userId: Int): ServiceResult<UserDto> {
+    suspend fun validateBlockRescuerRequest(userId: Int): ServiceResult<UserDto> {
         val user = userService.getById(userId) ?: return ServiceResult.NotFound
         val activeRoles = user.activeRoles.map { it.name }
         return if (activeRoles.contains("TEMPORAL_HOME") || activeRoles.contains("ADMIN")) ServiceResult.Success(user)

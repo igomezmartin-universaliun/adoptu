@@ -26,7 +26,7 @@ class EmailChangeService(
     private val secureRandom = SecureRandom()
     private val emailChangeExpirationMs = 60 * 60 * 1000L
 
-    fun requestEmailChange(userId: Int, newEmail: String, language: String = "en"): Result<Boolean> {
+    suspend fun requestEmailChange(userId: Int, newEmail: String, language: String = "en"): Result<Boolean> {
         val user = userRepository.getById(userId) ?: return Result.failure(Exception("User not found"))
         
         val existingWithNewEmail = userRepository.getByEmail(newEmail)

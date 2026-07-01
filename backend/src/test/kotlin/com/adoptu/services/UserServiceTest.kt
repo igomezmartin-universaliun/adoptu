@@ -22,6 +22,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalTime::class)
 class UserServiceTest {
@@ -37,13 +38,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getById returns null for non-existent user`() {
+    fun `getById returns null for non-existent user`() = runBlocking {
         val result = userService.getById(999)
         assertNull(result)
     }
 
     @Test
-    fun `getById returns user by id`() {
+    fun `getById returns user by id`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val result = userService.getById(userId)
@@ -54,7 +55,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getById returns user with correct role`() {
+    fun `getById returns user with correct role`() = runBlocking {
         val adminId = createTestUser(username = "admin@test.com", displayName = "Admin", role = "ADMIN")
         val rescuerId = createTestUser(username = "rescuer@test.com", displayName = "Rescuer", role = "RESCUER")
         val adopterId = createTestUser(username = "adopter@test.com", displayName = "Adopter", role = "ADOPTER")
@@ -69,13 +70,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getByEmail returns null for non-existent user`() {
+    fun `getByEmail returns null for non-existent user`() = runBlocking {
         val result = userService.getByEmail("nonexistent@test.com")
         assertNull(result)
     }
 
     @Test
-    fun `getByEmail returns user by email`() {
+    fun `getByEmail returns user by email`() = runBlocking {
         val userId = createTestUser(username = "email@test.com", displayName = "Email User")
 
         val result = userService.getByEmail("email@test.com")
@@ -86,7 +87,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getAllUsers returns all users`() {
+    fun `getAllUsers returns all users`() = runBlocking {
         createTestUser(username = "user1@test.com", displayName = "User 1")
         createTestUser(username = "user2@test.com", displayName = "User 2")
 
@@ -96,13 +97,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getAllUsers returns empty list when no users`() {
+    fun `getAllUsers returns empty list when no users`() = runBlocking {
         val result = userService.getAllUsers()
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun `getRescuers returns only rescuers`() {
+    fun `getRescuers returns only rescuers`() = runBlocking {
         createTestUser(username = "admin@test.com", displayName = "Admin", role = "ADMIN")
         createTestUser(username = "rescuer@test.com", displayName = "Rescuer", role = "RESCUER")
         createTestUser(username = "adopter@test.com", displayName = "Adopter", role = "ADOPTER")
@@ -114,7 +115,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getRescuers returns empty list when no rescuers`() {
+    fun `getRescuers returns empty list when no rescuers`() = runBlocking {
         createTestUser(username = "admin@test.com", displayName = "Admin", role = "ADMIN")
 
         val result = userService.getRescuers()
@@ -123,7 +124,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `banUser sets isBanned to true`() {
+    fun `banUser sets isBanned to true`() = runBlocking {
         val userId = createTestUser(username = "banned@test.com", displayName = "Banned User")
 
         val result = userService.banUser(userId, "Spam activity")
@@ -135,13 +136,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `banUser returns false for non-existent user`() {
+    fun `banUser returns false for non-existent user`() = runBlocking {
         val result = userService.banUser(999, "Test reason")
         assertFalse(result)
     }
 
     @Test
-    fun `banUser works without reason`() {
+    fun `banUser works without reason`() = runBlocking {
         val userId = createTestUser(username = "banned2@test.com", displayName = "Banned User 2")
 
         val result = userService.banUser(userId)
@@ -152,7 +153,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `unbanUser sets isBanned to false`() {
+    fun `unbanUser sets isBanned to false`() = runBlocking {
         val userId = createTestUser(username = "unbanned@test.com", displayName = "Unbanned User")
         userService.banUser(userId, "Was banned")
 
@@ -165,13 +166,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `unbanUser returns false for non-existent user`() {
+    fun `unbanUser returns false for non-existent user`() = runBlocking {
         val result = userService.unbanUser(999)
         assertFalse(result)
     }
 
     @Test
-    fun `isBanned returns true for banned user`() {
+    fun `isBanned returns true for banned user`() = runBlocking {
         val userId = createTestUser(username = "banned3@test.com", displayName = "Banned 3")
         userService.banUser(userId, "Test")
 
@@ -181,7 +182,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `isBanned returns false for non-banned user`() {
+    fun `isBanned returns false for non-banned user`() = runBlocking {
         val userId = createTestUser(username = "normal@test.com", displayName = "Normal User")
 
         val result = userService.isBanned(userId)
@@ -190,13 +191,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `isBanned returns false for non-existent user`() {
+    fun `isBanned returns false for non-existent user`() = runBlocking {
         val result = userService.isBanned(999)
         assertFalse(result)
     }
 
     @Test
-    fun `isRoleActive returns true for active role`() {
+    fun `isRoleActive returns true for active role`() = runBlocking {
         val userId = createTestUser(username = "role@test.com", displayName = "Role User", role = "RESCUER")
 
         val result = userService.isRoleActive(userId, UserRole.RESCUER)
@@ -205,7 +206,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `isRoleActive returns false for inactive role`() {
+    fun `isRoleActive returns false for inactive role`() = runBlocking {
         val userId = createTestUser(username = "norole@test.com", displayName = "No Role User", role = "ADOPTER")
 
         val result = userService.isRoleActive(userId, UserRole.RESCUER)
@@ -214,7 +215,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `activateRescuerProfile adds rescuer role`() {
+    fun `activateRescuerProfile adds rescuer role`() = runBlocking {
         val userId = createTestUser(username = "activate@test.com", displayName = "Activate User", role = "ADOPTER")
 
         val result = userService.activateRescuerProfile(userId)
@@ -224,13 +225,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `activateRescuerProfile returns null for non-existent user`() {
+    fun `activateRescuerProfile returns null for non-existent user`() = runBlocking {
         val result = userService.activateRescuerProfile(999)
         assertNull(result)
     }
 
     @Test
-    fun `deactivateRescuerProfile removes rescuer role`() {
+    fun `deactivateRescuerProfile removes rescuer role`() = runBlocking {
         val userId = createTestUser(username = "deactivate@test.com", displayName = "Deactivate User", role = "RESCUER")
 
         val result = userService.deactivateRescuerProfile(userId)
@@ -240,7 +241,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `activateTemporalHomeProfile adds temporal home role`() {
+    fun `activateTemporalHomeProfile adds temporal home role`() = runBlocking {
         val userId = createTestUser(username = "temporal@test.com", displayName = "Temporal User", role = "ADOPTER")
 
         val result = userService.activateTemporalHomeProfile(userId)
@@ -250,7 +251,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `deactivateTemporalHomeProfile removes temporal home role`() {
+    fun `deactivateTemporalHomeProfile removes temporal home role`() = runBlocking {
         val userId = createTestUser(username = "detemporal@test.com", displayName = "DeTemporal User", role = "TEMPORAL_HOME")
 
         val result = userService.deactivateTemporalHomeProfile(userId)
@@ -260,7 +261,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `updateProfile updates display name`() {
+    fun `updateProfile updates display name`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Old Name")
 
         val result = userService.updateProfile(userId, "New Name")
@@ -270,7 +271,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `updateProfile updates language`() {
+    fun `updateProfile updates language`() = runBlocking {
         val userId = createTestUser(username = "lang@test.com", displayName = "Lang User")
 
         val result = userService.updateProfile(userId, "Lang User", "es")
@@ -280,7 +281,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `updateProfile throws exception for blank name`() {
+    fun `updateProfile throws exception for blank name`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Old Name")
 
         val exception = assertThrows<IllegalArgumentException> {
@@ -291,13 +292,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `updateProfile returns null for non-existent user`() {
+    fun `updateProfile returns null for non-existent user`() = runBlocking {
         val result = userService.updateProfile(999, "New Name")
         assertNull(result)
     }
 
     @Test
-    fun `updateLanguage updates language`() {
+    fun `updateLanguage updates language`() = runBlocking {
         val userId = createTestUser(username = "update@test.com", displayName = "Update User")
 
         val result = userService.updateLanguage(userId, "fr")
@@ -307,13 +308,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `updateLanguage returns null for non-existent user`() {
+    fun `updateLanguage returns null for non-existent user`() = runBlocking {
         val result = userService.updateLanguage(999, "de")
         assertNull(result)
     }
 
     @Test
-    fun `acceptTerms updates privacy policy timestamp`() {
+    fun `acceptTerms updates privacy policy timestamp`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val expectedTime = clock.now().toEpochMilliseconds()
@@ -329,7 +330,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `acceptTerms updates terms and conditions timestamp`() {
+    fun `acceptTerms updates terms and conditions timestamp`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val expectedTime = clock.now().toEpochMilliseconds()
@@ -345,7 +346,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `acceptTerms updates both timestamps`() {
+    fun `acceptTerms updates both timestamps`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         val expectedTime = clock.now().toEpochMilliseconds()
@@ -362,7 +363,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `acceptTerms preserves existing timestamps when only one accepted`() {
+    fun `acceptTerms preserves existing timestamps when only one accepted`() = runBlocking {
         val userId = createTestUser(username = "testuser@test.com", displayName = "Test User")
 
         userService.acceptTerms(userId, AcceptTermsRequest(
@@ -378,10 +379,11 @@ class UserServiceTest {
         assertNotNull(result)
         assertNotNull(result.lastAcceptedPrivacyPolicy)
         assertNotNull(result.lastAcceptedTermsAndConditions)
+        Unit
     }
 
     @Test
-    fun `acceptTerms returns null for non-existent user`() {
+    fun `acceptTerms returns null for non-existent user`() = runBlocking {
         val result = userService.acceptTerms(999, AcceptTermsRequest(
             acceptPrivacyPolicy = true,
             acceptTermsAndConditions = false
@@ -390,7 +392,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `isUserVerified returns false for unverified user`() {
+    fun `isUserVerified returns false for unverified user`() = runBlocking {
         val userId = createTestUser(username = "unverified@test.com", displayName = "Unverified User")
 
         val result = userService.isUserVerified(userId)
@@ -399,7 +401,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `isUserVerified returns true for verified user`() {
+    fun `isUserVerified returns true for verified user`() = runBlocking {
         val userId = createTestUser(username = "verified@test.com", displayName = "Verified User")
         transaction {
             Users.update({ Users.id eq userId }) {
@@ -413,13 +415,13 @@ class UserServiceTest {
     }
 
     @Test
-    fun `verifyToken returns false for invalid token`() {
+    fun `verifyToken returns false for invalid token`() = runBlocking {
         val result = userService.verifyToken("invalid-token")
         assertFalse(result)
     }
 
     @Test
-    fun `verifyTokenAndGetLanguage returns false and en for invalid token`() {
+    fun `verifyTokenAndGetLanguage returns false and en for invalid token`() = runBlocking {
         val result = userService.verifyTokenAndGetLanguage("invalid-token")
         
         assertFalse(result.first)
@@ -427,7 +429,7 @@ class UserServiceTest {
     }
 
     @Test
-    fun `getById returns user with all fields`() {
+    fun `getById returns user with all fields`() = runBlocking {
         val userId = createTestUser(
             username = "fulluser@test.com",
             displayName = "Full User"

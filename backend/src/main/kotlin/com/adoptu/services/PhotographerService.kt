@@ -21,17 +21,17 @@ class PhotographerService(
     private val userRepository: UserRepositoryPort,
     private val clock: Clock
 ) {
-    fun getPhotographers(country: String? = null, state: String? = null): List<PhotographerDto> = 
+    suspend fun getPhotographers(country: String? = null, state: String? = null): List<PhotographerDto> =
         photographerRepository.getPhotographers(country, state)
 
-    fun getPhotographerById(userId: Int): PhotographerDto? = photographerRepository.getPhotographerById(userId)
+    suspend fun getPhotographerById(userId: Int): PhotographerDto? = photographerRepository.getPhotographerById(userId)
 
-    fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? =
+    suspend fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? =
         photographerRepository.updatePhotographerSettings(userId, request)
 
-    fun canSendMessage(userId: Int): Boolean = photographerRepository.canSendMessage(userId)
+    suspend fun canSendMessage(userId: Int): Boolean = photographerRepository.canSendMessage(userId)
 
-    fun createPhotographyRequest(
+    suspend fun createPhotographyRequest(
         requesterId: Int,
         photographerIds: List<Int>,
         petId: Int?,
@@ -84,7 +84,7 @@ class PhotographerService(
         return Result.success(createdRequestIds)
     }
 
-    fun getMyRequests(userId: Int): List<Map<String, Any?>> {
+    suspend fun getMyRequests(userId: Int): List<Map<String, Any?>> {
         return photographerRepository.getMyRequests(userId).map { dto ->
             mapOf(
                 "id" to dto.id,
@@ -101,7 +101,7 @@ class PhotographerService(
         }
     }
 
-    fun getRequestsForPhotographer(photographerId: Int): List<Map<String, Any?>> {
+    suspend fun getRequestsForPhotographer(photographerId: Int): List<Map<String, Any?>> {
         return photographerRepository.getRequestsForPhotographer(photographerId).map { dto ->
             mapOf(
                 "id" to dto.id,
@@ -117,7 +117,7 @@ class PhotographerService(
         }
     }
 
-    fun createPhotographyRequest(
+    suspend fun createPhotographyRequest(
         requesterId: Int,
         photographerId: Int,
         petId: Int?,
@@ -146,7 +146,7 @@ class PhotographerService(
         )
     }
 
-    fun getRequestsForUser(user: UserDto): List<Map<String, Any?>> {
+    suspend fun getRequestsForUser(user: UserDto): List<Map<String, Any?>> {
         val activeRoles = user.activeRoles.map { it.name }
 
         return if (activeRoles.contains("PHOTOGRAPHER")) {
@@ -184,11 +184,11 @@ class PhotographerService(
         }
     }
 
-    fun activatePhotographerProfile(userId: Int): UserDto? = photographerRepository.activatePhotographerProfile(userId)
+    suspend fun activatePhotographerProfile(userId: Int): UserDto? = photographerRepository.activatePhotographerProfile(userId)
 
-    fun deactivatePhotographerProfile(userId: Int): UserDto? = photographerRepository.deactivatePhotographerProfile(userId)
+    suspend fun deactivatePhotographerProfile(userId: Int): UserDto? = photographerRepository.deactivatePhotographerProfile(userId)
 
-    fun updatePhotographyRequest(
+    suspend fun updatePhotographyRequest(
         userId: Int,
         user: UserDto?,
         requestId: Int,

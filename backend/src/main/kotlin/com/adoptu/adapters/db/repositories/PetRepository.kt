@@ -13,6 +13,8 @@ import com.adoptu.dto.input.Status
 import com.adoptu.dto.input.UpdatePetRequest
 import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.PetRepositoryPort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
@@ -79,37 +81,41 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             }
     }
 
-    override fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = transaction {
-        val baseCondition = Pets.status eq "AVAILABLE"
-        val finalCondition = if (type != null) {
-            if (showPromotedOnly) {
-                baseCondition and (Pets.type eq type.uppercase()) and (Pets.isPromoted eq true)
+    override suspend fun getAll(type: String?, showPromotedOnly: Boolean): List<PetDto> = withContext(Dispatchers.IO) {
+        transaction {
+            val baseCondition = Pets.status eq "AVAILABLE"
+            val finalCondition = if (type != null) {
+                if (showPromotedOnly) {
+                    baseCondition and (Pets.type eq type.uppercase()) and (Pets.isPromoted eq true)
+                } else {
+                    baseCondition and (Pets.type eq type.uppercase())
+                }
             } else {
-                baseCondition and (Pets.type eq type.uppercase())
+                if (showPromotedOnly) {
+                    baseCondition and (Pets.isPromoted eq true)
+                } else {
+                    baseCondition
+                }
             }
-        } else {
-            if (showPromotedOnly) {
-                baseCondition and (Pets.isPromoted eq true)
-            } else {
-                baseCondition
-            }
+
+            val rescuerIds = UserActiveRoles.select(UserActiveRoles.userId)
+                .where { UserActiveRoles.role eq UserRole.RESCUER.name }
+                .map { it[UserActiveRoles.userId] }
+
+            Pets.selectAll()
+                .where { finalCondition and (Pets.rescuerId inList rescuerIds) }
+                .orderBy(Pets.createdAt, SortOrder.DESC)
+                .map(::rowToPetDto)
         }
-        
-        val rescuerIds = UserActiveRoles.select(UserActiveRoles.userId)
-            .where { UserActiveRoles.role eq UserRole.RESCUER.name }
-            .map { it[UserActiveRoles.userId] }
-        
-        Pets.selectAll()
-            .where { finalCondition and (Pets.rescuerId inList rescuerIds) }
-            .orderBy(Pets.createdAt, SortOrder.DESC)
-            .map(::rowToPetDto)
     }
 
-    override fun getById(id: Int): PetDto? = transaction {
-        Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).firstOrNull()
+    override suspend fun getById(id: Int): PetDto? = withContext(Dispatchers.IO) {
+        transaction {
+            Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).firstOrNull()
+        }
     }
 
-    override fun create(
+    override suspend fun create(
         rescuerId: Int,
         name: String,
         type: String,
@@ -139,7 +145,8 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
         isUrgent: Boolean,
         isPromoted: Boolean,
         status: String
-    ): PetDto = transaction {
+    ): PetDto = withContext(Dispatchers.IO) {
+        transaction {
         val id = Pets.insert {
             it[Pets.rescuerId] = rescuerId
             it[Pets.name] = name
@@ -173,10 +180,12 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             it[Pets.createdAt] = clock.now().toEpochMilliseconds()
         } get Pets.id
 
-        getById(id)!!
+        Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).first()
+        }
     }
 
-    override fun update(id: Int, body: UpdatePetRequest): PetDto? = transaction {
+    override suspend fun update(id: Int, body: UpdatePetRequest): PetDto? = withContext(Dispatchers.IO) {
+        transaction {
         Pets.update({ Pets.id eq id }) {
             body.name?.let { name -> it[Pets.name] = name }
             body.type?.let { type -> it[Pets.type] = type.uppercase() }
@@ -207,16 +216,20 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             body.isUrgent?.let { u -> it[Pets.isUrgent] = u }
             body.isPromoted?.let { p -> it[Pets.isPromoted] = p }
         }
-        getById(id)
+        Pets.selectAll().where { Pets.id eq id }.map(::rowToPetDto).firstOrNull()
+        }
     }
 
-    override fun delete(petId: Int): Unit = transaction {
-        exec("DELETE FROM pet_images WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
-        exec("DELETE FROM adoption_requests WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
-        exec("DELETE FROM pets WHERE id = ?", listOf(IntegerColumnType() to petId))
+    override suspend fun delete(petId: Int): Unit = withContext(Dispatchers.IO) {
+        transaction {
+            exec("DELETE FROM pet_images WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
+            exec("DELETE FROM adoption_requests WHERE pet_id = ?", listOf(IntegerColumnType() to petId))
+            exec("DELETE FROM pets WHERE id = ?", listOf(IntegerColumnType() to petId))
+        }
     }
 
-    override fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = transaction {
+    override suspend fun createAdoptionRequest(petId: Int, adopterId: Int, message: String): AdoptionRequestDto = withContext(Dispatchers.IO) {
+        transaction {
         val createdAt = clock.now().toEpochMilliseconds()
         val id = AdoptionRequests.insert {
             it[AdoptionRequests.petId] = petId
@@ -234,117 +247,134 @@ class PetRepositoryImpl(private val clock: Clock) : PetRepositoryPort {
             status = "PENDING",
             createdAt = createdAt
         )
-    }
-
-    override fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = transaction {
-        AdoptionRequests.selectAll()
-            .where { AdoptionRequests.petId eq petId }
-            .map { row ->
-                AdoptionRequestDto(
-                    id = row[AdoptionRequests.id],
-                    petId = row[AdoptionRequests.petId],
-                    adopterId = row[AdoptionRequests.adopterId],
-                    message = row[AdoptionRequests.message],
-                    status = row[AdoptionRequests.status],
-                    createdAt = row[AdoptionRequests.createdAt]
-                )
-            }
-    }
-
-    override fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = transaction {
-        AdoptionRequests.selectAll()
-            .where { AdoptionRequests.adopterId eq userId }
-            .map { row ->
-                AdoptionRequestDto(
-                    id = row[AdoptionRequests.id],
-                    petId = row[AdoptionRequests.petId],
-                    adopterId = row[AdoptionRequests.adopterId],
-                    message = row[AdoptionRequests.message],
-                    status = row[AdoptionRequests.status],
-                    createdAt = row[AdoptionRequests.createdAt]
-                )
-            }
-    }
-
-    override fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = transaction {
-        val updated = AdoptionRequests.update({ AdoptionRequests.id eq requestId }) {
-            it[AdoptionRequests.status] = status
-        }
-        updated > 0
-    }
-
-    override fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = transaction {
-        AdoptionRequests.selectAll()
-            .where { AdoptionRequests.id eq requestId }
-            .firstOrNull()
-            ?.let { row ->
-                AdoptionRequestDto(
-                    id = row[AdoptionRequests.id],
-                    petId = row[AdoptionRequests.petId],
-                    adopterId = row[AdoptionRequests.adopterId],
-                    message = row[AdoptionRequests.message],
-                    status = row[AdoptionRequests.status],
-                    createdAt = row[AdoptionRequests.createdAt]
-                )
-            }
-    }
-
-    override fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean, sortOrder: Int): PetImageDto = transaction {
-        if (isPrimary) {
-            PetImages.update({ PetImages.petId eq petId }) {
-                it[PetImages.isPrimary] = false
-            }
-        }
-        val maxOrder = PetImages.selectAll()
-            .where { PetImages.petId eq petId }
-            .orderBy(PetImages.sortOrder, SortOrder.DESC)
-            .limit(1)
-            .map { it[PetImages.sortOrder] }
-            .firstOrNull() ?: -1
-
-        val id = PetImages.insert {
-            it[PetImages.petId] = petId
-            it[PetImages.imageUrl] = imageUrl
-            it[PetImages.isPrimary] = isPrimary
-            it[PetImages.sortOrder] = if (sortOrder > 0) sortOrder else maxOrder + 1
-        } get PetImages.id
-
-        PetImageDto(
-            id = id,
-            imageUrl = imageUrl,
-            isPrimary = isPrimary,
-            sortOrder = if (sortOrder > 0) sortOrder else maxOrder + 1
-        )
-    }
-
-    override fun removeImage(petId: Int, imageId: Int): Boolean = transaction {
-        val image = PetImages.selectAll()
-            .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
-            .firstOrNull()
-        if (image != null) {
-            exec("DELETE FROM pet_images WHERE id = ?", listOf(IntegerColumnType() to imageId))
-            true
-        } else {
-            false
         }
     }
 
-    override fun setPrimaryImage(petId: Int, imageId: Int): Boolean = transaction {
-        val image = PetImages.selectAll()
-            .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
-            .firstOrNull()
-        if (image != null) {
-            PetImages.update({ PetImages.petId eq petId }) {
-                it[PetImages.isPrimary] = false
-            }
-            PetImages.update({ PetImages.id eq imageId }) {
-                it[PetImages.isPrimary] = true
-            }
-            true
-        } else {
-            false
+    override suspend fun getAdoptionRequestsForPet(petId: Int): List<AdoptionRequestDto> = withContext(Dispatchers.IO) {
+        transaction {
+            AdoptionRequests.selectAll()
+                .where { AdoptionRequests.petId eq petId }
+                .map { row ->
+                    AdoptionRequestDto(
+                        id = row[AdoptionRequests.id],
+                        petId = row[AdoptionRequests.petId],
+                        adopterId = row[AdoptionRequests.adopterId],
+                        message = row[AdoptionRequests.message],
+                        status = row[AdoptionRequests.status],
+                        createdAt = row[AdoptionRequests.createdAt]
+                    )
+                }
         }
     }
 
-    override fun getImages(petId: Int): List<PetImageDto> = getPetImages(petId)
+    override suspend fun getAdoptionRequestsForUser(userId: Int): List<AdoptionRequestDto> = withContext(Dispatchers.IO) {
+        transaction {
+            AdoptionRequests.selectAll()
+                .where { AdoptionRequests.adopterId eq userId }
+                .map { row ->
+                    AdoptionRequestDto(
+                        id = row[AdoptionRequests.id],
+                        petId = row[AdoptionRequests.petId],
+                        adopterId = row[AdoptionRequests.adopterId],
+                        message = row[AdoptionRequests.message],
+                        status = row[AdoptionRequests.status],
+                        createdAt = row[AdoptionRequests.createdAt]
+                    )
+                }
+        }
+    }
+
+    override suspend fun updateAdoptionRequestStatus(requestId: Int, status: String): Boolean = withContext(Dispatchers.IO) {
+        transaction {
+            val updated = AdoptionRequests.update({ AdoptionRequests.id eq requestId }) {
+                it[AdoptionRequests.status] = status
+            }
+            updated > 0
+        }
+    }
+
+    override suspend fun getAdoptionRequestById(requestId: Int): AdoptionRequestDto? = withContext(Dispatchers.IO) {
+        transaction {
+            AdoptionRequests.selectAll()
+                .where { AdoptionRequests.id eq requestId }
+                .firstOrNull()
+                ?.let { row ->
+                    AdoptionRequestDto(
+                        id = row[AdoptionRequests.id],
+                        petId = row[AdoptionRequests.petId],
+                        adopterId = row[AdoptionRequests.adopterId],
+                        message = row[AdoptionRequests.message],
+                        status = row[AdoptionRequests.status],
+                        createdAt = row[AdoptionRequests.createdAt]
+                    )
+                }
+        }
+    }
+
+    override suspend fun addImage(petId: Int, imageUrl: String, isPrimary: Boolean, sortOrder: Int): PetImageDto = withContext(Dispatchers.IO) {
+        transaction {
+            if (isPrimary) {
+                PetImages.update({ PetImages.petId eq petId }) {
+                    it[PetImages.isPrimary] = false
+                }
+            }
+            val maxOrder = PetImages.selectAll()
+                .where { PetImages.petId eq petId }
+                .orderBy(PetImages.sortOrder, SortOrder.DESC)
+                .limit(1)
+                .map { it[PetImages.sortOrder] }
+                .firstOrNull() ?: -1
+
+            val id = PetImages.insert {
+                it[PetImages.petId] = petId
+                it[PetImages.imageUrl] = imageUrl
+                it[PetImages.isPrimary] = isPrimary
+                it[PetImages.sortOrder] = if (sortOrder > 0) sortOrder else maxOrder + 1
+            } get PetImages.id
+
+            PetImageDto(
+                id = id,
+                imageUrl = imageUrl,
+                isPrimary = isPrimary,
+                sortOrder = if (sortOrder > 0) sortOrder else maxOrder + 1
+            )
+        }
+    }
+
+    override suspend fun removeImage(petId: Int, imageId: Int): Boolean = withContext(Dispatchers.IO) {
+        transaction {
+            val image = PetImages.selectAll()
+                .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
+                .firstOrNull()
+            if (image != null) {
+                exec("DELETE FROM pet_images WHERE id = ?", listOf(IntegerColumnType() to imageId))
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    override suspend fun setPrimaryImage(petId: Int, imageId: Int): Boolean = withContext(Dispatchers.IO) {
+        transaction {
+            val image = PetImages.selectAll()
+                .where { (PetImages.id eq imageId) and (PetImages.petId eq petId) }
+                .firstOrNull()
+            if (image != null) {
+                PetImages.update({ PetImages.petId eq petId }) {
+                    it[PetImages.isPrimary] = false
+                }
+                PetImages.update({ PetImages.id eq imageId }) {
+                    it[PetImages.isPrimary] = true
+                }
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    override suspend fun getImages(petId: Int): List<PetImageDto> = withContext(Dispatchers.IO) {
+        getPetImages(petId)
+    }
 }

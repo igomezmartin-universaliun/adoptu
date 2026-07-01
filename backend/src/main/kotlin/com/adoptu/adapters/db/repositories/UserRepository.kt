@@ -9,6 +9,8 @@ import com.adoptu.dto.input.UserDto
 import com.adoptu.dto.input.UserRole
 import com.adoptu.ports.EmailVerificationTokenInfo
 import com.adoptu.ports.UserRepositoryPort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
@@ -24,6 +26,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class UserRepository(private val clock: Clock) : UserRepositoryPort {
 
+    // Kept as a plain blocking helper (nested transaction): it is invoked from within other
+    // transaction {} blocks below, which cannot suspend.
     private fun getActiveRolesForUser(userId: Int): Set<UserRole> {
         return transaction {
             UserActiveRoles.selectAll()
@@ -40,273 +44,327 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         }
     }
 
-    override fun getById(userId: Int): UserDto? = transaction {
-        Users.selectAll()
-            .where { Users.id eq userId }
-            .firstOrNull()
-            ?.let { user ->
-                val activeRoles = getActiveRolesForUser(userId)
-                val photographerSettings = if (activeRoles.contains(UserRole.PHOTOGRAPHER)) {
-                    Photographers.selectAll()
-                        .where { Photographers.userId eq userId }
-                        .firstOrNull()
-                } else null
-                UserDto(
-                    id = user[Users.id],
-                    username = user[Users.username],
-                    email = user[Users.username],
-                    displayName = user[Users.displayName],
-                    language = user[Users.language],
-                    activeRoles = activeRoles,
-                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
-                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
-                    isBanned = user[Users.isBanned],
-                    banReason = user[Users.banReason],
-                    photographerFee = photographerSettings?.get(Photographers.photographerFee)?.toDouble(),
-                    photographerCurrency = photographerSettings?.get(Photographers.photographerCurrency),
-                    photographerCountry = photographerSettings?.get(Photographers.country)?.displayName,
-                    photographerState = photographerSettings?.get(Photographers.state)
-                )
-            }
-    }
-
-    override fun getByEmail(email: String): UserDto? = transaction {
-        Users.selectAll()
-            .where { Users.username eq email }
-            .firstOrNull()
-            ?.let { user ->
-                val activeRoles = getActiveRolesForUser(user[Users.id])
-                UserDto(
-                    id = user[Users.id],
-                    username = user[Users.username],
-                    email = user[Users.username],
-                    displayName = user[Users.displayName],
-                    language = user[Users.language],
-                    activeRoles = activeRoles,
-                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
-                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
-                    isBanned = user[Users.isBanned],
-                    banReason = user[Users.banReason]
-                )
-            }
-    }
-
-    override fun getAllUsers(): List<UserDto> = transaction {
-        Users.selectAll()
-            .map { user ->
-                val activeRoles = getActiveRolesForUser(user[Users.id])
-                UserDto(
-                    id = user[Users.id],
-                    username = user[Users.username],
-                    email = user[Users.username],
-                    displayName = user[Users.displayName],
-                    language = user[Users.language],
-                    activeRoles = activeRoles,
-                    lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
-                    lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
-                    isBanned = user[Users.isBanned],
-                    banReason = user[Users.banReason]
-                )
-            }
-    }
-
-    override fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = transaction {
-        val parsedFilterCountry: Country? = if (!country.isNullOrBlank()) {
-            Country.fromDisplayName(country) ?: return@transaction emptyList()
-        } else null
-
-        val photographerUserIds = UserActiveRoles.selectAll()
-            .where { UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name }
-            .map { row -> row[UserActiveRoles.userId] }
-            .distinct()
-
-        photographerUserIds.mapNotNull { userId ->
-            val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
-            val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
-
-            if (user != null) {
-                val photographerCountry = photographer?.get(Photographers.country)
-                val photographerState = photographer?.get(Photographers.state)
-
-                val matchesCountry = parsedFilterCountry == null || photographerCountry == parsedFilterCountry
-                val matchesState = state.isNullOrBlank() || photographerState == state
-
-                if (matchesCountry && matchesState) {
-                    PhotographerDto(
-                        userId = userId,
-                        displayName = user[Users.displayName],
-                        username = user[Users.username],
-                        photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
-                        photographerCurrency = photographer?.get(Photographers.photographerCurrency),
-                        country = photographerCountry?.displayName,
-                        state = photographerState
-                    )
-                } else null
-            } else null
-        }
-    }
-
-    override fun getRescuers(): List<UserDto> = transaction {
-        UserActiveRoles.selectAll()
-            .where { UserActiveRoles.role eq UserRole.RESCUER.name }
-            .map { row -> row[UserActiveRoles.userId] }
-            .distinct()
-            .mapNotNull { userId -> getById(userId) }
-    }
-
-    override fun banUser(userId: Int, reason: String?): Boolean {
-        return transaction {
-            val rowsUpdated = Users.update({ Users.id eq userId }) {
-                it[Users.isBanned] = true
-                it[Users.banReason] = reason
-            }
-            rowsUpdated > 0
-        }
-    }
-
-    override fun unbanUser(userId: Int): Boolean {
-        return transaction {
-            val rowsUpdated = Users.update({ Users.id eq userId }) {
-                it[Users.isBanned] = false
-                it[Users.banReason] = null
-            }
-            rowsUpdated > 0
-        }
-    }
-
-    override fun isBanned(userId: Int): Boolean {
-        return transaction {
+    override suspend fun getById(userId: Int): UserDto? = withContext(Dispatchers.IO) {
+        transaction {
             Users.selectAll()
                 .where { Users.id eq userId }
                 .firstOrNull()
-                ?.get(Users.isBanned) ?: false
+                ?.let { user ->
+                    val activeRoles = getActiveRolesForUser(userId)
+                    val photographerSettings = if (activeRoles.contains(UserRole.PHOTOGRAPHER)) {
+                        Photographers.selectAll()
+                            .where { Photographers.userId eq userId }
+                            .firstOrNull()
+                    } else null
+                    UserDto(
+                        id = user[Users.id],
+                        username = user[Users.username],
+                        email = user[Users.username],
+                        displayName = user[Users.displayName],
+                        language = user[Users.language],
+                        activeRoles = activeRoles,
+                        lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                        lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                        isBanned = user[Users.isBanned],
+                        banReason = user[Users.banReason],
+                        photographerFee = photographerSettings?.get(Photographers.photographerFee)?.toDouble(),
+                        photographerCurrency = photographerSettings?.get(Photographers.photographerCurrency),
+                        photographerCountry = photographerSettings?.get(Photographers.country)?.displayName,
+                        photographerState = photographerSettings?.get(Photographers.state)
+                    )
+                }
         }
     }
 
-    override fun isRoleActive(userId: Int, role: UserRole): Boolean {
-        return transaction {
-            UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq role.name) }
-                .count() > 0
-        }
-    }
-
-    override fun activateRescuerProfile(userId: Int): UserDto? {
-        val user = getById(userId) ?: return null
-        
+    override suspend fun getByEmail(email: String): UserDto? = withContext(Dispatchers.IO) {
         transaction {
-            val existingRole = UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name) }
+            Users.selectAll()
+                .where { Users.username eq email }
                 .firstOrNull()
-            if (existingRole == null) {
-                UserActiveRoles.insert {
-                    it[UserActiveRoles.userId] = userId
-                    it[UserActiveRoles.role] = UserRole.RESCUER.name
+                ?.let { user ->
+                    val activeRoles = getActiveRolesForUser(user[Users.id])
+                    UserDto(
+                        id = user[Users.id],
+                        username = user[Users.username],
+                        email = user[Users.username],
+                        displayName = user[Users.displayName],
+                        language = user[Users.language],
+                        activeRoles = activeRoles,
+                        lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                        lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                        isBanned = user[Users.isBanned],
+                        banReason = user[Users.banReason]
+                    )
+                }
+        }
+    }
+
+    override suspend fun getAllUsers(): List<UserDto> = withContext(Dispatchers.IO) {
+        transaction {
+            Users.selectAll()
+                .map { user ->
+                    val activeRoles = getActiveRolesForUser(user[Users.id])
+                    UserDto(
+                        id = user[Users.id],
+                        username = user[Users.username],
+                        email = user[Users.username],
+                        displayName = user[Users.displayName],
+                        language = user[Users.language],
+                        activeRoles = activeRoles,
+                        lastAcceptedPrivacyPolicy = user[Users.lastAcceptedPrivacyPolicy],
+                        lastAcceptedTermsAndConditions = user[Users.lastAcceptedTermsAndConditions],
+                        isBanned = user[Users.isBanned],
+                        banReason = user[Users.banReason]
+                    )
+                }
+        }
+    }
+
+    override suspend fun getPhotographers(country: String?, state: String?): List<PhotographerDto> = withContext(Dispatchers.IO) {
+        transaction {
+            val parsedFilterCountry: Country? = if (!country.isNullOrBlank()) {
+                Country.fromDisplayName(country) ?: return@transaction emptyList()
+            } else null
+
+            val photographerUserIds = UserActiveRoles.selectAll()
+                .where { UserActiveRoles.role eq UserRole.PHOTOGRAPHER.name }
+                .map { row -> row[UserActiveRoles.userId] }
+                .distinct()
+
+            photographerUserIds.mapNotNull { userId ->
+                val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
+                val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
+
+                if (user != null) {
+                    val photographerCountry = photographer?.get(Photographers.country)
+                    val photographerState = photographer?.get(Photographers.state)
+
+                    val matchesCountry = parsedFilterCountry == null || photographerCountry == parsedFilterCountry
+                    val matchesState = state.isNullOrBlank() || photographerState == state
+
+                    if (matchesCountry && matchesState) {
+                        PhotographerDto(
+                            userId = userId,
+                            displayName = user[Users.displayName],
+                            username = user[Users.username],
+                            photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
+                            photographerCurrency = photographer?.get(Photographers.photographerCurrency),
+                            country = photographerCountry?.displayName,
+                            state = photographerState
+                        )
+                    } else null
+                } else null
+            }
+        }
+    }
+
+    override suspend fun getRescuers(): List<UserDto> {
+        // Raw id lookup stays inside the transaction; getById (now suspend) is called afterward
+        // since it cannot be invoked from within the transaction {} lambda.
+        val rescuerIds = withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.selectAll()
+                    .where { UserActiveRoles.role eq UserRole.RESCUER.name }
+                    .map { row -> row[UserActiveRoles.userId] }
+                    .distinct()
+            }
+        }
+        return rescuerIds.mapNotNull { userId -> getById(userId) }
+    }
+
+    override suspend fun banUser(userId: Int, reason: String?): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val rowsUpdated = Users.update({ Users.id eq userId }) {
+                    it[Users.isBanned] = true
+                    it[Users.banReason] = reason
+                }
+                rowsUpdated > 0
+            }
+        }
+    }
+
+    override suspend fun unbanUser(userId: Int): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val rowsUpdated = Users.update({ Users.id eq userId }) {
+                    it[Users.isBanned] = false
+                    it[Users.banReason] = null
+                }
+                rowsUpdated > 0
+            }
+        }
+    }
+
+    override suspend fun isBanned(userId: Int): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                Users.selectAll()
+                    .where { Users.id eq userId }
+                    .firstOrNull()
+                    ?.get(Users.isBanned) ?: false
+            }
+        }
+    }
+
+    override suspend fun isRoleActive(userId: Int, role: UserRole): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.selectAll()
+                    .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq role.name) }
+                    .count() > 0
+            }
+        }
+    }
+
+    override suspend fun activateRescuerProfile(userId: Int): UserDto? {
+        val user = getById(userId) ?: return null
+
+        withContext(Dispatchers.IO) {
+            transaction {
+                val existingRole = UserActiveRoles.selectAll()
+                    .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name) }
+                    .firstOrNull()
+                if (existingRole == null) {
+                    UserActiveRoles.insert {
+                        it[UserActiveRoles.userId] = userId
+                        it[UserActiveRoles.role] = UserRole.RESCUER.name
+                    }
                 }
             }
         }
         return getById(userId)
     }
 
-    override fun deactivateRescuerProfile(userId: Int): UserDto? {
-        transaction {
-            UserActiveRoles.deleteWhere {
-                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name)
-            }
-            
-            Pets.update({ Pets.rescuerId eq userId }) {
-                it[Pets.isPromoted] = false
-            }
-        }
-        return getById(userId)
-    }
+    override suspend fun deactivateRescuerProfile(userId: Int): UserDto? {
+        withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.deleteWhere {
+                    (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.RESCUER.name)
+                }
 
-    override fun activateTemporalHomeProfile(userId: Int): UserDto? {
-        val user = getById(userId) ?: return null
-        
-        transaction {
-            val existingRole = UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name) }
-                .firstOrNull()
-            if (existingRole == null) {
-                UserActiveRoles.insert {
-                    it[UserActiveRoles.userId] = userId
-                    it[UserActiveRoles.role] = UserRole.TEMPORAL_HOME.name
+                Pets.update({ Pets.rescuerId eq userId }) {
+                    it[Pets.isPromoted] = false
                 }
             }
         }
         return getById(userId)
     }
 
-    override fun deactivateTemporalHomeProfile(userId: Int): UserDto? {
-        transaction {
-            UserActiveRoles.deleteWhere {
-                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name)
-            }
-        }
-        return getById(userId)
-    }
-
-    override fun activateShelterProfile(userId: Int): UserDto? {
+    override suspend fun activateTemporalHomeProfile(userId: Int): UserDto? {
         val user = getById(userId) ?: return null
-        
-        transaction {
-            val existingRole = UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name) }
-                .firstOrNull()
-            if (existingRole == null) {
-                UserActiveRoles.insert {
-                    it[UserActiveRoles.userId] = userId
-                    it[UserActiveRoles.role] = UserRole.SHELTER.name
+
+        withContext(Dispatchers.IO) {
+            transaction {
+                val existingRole = UserActiveRoles.selectAll()
+                    .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name) }
+                    .firstOrNull()
+                if (existingRole == null) {
+                    UserActiveRoles.insert {
+                        it[UserActiveRoles.userId] = userId
+                        it[UserActiveRoles.role] = UserRole.TEMPORAL_HOME.name
+                    }
                 }
             }
         }
         return getById(userId)
     }
 
-    override fun deactivateShelterProfile(userId: Int): UserDto? {
-        transaction {
-            UserActiveRoles.deleteWhere {
-                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name)
-            }
-        }
-        return getById(userId)
-    }
-
-    override fun activateSterilizationProfile(userId: Int): UserDto? {
-        val user = getById(userId) ?: return null
-        
-        transaction {
-            val existingRole = UserActiveRoles.selectAll()
-                .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name) }
-                .firstOrNull()
-            if (existingRole == null) {
-                UserActiveRoles.insert {
-                    it[UserActiveRoles.userId] = userId
-                    it[UserActiveRoles.role] = UserRole.STERILIZATION_SERVICE.name
+    override suspend fun deactivateTemporalHomeProfile(userId: Int): UserDto? {
+        withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.deleteWhere {
+                    (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.TEMPORAL_HOME.name)
                 }
             }
         }
         return getById(userId)
     }
 
-    override fun deactivateSterilizationProfile(userId: Int): UserDto? {
-        transaction {
-            UserActiveRoles.deleteWhere {
-                (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name)
+    override suspend fun activateShelterProfile(userId: Int): UserDto? {
+        val user = getById(userId) ?: return null
+
+        withContext(Dispatchers.IO) {
+            transaction {
+                val existingRole = UserActiveRoles.selectAll()
+                    .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name) }
+                    .firstOrNull()
+                if (existingRole == null) {
+                    UserActiveRoles.insert {
+                        it[UserActiveRoles.userId] = userId
+                        it[UserActiveRoles.role] = UserRole.SHELTER.name
+                    }
+                }
             }
         }
         return getById(userId)
     }
 
-    override fun updateProfile(userId: Int, displayName: String, language: String?): UserDto? {
+    override suspend fun deactivateShelterProfile(userId: Int): UserDto? {
+        withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.deleteWhere {
+                    (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.SHELTER.name)
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override suspend fun activateSterilizationProfile(userId: Int): UserDto? {
+        val user = getById(userId) ?: return null
+
+        withContext(Dispatchers.IO) {
+            transaction {
+                val existingRole = UserActiveRoles.selectAll()
+                    .where { (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name) }
+                    .firstOrNull()
+                if (existingRole == null) {
+                    UserActiveRoles.insert {
+                        it[UserActiveRoles.userId] = userId
+                        it[UserActiveRoles.role] = UserRole.STERILIZATION_SERVICE.name
+                    }
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override suspend fun deactivateSterilizationProfile(userId: Int): UserDto? {
+        withContext(Dispatchers.IO) {
+            transaction {
+                UserActiveRoles.deleteWhere {
+                    (UserActiveRoles.userId eq userId) and (UserActiveRoles.role eq UserRole.STERILIZATION_SERVICE.name)
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override suspend fun updateProfile(userId: Int, displayName: String, language: String?): UserDto? {
         if (displayName.isBlank()) {
             throw IllegalArgumentException("Display name cannot be empty")
         }
-        transaction {
-            Users.update({ Users.id eq userId }) {
-                it[Users.displayName] = displayName
-                if (language != null) {
+        withContext(Dispatchers.IO) {
+            transaction {
+                Users.update({ Users.id eq userId }) {
+                    it[Users.displayName] = displayName
+                    if (language != null) {
+                        it[Users.language] = language
+                    }
+                }
+            }
+        }
+        return getById(userId)
+    }
+
+    override suspend fun updateLanguage(userId: Int, language: String): UserDto? {
+        if (language.isBlank()) {
+            throw IllegalArgumentException("Language cannot be empty")
+        }
+        withContext(Dispatchers.IO) {
+            transaction {
+                Users.update({ Users.id eq userId }) {
                     it[Users.language] = language
                 }
             }
@@ -314,25 +372,15 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
         return getById(userId)
     }
 
-    override fun updateLanguage(userId: Int, language: String): UserDto? {
-        if (language.isBlank()) {
-            throw IllegalArgumentException("Language cannot be empty")
-        }
-        transaction {
-            Users.update({ Users.id eq userId }) {
-                it[Users.language] = language
-            }
-        }
-        return getById(userId)
-    }
-
-    override fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? {
+    override suspend fun updatePhotographerSettings(userId: Int, request: PhotographerSettingsRequest): PhotographerDto? {
         if (request.photographerFee < 0) {
             throw IllegalArgumentException("Photographer fee must be zero or positive")
         }
-        
-        val userExists = transaction {
-            Users.selectAll().where { Users.id eq userId }.firstOrNull() != null
+
+        val userExists = withContext(Dispatchers.IO) {
+            transaction {
+                Users.selectAll().where { Users.id eq userId }.firstOrNull() != null
+            }
         }
         if (!userExists) return null
 
@@ -340,149 +388,173 @@ class UserRepository(private val clock: Clock) : UserRepositoryPort {
             Country.fromDisplayName(it) ?: throw IllegalArgumentException("Invalid country: $it")
         }
 
-        transaction {
-            val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
-            if (existing != null) {
-                Photographers.update({ Photographers.userId eq userId }) {
-                    it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
-                    it[photographerCurrency] = request.photographerCurrency
-                    it[country] = parsedCountry
-                    it[state] = request.state
-                }
-            } else {
-                Photographers.insert {
-                    it[Photographers.userId] = userId
-                    it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
-                    it[photographerCurrency] = request.photographerCurrency
-                    it[country] = parsedCountry
-                    it[state] = request.state
+        withContext(Dispatchers.IO) {
+            transaction {
+                val existing = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
+                if (existing != null) {
+                    Photographers.update({ Photographers.userId eq userId }) {
+                        it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
+                        it[photographerCurrency] = request.photographerCurrency
+                        it[country] = parsedCountry
+                        it[state] = request.state
+                    }
+                } else {
+                    Photographers.insert {
+                        it[Photographers.userId] = userId
+                        it[photographerFee] = BigDecimal.valueOf(request.photographerFee)
+                        it[photographerCurrency] = request.photographerCurrency
+                        it[country] = parsedCountry
+                        it[state] = request.state
+                    }
                 }
             }
         }
 
-        return transaction {
-            val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
-            val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
-            if (user != null) {
-                PhotographerDto(
-                    userId = userId,
-                    displayName = user[Users.displayName],
-                    photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
-                    photographerCurrency = photographer?.get(Photographers.photographerCurrency),
-                    country = photographer?.get(Photographers.country)?.displayName,
-                    state = photographer?.get(Photographers.state)
-                )
-            } else null
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val user = Users.selectAll().where { Users.id eq userId }.firstOrNull()
+                val photographer = Photographers.selectAll().where { Photographers.userId eq userId }.firstOrNull()
+                if (user != null) {
+                    PhotographerDto(
+                        userId = userId,
+                        displayName = user[Users.displayName],
+                        photographerFee = photographer?.get(Photographers.photographerFee)?.toDouble(),
+                        photographerCurrency = photographer?.get(Photographers.photographerCurrency),
+                        country = photographer?.get(Photographers.country)?.displayName,
+                        state = photographer?.get(Photographers.state)
+                    )
+                } else null
+            }
         }
     }
 
-    override fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? {
+    override suspend fun acceptTerms(userId: Int, request: AcceptTermsRequest): UserDto? {
         val now = clock.now().toEpochMilliseconds()
-        transaction {
-            Users.update({ Users.id eq userId }) {
-                if (request.acceptPrivacyPolicy) {
-                    it[Users.lastAcceptedPrivacyPolicy] = now
-                }
-                if (request.acceptTermsAndConditions) {
-                    it[Users.lastAcceptedTermsAndConditions] = now
+        withContext(Dispatchers.IO) {
+            transaction {
+                Users.update({ Users.id eq userId }) {
+                    if (request.acceptPrivacyPolicy) {
+                        it[Users.lastAcceptedPrivacyPolicy] = now
+                    }
+                    if (request.acceptTermsAndConditions) {
+                        it[Users.lastAcceptedTermsAndConditions] = now
+                    }
                 }
             }
         }
         return getById(userId)
     }
 
-    override fun isEmailVerified(userId: Int): Boolean {
-        return transaction {
-            Users.selectAll()
-                .where { Users.id eq userId }
-                .firstOrNull()
-                ?.get(Users.isEmailVerified) ?: false
-        }
-    }
-
-    override fun setEmailVerified(userId: Int, verified: Boolean): Boolean {
-        return transaction {
-            val rowsUpdated = Users.update({ Users.id eq userId }) {
-                it[Users.isEmailVerified] = verified
+    override suspend fun isEmailVerified(userId: Int): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                Users.selectAll()
+                    .where { Users.id eq userId }
+                    .firstOrNull()
+                    ?.get(Users.isEmailVerified) ?: false
             }
-            rowsUpdated > 0
         }
     }
 
-    override fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean {
-        return transaction {
-            try {
-                EmailVerificationTokens.insert {
-                    it[EmailVerificationTokens.userId] = userId
-                    it[EmailVerificationTokens.token] = token
-                    it[EmailVerificationTokens.expiresAt] = expiresAt
-                    it[EmailVerificationTokens.createdAt] = clock.now().toEpochMilliseconds()
+    override suspend fun setEmailVerified(userId: Int, verified: Boolean): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val rowsUpdated = Users.update({ Users.id eq userId }) {
+                    it[Users.isEmailVerified] = verified
                 }
-                true
-            } catch (e: Exception) {
-                false
+                rowsUpdated > 0
             }
         }
     }
 
-    override fun verifyToken(token: String): Int? {
-        return transaction {
-            val now = clock.now().toEpochMilliseconds()
-            val tokenRow = EmailVerificationTokens
-                .selectAll()
-                .where { EmailVerificationTokens.token eq token }
-                .firstOrNull()
-
-            if (tokenRow != null && tokenRow[EmailVerificationTokens.expiresAt] > now) {
-                tokenRow[EmailVerificationTokens.userId]
-            } else {
-                null
+    override suspend fun createEmailVerificationToken(userId: Int, token: String, expiresAt: Long): Boolean {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                try {
+                    EmailVerificationTokens.insert {
+                        it[EmailVerificationTokens.userId] = userId
+                        it[EmailVerificationTokens.token] = token
+                        it[EmailVerificationTokens.expiresAt] = expiresAt
+                        it[EmailVerificationTokens.createdAt] = clock.now().toEpochMilliseconds()
+                    }
+                    true
+                } catch (e: Exception) {
+                    false
+                }
             }
         }
     }
 
-    override fun getUserIdByToken(token: String): Int? {
-        return transaction {
-            EmailVerificationTokens
-                .selectAll()
-                .where { EmailVerificationTokens.token eq token }
-                .firstOrNull()
-                ?.get(EmailVerificationTokens.userId)
-        }
-    }
+    override suspend fun verifyToken(token: String): Int? {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val now = clock.now().toEpochMilliseconds()
+                val tokenRow = EmailVerificationTokens
+                    .selectAll()
+                    .where { EmailVerificationTokens.token eq token }
+                    .firstOrNull()
 
-    override fun deleteVerificationTokens(userId: Int) {
-        transaction {
-            EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
-        }
-    }
-
-    override fun getVerificationAttemptsToday(userId: Int): Int {
-        return transaction {
-            val startOfDay = getStartOfDayMillis()
-            EmailVerificationAttempts.selectAll()
-                .where { (EmailVerificationAttempts.userId eq userId) and (EmailVerificationAttempts.createdAt greaterEq startOfDay) }
-                .count()
-                .toInt()
-        }
-    }
-
-    override fun recordVerificationAttempt(userId: Int) {
-        transaction {
-            EmailVerificationAttempts.insert {
-                it[EmailVerificationAttempts.userId] = userId
-                it[EmailVerificationAttempts.createdAt] = clock.now().toEpochMilliseconds()
+                if (tokenRow != null && tokenRow[EmailVerificationTokens.expiresAt] > now) {
+                    tokenRow[EmailVerificationTokens.userId]
+                } else {
+                    null
+                }
             }
         }
     }
 
-    override fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo? {
-        val result = transaction {
-            EmailVerificationTokens
-                .selectAll()
-                .where { EmailVerificationTokens.userId eq userId }
-                .orderBy(EmailVerificationTokens.createdAt, org.jetbrains.exposed.v1.core.SortOrder.DESC)
-                .firstOrNull()
+    override suspend fun getUserIdByToken(token: String): Int? {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                EmailVerificationTokens
+                    .selectAll()
+                    .where { EmailVerificationTokens.token eq token }
+                    .firstOrNull()
+                    ?.get(EmailVerificationTokens.userId)
+            }
+        }
+    }
+
+    override suspend fun deleteVerificationTokens(userId: Int) {
+        withContext(Dispatchers.IO) {
+            transaction {
+                EmailVerificationTokens.deleteWhere { EmailVerificationTokens.userId eq userId }
+            }
+        }
+    }
+
+    override suspend fun getVerificationAttemptsToday(userId: Int): Int {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val startOfDay = getStartOfDayMillis()
+                EmailVerificationAttempts.selectAll()
+                    .where { (EmailVerificationAttempts.userId eq userId) and (EmailVerificationAttempts.createdAt greaterEq startOfDay) }
+                    .count()
+                    .toInt()
+            }
+        }
+    }
+
+    override suspend fun recordVerificationAttempt(userId: Int) {
+        withContext(Dispatchers.IO) {
+            transaction {
+                EmailVerificationAttempts.insert {
+                    it[EmailVerificationAttempts.userId] = userId
+                    it[EmailVerificationAttempts.createdAt] = clock.now().toEpochMilliseconds()
+                }
+            }
+        }
+    }
+
+    override suspend fun getLatestVerificationToken(userId: Int): EmailVerificationTokenInfo? {
+        val result = withContext(Dispatchers.IO) {
+            transaction {
+                EmailVerificationTokens
+                    .selectAll()
+                    .where { EmailVerificationTokens.userId eq userId }
+                    .orderBy(EmailVerificationTokens.createdAt, org.jetbrains.exposed.v1.core.SortOrder.DESC)
+                    .firstOrNull()
+            }
         }
         return result?.let {
             EmailVerificationTokenInfo(
