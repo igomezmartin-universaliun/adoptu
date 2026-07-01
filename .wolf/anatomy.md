@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T04:37:25.473Z
-> Files: 762 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T17:41:32.528Z
+> Files: 764 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -1391,6 +1391,10 @@
 
 - `Shared.kt` — `countrySelect()` now renders `<option>`s from `Country.entries` instead of a hardcoded 112-line list (~3000 tok)
 
+## backend/src/main/kotlin/com/adoptu/plugins/
+
+- `Sessions.kt` — Application (~152 tok)
+
 ## backend/src/main/kotlin/com/adoptu/ports/
 
 - `PetRepositoryPort.kt` — getAll, getAllUnfiltered, getById, create, update (~682 tok)
@@ -1420,6 +1424,10 @@
 ## backend/src/test/kotlin/com/adoptu/services/
 
 - `PetServiceTest.kt` — PetServiceTest: setup (~7228 tok)
+
+## frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
+
+- `IndexPage.kt` — init, loadPets, renderPets (~180 tok)
 
 ## infra/ (OpenTofu - AWS deployment)
 

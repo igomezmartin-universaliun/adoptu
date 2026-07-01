@@ -251,7 +251,7 @@ class UserShelterServiceTest {
         ))
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Updated Name", updated.name)
         assertEquals("Brooklyn", updated.city)
         assertEquals("NY", updated.state)
@@ -279,7 +279,7 @@ class UserShelterServiceTest {
         val result = userShelterService.update(userId, UpdateUserShelterRequest(name = "Updated"))
 
         assertTrue(result is ServiceResult.Success)
-        val updated = (result as ServiceResult.Success).data
+        val updated = result.data
         assertEquals("Updated", updated.name)
         assertEquals("United States", updated.country)
         assertEquals("NY", updated.state)

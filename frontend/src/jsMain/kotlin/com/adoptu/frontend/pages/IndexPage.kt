@@ -17,7 +17,6 @@ object IndexPageModule {
     fun loadPets(): Promise<dynamic> {
         return ApiClientModule.getPets(currentType).then<Unit> { pets ->
             renderPets(pets)
-            pets
         }
     }
 
