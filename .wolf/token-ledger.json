@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-06-21T17:54:59.933Z",
   "lifetime": {
-    "total_tokens_estimated": 2767026,
-    "total_reads": 2386,
-    "total_writes": 1348,
-    "total_sessions": 76,
-    "anatomy_hits": 271,
-    "anatomy_misses": 2083,
-    "repeated_reads_blocked": 767,
-    "estimated_savings_vs_bare_cli": 1877874
+    "total_tokens_estimated": 2767562,
+    "total_reads": 2392,
+    "total_writes": 1356,
+    "total_sessions": 78,
+    "anatomy_hits": 273,
+    "anatomy_misses": 2087,
+    "repeated_reads_blocked": 769,
+    "estimated_savings_vs_bare_cli": 1878564
   },
   "sessions": [
     {
@@ -22968,6 +22968,116 @@
         "reads_count": 3,
         "writes_count": 3,
         "repeated_reads_blocked": 0,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-07-01-1136",
+      "started": "2026-07-01T17:36:39.915Z",
+      "ended": "2026-07-01T18:47:16.993Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.gitignore",
+          "tokens_estimated": 145,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.gitignore",
+          "tokens_estimated": 27,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 145,
+        "output_tokens_estimated": 123,
+        "reads_count": 3,
+        "writes_count": 4,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-07-01-1136",
+      "started": "2026-07-01T17:36:39.915Z",
+      "ended": "2026-07-01T18:50:04.174Z",
+      "reads": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.gitignore",
+          "tokens_estimated": 145,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/backend/src/main/kotlin/com/adoptu/plugins/Sessions.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "/home/laf/Proyektes/adoptu/.gitignore",
+          "tokens_estimated": 27,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 145,
+        "output_tokens_estimated": 123,
+        "reads_count": 3,
+        "writes_count": 4,
+        "repeated_reads_blocked": 1,
         "anatomy_lookups": 1
       }
     }
