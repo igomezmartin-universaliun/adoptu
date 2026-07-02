@@ -103,7 +103,7 @@ object MyPetsPageModule {
         val urgent = if (p.isUrgent == true) " ⚠️" else ""
         val breedHtml = if (p.breed != null) "<span class=\"pet-breed\">${CommonModule.escapeHtml(p.breed.toString())}</span>" else ""
         val rescueDateHtml = if (p.rescueDate != null) {
-            val date = js("new Date(p.rescueDate)").asDynamic().toLocaleDateString()
+            val date = js("new Date(p.rescueDate)").toLocaleDateString()
             "<span class=\"label\">${I18n.t("rescued")}</span><span class=\"value\">$date</span>"
         } else ""
         return "<div class=\"pet-card\">$imageHtml<div class=\"pet-card-body\">" +
@@ -148,7 +148,7 @@ object MyPetsPageModule {
             return
         }
         container?.innerHTML = allRequests.joinToString("") { r ->
-            val date = js("new Date(r.createdAt)").asDynamic().toLocaleDateString()
+            val date = js("new Date(r.createdAt)").toLocaleDateString()
             val message = if (r.message != null) CommonModule.escapeHtml(r.message.toString()) else "No message"
             val actions = if (r.status == "PENDING") {
                 "<div class=\"ar-actions\"><button class=\"btn btn-secondary\" onclick=\"approveRequest(${r.id})\">Approve</button>" +
@@ -194,7 +194,7 @@ object MyPetsPageModule {
         (document.getElementById("isHouseTrained") as HTMLInputElement).checked = pet.isHouseTrained == true
         (document.getElementById("rescueLocation") as HTMLInputElement).value = pet.rescueLocation?.toString() ?: ""
         if (pet.rescueDate != null) {
-            val iso = js("new Date(pet.rescueDate)").asDynamic().toISOString().toString()
+            val iso = js("new Date(pet.rescueDate)").toISOString().toString()
             (document.getElementById("rescueDate") as HTMLInputElement).value = iso.split("T")[0]
         }
         (document.getElementById("specialNeeds") as HTMLTextAreaElement).value = pet.specialNeeds?.toString() ?: ""
@@ -350,7 +350,7 @@ object MyPetsPageModule {
         data.isGoodWithCats = (document.getElementById("isGoodWithCats") as HTMLInputElement).checked
         data.isHouseTrained = (document.getElementById("isHouseTrained") as HTMLInputElement).checked
         data.rescueLocation = (document.getElementById("rescueLocation") as HTMLInputElement).value.ifEmpty { null }
-        data.rescueDate = if (rescueDateVal.isNotEmpty()) js("new Date(rescueDateVal)").asDynamic().getTime() else null
+        data.rescueDate = if (rescueDateVal.isNotEmpty()) js("new Date(rescueDateVal)").getTime() else null
         data.specialNeeds = (document.getElementById("specialNeeds") as HTMLTextAreaElement).value.ifEmpty { null }
         data.adoptionFee = adoptionFee
         data.currency = (document.getElementById("currency") as HTMLSelectElement).value

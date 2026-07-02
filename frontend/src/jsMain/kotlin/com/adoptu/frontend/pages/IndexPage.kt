@@ -95,7 +95,7 @@ object IndexPageModule {
             val urgent = if (p.isUrgent == true) " ⚠️" else ""
             val breedHtml = if (p.breed != null) "<span class=\"pet-breed\">${p.breed}</span>" else ""
             val rescueDateHtml = if (p.rescueDate != null) {
-                val date = js("new Date(p.rescueDate)").asDynamic().toLocaleDateString()
+                val date = js("new Date(p.rescueDate)").toLocaleDateString()
                 "<span class=\"label\">${I18n.t("rescued")}</span><span class=\"value\">$date</span>"
             } else ""
             "<a href=\"/pet/${p.id}\" class=\"pet-card\">$imageHtml<div class=\"pet-card-body\">" +
