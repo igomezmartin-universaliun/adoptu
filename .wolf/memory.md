@@ -1112,3 +1112,60 @@
 | 20:50 | Fixed mobile header overlap: `.logo` no longer `position:absolute`, added responsive breakpoints | _layout.scss | fixed, verified via screenshot | ~4000 |
 | 20:50 | Fixed unstyled home-page country dropdown: added missing `@use 'location-search-form'` | style.scss | fixed, verified via screenshot | ~1500 |
 | 20:50 | Recompiled 7 top-level SCSS files affected by _layout.scss/style.scss changes | style.css, shelters.css, policy.css, temporal-home.css, photographers.css, pet-food.css, sterilization.css | compiled clean | ~500 |
+| 21:32 | Session end: 65 writes across 29 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 69 reads | ~96325 tok |
+| 21:33 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/backend/src/test/kotlin/com/adoptu/pages/SharedPageElementsTest.kt | 8→8 lines | ~77 |
+| 21:35 | Session end: 66 writes across 30 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 70 reads | ~96407 tok |
+| 21:43 | Session end: 66 writes across 30 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 70 reads | ~96407 tok |
+| 21:43 | Session end: 66 writes across 30 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 70 reads | ~96407 tok |
+| 21:47 | Session end: 66 writes across 30 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 70 reads | ~96407 tok |
+| 21:50 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/backend/src/main/kotlin/com/adoptu/dto/input/PetDto.kt | 3→3 lines | ~17 |
+
+## Session: 2026-07-02 21:51
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 21:51
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→7 lines | ~117 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→7 lines | ~128 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→7 lines | ~136 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→7 lines | ~124 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 2→7 lines | ~77 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/backend/src/main/kotlin/com/adoptu/pages/PetsPage.kt | modified div() | ~394 |
+| 21:57 | Edited .claude/worktrees/pets-listing-ux/backend/src/main/kotlin/com/adoptu/pages/IndexPage.kt | modified div() | ~394 |
+| 21:58 | Created .claude/worktrees/pets-listing-ux/backend/src/main/resources/static/js/index.js | — | ~1841 |
+| 21:58 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/MyPetsPage.kt | inline fix | ~35 |
+| 21:58 | Edited .claude/worktrees/pets-listing-ux/backend/src/main/scss/style.scss | expanded (+38 lines) | ~212 |
+| 21:59 | Edited .claude/worktrees/pets-listing-ux/backend/src/main/scss/style.scss | expanded (+10 lines) | ~87 |
+| 21:59 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/tests/e2e-verify.spec.ts | modified for() | ~201 |
+| 21:59 | Edited .claude/worktrees/pets-listing-ux/backend/src/main/scss/_location-search-form.scss | expanded (+8 lines) | ~79 |
+| 22:01 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | modified commonScripts() | ~124 |
+| 22:02 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SheltersPage.kt | 2→2 lines | ~44 |
+| 22:02 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminSheltersPage.kt | inline fix | ~58 |
+| 22:02 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SterilizationLocationsPage.kt | 1→2 lines | ~51 |
+| 22:02 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SterilizationLocationsPage.kt | modified joinToString() | ~74 |
+| 22:03 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/TemporalHomePage.kt | added 1 import(s) | ~39 |
+| 22:03 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/TemporalHomePage.kt | added optional chaining | ~41 |
+| 22:04 | Created ../../.claude/jobs/3616329a/tmp/petsui/index.html | — | ~847 |
+| 22:05 | Session end: 21 writes across 14 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~28275 tok |
+| 22:05 | Created ../../.claude/jobs/3616329a/tmp/petsui/check.mjs | — | ~865 |
+| 22:08 | Session end: 22 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~29201 tok |
+| 22:10 | Session end: 22 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~29201 tok |
+| 22:11 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/tests/e2e-verify.spec.ts | "${BASE}/api/pets?status=A" → "${BASE}/api/pets?status=A" | ~26 |
+| 22:11 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/tests/e2e-verify.spec.ts | 5→6 lines | ~115 |
+| 22:12 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/tests/e2e-verify.spec.ts | 2→2 lines | ~43 |
+| 22:16 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/tests/e2e-verify.spec.ts | 20→23 lines | ~296 |
+| 22:17 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:20 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:23 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:26 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:27 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:49 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:49 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:49 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:50 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:55 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
+| 22:55 | Session end: 26 writes across 15 files (I18n.kt, PetsPage.kt, IndexPage.kt, index.js, MyPetsPage.kt) | 23 reads | ~38872 tok |
