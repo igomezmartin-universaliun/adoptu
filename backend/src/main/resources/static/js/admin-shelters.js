@@ -52,7 +52,7 @@ async function loadShelters() {
         container.innerHTML = '<table class="admin-table"><thead><tr><th>' + t('name') + '</th><th>' + t('location') + '</th><th>' + t('contact') + '</th><th>' + t('actions') + '</th></tr></thead><tbody>' +
             shelters.map(s => '<tr>' +
                 '<td><strong>' + escapeHtml(s.name) + '</strong></td>' +
-                '<td>' + escapeHtml(s.city || '') + ', ' + escapeHtml(s.state || '') + ', ' + escapeHtml(s.country || '') + '</td>' +
+                '<td>' + escapeHtml(s.city || '') + ', ' + escapeHtml(s.state || '') + ', ' + escapeHtml(tCountry(s.country) || '') + '</td>' +
                 '<td>' + escapeHtml(s.phone || s.email || '-') + '</td>' +
                 '<td><button class="btn btn-secondary" onclick="editShelter(' + s.id + ')">' + t('edit') + '</button> <button class="btn btn-danger" onclick="deleteShelter(' + s.id + ')">' + t('delete') + '</button></td>' +
                 '</tr>'

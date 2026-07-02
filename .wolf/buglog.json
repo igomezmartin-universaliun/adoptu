@@ -1349,6 +1349,16 @@
       "last_seen": "2026-07-01T12:44:00.000Z"
     },
     {
+      "id": "bug-083",
+      "timestamp": "2026-07-01T17:45:00.000Z",
+      "error_message": "Country names shown on shelter/sterilization-location/temporal-home cards and admin tables always render in English (e.g. \"United States\"), never translated, even though country dropdowns already translate correctly.",
+      "file": "backend/src/main/resources/static/js/shelters.js, admin-shelters.js, sterilization.js, sterilization-locations.js, temporal-home-search.js",
+      "root_cause": "Country.entries + Shared.kt's countrySelect() already wire dropdown <option> text through data-i18n (translated by the live I18n.kt/common.js system), but these 5 hand-written JS files interpolate loc.country/shelter.country/home.country -- the raw English display name returned by the API -- directly into card/table HTML with no translation call at all.",
+      "fix": "Added I18n.translateCountry(name) to frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt (a Kotlin-literal reverse map of lowercase English country name -> \"country.xxx\" key, avoiding fragile js(\"Object.keys(...)\") reflection against IR-mangled/minified top-level vals), exposed it globally via window.tCountry in Shared.kt's commonScripts() (same bridge pattern as window.t), rebuilt common.js with ./gradlew :frontend:jsBrowserProductionWebpack, then wrapped the 5 raw country interpolations with tCountry(...).",
+      "tags": ["i18n", "country", "frontend", "translation"],
+      "related_bugs": ["bug-051"],
+      "occurrences": 1,
+      "last_seen": "2026-07-01T17:45:00.000Z"
       "id": "bug-080",
       "timestamp": "2026-07-01T22:02:32.124Z",
       "error_message": "Incorrect value in code",

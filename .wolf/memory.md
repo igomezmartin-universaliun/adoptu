@@ -943,6 +943,8 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 17:47 | Added I18n.translateCountry() + window.tCountry bridge; wired into 5 raw country renders | I18n.kt, Shared.kt, shelters.js, admin-shelters.js, sterilization.js, sterilization-locations.js, temporal-home-search.js | rebuilt common.js, backend compiles clean | ~3k |
+| 17:47 | Session end: country names now translate on shelter/sterilization/temporal-home cards and admin table | bug-083 logged | ~3k |
 
 ## Session: 2026-07-01 17:32
 
