@@ -13,6 +13,11 @@ fun HTML.indexPage(navParams: NavParams = NavParams()) {
         main {
             h1 { attributes["data-i18n"] = "petsForAdoption"; +"Pets for Adoption" }
             div(classes = "filter-buttons") {
+                label { htmlFor = "pets-country"; attributes["data-i18n"] = "countryLabel"; +"Country" }
+                select { id = "pets-country"; countrySelect("pets-country", true, "selectCountryToSearch") }
+            }
+            p(classes = "location-search-hint") { id = "pets-country-hint"; attributes["data-i18n"] = "selectCountryFirst"; +"Select a country to enable these filters" }
+            div(classes = "filter-buttons") {
                 button(classes = "filter-btn active", type = ButtonType.button) { attributes["data-type"] = ""; attributes["data-i18n"] = "all"; +"All" }
                 button(classes = "filter-btn", type = ButtonType.button) { attributes["data-type"] = "DOG"; +"🐕 Dogs" }
                 button(classes = "filter-btn", type = ButtonType.button) { attributes["data-type"] = "CAT"; +"🐱 Cats" }
@@ -26,6 +31,7 @@ fun HTML.indexPage(navParams: NavParams = NavParams()) {
                     option { value = "FEMALE"; +"♀ Female" }
                 }
             }
+            div(classes = "field-error") { id = "pets-error" }
             div { id = "pets"; classes = setOf("pet-grid"); +"" }
         }
         footer()
