@@ -55,9 +55,11 @@ if (countrySelect) {
     countrySelect.onchange = () => loadPets();
 }
 
-// Default the country dropdown to the logged-in user's saved profile country, if any.
-// No IP geolocation - if the user isn't logged in or has no saved country, the dropdown
-// stays unselected and loadPets() shows the "select a country" prompt until they pick one.
+// Default the country dropdown, in priority order: the logged-in user's saved profile
+// country, then CloudFront's IP-based geolocation header (via /api/detect-country),
+// then the browser's own locale as a fallback for requests that bypass CloudFront (e.g.
+// local dev). If none of these resolve, the dropdown stays unselected and loadPets()
+// shows the "select a country" prompt until the visitor picks one themselves.
 (async function initCountry() {
     if (countrySelect) {
         try {
@@ -66,7 +68,17 @@ if (countrySelect) {
                 countrySelect.value = user.country;
             }
         } catch (e) {
-            // Not logged in or lookup failed - leave the dropdown unselected.
+            // Not logged in or lookup failed - fall through to detection below.
+        }
+        if (!countrySelect.value) {
+            try {
+                const detected = await api.detectCountry(navigator.language);
+                if (detected && detected.country) {
+                    countrySelect.value = detected.country;
+                }
+            } catch (e) {
+                // Detection unavailable - leave the dropdown unselected.
+            }
         }
     }
     loadPets();

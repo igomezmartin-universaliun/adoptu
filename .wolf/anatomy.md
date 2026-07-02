@@ -1443,6 +1443,7 @@
 
 ## backend/src/main/kotlin/com/adoptu/routes/
 
+- `CountryRoutes.kt` — GET /api/detect-country: resolves Country from CloudFront-Viewer-Country header, else browser locale region query param (~120 tok)
 - `PetsRoutes.kt` — Route (~3615 tok)
 - `UsersRoutes.kt` — Data class: UpdateProfileRequest (~3500 tok)
 
@@ -1453,8 +1454,8 @@
 
 ## backend/src/main/resources/static/js/
 
-- `api.js` — Declares api (~2504 tok)
-- `index.js` — emoji: updateCountryHint, loadPets, initCountry (~1036 tok)
+- `api.js` — Declares api; `detectCountry(locale)` calls GET /api/detect-country (~2504 tok)
+- `index.js` — emoji: updateCountryHint, loadPets, initCountry (now falls back user->CloudFront/browser detection->unset) (~1036 tok)
 - `my-pets.js` — API routes: GET (2 endpoints) (~4244 tok)
 - `profile.js` — load: loadPhotographer, loadTemporalHome, loadShelter, loadSterilization (~9709 tok)
 
@@ -1472,7 +1473,7 @@
 
 ## infra/ (OpenTofu - AWS deployment)
 
-- `cloudfront.tf` — 3 distributions: static/dynamic image origins (S3+OAC), app origin is `backend.<domain>` directly (custom origin, `http-only`/8080 — verified to match the live distribution's actual config exactly, NOT an ALB). `backend.<domain>` is internal-only — distinct from the public `api.<domain>` alias, which still goes through this same distribution (~450 tok)
+- `cloudfront.tf` — 3 distributions: static/dynamic image origins (S3+OAC), app origin is `backend.<domain>` directly (custom origin, `http-only`/8080 — verified to match the live distribution's actual config exactly, NOT an ALB). `backend.<domain>` is internal-only — distinct from the public `api.<domain>` alias, which still goes through this same distribution. `default_cache_behavior` uses a custom `all_viewer_plus_country` origin request policy (Managed-AllViewer + whitelisted `CloudFront-Viewer-Country` header) so `GET /api/detect-country` can read IP-based geolocation (~500 tok)
 - `data.tf` — read-only lookups: Route53 zone, ACM cert (us-east-1, CloudFront), ECR repo, default VPC, DB subnet group, rds-monitoring-role (~300 tok)
 - `dns_updater.tf` — EventBridge rule (`ECS Task State Change`, `lastStatus=RUNNING`, filtered to the `adoptu` cluster) -> Lambda that looks up the new task's IPv6 (ecs:DescribeTasks -> ec2:DescribeNetworkInterfaces) and UPSERTs `backend.<domain>`. Fully automatic — no manual DNS step, ever. Source at `lambda/dns_updater/index.py`, zipped via `data.archive_file` (~550 tok)
 - `ecs.tf` — new `adoptu` ECS cluster/service/task def, Fargate, deployed into the IPv6-only subnets; container_port fixed to 8080 (live task def had 80, app actually listens on 8080); no `load_balancer` block (~400 tok)

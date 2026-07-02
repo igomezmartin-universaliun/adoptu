@@ -12,6 +12,7 @@ fun Application.configureRouting() {
         }
         uiRoutes()
         authRoutes()
+        countryRoutes()
         petsRoutes()
         usersRoutes()
         adminUsersRoutes()

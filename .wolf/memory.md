@@ -1007,3 +1007,4 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 21:00 | Added country auto-detect (CloudFront-Viewer-Country header + browser locale fallback) to pet search country dropdown | Country.kt, CountryRoutes.kt, Routing.kt, api.js, index.js, cloudfront.tf | Backend compiles + tests pass; tofu validate clean; not yet deployed (needs tofu apply) | ~55k |

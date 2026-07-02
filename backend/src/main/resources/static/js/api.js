@@ -10,6 +10,9 @@ const api = {
     },
     async me() { return this.fetch('/api/auth/me'); },
     async logout() { return this.fetch('/api/auth/logout', { method: 'POST' }); },
+    async detectCountry(locale) {
+        return this.fetch('/api/detect-country' + (locale ? '?locale=' + encodeURIComponent(locale) : ''));
+    },
     async getPets(type, country) {
         const params = new URLSearchParams();
         if (type) params.append('type', type);
