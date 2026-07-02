@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T04:16:49.284Z
-> Files: 830 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T05:12:13.321Z
+> Files: 832 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -22,6 +22,11 @@
 ## ../../.claude/plans/
 
 - `enumerated-yawning-cloud.md` — Country enum as single source of truth (~1699 tok)
+
+## ../../.claude/projects/-home-laf-Proyektes-adoptu/memory/
+
+- `feedback_background_job_merge_restriction.md` (~405 tok)
+- `MEMORY.md` (~131 tok)
 
 ## ./
 
@@ -404,7 +409,7 @@
 
 ## .claude/worktrees/country-detect/.wolf/
 
-- `anatomy.md` — anatomy.md (~18171 tok)
+- `anatomy.md` — anatomy.md (~19416 tok)
 - `cerebrum.md` — Cerebrum (~9898 tok)
 
 ## .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/common/
@@ -1081,7 +1086,7 @@
 - `AdminPage.kt` — init, switchTab, loadUsers, renderUsers, showBanModal (~1801 tok)
 - `AdminSheltersPage.kt` — init, loadShelters, renderShelters, showMessage, getFormData (~2981 tok)
 - `AuthFlowPages.kt` — init, submit, init, tokenFromUrl, submit (~2010 tok)
-- `IndexPage.kt` — init, loadPets, updateCountryHint, renderPets (~1380 tok)
+- `IndexPage.kt` — init, loadPets, updateCountryHint, showEmptyState, hideEmptyState (~2240 tok)
 - `MyPetsPage.kt` — init, clampNonNegative, load, onPetsLoaded, renderPetCard (~5802 tok)
 - `PetDetailPage.kt` — init, render, renderImages (~2131 tok)
 - `PetFoodPage.kt` — Data class: FoodItem (~1890 tok)
