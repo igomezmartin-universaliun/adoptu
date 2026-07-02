@@ -80,6 +80,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-07-02T03:06:33.312Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-07-02T03:16:51.741Z",
+      "error_message": "Wrong return value",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+      "root_cause": "Was returning: ApiClientModule.getPets(if (currentType.isEmpty())",
+      "fix": "Now returns: ApiClientModule.getPets(currentType.ifEmpty { null",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-02T03:16:51.741Z"
     }
   ]
 }
