@@ -998,6 +998,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-07-02T04:11:57.717Z"
+    },
+    {
+      "id": "bug-060",
+      "timestamp": "2026-07-02T05:12:13.340Z",
+      "error_message": "Missing guard clause",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt",
+      "root_cause": "No early return/throw for edge case: sentinel == null || renderedCount >= allPets.size",
+      "fix": "Added guard clause: if (sentinel == null || renderedCount >= all)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-02T05:12:13.340Z"
     }
   ]
 }
