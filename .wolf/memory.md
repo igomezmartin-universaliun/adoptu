@@ -1056,3 +1056,21 @@
 | 21:07 | Session end: 19 writes across 13 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 48 reads | ~37405 tok |
 | 21:08 | Session end: 19 writes across 13 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 49 reads | ~37405 tok |
 | 21:09 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | modified searchTemporalHomes() | ~289 |
+| 21:11 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PetDetailPage.kt | — | ~2131 |
+| 21:11 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SheltersPage.kt | — | ~1260 |
+| 21:12 | Session end: 22 writes across 16 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 53 reads | ~43851 tok |
+| 21:12 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PhotographersPage.kt | — | ~1669 |
+| 21:12 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SterilizationLocationsPage.kt | — | ~2562 |
+| 21:13 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/TemporalHomePage.kt | — | ~1300 |
+| 21:13 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminSheltersPage.kt | — | ~2948 |
+| 21:14 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PetFoodPage.kt | — | ~1880 |
+| 21:15 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AuthFlowPages.kt | — | ~2010 |
+| 21:16 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt | — | ~1373 |
+| 21:16 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | added 3 condition(s) | ~126 |
+| 21:16 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt | 3→3 lines | ~42 |
+| 21:17 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | modified createPhotographyRequest() | ~373 |
+| 21:17 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | added 1 condition(s) | ~162 |
+| 21:18 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/MyPetsPage.kt | — | ~5788 |
+| 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminPage.kt | — | ~1801 |
+| 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Main.kt | — | ~1096 |
+| 21:19 | Session end: 36 writes across 26 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 59 reads | ~77592 tok |

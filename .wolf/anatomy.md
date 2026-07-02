@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T03:06:33.293Z
-> Files: 791 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T03:19:28.456Z
+> Files: 804 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -1043,7 +1043,23 @@
 
 ## .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/
 
+- `ApiClient.kt` — apiFetch, me, logout, getPets, getPet (~2346 tok)
 - `Common.kt` — onCountryChange, initI18n, initDropdowns, checkProfileCompletion, escapeHtml (~1072 tok)
+- `Main.kt` — main (~1096 tok)
+
+## .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
+
+- `AdminPage.kt` — init, switchTab, loadUsers, renderUsers, showBanModal (~1801 tok)
+- `AdminSheltersPage.kt` — init, loadShelters, renderShelters, showMessage, getFormData (~2948 tok)
+- `AuthFlowPages.kt` — init, submit, init, tokenFromUrl, submit (~2010 tok)
+- `IndexPage.kt` — init, loadPets, updateCountryHint, renderPets (~1370 tok)
+- `MyPetsPage.kt` — init, clampNonNegative, load, onPetsLoaded, renderPetCard (~5788 tok)
+- `PetDetailPage.kt` — init, render, renderImages (~2131 tok)
+- `PetFoodPage.kt` — Data class: FoodItem (~1880 tok)
+- `PhotographersPage.kt` — init, search, load, render, createRequestModal (~1669 tok)
+- `SheltersPage.kt` — init, search, renderShelters (~1260 tok)
+- `SterilizationLocationsPage.kt` — init, search, render, locationCard, init (~2562 tok)
+- `TemporalHomePage.kt` — init, search, displayResults, init, loadRequests (~1300 tok)
 
 ## .claude/worktrees/mutable-enchanting-moler/scripts/
 
