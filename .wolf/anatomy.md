@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T03:19:28.456Z
-> Files: 804 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T03:28:20.127Z
+> Files: 817 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -1041,22 +1041,38 @@
 
 - `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
 
+## .claude/worktrees/migrate-legacy-js-to-kotlin/backend/src/main/kotlin/com/adoptu/pages/
+
+- `AdminPage.kt` — HTML (~797 tok)
+- `AdminSheltersPage.kt` — HTML (~1719 tok)
+- `ForgotPasswordPage.kt` — HTML, HTML, HTML, HTML (~994 tok)
+- `IndexPage.kt` — HTML (~632 tok)
+- `MyPetsPage.kt` — HTML (~2296 tok)
+- `PetDetailPage.kt` — HTML (~165 tok)
+- `PetFoodPage.kt` — Data class: FoodCategory (~2063 tok)
+- `PetsPage.kt` — HTML (~632 tok)
+- `PhotographersPage.kt` — HTML (~346 tok)
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~1977 tok)
+- `SheltersPage.kt` — HTML (~367 tok)
+- `SterilizationLocationsPage.kt` — HTML, HTML (~1559 tok)
+- `TemporalHomePage.kt` — HTML, HTML (~486 tok)
+
 ## .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/
 
 - `ApiClient.kt` — apiFetch, me, logout, getPets, getPet (~2346 tok)
-- `Common.kt` — onCountryChange, initI18n, initDropdowns, checkProfileCompletion, escapeHtml (~1072 tok)
+- `Common.kt` — NodeList, onCountryChange, initI18n, initDropdowns, checkProfileCompletion (~1110 tok)
 - `Main.kt` — main (~1096 tok)
 
 ## .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/
 
 - `AdminPage.kt` — init, switchTab, loadUsers, renderUsers, showBanModal (~1801 tok)
-- `AdminSheltersPage.kt` — init, loadShelters, renderShelters, showMessage, getFormData (~2948 tok)
+- `AdminSheltersPage.kt` — init, loadShelters, renderShelters, showMessage, getFormData (~2972 tok)
 - `AuthFlowPages.kt` — init, submit, init, tokenFromUrl, submit (~2010 tok)
-- `IndexPage.kt` — init, loadPets, updateCountryHint, renderPets (~1370 tok)
-- `MyPetsPage.kt` — init, clampNonNegative, load, onPetsLoaded, renderPetCard (~5788 tok)
+- `IndexPage.kt` — init, loadPets, updateCountryHint, renderPets (~1380 tok)
+- `MyPetsPage.kt` — init, clampNonNegative, load, onPetsLoaded, renderPetCard (~5796 tok)
 - `PetDetailPage.kt` — init, render, renderImages (~2131 tok)
-- `PetFoodPage.kt` — Data class: FoodItem (~1880 tok)
-- `PhotographersPage.kt` — init, search, load, render, createRequestModal (~1669 tok)
+- `PetFoodPage.kt` — Data class: FoodItem (~1890 tok)
+- `PhotographersPage.kt` — init, search, load, render, createRequestModal (~1680 tok)
 - `SheltersPage.kt` — init, search, renderShelters (~1260 tok)
 - `SterilizationLocationsPage.kt` — init, search, render, locationCard, init (~2562 tok)
 - `TemporalHomePage.kt` — init, search, displayResults, init, loadRequests (~1300 tok)

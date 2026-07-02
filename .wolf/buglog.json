@@ -96,6 +96,54 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-07-02T03:16:51.741Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-07-02T03:24:06.386Z",
+      "error_message": "Significant refactor of ",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/backend/src/main/kotlin/com/adoptu/pages/ForgotPasswordPage.kt",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5→3 lines (2 removed) | Also: script(src = \"/static/js/crypto.js\") {}; script(src = \"/static/js/reset-password.js\") {}",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-07-02T03:24:07.837Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-07-02T03:25:20.768Z",
+      "error_message": "Null/undefined access in ",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminSheltersPage.kt",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-02T03:25:20.768Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-07-02T03:27:17.605Z",
+      "error_message": "Null/undefined access in ",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Common.kt",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-02T03:27:17.605Z"
     }
   ]
 }
