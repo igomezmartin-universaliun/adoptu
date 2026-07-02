@@ -1359,6 +1359,8 @@
       "related_bugs": ["bug-051"],
       "occurrences": 1,
       "last_seen": "2026-07-01T17:45:00.000Z"
+    },
+    {
       "id": "bug-080",
       "timestamp": "2026-07-01T22:02:32.124Z",
       "error_message": "Incorrect value in code",
@@ -1474,6 +1476,18 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-07-01T23:42:21.139Z"
+    },
+    {
+      "id": "bug-087",
+      "timestamp": "2026-07-01T20:45:00.000Z",
+      "error_message": "Home page country dropdown rendered as unstyled native white select clashing with dark theme; mobile header logo wordmark overlapped Donate/Login and logo image overflowed past the fixed header",
+      "file": "backend/src/main/scss/style.scss, backend/src/main/scss/_layout.scss",
+      "root_cause": "(1) style.scss never @use'd the _location-search-form.scss partial (unlike shelters.scss/policy.scss/temporal-home.scss/photographers.scss/sterilization.scss), so .location-search-country select had no dark-theme styling on any page loading only style.css. (2) .logo used position:absolute with a vw-sized image and an absolutely-positioned wordmark span at a fixed 2rem font-size, reserving zero layout space in the header's flexbox, so on narrow viewports the wordmark visually collided with nav-right items and the image overflowed past the header's 70px height.",
+      "fix": "Added '@use location-search-form;' to style.scss. Rewrote .logo to a normal flex item (no position:absolute, height:44px) and added max-width:640px/400px media queries to shrink/hide the wordmark on small screens. Recompiled all 7 top-level .scss files that @use _layout.scss with the vendored dart-sass binary, then verified both fixes visually via openwolf designqc against a local :backend:run instance on port 8090.",
+      "tags": ["css", "scss", "look-and-feel", "responsive", "mobile", "header", "logo"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-01T20:45:00.000Z"
     }
   ]
 }
