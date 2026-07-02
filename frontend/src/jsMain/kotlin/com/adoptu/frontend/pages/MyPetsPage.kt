@@ -71,7 +71,7 @@ object MyPetsPageModule {
         val filterType = params.get("filter") as? String
         if (!filterType.isNullOrEmpty()) pets = pets.filter { it.type == filterType }.toTypedArray()
         val roles = user.activeRoles as? Array<String>
-        if (roles?.contains("ADMIN") != true) pets = pets.filter { it.rescuerId == user.id }.toTypedArray()
+        if (roles?.contains("ADMIN") != true) pets = pets.filter { it.rescuerId.toString() == user.id.toString() }.toTypedArray()
 
         val container = document.getElementById("pets").unsafeCast<HTMLElement?>()
         container?.innerHTML = if (pets.isNotEmpty()) {

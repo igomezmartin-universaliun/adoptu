@@ -114,11 +114,19 @@ test.describe('1 · Test data', () => {
   });
 
   test('pets endpoint returns pets', async ({ page }) => {
-    const res = await page.request.get(`${BASE}/api/pets`);
-    expect(res.status()).toBe(200);
-    const pets = await res.json();
-    expect(Array.isArray(pets)).toBe(true);
-    expect(pets.length).toBeGreaterThanOrEqual(100);
+    // /api/pets requires a country filter; the seed data's 200 pets are split
+    // across a handful of countries, so query the total across the countries
+    // the fixture uses rather than assuming one country has >=100 on its own.
+    const countries = ['MEXICO', 'ARGENTINA', 'COLOMBIA', 'CHILE'];
+    let total = 0;
+    for (const country of countries) {
+      const res = await page.request.get(`${BASE}/api/pets?country=${country}`);
+      expect(res.status()).toBe(200);
+      const pets = await res.json();
+      expect(Array.isArray(pets)).toBe(true);
+      total += pets.length;
+    }
+    expect(total).toBeGreaterThanOrEqual(100);
   });
 
   test('photographers endpoint returns data', async ({ page }) => {
