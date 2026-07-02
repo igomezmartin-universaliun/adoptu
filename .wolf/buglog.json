@@ -64,6 +64,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-07-02T02:59:14.179Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-07-02T03:06:33.312Z",
+      "error_message": "Missing guard clause",
+      "file": ".claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Common.kt",
+      "root_cause": "No early return/throw for edge case: s == null",
+      "fix": "Added guard clause: if (s == null)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "kt"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-07-02T03:06:33.312Z"
     }
   ]
 }

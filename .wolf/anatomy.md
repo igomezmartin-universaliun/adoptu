@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T02:59:35.001Z
-> Files: 790 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T03:06:33.293Z
+> Files: 791 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -1040,6 +1040,10 @@
 ## .claude/worktrees/memoized-herding-badger/backend/src/main/kotlin/com/adoptu/services/crypto/
 
 - `CryptoService.kt` — getOaepParameterSpec, initialize, generateKeyPair, getPublicKey, encrypt (~1031 tok)
+
+## .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `Common.kt` — onCountryChange, initI18n, initDropdowns, checkProfileCompletion, escapeHtml (~1072 tok)
 
 ## .claude/worktrees/mutable-enchanting-moler/scripts/
 
