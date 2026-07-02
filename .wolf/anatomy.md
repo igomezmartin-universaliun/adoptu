@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-01T18:46:21.175Z
-> Files: 764 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T00:07:52.134Z
+> Files: 778 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -426,6 +426,14 @@
 ## .claude/worktrees/country-enum-fix/backend/src/test/kotlin/com/adoptu/services/
 
 - `ShelterServiceTest.kt` — ShelterServiceTest: setup, createTestShelter (~3232 tok)
+
+## .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/backend/src/main/kotlin/com/adoptu/pages/
+
+- `IndexPage.kt` — HTML (~583 tok)
+
+## .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~18544 tok)
 
 ## .claude/worktrees/country-hint-fix-v2/backend/src/main/kotlin/com/adoptu/pages/
 
@@ -1102,6 +1110,31 @@
 
 - `photographers.js` — t: loadPhotographers, createRequestModal, showRequestModal, executedFunction (~2098 tok)
 
+## .claude/worktrees/sprightly-splashing-blum/.wolf/
+
+- `buglog.json` — Declares lives (~18561 tok)
+- `memory.md` — Memory (~22642 tok)
+
+## .claude/worktrees/sprightly-splashing-blum/backend/src/main/kotlin/com/adoptu/pages/
+
+- `Shared.kt` — HTML, A, BODY, DIV, NAV (~2016 tok)
+
+## .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/
+
+- `admin-shelters.js` — escapeHtml: loadShelters, showMessage, getFormData + 4 more (~2284 tok)
+- `shelters.js` — errorDiv: executedFunction (~1290 tok)
+- `sterilization-locations.js` — escapeHtml: loadCountries, loadLocations, showForm + 3 more (~1327 tok)
+- `sterilization.js` — params: executedFunction (~797 tok)
+- `temporal-home-search.js` — params: executedFunction (~504 tok)
+
+## .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/i18n/
+
+- `i18n.js` — i18n: setLang, t (~1017 tok)
+
+## .claude/worktrees/sprightly-splashing-blum/frontend/src/jsMain/kotlin/com/adoptu/frontend/
+
+- `I18n.kt` (~19749 tok)
+
 ## .claude/worktrees/swift-orbiting-crab/
 
 - `.dockerignore` — Docker ignore rules (~0 tok)
@@ -1331,6 +1364,10 @@
 
 - `e2e-verify.spec.ts` — Adoptu — End-to-End Verification Suite (~9827 tok)
 
+## .claude/worktrees/wiggly-dazzling-graham/backend/src/main/kotlin/com/adoptu/pages/
+
+- `IndexPage.kt` — HTML (~645 tok)
+
 ## .claude/worktrees/woolly-mixing-catmull/
 
 - `local-start.sh` (~163 tok)
@@ -1351,6 +1388,10 @@
 ## .claude/worktrees/zippy-rolling-cocke/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1961 tok)
+
+## .idea/
+
+- `workspace.xml` (~7543 tok)
 
 ## backend/ (canonical)
 

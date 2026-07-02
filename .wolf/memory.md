@@ -898,9 +898,114 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 
+## Session: 2026-07-01 13:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 13:52
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 13:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 13:54
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 14:00
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 14:45
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:52 | Re-verified bug-079 (kotlinStoreYarnLock lock-file error) | kotlin-js-store/yarn.lock | CLI build clean, UP-TO-DATE; likely IDEA stale Gradle cache (see S116) | ~400 |
+
+## Session: 2026-07-01 14:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:02 | Edited .idea/workspace.xml | inline fix | ~68 |
+| 16:02 | Fixed IntelliJ-only kotlinStoreYarnLock failure (bug-080) | .idea/workspace.xml | Updated stale Gradle 8.14.4 pin to 9.6.1 to match wrapper | ~600 |
+| 16:05 | Session end: 1 writes across 1 files (workspace.xml) | 1 reads | ~72 tok |
+| 17:10 | Actually fixed kotlinStoreYarnLock clean-build failure (bug-081) | kotlin-js-store/yarn.lock | Regenerated lock to match toolchain yarn format, verified deterministic, committed eb6dceb | ~1200 |
+| 17:03 | Session end: 1 writes across 1 files (workspace.xml) | 1 reads | ~72 tok |
+
 ## Session: 2026-07-01 17:32
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 17:47 | Added I18n.translateCountry() + window.tCountry bridge; wired into 5 raw country renders | I18n.kt, Shared.kt, shelters.js, admin-shelters.js, sterilization.js, sterilization-locations.js, temporal-home-search.js | rebuilt common.js, backend compiles clean | ~3k |
 | 17:47 | Session end: country names now translate on shelter/sterilization/temporal-home cards and admin table | bug-083 logged | ~3k |
+
+## Session: 2026-07-01 17:32
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 17:33
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-01 17:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 17:35 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/i18n/i18n.js | added optional chaining | ~145 |
+| 17:35 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/i18n/i18n.js | modified t() | ~32 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/sterilization-locations.js | 2→2 lines | ~53 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/sterilization-locations.js | inline fix | ~26 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/shelters.js | inline fix | ~33 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/sterilization.js | inline fix | ~40 |
+| 17:36 | Edited .claude/worktrees/wiggly-dazzling-graham/backend/src/main/kotlin/com/adoptu/pages/IndexPage.kt | modified div() | ~232 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/admin-shelters.js | inline fix | ~41 |
+| 17:36 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/temporal-home-search.js | inline fix | ~86 |
+| 17:37 | Session end: 9 writes across 7 files (i18n.js, sterilization-locations.js, shelters.js, sterilization.js, IndexPage.kt) | 12 reads | ~1348 tok |
+| 17:40 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/i18n/i18n.js | removed 14 lines | ~11 |
+| 17:40 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/resources/static/js/i18n/i18n.js | modified t() | ~13 |
+| 17:42 | Edited .claude/worktrees/sprightly-splashing-blum/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | added 1 condition(s) | ~1357 |
+| 17:42 | Edited .claude/worktrees/sprightly-splashing-blum/backend/src/main/kotlin/com/adoptu/pages/Shared.kt | "window.isLoggedInGlobal =" → "window.isLoggedInGlobal =" | ~98 |
+| 17:44 | Edited .claude/worktrees/sprightly-splashing-blum/.wolf/buglog.json | expanded (+12 lines) | ~479 |
+| 17:45 | Edited .claude/worktrees/sprightly-splashing-blum/.wolf/memory.md | expanded (+7 lines) | ~211 |
+| 17:46 | Session end: 15 writes across 11 files (i18n.js, sterilization-locations.js, shelters.js, sterilization.js, IndexPage.kt) | 21 reads | ~4806 tok |
+
+## Session: 2026-07-01 17:56
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 18:05
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/backend/src/main/kotlin/com/adoptu/pages/IndexPage.kt | modified div() | ~449 |
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~39 |
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~42 |
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~45 |
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~41 |
+| 18:07 | Edited .claude/worktrees/country-hint-fix-v2/.claude/worktrees/fix-pets-country-selector/frontend/src/jsMain/kotlin/com/adoptu/frontend/I18n.kt | 1→2 lines | ~24 |
+| 18:09 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 3 reads | ~686 tok |
+| 18:21 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 5 reads | ~4120 tok |
+| 19:22 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 5 reads | ~4120 tok |
+| 19:36 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 5 reads | ~4120 tok |
+| 19:38 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 5 reads | ~4120 tok |
+| 20:12 | Session end: 6 writes across 2 files (IndexPage.kt, I18n.kt) | 5 reads | ~4120 tok |
+
+## Session: 2026-07-02 20:13
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 20:13
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
