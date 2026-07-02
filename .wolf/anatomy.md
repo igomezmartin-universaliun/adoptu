@@ -1550,3 +1550,5 @@
 - `terraform.tfvars.example` — sample values matching the live account (~60 tok)
 - `variables.tf` — all configurable inputs: region/profile, domain, container image/port, RDS sizing, db_app_password (sensitive, no default) (~700 tok)
 - `versions.tf` — OpenTofu/AWS+archive provider version pins, backend notes (local by default) (~170 tok)
+- `_layout.scss` — Header/logo/nav/footer/dropdowns. `.logo` now normal flex flow (was `position:absolute`, causing the image to overflow past the fixed 70px header and the wordmark to drift into the nav-right area on mobile). Added `@media (max-width:640px)` (shrink logo/donate) and `@media (max-width:400px)` (hide wordmark, icon-only) so header items never overlap/overflow on phones (~2000 tok)
+- `style.scss` — now `@use`s `location-search-form` (was missing, so `.location-search-country select` — the home-page country dropdown — rendered as an unstyled native white control on any page loading only `style.css`, e.g. IndexPage) (~2500 tok)

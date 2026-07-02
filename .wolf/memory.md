@@ -1073,3 +1073,8 @@
 | 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminPage.kt | — | ~1801 |
 | 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Main.kt | — | ~1096 |
 | 21:19 | Session end: 36 writes across 26 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 59 reads | ~77592 tok |
+| 20:40 | designqc: captured 2 screenshots (52KB, ~5000 tok) | / | ready for eval | ~0 |
+| 20:47 | designqc: captured 2 screenshots (51KB, ~5000 tok) | / | ready for eval | ~0 |
+| 20:50 | Fixed mobile header overlap: `.logo` no longer `position:absolute`, added responsive breakpoints | _layout.scss | fixed, verified via screenshot | ~4000 |
+| 20:50 | Fixed unstyled home-page country dropdown: added missing `@use 'location-search-form'` | style.scss | fixed, verified via screenshot | ~1500 |
+| 20:50 | Recompiled 7 top-level SCSS files affected by _layout.scss/style.scss changes | style.css, shelters.css, policy.css, temporal-home.css, photographers.css, pet-food.css, sterilization.css | compiled clean | ~500 |

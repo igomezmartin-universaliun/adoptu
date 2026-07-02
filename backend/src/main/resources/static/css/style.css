@@ -210,10 +210,11 @@ main {
 header {
   background: var(--card-bg);
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -229,9 +230,10 @@ header a {
 header nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-left: 2rem;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-left {
@@ -247,6 +249,29 @@ header nav {
   margin-left: auto;
 }
 
+@media (max-width: 640px) {
+  header {
+    padding: 0.5rem 0.75rem;
+  }
+  .logo span {
+    font-size: 1.1rem;
+  }
+  .logo img {
+    height: 36px;
+  }
+  .nav-right {
+    gap: 0.5rem;
+  }
+  #nav-donate {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+}
+@media (max-width: 400px) {
+  .logo span {
+    display: none;
+  }
+}
 #nav-donate {
   background-color: #ff6b6b;
   color: white;
@@ -353,27 +378,20 @@ header nav {
 }
 
 .logo {
-  position: absolute;
-  top: 10px;
-  left: 20px;
   display: flex;
   align-items: center;
-  height: 84px;
+  gap: 0.6rem;
+  height: 44px;
+  flex-shrink: 0;
   white-space: nowrap;
+  margin: 0;
 }
 .logo img {
-  min-width: 10vw;
-  max-width: 20vw;
   width: auto;
   height: 100%;
 }
 .logo span {
-  position: absolute;
-  left: 100%;
-  top: 30%;
-  transform: translateY(-50%);
-  margin-left: 0.75rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
@@ -532,6 +550,84 @@ footer span {
 }
 .resources-dropdown:hover .resources-dropdown-content {
   display: block;
+}
+
+.location-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.location-search-form .location-search-country {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.location-search-form .location-search-country label {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.location-search-form .location-search-country select {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+}
+.location-search-form .location-search-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.location-search-form .location-search-filters .location-search-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #888);
+  font-style: italic;
+}
+.location-search-form .location-search-filters .location-search-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 200px;
+}
+.location-search-form .location-search-filters .location-search-filter label {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.location-search-form .location-search-filters .location-search-filter input {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  width: 100%;
+}
+.location-search-form .location-search-filters .location-search-filter:has(input[id=search-zip]) {
+  flex: 0 0 7rem;
+}
+@media (max-width: 800px) {
+  .location-search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .location-search-form .location-search-country select,
+.location-search-form .location-search-filters {
+    width: 100%;
+  }
+  .location-search-form .location-search-filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .location-search-form .location-search-filters input {
+    width: 100%;
+  }
+  .location-search-form .location-search-filters .location-search-filter:has(input[id=search-zip]) {
+    flex: auto;
+  }
 }
 
 form {
