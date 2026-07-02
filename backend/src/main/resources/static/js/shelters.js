@@ -25,7 +25,7 @@ window.searchShelters = async function() {
         }
         
         container.innerHTML = shelters.map(shelter => {
-            const location = [shelter.city, shelter.state, shelter.country].filter(Boolean).join(', ');
+            const location = [shelter.city, shelter.state, tCountry(shelter.country)].filter(Boolean).join(', ');
             const hasDonationInfo = shelter.bankName || shelter.accountNumber || shelter.iban;
             
             return '<div class="shelter-card">' +

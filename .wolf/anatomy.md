@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T00:07:52.134Z
-> Files: 778 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-07-02T02:59:35.001Z
+> Files: 790 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../.claude/jobs/34544b15/tmp/
 
@@ -396,6 +396,32 @@
 
 - `EmailVerificationPage.kt` — HTML (~1236 tok)
 - `Shared.kt` — HTML, A, BODY, DIV, NAV (~3173 tok)
+
+## .claude/worktrees/country-detect/.wolf/
+
+- `anatomy.md` — anatomy.md (~18171 tok)
+- `cerebrum.md` — Cerebrum (~9898 tok)
+
+## .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/common/
+
+- `Country.kt` — Country: fromDisplayName, fromIso2, normalize (~1783 tok)
+
+## .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/plugins/
+
+- `Routing.kt` — Ktor routing (~186 tok)
+
+## .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/routes/
+
+- `CountryRoutes.kt` — Route, regionFromLocale (~276 tok)
+
+## .claude/worktrees/country-detect/backend/src/main/resources/static/js/
+
+- `api.js` — Declares api (~2546 tok)
+- `index.js` — emoji: updateCountryHint, loadPets, initCountry (~1192 tok)
+
+## .claude/worktrees/country-detect/infra/
+
+- `cloudfront.tf` (~2963 tok)
 
 ## .claude/worktrees/country-enum-fix/.wolf/
 
@@ -993,6 +1019,19 @@
 ## .claude/worktrees/layout-fix/backend/src/main/scss/
 
 - `_layout.scss` — Styles: 11 rules (~1915 tok)
+
+## .claude/worktrees/look-and-feel/
+
+- `.gitignore` — Git ignore rules (~202 tok)
+
+## .claude/worktrees/look-and-feel/.wolf/
+
+- `buglog.json` — Declares lives (~20296 tok)
+
+## .claude/worktrees/look-and-feel/backend/src/main/scss/
+
+- `_layout.scss` — Styles: 13 rules (~2018 tok)
+- `style.scss` — Styles: 45 rules (~2524 tok)
 
 ## .claude/worktrees/memoized-herding-badger/.wolf/
 
