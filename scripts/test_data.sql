@@ -533,3 +533,16 @@ INSERT INTO pets (rescuer_id, name, type, breed, description, weight, age_years,
 (11,'Tetra',   'FISH','Neón Tetra',           'Tetra brilla en la oscuridad del acuario.',       0.002,0,2,'MALE', 'AVAILABLE','Azul neón', 'SMALL','Luminoso', false,false, NULL,                                  false, false, false, true,  'LOW',    1749340800000,'Monterrey, NL',            80.00,'MXN',false,false,1749340800000),
 (12,'Burbuja', 'FISH','Goldfish Oranda',      'Burbuja tiene la cabeza más grande del acuario.',  0.06,1,0,'FEMALE','AVAILABLE','Naranja', 'SMALL', 'Cómica',   false,false, NULL,                                  false, false, false, true,  'LOW',    1749340800000,'Lima, Perú',              0.00,'PEN', false,false,1749340800000),
 (13,'Milo',    'DOG','Mestizo',               'Milo fue encontrado en la puerta del refugio.',   13.0,1,0,'MALE',  'AVAILABLE','Café y blanco','MEDIUM','Misterioso',false,false,'Antirrábica',                          true,  true,  true,  false, 'MEDIUM', 1750550400000,'La Boca, CABA',           0.00,'ARS', true, false,1750550400000);
+
+-- Backfill pets.country from currency: this seed data predates the mandatory
+-- country-based search feature, so every row above left country NULL. Each
+-- currency used here maps to exactly one country, so it's an unambiguous
+-- backfill (unlike the free-text rescue_location column, which isn't).
+UPDATE pets SET country = CASE currency
+    WHEN 'MXN' THEN 'MEXICO'
+    WHEN 'ARS' THEN 'ARGENTINA'
+    WHEN 'COP' THEN 'COLOMBIA'
+    WHEN 'CLP' THEN 'CHILE'
+    WHEN 'PEN' THEN 'PERU'
+END
+WHERE country IS NULL;

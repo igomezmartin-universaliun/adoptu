@@ -53,7 +53,8 @@ private fun locationCard(loc: dynamic, includeActions: Boolean): String {
     val address = if (includeActions) CommonModule.escapeHtml(loc.address?.toString()) else loc.address.toString()
     val city = if (includeActions) CommonModule.escapeHtml(loc.city?.toString()) else loc.city.toString()
     val state = loc.state?.toString()?.takeIf { it.isNotEmpty() }?.let { if (includeActions) CommonModule.escapeHtml(it) else it }
-    val country = if (includeActions) CommonModule.escapeHtml(loc.country?.toString()) else loc.country.toString()
+    val translatedCountry = I18n.translateCountry(loc.country?.toString())
+    val country = if (includeActions) CommonModule.escapeHtml(translatedCountry) else translatedCountry.toString()
     val sb = StringBuilder()
     sb.append("<div class=\"location-card card-bg\"><h3>$name</h3>")
     sb.append("<p class=\"location-address\">$address, $city${if (state != null) ", $state" else ""}, $country</p>")
@@ -89,7 +90,9 @@ object AdminSterilizationLocationsPageModule {
             res.json().then { data: dynamic ->
                 val select = document.getElementById("form-country") as? HTMLSelectElement
                 val countries = data.countries as? Array<dynamic> ?: arrayOf()
-                val options = countries.joinToString("") { c -> "<option value=\"$c\">$c</option>" }
+                val options = countries.joinToString("") { c ->
+                    "<option value=\"$c\">${CommonModule.escapeHtml(I18n.translateCountry(c.toString()))}</option>"
+                }
                 select?.innerHTML = "<option value=\"\">${I18n.t("selectCountry")}</option>$options"
             }
         }

@@ -81,7 +81,7 @@ object AdminSheltersPageModule {
         val rows = list.joinToString("") { s ->
             val contact = s.phone ?: s.email ?: "-"
             "<tr><td><strong>${CommonModule.escapeHtml(s.name?.toString())}</strong></td>" +
-                "<td>${CommonModule.escapeHtml(s.city?.toString() ?: "")}, ${CommonModule.escapeHtml(s.state?.toString() ?: "")}, ${CommonModule.escapeHtml(s.country?.toString() ?: "")}</td>" +
+                "<td>${CommonModule.escapeHtml(s.city?.toString() ?: "")}, ${CommonModule.escapeHtml(s.state?.toString() ?: "")}, ${CommonModule.escapeHtml(I18n.translateCountry(s.country?.toString()) ?: "")}</td>" +
                 "<td>${CommonModule.escapeHtml(contact.toString())}</td>" +
                 "<td><button class=\"btn btn-secondary\" onclick=\"editShelter(${s.id})\">${I18n.t("edit")}</button> " +
                 "<button class=\"btn btn-danger\" onclick=\"deleteShelter(${s.id})\">${I18n.t("delete")}</button></td></tr>"

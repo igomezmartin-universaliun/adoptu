@@ -57,7 +57,7 @@ object SheltersPageModule {
             val location = listOfNotNull(
                 shelter.city?.toString()?.takeIf { it.isNotEmpty() },
                 shelter.state?.toString()?.takeIf { it.isNotEmpty() },
-                shelter.country?.toString()?.takeIf { it.isNotEmpty() }
+                I18n.translateCountry(shelter.country?.toString())?.takeIf { it.isNotEmpty() }
             ).joinToString(", ")
             val hasDonationInfo = (shelter.bankName != null) || (shelter.accountNumber != null) || (shelter.iban != null)
 

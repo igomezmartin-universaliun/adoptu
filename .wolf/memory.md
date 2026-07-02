@@ -943,6 +943,8 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 17:47 | Added I18n.translateCountry() + window.tCountry bridge; wired into 5 raw country renders | I18n.kt, Shared.kt, shelters.js, admin-shelters.js, sterilization.js, sterilization-locations.js, temporal-home-search.js | rebuilt common.js, backend compiles clean | ~3k |
+| 17:47 | Session end: country names now translate on shelter/sterilization/temporal-home cards and admin table | bug-083 logged | ~3k |
 
 ## Session: 2026-07-01 17:32
 
@@ -1007,3 +1009,67 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 20:40
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 20:40
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-07-02 20:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 20:45 | Edited .claude/worktrees/look-and-feel/backend/src/main/scss/style.scss | 3→4 lines | ~22 |
+| 20:45 | Edited .claude/worktrees/look-and-feel/backend/src/main/scss/_layout.scss | modified media() | ~294 |
+| 20:45 | Edited .claude/worktrees/look-and-feel/backend/src/main/scss/_layout.scss | CSS: gap, flex-shrink, margin | ~75 |
+| 20:48 | Edited .claude/worktrees/look-and-feel/.gitignore | 2→5 lines | ~41 |
+| 20:52 | Edited .claude/worktrees/look-and-feel/.wolf/buglog.json | 2→4 lines | ~24 |
+| 20:52 | Edited .claude/worktrees/look-and-feel/.wolf/buglog.json | 2→4 lines | ~24 |
+| 20:53 | Edited .claude/worktrees/look-and-feel/.wolf/buglog.json | expanded (+12 lines) | ~488 |
+| 20:53 | Created .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/common/Country.kt | — | ~1783 |
+| 20:54 | Created .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/routes/CountryRoutes.kt | — | ~276 |
+| 20:54 | Edited .claude/worktrees/country-detect/backend/src/main/kotlin/com/adoptu/plugins/Routing.kt | 3→4 lines | ~23 |
+| 20:54 | Edited .claude/worktrees/country-detect/backend/src/main/resources/static/js/api.js | modified me() | ~82 |
+| 20:54 | Edited .claude/worktrees/country-detect/backend/src/main/resources/static/js/index.js | added 2 condition(s) | ~344 |
+| 20:54 | Edited .claude/worktrees/country-detect/infra/cloudfront.tf | expanded (+24 lines) | ~278 |
+| 20:54 | Session end: 13 writes across 10 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 25 reads | ~36365 tok |
+| 20:54 | Edited .claude/worktrees/country-detect/infra/cloudfront.tf | 5→5 lines | ~70 |
+| 20:59 | Edited .claude/worktrees/country-detect/.wolf/anatomy.md | 4→5 lines | ~82 |
+| 20:59 | Edited .claude/worktrees/country-detect/.wolf/anatomy.md | inline fix | ~158 |
+| 20:59 | Edited .claude/worktrees/country-detect/.wolf/anatomy.md | 3→3 lines | ~76 |
+| 20:59 | Edited .claude/worktrees/country-detect/.wolf/cerebrum.md | 1→2 lines | ~348 |
+| 21:00 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 27 reads | ~37150 tok |
+| 21:01 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 27 reads | ~37150 tok |
+| 21:01 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 27 reads | ~37150 tok |
+| 21:03 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 27 reads | ~37150 tok |
+| 21:04 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 37 reads | ~37150 tok |
+| 21:05 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 42 reads | ~37150 tok |
+| 21:05 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 42 reads | ~37150 tok |
+| 21:06 | Session end: 18 writes across 12 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 45 reads | ~37150 tok |
+| 21:06 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Common.kt | added 2 condition(s) | ~238 |
+| 21:07 | Session end: 19 writes across 13 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 48 reads | ~37405 tok |
+| 21:08 | Session end: 19 writes across 13 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 49 reads | ~37405 tok |
+| 21:09 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | modified searchTemporalHomes() | ~289 |
+| 21:11 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PetDetailPage.kt | — | ~2131 |
+| 21:11 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SheltersPage.kt | — | ~1260 |
+| 21:12 | Session end: 22 writes across 16 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 53 reads | ~43851 tok |
+| 21:12 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PhotographersPage.kt | — | ~1669 |
+| 21:12 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/SterilizationLocationsPage.kt | — | ~2562 |
+| 21:13 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/TemporalHomePage.kt | — | ~1300 |
+| 21:13 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminSheltersPage.kt | — | ~2948 |
+| 21:14 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/PetFoodPage.kt | — | ~1880 |
+| 21:15 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AuthFlowPages.kt | — | ~2010 |
+| 21:16 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt | — | ~1373 |
+| 21:16 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | added 3 condition(s) | ~126 |
+| 21:16 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/IndexPage.kt | 3→3 lines | ~42 |
+| 21:17 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | modified createPhotographyRequest() | ~373 |
+| 21:17 | Edited .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/ApiClient.kt | added 1 condition(s) | ~162 |
+| 21:18 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/MyPetsPage.kt | — | ~5788 |
+| 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/pages/AdminPage.kt | — | ~1801 |
+| 21:19 | Created .claude/worktrees/migrate-legacy-js-to-kotlin/frontend/src/jsMain/kotlin/com/adoptu/frontend/Main.kt | — | ~1096 |
+| 21:19 | Session end: 36 writes across 26 files (style.scss, _layout.scss, .gitignore, buglog.json, Country.kt) | 59 reads | ~77592 tok |

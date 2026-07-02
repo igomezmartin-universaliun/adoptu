@@ -2,6 +2,7 @@ package com.adoptu.frontend.pages
 
 import com.adoptu.frontend.ApiClientModule
 import com.adoptu.frontend.CommonModule
+import com.adoptu.frontend.I18n
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
@@ -36,7 +37,7 @@ object TemporalHomeSearchPageModule {
         }
         container?.innerHTML = list.joinToString("") { home ->
             val alias = home.alias?.toString()?.takeIf { it.isNotEmpty() } ?: "Temporal Home"
-            "<div class=\"temporal-home-card\"><h3>$alias</h3><p>${home.city}, ${home.state}, ${home.country}</p>" +
+            "<div class=\"temporal-home-card\"><h3>$alias</h3><p>${home.city}, ${home.state}, ${I18n.translateCountry(home.country?.toString())}</p>" +
                 "<a href=\"/temporal-home/${home.id}\" data-i18n=\"viewDetails\">View Details</a></div>"
         }
     }
